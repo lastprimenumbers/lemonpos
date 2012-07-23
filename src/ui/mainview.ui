@@ -387,7 +387,7 @@
                    <string>Ca&amp;sh</string>
                   </property>
                   <property name="icon">
-                   <iconset resource="mainview.qrc">
+                   <iconset>
                     <normaloff>:/images/icons/images/money.png</normaloff>:/images/icons/images/money.png</iconset>
                   </property>
                   <property name="checked">
@@ -419,7 +419,7 @@
                    <string>Ca&amp;rd</string>
                   </property>
                   <property name="icon">
-                   <iconset resource="mainview.qrc">
+                   <iconset>
                     <normaloff>:/images/icons/images/card.png</normaloff>:/images/icons/images/card.png</iconset>
                   </property>
                  </widget>
@@ -432,7 +432,7 @@
                  <string>&amp;Internal Credit</string>
                 </property>
                 <property name="icon">
-                 <iconset resource="mainview.qrc">
+                 <iconset>
                   <normaloff>:/images/icons/images/owncredit.png</normaloff>:/images/icons/images/owncredit.png</iconset>
                 </property>
                </widget>
@@ -2224,8 +2224,6 @@ p, li { white-space: pre-wrap; }
    <header>../../mibitWidgets/mibitlineedit.h</header>
   </customwidget>
  </customwidgets>
- <resources>
-  <include location="mainview.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

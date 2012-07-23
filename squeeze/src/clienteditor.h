@@ -44,10 +44,12 @@ class ClientEditor : public KDialog
     void setPhone(QString phone) { ui->editClientPhone->setText(phone); };
     void setCell(QString cell) { ui->editClientCell->setText(cell); };
     void setPoints(qulonglong p) { ui->editClientPoints->setText(QString::number(p)); };
+    void setMonthly(double p) { ui->editMonthlyPoints->setText(QString::number(p)); };
     void setDiscount(double d) {ui->editClientDiscount->setText(QString::number(d)); };
     void setPhoto(QPixmap photo) { ui->labelClientPhoto->setPixmap(photo); pix = photo; };
     void setId(long int id) { clientId = id; };
     void setSinceDate(QDate date) { ui->sinceDatePicker->setDate(date); }
+    void setExpiryDate(QDate date) { ui->expiryDatePicker->setDate(date); }
 
     QString getCode(){ return ui->editClientCode->text();};
     QString getName(){ return ui->editClientName->text();};
@@ -55,10 +57,11 @@ class ClientEditor : public KDialog
     QString getPhone(){ return ui->editClientPhone->text();};
     QString getCell(){ return ui->editClientCell->text();};
     qulonglong getPoints() { return ui->editClientPoints->text().toULongLong(); };
+    double getMonthly() { return ui->editMonthlyPoints->text().toDouble(); };
     double  getDiscount() {return ui->editClientDiscount->text().toDouble(); }
     QPixmap getPhoto(){ return pix;};
     QDate   getSinceDate() { return ui->sinceDatePicker->date(); }
-
+    QDate   getExpiryDate() { return ui->expiryDatePicker->date(); }
 
   private slots:
     void changePhoto();

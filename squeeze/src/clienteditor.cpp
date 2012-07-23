@@ -52,6 +52,7 @@ ClientEditor::ClientEditor( QWidget *parent )
     QRegExpValidator * validator = new QRegExpValidator(regexpC, this);
     ui->editClientPoints->setValidator(validator);
     ui->editClientDiscount->setValidator((new QDoubleValidator(0.00, 100.000, 3,ui->editClientDiscount)));
+    ui->editMonthlyPoints->setValidator((new QDoubleValidator(0.00, 1000.000, 3,ui->editMonthlyPoints)));
     ui->editClientCode->setValidator(validator);
 
     ui->editClientCode->setEmptyMessage(i18n("Enter a 6, 12, or 13 digits Bar Code."));

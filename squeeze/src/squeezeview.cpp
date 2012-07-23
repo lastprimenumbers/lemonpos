@@ -2030,11 +2030,14 @@ void squeezeView::clientsViewOnSelected(const QModelIndex & index)
     qulonglong points = model->data(indx, Qt::DisplayRole).toULongLong();
     indx = model->index(row, clientsModel->fieldIndex("discount"));
     double discount = model->data(indx, Qt::DisplayRole).toDouble();
+    indx = model->index(row, clientsModel->fieldIndex("monthly"));
+    double monthly = model->data(indx, Qt::DisplayRole).toDouble();
     indx = model->index(row, clientsModel->fieldIndex("photo"));
     QByteArray photoBA = model->data(indx, Qt::DisplayRole).toByteArray();
     indx = model->index(row, clientsModel->fieldIndex("since"));
     QDate sinceDate = model->data(indx, Qt::DisplayRole).toDate();
-
+    indx = model->index(row, clientsModel->fieldIndex("expiry"));
+    QDate expiryDate = model->data(indx, Qt::DisplayRole).toDate();
     ClientInfo cInfo;
     QPixmap photo;
     photo.loadFromData(photoBA);
@@ -2050,8 +2053,10 @@ void squeezeView::clientsViewOnSelected(const QModelIndex & index)
     clientEditorDlg->setCell(cell);
     clientEditorDlg->setPhoto(photo);
     clientEditorDlg->setPoints(points);
+    clientEditorDlg->setMonthly(monthly);
     clientEditorDlg->setDiscount(discount);
     clientEditorDlg->setSinceDate(sinceDate);
+    clientEditorDlg->setExpiryDate(expiryDate);
 
     if (clientEditorDlg->exec() ) {
       cInfo.id       = id;
@@ -2062,9 +2067,10 @@ void squeezeView::clientsViewOnSelected(const QModelIndex & index)
       cInfo.cell     = clientEditorDlg->getCell();
       photo          = clientEditorDlg->getPhoto();
       cInfo.points   = clientEditorDlg->getPoints();
+      cInfo.monthly   = clientEditorDlg->getMonthly();
       cInfo.discount = clientEditorDlg->getDiscount();
       cInfo.since    = clientEditorDlg->getSinceDate();
-
+      cInfo.expiry    = clientEditorDlg->getExpiryDate();
       cInfo.photo    = Misc::pixmap2ByteArray(new QPixmap(photo));
 
       //Modify data on mysql...
@@ -2500,8 +2506,10 @@ void squeezeView::createClient()
       info.cell     = clientEditorDlg->getCell();
       photo    = clientEditorDlg->getPhoto();
       info.points   = clientEditorDlg->getPoints();
+      info.monthly   = clientEditorDlg->getMonthly();
       info.discount = clientEditorDlg->getDiscount();
       info.since    = QDate::currentDate();
+      info.expiry    = clientEditorDlg->getExpiryDate();
 
       info.photo = Misc::pixmap2ByteArray(new QPixmap(photo));
       if (!db.isOpen()) openDB();

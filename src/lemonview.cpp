@@ -2093,108 +2093,134 @@ void lemonView::finishCurrentTransaction()
     KMessageBox::sorry(this, i18n("Before selling, you must start operations."));
   }
 
-  if (canfinish) // Ticket #52: Allow ZERO DUE.
-  {
-    ui_mainview.editAmount->setStyleSheet("");
-    ui_mainview.editCardNumber->setStyleSheet("");
-    TransactionInfo tInfo;
-    PaymentType      pType;
-    double           payWith = 0.0;
-    double           payTotal = 0.0;
-    double           changeGiven = 0.0;
-    QString          authnumber = "";
-    QString          cardNum = "";
-    QString          paidStr = "'[Not Available]'";
-    QStringList      groupList;
-    
-    payTotal = totalSum;
-    if (ui_mainview.checkCash->isChecked()) {
-      pType = pCash;
-      if (!ui_mainview.editAmount->text().isEmpty()) payWith = ui_mainview.editAmount->text().toDouble();
-      changeGiven = payWith- totalSum;
-    } else if (ui_mainview.checkCard->isChecked()) {
-      pType = pCard;
-      if (ui_mainview.editCardNumber->hasAcceptableInput() ) {
-        cardNum = ui_mainview.editCardNumber->text().replace(0,15,"***************"); //FIXED: Only save last 4 digits;
+  TransactionInfo tInfo;
+  PaymentType      pType;
+  double           payWith = 0.0;
+  double           payTotal = 0.0;
+  double           changeGiven = 0.0;
+  QString          authnumber = "";
+  QString          cardNum = "";
+  QString          paidStr = "'[Not Available]'";
+  QStringList      groupList;
+
+  payTotal = totalSum;
+  if (ui_mainview.checkCash->isChecked()) {
+    pType = pCash;
+    if (!ui_mainview.editAmount->text().isEmpty()) payWith = ui_mainview.editAmount->text().toDouble();
+         changeGiven = payWith- totalSum;
+  } else if (ui_mainview.checkCard->isChecked()) {
+    pType = pCard;
+    if (ui_mainview.editCardNumber->hasAcceptableInput() ) {
+    cardNum = ui_mainview.editCardNumber->text().replace(0,15,"***************"); //FIXED: Only save last 4 digits;
+    }
+    if (ui_mainview.editCardAuthNumber->hasAcceptableInput())
+      authnumber = ui_mainview.editCardAuthNumber->text();
+      payWith = payTotal;
+  } else { //own credit
+    pType = pOwnCredit;
+    payWith = payTotal;
+    changeGiven = 0;
+    ///TODO: Any other ownCredit stuff?
+  }
+
+  tInfo.id = currentTransaction;
+  tInfo.balanceId = currentBalanceId;
+  tInfo.type = 0;//already on db.
+
+  qDebug()<<"FinishingReservation:"<<finishingReservation<<" reservation Payment:"<<reservationPayment;
+  if (finishingReservation)
+      tInfo.amount = totalSum + reservationPayment; //at the transaction the REAL total must be considered (for accountability)
+  else
+      tInfo.amount = totalSum;
+
+  //new feature from biel : Change sale date time
+  bool printDTticket=true;
+  if (!ui_mainview.groupSaleDate->isHidden()) { //not hidden, change date.
+    QDateTime datetime = ui_mainview.editTransactionDate->dateTime();
+    tInfo.date   =  datetime.date();
+    tInfo.time   =  datetime.time();
+    ticket.datetime = datetime;
+    if (!Settings::printChangedDateTicket()) printDTticket = false;
+  } else  { // hidden, keep current date as sale date.
+    tInfo.date   = QDate::currentDate();
+    tInfo.time   = QTime::currentTime();
+    ticket.datetime = QDateTime::currentDateTime();
+  }
+
+  tInfo.paywith= payWith;
+  tInfo.changegiven =changeGiven;
+  tInfo.paymethod = pType;
+  tInfo.state = tCompleted;
+  tInfo.userid = loggedUserId;
+  tInfo.clientid = clientInfo.id;
+  tInfo.cardnumber = cardNum;
+  tInfo.cardauthnum= authnumber;
+  tInfo.itemcount= 0;//later
+  tInfo.itemlist = ""; //at the for..
+  tInfo.disc = clientInfo.discount;
+  tInfo.discmoney = discMoney; //global variable... Now included the oDiscountMoney
+  qDebug()<<"tInfo.disc:"<<tInfo.disc; qDebug()<<" tInfo.discmoney:"<<tInfo.discmoney;
+  tInfo.points = buyPoints; //global variable...
+  tInfo.utility = 0; //later
+  tInfo.terminalnum=Settings::editTerminalNumber();
+  tInfo.providerid = 1; //default... at sale we dont use providers.
+  tInfo.totalTax = totalTax;
+
+  Azahar *myDb = new Azahar;
+  myDb->setDatabase(db);
+  CreditInfo credit;
+  CreditHistoryInfo history;
+
+
+  if (pType == pOwnCredit) {
+      tInfo.state = tCompletedOwnCreditPending; ///setting pending payment status for the OwnCredit.
+      //create the credit record
+      credit = myDb->getCreditInfoForClient(clientInfo.id); //this creates a new one if no one exists for the client.
+      qDebug()<<__FUNCTION__<<" :: Getting credit info...";
+      credit.total += totalSum;
+      // credit will be committed to database after last canfinish check
+      //now create the credit history
+      history.customerId = credit.clientId;
+      history.date = tInfo.date;
+      history.time = tInfo.time;
+      history.amount = totalSum; //history amount + to indicate is a credit. Payments and debit deposits are -.
+      history.saleId = currentTransaction;
+      // history will be committed to database after last canfinish check
+      // Check if client's credit does not exceed monthly credit.
+      if (credit.total + totalSum > clientInfo.monthly) {
+          qDebug()<<__FUNCTION__<<" :: Insufficient monthly credit.";
+          qDebug()<<"  credit.total    :"<<QString::number(credit.total,'f',64);
+          qDebug()<<"  totalSum    :"<<QString::number(totalSum,'f',64);
+          qDebug()<<"  clientInfo.monthly    :"<<QString::number(clientInfo.monthly,'f',64);
+          canfinish = false;
+          QMessageBox::StandardButton override;
+          override=QMessageBox::warning(this,
+                               i18n("Warning: Insufficient Credit for this Transaction"),
+                               i18n("Click Discard to return to modify the transaction, Apply to override credit limit"),
+                               QMessageBox::Apply|QMessageBox::Abort,
+                               QMessageBox::Abort);
+          if ( override  == QMessageBox::Apply ) { canfinish = true; }
       }
-      if (ui_mainview.editCardAuthNumber->hasAcceptableInput())
-        authnumber = ui_mainview.editCardAuthNumber->text();
-      payWith = payTotal;
-    } else { //own credit
-      pType = pOwnCredit;
-      payWith = payTotal;
-      changeGiven = 0;
-      ///TODO: Any other ownCredit stuff?
-    }
+  }
 
-    tInfo.id = currentTransaction;
-    tInfo.balanceId = currentBalanceId;
-    tInfo.type = 0;//already on db.
+  // From now on, transaction must succeed!
+  if (canfinish)
+  {
+      QStringList productIDs; productIDs.clear();
+      int cantidad=0;
+      double utilidad=0;
+      double soGTotal=0; //totals for all so.
+      QDateTime soDeliveryDT;
 
-    qDebug()<<"FinishingReservation:"<<finishingReservation<<" reservation Payment:"<<reservationPayment;
-    if (finishingReservation) 
-        tInfo.amount = totalSum + reservationPayment; //at the transaction the REAL total must be considered (for accountability)
-    else
-        tInfo.amount = totalSum;
+      ui_mainview.editAmount->setStyleSheet("");
+      ui_mainview.editCardNumber->setStyleSheet("");
 
-    //new feature from biel : Change sale date time
-    bool printDTticket=true;
-    if (!ui_mainview.groupSaleDate->isHidden()) { //not hidden, change date.
-      QDateTime datetime = ui_mainview.editTransactionDate->dateTime();
-      tInfo.date   =  datetime.date();
-      tInfo.time   =  datetime.time();
-      ticket.datetime = datetime;
-      if (!Settings::printChangedDateTicket()) printDTticket = false;
-    } else  { // hidden, keep current date as sale date.
-      tInfo.date   = QDate::currentDate();
-      tInfo.time   = QTime::currentTime();
-      ticket.datetime = QDateTime::currentDateTime();
-    }
-    
-    tInfo.paywith= payWith;
-    tInfo.changegiven =changeGiven;
-    tInfo.paymethod = pType;
-    tInfo.state = tCompleted;
-    tInfo.userid = loggedUserId;
-    tInfo.clientid = clientInfo.id;
-    tInfo.cardnumber = cardNum;
-    tInfo.cardauthnum= authnumber;
-    tInfo.itemcount= 0;//later
-    tInfo.itemlist = ""; //at the for..
-    tInfo.disc = clientInfo.discount;
-    tInfo.discmoney = discMoney; //global variable... Now included the oDiscountMoney
-    qDebug()<<"tInfo.disc:"<<tInfo.disc; qDebug()<<" tInfo.discmoney:"<<tInfo.discmoney;
-    tInfo.points = buyPoints; //global variable...
-    tInfo.utility = 0; //later
-    tInfo.terminalnum=Settings::editTerminalNumber();
-    tInfo.providerid = 1; //default... at sale we dont use providers.
-    tInfo.totalTax = totalTax;
-
-    Azahar *myDb = new Azahar;
-    myDb->setDatabase(db);
-    
-    if (pType == pOwnCredit) {
-        tInfo.state = tCompletedOwnCreditPending; ///setting pending payment status for the OwnCredit.
-        //create the credit record
-        CreditInfo credit = myDb->getCreditInfoForClient(clientInfo.id);//this creates a new one if no one exists for the client.
-        qDebug()<<__FUNCTION__<<" :: Getting credit info...";
-        credit.total += totalSum;
+    if (pType == pOwnCredit); {
+        // Commit to db the previously prepared credit record
         myDb->updateCredit(credit);
-        //now create the credit history
-        CreditHistoryInfo history;
-        history.customerId = credit.clientId;
-        history.date = tInfo.date;
-        history.time = tInfo.time;
-        history.amount = totalSum; //history amount + to indicate is a credit. Payments and debit deposits are -.
-        history.saleId = currentTransaction;
+        // Commit to db the previously prepared credit history record
         myDb->insertCreditHistory(history);
     }
-
-    QStringList productIDs; productIDs.clear();
-    int cantidad=0;
-    double utilidad=0;
-    double soGTotal=0; //totals for all so.
-    QDateTime soDeliveryDT;
 
 
     if (finishingReservation) {

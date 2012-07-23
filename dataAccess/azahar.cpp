@@ -1616,9 +1616,10 @@ bool Azahar::insertClient(ClientInfo info)
   if (!db.isOpen()) db.open();
   if (db.isOpen()) {
     QSqlQuery query(db);
-    query.prepare("INSERT INTO clients (name, address, phone, phone_movil, points, discount, photo, since, code) VALUES(:name, :address, :phone, :cell,:points, :discount, :photo, :since, :code)");
+    query.prepare("INSERT INTO clients (name, address, phone, phone_movil, points, monthly, discount, photo, since, expiry, code) VALUES(:name, :address, :phone, :cell,:points, :monthly, :discount, :photo, :since, :expiry, :code)");
     query.bindValue(":photo", info.photo);
     query.bindValue(":points", info.points);
+    query.bindValue(":monthly", info.monthly);
     query.bindValue(":discount", info.discount);
     query.bindValue(":name", info.name);
     query.bindValue(":code", info.code);
@@ -1626,6 +1627,7 @@ bool Azahar::insertClient(ClientInfo info)
     query.bindValue(":phone", info.phone);
     query.bindValue(":cell", info.cell);
     query.bindValue(":since", info.since);
+    query.bindValue(":expiry", info.expiry);
     if (!query.exec()) setError(query.lastError().text()); else result = true;
   }
   return result;
@@ -1636,10 +1638,11 @@ bool Azahar::updateClient(ClientInfo info)
   bool result=false;
   if (!db.isOpen()) db.open();
   QSqlQuery query(db);
-  query.prepare("UPDATE clients SET photo=:photo, name=:name, code=:code, address=:address, phone=:phone, phone_movil=:cell, points=:points, discount=:disc, since=:since  WHERE id=:id;");
+  query.prepare("UPDATE clients SET photo=:photo, name=:name, code=:code, address=:address, phone=:phone, phone_movil=:cell, points=:points, monthly=:monthly, discount=:disc, since=:since, expiry=:expiry WHERE id=:id;");
   query.bindValue(":id", info.id);
   query.bindValue(":photo", info.photo);
   query.bindValue(":points", info.points);
+  query.bindValue(":monthly", info.monthly);
   query.bindValue(":disc", info.discount);
   query.bindValue(":name", info.name);
   query.bindValue(":code", info.code);
@@ -1647,6 +1650,7 @@ bool Azahar::updateClient(ClientInfo info)
   query.bindValue(":phone", info.phone);
   query.bindValue(":cell", info.cell);
   query.bindValue(":since", info.since);
+  query.bindValue(":expiry", info.expiry);
   if (!query.exec()) setError(query.lastError().text()); else result = true;
 
   return result;
@@ -1791,15 +1795,19 @@ QHash<QString, ClientInfo> Azahar::getClientsHash()
         int fieldId     = qC.record().indexOf("id");
         int fieldName   = qC.record().indexOf("name");
         int fieldPoints = qC.record().indexOf("points");
+        int fieldMonthly = qC.record().indexOf("monthly");
         int fieldPhoto  = qC.record().indexOf("photo");
         int fieldDisc   = qC.record().indexOf("discount");
         int fieldSince  = qC.record().indexOf("since");
+        int fieldExpiry  = qC.record().indexOf("expiry");
         info.id = qC.value(fieldId).toUInt();
         info.name       = qC.value(fieldName).toString();
         info.points     = qC.value(fieldPoints).toULongLong();
+        info.monthly   = qC.value(fieldMonthly).toDouble();
         info.discount   = qC.value(fieldDisc).toDouble();
         info.photo      = qC.value(fieldPhoto).toByteArray();
         info.since      = qC.value(fieldSince).toDate();
+        info.expiry      = qC.value(fieldExpiry).toDate();
         result.insert(info.name, info);
         if (info.id == 1) m_mainClient = info.name;
       }

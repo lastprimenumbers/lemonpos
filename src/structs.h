@@ -88,9 +88,11 @@ struct ClientInfo
   QString      phone;
   QString      cell;
   qulonglong   points;
+  double monthly;
   double discount;
   QByteArray   photo;
   QDate        since;
+  QDate        expiry;
 };
 
 struct OfferInfo

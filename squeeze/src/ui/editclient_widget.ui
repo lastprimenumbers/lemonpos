@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>409</width>
-    <height>345</height>
+    <height>473</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -24,7 +24,10 @@
      </property>
     </widget>
    </item>
-   <item row="0" column="2" rowspan="6">
+   <item row="1" column="0" colspan="2">
+    <widget class="MibitLineEdit" name="editClientCode"/>
+   </item>
+   <item row="1" column="3" rowspan="5">
     <widget class="QLabel" name="labelClientPhoto">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
@@ -52,6 +55,16 @@
      </property>
     </widget>
    </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="label_4">
+     <property name="text">
+      <string>&amp;Name:</string>
+     </property>
+     <property name="buddy">
+      <cstring>editClientName</cstring>
+     </property>
+    </widget>
+   </item>
    <item row="3" column="0" colspan="2">
     <widget class="MibitLineEdit" name="editClientName"/>
    </item>
@@ -65,7 +78,7 @@
      </property>
     </widget>
    </item>
-   <item row="5" column="0" colspan="2">
+   <item row="5" column="0" rowspan="2" colspan="3">
     <widget class="QTextEdit" name="editClientAddress">
      <property name="maximumSize">
       <size>
@@ -81,7 +94,14 @@
      </property>
     </widget>
    </item>
-   <item row="6" column="0">
+   <item row="6" column="3" rowspan="2">
+    <widget class="QPushButton" name="btnChangeClientPhoto">
+     <property name="text">
+      <string>Change &amp;Photo</string>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="0">
     <widget class="QLabel" name="label_17">
      <property name="text">
       <string>Phone</string>
@@ -91,7 +111,7 @@
      </property>
     </widget>
    </item>
-   <item row="6" column="1">
+   <item row="7" column="2">
     <widget class="QLabel" name="label_18">
      <property name="text">
       <string>Cell Phone:</string>
@@ -101,7 +121,7 @@
      </property>
     </widget>
    </item>
-   <item row="7" column="0">
+   <item row="8" column="0" colspan="2">
     <widget class="MibitLineEdit" name="editClientPhone">
      <property name="minimumSize">
       <size>
@@ -117,7 +137,7 @@
      </property>
     </widget>
    </item>
-   <item row="7" column="1">
+   <item row="8" column="2">
     <widget class="MibitLineEdit" name="editClientCell">
      <property name="maximumSize">
       <size>
@@ -127,28 +147,28 @@
      </property>
     </widget>
    </item>
-   <item row="7" column="2">
-    <widget class="QPushButton" name="btnChangeClientPhoto">
-     <property name="text">
-      <string>Change &amp;Photo</string>
-     </property>
-    </widget>
-   </item>
-   <item row="8" column="0">
+   <item row="9" column="0">
     <widget class="QLabel" name="label">
      <property name="text">
       <string>Points:</string>
      </property>
     </widget>
    </item>
-   <item row="8" column="1">
+   <item row="9" column="2">
     <widget class="QLabel" name="label_2">
      <property name="text">
       <string>Discount:</string>
      </property>
     </widget>
    </item>
-   <item row="9" column="0">
+   <item row="9" column="3">
+    <widget class="QLabel" name="label_5">
+     <property name="text">
+      <string>Monthly Points:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="10" column="0" colspan="2">
     <widget class="MibitLineEdit" name="editClientPoints">
      <property name="minimumSize">
       <size>
@@ -164,7 +184,7 @@
      </property>
     </widget>
    </item>
-   <item row="9" column="1">
+   <item row="10" column="2">
     <widget class="MibitLineEdit" name="editClientDiscount">
      <property name="maximumSize">
       <size>
@@ -174,24 +194,51 @@
      </property>
     </widget>
    </item>
-   <item row="10" column="0">
+   <item row="10" column="3">
+    <widget class="MibitLineEdit" name="editMonthlyPoints">
+     <property name="maximumSize">
+      <size>
+       <width>100</width>
+       <height>16777215</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+   <item row="11" column="0">
     <widget class="QLabel" name="label_3">
      <property name="text">
       <string>Since:</string>
      </property>
     </widget>
    </item>
-   <item row="11" column="0" colspan="2">
+   <item row="12" column="0" colspan="3">
     <widget class="KDateWidget" name="sinceDatePicker"/>
    </item>
-   <item row="12" column="0" colspan="3">
+   <item row="12" column="3">
+    <widget class="QPushButton" name="editClientLimits">
+     <property name="text">
+      <string>Limits</string>
+     </property>
+    </widget>
+   </item>
+   <item row="13" column="0">
+    <widget class="QLabel" name="label_6">
+     <property name="text">
+      <string>Expiry:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="14" column="0" colspan="3">
+    <widget class="KDateWidget" name="expiryDatePicker"/>
+   </item>
+   <item row="15" column="0" rowspan="2" colspan="4">
     <widget class="Line" name="line">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
     </widget>
    </item>
-   <item row="13" column="0">
+   <item row="16" column="1">
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -206,19 +253,6 @@
       </size>
      </property>
     </spacer>
-   </item>
-   <item row="1" column="0" colspan="2">
-    <widget class="MibitLineEdit" name="editClientCode"/>
-   </item>
-   <item row="2" column="0">
-    <widget class="QLabel" name="label_4">
-     <property name="text">
-      <string>&amp;Name:</string>
-     </property>
-     <property name="buddy">
-      <cstring>editClientName</cstring>
-     </property>
-    </widget>
    </item>
   </layout>
  </widget>
