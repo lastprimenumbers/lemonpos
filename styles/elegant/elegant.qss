@@ -18,19 +18,22 @@
          A workaround is to select an image acording to the screen size. 
          for widescreens at 1280x800. and changed the name below.
 */
-LoginWindow#passwordDialog{
-   background-image: url([STYLE_PATH]passwordBackground_wide.png); /* choose resolution */
-   background-position: center center;
-   background-attachment: fixed;
-   background-repeat:no-repeat;
-}
 
-LoginWindow#loginDialog {
-   background-image: url([STYLE_PATH]loginBackground_1280x800.png); /* choose resolution */
-   background-position: center center;
-   background-attachment: fixed;
-   background-repeat:no-repeat;
-}
+
+// LoginWindow#passwordDialog{
+//    background-image: url([STYLE_PATH]passwordBackground_wide.png); /* choose resolution */
+//    background-position: center center;
+//    background-attachment: fixed;
+//    background-repeat:no-repeat;
+// }
+// 
+// LoginWindow#loginDialog {
+//    background-image: url([STYLE_PATH]loginBackground_1280x800.png); /* choose resolution */
+//    background-position: center center;
+//    background-attachment: fixed;
+//    background-repeat:no-repeat;
+// }
+
 
 
 LoginWindow#passwordDialog > QLabel#labelCaption {
@@ -104,7 +107,6 @@ QLabel#labelTotalpre , QLabel#labelChangepre
  color: black;
  font-weight: bold;
  font-size: 40px;
-}
 
 QGroupBox#groupInput
 { /* FIXME: Hacer un grafico diferente... */

@@ -57,8 +57,9 @@
 
 
 //For a frameless window: KMainWindow(0, Qt::FramelessWindowHint)
+
 lemon::lemon()
-  : KXmlGuiWindow(0,Qt::FramelessWindowHint),
+ : KXmlGuiWindow(0, Qt::Window ),
       m_view(new lemonView(this))
 {
     setObjectName(QLatin1String("lemon"));

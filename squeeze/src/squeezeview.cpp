@@ -2012,76 +2012,46 @@ void squeezeView::clientsViewOnSelected(const QModelIndex & index)
 {
   if (db.isOpen()) {
     //getting data from model...
+    ClientInfo info;
     const QAbstractItemModel *model = index.model();
     int row = index.row();
+
     QModelIndex indx = model->index(row, clientsModel->fieldIndex("id"));
-    int id = model->data(indx, Qt::DisplayRole).toInt();
-    indx = model->index(row, clientsModel->fieldIndex("name"));
-    QString name = model->data(indx, Qt::DisplayRole).toString();
+//    info.id = model->data(indx, Qt::DisplayRole).toInt();
+//    indx = model->index(row, clientsModel->fieldIndex("name"));
+//    info.name = model->data(indx, Qt::DisplayRole).toString();
+//    indx = model->index(row, clientsModel->fieldIndex("parent"));
+//    info.parentClient = model->data(indx, Qt::DisplayRole).toString();
     indx = model->index(row, clientsModel->fieldIndex("code"));
-    QString code = model->data(indx, Qt::DisplayRole).toString();
-    indx = model->index(row, clientsModel->fieldIndex("address"));
-    QString address = model->data(indx, Qt::DisplayRole).toString();
-    indx = model->index(row, clientsModel->fieldIndex("phone"));
-    QString phone = model->data(indx, Qt::DisplayRole).toString();
-    indx = model->index(row, clientsModel->fieldIndex("phone_movil"));
-    QString cell = model->data(indx, Qt::DisplayRole).toString();
-    indx = model->index(row, clientsModel->fieldIndex("points"));
-    qulonglong points = model->data(indx, Qt::DisplayRole).toULongLong();
-    indx = model->index(row, clientsModel->fieldIndex("discount"));
-    double discount = model->data(indx, Qt::DisplayRole).toDouble();
-    indx = model->index(row, clientsModel->fieldIndex("monthly"));
-    double monthly = model->data(indx, Qt::DisplayRole).toDouble();
-    indx = model->index(row, clientsModel->fieldIndex("photo"));
-    QByteArray photoBA = model->data(indx, Qt::DisplayRole).toByteArray();
-    indx = model->index(row, clientsModel->fieldIndex("since"));
-    QDate sinceDate = model->data(indx, Qt::DisplayRole).toDate();
-    indx = model->index(row, clientsModel->fieldIndex("expiry"));
-    QDate expiryDate = model->data(indx, Qt::DisplayRole).toDate();
-    ClientInfo cInfo;
-    QPixmap photo;
-    photo.loadFromData(photoBA);
+    info.code = model->data(indx, Qt::DisplayRole).toString();
+//    indx = model->index(row, clientsModel->fieldIndex("address"));
+//    info.address = model->data(indx, Qt::DisplayRole).toString();
+//    indx = model->index(row, clientsModel->fieldIndex("phone"));
+//    info.phone = model->data(indx, Qt::DisplayRole).toString();
+//    indx = model->index(row, clientsModel->fieldIndex("phone_movil"));
+//    info.cell = model->data(indx, Qt::DisplayRole).toString();
+//    indx = model->index(row, clientsModel->fieldIndex("points"));
+//    info.points = model->data(indx, Qt::DisplayRole).toULongLong();
+//    indx = model->index(row, clientsModel->fieldIndex("discount"));
+//    info.discount = model->data(indx, Qt::DisplayRole).toDouble();
+//    indx = model->index(row, clientsModel->fieldIndex("monthly"));
+//    info.monthly = model->data(indx, Qt::DisplayRole).toDouble();
+//    indx = model->index(row, clientsModel->fieldIndex("photo"));
+//    info.photo = model->data(indx, Qt::DisplayRole).toByteArray();
+//    indx = model->index(row, clientsModel->fieldIndex("since"));
+//    info.since = model->data(indx, Qt::DisplayRole).toDate();
+//    indx = model->index(row, clientsModel->fieldIndex("expiry"));
+//    info.expiry = model->data(indx, Qt::DisplayRole).toDate();
 
     //Launch Edit dialog
-    ClientEditor *clientEditorDlg = new ClientEditor(this);
-    //Set data on dialog
-    clientEditorDlg->setCode(code);
-    clientEditorDlg->setId(id);
-    clientEditorDlg->setName(name);
-    clientEditorDlg->setAddress(address);
-    clientEditorDlg->setPhone(phone);
-    clientEditorDlg->setCell(cell);
-    clientEditorDlg->setPhoto(photo);
-    clientEditorDlg->setPoints(points);
-    clientEditorDlg->setMonthly(monthly);
-    clientEditorDlg->setDiscount(discount);
-    clientEditorDlg->setSinceDate(sinceDate);
-    clientEditorDlg->setExpiryDate(expiryDate);
+    ClientEditor *clientEditorDlg = new ClientEditor(db, this);
+    clientEditorDlg->setClientInfo(info.code);
 
     if (clientEditorDlg->exec() ) {
-      cInfo.id       = id;
-      cInfo.code     = clientEditorDlg->getCode();
-      cInfo.name     = clientEditorDlg->getName();
-      cInfo.address  = clientEditorDlg->getAddress();
-      cInfo.phone    = clientEditorDlg->getPhone();
-      cInfo.cell     = clientEditorDlg->getCell();
-      photo          = clientEditorDlg->getPhoto();
-      cInfo.points   = clientEditorDlg->getPoints();
-      cInfo.monthly   = clientEditorDlg->getMonthly();
-      cInfo.discount = clientEditorDlg->getDiscount();
-      cInfo.since    = clientEditorDlg->getSinceDate();
-      cInfo.expiry    = clientEditorDlg->getExpiryDate();
-      cInfo.photo    = Misc::pixmap2ByteArray(new QPixmap(photo));
-
-      //Modify data on mysql...
-      if (!db.isOpen()) openDB();
-      Azahar *myDb = new Azahar;
-      myDb->setDatabase(db);
-      myDb->updateClient(cInfo);
-      delete myDb;
-
+      clientEditorDlg->commitClientInfo();
       clientsModel->select();
     }
+//    Tasto Canc premuto
     delete clientEditorDlg;
   }
 }
@@ -2494,24 +2464,12 @@ void squeezeView::createClient()
   myDb->setDatabase(db);
 
   if (db.isOpen()) {
-    ClientEditor *clientEditorDlg = new ClientEditor(this);
-    ClientInfo info;
+    ClientEditor *clientEditorDlg = new ClientEditor(db,this);
+//    ClientInfo info;
     QPixmap photo;
 
     if (clientEditorDlg->exec() ) {
-      info.code     = clientEditorDlg->getCode();
-      info.name     = clientEditorDlg->getName();
-      info.address  = clientEditorDlg->getAddress();
-      info.phone    = clientEditorDlg->getPhone();
-      info.cell     = clientEditorDlg->getCell();
-      photo    = clientEditorDlg->getPhoto();
-      info.points   = clientEditorDlg->getPoints();
-      info.monthly   = clientEditorDlg->getMonthly();
-      info.discount = clientEditorDlg->getDiscount();
-      info.since    = QDate::currentDate();
-      info.expiry    = clientEditorDlg->getExpiryDate();
-
-      info.photo = Misc::pixmap2ByteArray(new QPixmap(photo));
+        ClientInfo info = clientEditorDlg->getClientInfo();
       if (!db.isOpen()) openDB();
       if (!myDb->insertClient(info)) qDebug()<<myDb->lastError();
 

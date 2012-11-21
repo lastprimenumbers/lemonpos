@@ -40,8 +40,8 @@ LoginWindow::LoginWindow(QWidget *parent,
                          QString prompt,
                          LoginWindow::Mode mode)
 {
-  setWindowFlags(Qt::Dialog|Qt::FramelessWindowHint);
-  setWindowModality(Qt::ApplicationModal);
+  //setWindowFlags(Qt::Dialog|Qt::FramelessWindowHint);
+  //setWindowModality(Qt::ApplicationModal);
   currentMode = mode;
   userId = 0;
 

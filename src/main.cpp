@@ -99,7 +99,9 @@ int main(int argc, char **argv)
             mysqldump.waitForFinished();
             
             lemon *widget = new lemon;
+
             widget->show();
+
             splash->finish(widget);
         }
         else

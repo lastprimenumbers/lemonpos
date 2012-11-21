@@ -1616,11 +1616,12 @@ bool Azahar::insertClient(ClientInfo info)
   if (!db.isOpen()) db.open();
   if (db.isOpen()) {
     QSqlQuery query(db);
-    query.prepare("INSERT INTO clients (name, address, phone, phone_movil, points, monthly, discount, photo, since, expiry, code) VALUES(:name, :address, :phone, :cell,:points, :monthly, :discount, :photo, :since, :expiry, :code)");
+    query.prepare("INSERT INTO clients (name, address, phone, phone_movil, points, monthly, discount, photo, since, expiry, code, parent) VALUES(:name, :address, :phone, :cell,:points, :monthly, :discount, :photo, :since, :expiry, :code, :parent)");
     query.bindValue(":photo", info.photo);
     query.bindValue(":points", info.points);
     query.bindValue(":monthly", info.monthly);
     query.bindValue(":discount", info.discount);
+    query.bindValue(":parent", info.parentClient);
     query.bindValue(":name", info.name);
     query.bindValue(":code", info.code);
     query.bindValue(":address", info.address);
@@ -1638,13 +1639,14 @@ bool Azahar::updateClient(ClientInfo info)
   bool result=false;
   if (!db.isOpen()) db.open();
   QSqlQuery query(db);
-  query.prepare("UPDATE clients SET photo=:photo, name=:name, code=:code, address=:address, phone=:phone, phone_movil=:cell, points=:points, monthly=:monthly, discount=:disc, since=:since, expiry=:expiry WHERE id=:id;");
+  query.prepare("UPDATE clients SET photo=:photo, name=:name, code=:code, address=:address, phone=:phone, phone_movil=:cell, points=:points, monthly=:monthly, discount=:disc, since=:since, expiry=:expiry, parent=:parent WHERE id=:id;");
   query.bindValue(":id", info.id);
   query.bindValue(":photo", info.photo);
   query.bindValue(":points", info.points);
   query.bindValue(":monthly", info.monthly);
   query.bindValue(":disc", info.discount);
   query.bindValue(":name", info.name);
+  query.bindValue(":parent", info.parentClient);
   query.bindValue(":code", info.code);
   query.bindValue(":address", info.address);
   query.bindValue(":phone", info.phone);
@@ -1652,7 +1654,6 @@ bool Azahar::updateClient(ClientInfo info)
   query.bindValue(":since", info.since);
   query.bindValue(":expiry", info.expiry);
   if (!query.exec()) setError(query.lastError().text()); else result = true;
-
   return result;
 }
 
@@ -1700,10 +1701,12 @@ ClientInfo Azahar::getClientInfo(qulonglong clientId)
           int fieldPhone  = qC.record().indexOf("phone");
           int fieldCell   = qC.record().indexOf("phone_movil");
           int fieldAdd    = qC.record().indexOf("address");
+          int fieldParent = qC.record().indexOf("parent");
           //Should be only one
           info.id         = qC.value(fieldId).toUInt();
           info.code       = qC.value(fieldCode).toString();
           info.name       = qC.value(fieldName).toString();
+          info.parentClient = qC.value(fieldParent).toString();
           info.points     = qC.value(fieldPoints).toULongLong();
           info.discount   = qC.value(fieldDisc).toDouble();
           info.photo      = qC.value(fieldPhoto).toByteArray();
@@ -1733,6 +1736,7 @@ ClientInfo Azahar::getClientInfo(QString clientCode)
                 int fieldId     = qC.record().indexOf("id");
                 int fieldCode   = qC.record().indexOf("code");
                 int fieldName   = qC.record().indexOf("name");
+                int fieldParent   = qC.record().indexOf("parent");
                 int fieldPoints = qC.record().indexOf("points");
                 int fieldPhoto  = qC.record().indexOf("photo");
                 int fieldDisc   = qC.record().indexOf("discount");
@@ -1743,6 +1747,7 @@ ClientInfo Azahar::getClientInfo(QString clientCode)
                 info.id         = qC.value(fieldId).toUInt();
                 info.code       = qC.value(fieldCode).toString();
                 info.name       = qC.value(fieldName).toString();
+                info.parentClient       = qC.value(fieldParent).toString();
                 info.points     = qC.value(fieldPoints).toULongLong();
                 info.discount   = qC.value(fieldDisc).toDouble();
                 info.photo      = qC.value(fieldPhoto).toByteArray();
@@ -1758,6 +1763,8 @@ ClientInfo Azahar::getClientInfo(QString clientCode)
     }
     return info;
 }
+
+
 
 QString Azahar::getMainClient()
 {
@@ -1794,6 +1801,7 @@ QHash<QString, ClientInfo> Azahar::getClientsHash()
       while (qC.next()) {
         int fieldId     = qC.record().indexOf("id");
         int fieldName   = qC.record().indexOf("name");
+        int fieldParent   = qC.record().indexOf("parent");
         int fieldPoints = qC.record().indexOf("points");
         int fieldMonthly = qC.record().indexOf("monthly");
         int fieldPhoto  = qC.record().indexOf("photo");
@@ -1802,6 +1810,7 @@ QHash<QString, ClientInfo> Azahar::getClientsHash()
         int fieldExpiry  = qC.record().indexOf("expiry");
         info.id = qC.value(fieldId).toUInt();
         info.name       = qC.value(fieldName).toString();
+        info.parentClient       = qC.value(fieldParent).toString();
         info.points     = qC.value(fieldPoints).toULongLong();
         info.monthly   = qC.value(fieldMonthly).toDouble();
         info.discount   = qC.value(fieldDisc).toDouble();
@@ -1838,6 +1847,42 @@ QStringList Azahar::getClientsList()
     }
   }
   return result;
+}
+
+// Cerco la lista di clienti che hanno parentClient come cliente pagante
+void Azahar::getChildrenClientsList(QString parentClient, QStringList& codes, QStringList& names)
+{
+    codes.clear();
+    names.clear();
+  qDebug()<<"Starting getChildreClientsList"<<parentClient;
+  if (!db.isOpen()) db.open();
+  qDebug()<<"Is db open?"<<db.isOpen();
+
+  if (db.isOpen()) {
+    QSqlQuery myQuery(db);
+    myQuery.prepare("select code,name from clients where parent = :parent ;");
+    myQuery.bindValue(":parent", parentClient);
+
+    qDebug()<<"Last Query: "<<myQuery.lastQuery();
+    if (myQuery.exec()) {
+      while (myQuery.next()) {
+        int fieldName = myQuery.record().indexOf("name");
+        int fieldCode = myQuery.record().indexOf("code");
+        QString name = myQuery.value(fieldName).toString();
+        QString code = myQuery.value(fieldCode).toString();
+        names.append(name);
+        codes.append(code);
+        qDebug()<<"Found: "<<code<<" , "<<name;
+      }
+    }
+    else {
+      qDebug()<<"ERROR: "<<myQuery.lastError();
+    }
+  }
+  else {
+      qDebug()<<"ERROR Database Closed: "<<db.lastError();
+  }
+
 }
 
 unsigned int Azahar::getClientId(QString uname)

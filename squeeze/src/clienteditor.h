@@ -23,7 +23,9 @@
 
 #include <KDialog>
 #include <QtGui>
+#include "../../dataAccess/azahar.h"
 #include "ui_editclient_widget.h"
+#include <QtSql>
 
 class ClientEditorUI : public QFrame, public Ui::clientEditor
 {
@@ -36,14 +38,20 @@ class ClientEditor : public KDialog
 {
   Q_OBJECT
   public:
-    ClientEditor( QWidget *parent=0 );
+    ClientEditor( QSqlDatabase db, QWidget *parent=0 );
     ~ClientEditor();
+    QSqlDatabase db;
+    bool hasParent;
+    bool hasChild;
+    ClientInfo parentClientInfo;
     void setCode(QString code) { ui->editClientCode->setText(code); };
     void setName(QString name) { ui->editClientName->setText(name); };
     void setAddress(QString address) { ui->editClientAddress->setText(address); } ;
     void setPhone(QString phone) { ui->editClientPhone->setText(phone); };
     void setCell(QString cell) { ui->editClientCell->setText(cell); };
     void setPoints(qulonglong p) { ui->editClientPoints->setText(QString::number(p)); };
+//    void setParentClient(QString code) { ui->editParentClient->setText(code); };
+    void setParentClient(QString);
     void setMonthly(double p) { ui->editMonthlyPoints->setText(QString::number(p)); };
     void setDiscount(double d) {ui->editClientDiscount->setText(QString::number(d)); };
     void setPhoto(QPixmap photo) { ui->labelClientPhoto->setPixmap(photo); pix = photo; };
@@ -53,6 +61,7 @@ class ClientEditor : public KDialog
 
     QString getCode(){ return ui->editClientCode->text();};
     QString getName(){ return ui->editClientName->text();};
+    QString getParentClient(){ return ui->editParentClient->text();};
     QString getAddress(){ return ui->editClientAddress->toPlainText();};
     QString getPhone(){ return ui->editClientPhone->text();};
     QString getCell(){ return ui->editClientCell->text();};
@@ -63,11 +72,19 @@ class ClientEditor : public KDialog
     QDate   getSinceDate() { return ui->sinceDatePicker->date(); }
     QDate   getExpiryDate() { return ui->expiryDatePicker->date(); }
 
+    void setClientInfo(ClientInfo info);
+    void setClientInfo(QString code);
+    ClientInfo getClientInfo();
+    void commitClientInfo();
+
   private slots:
     void changePhoto();
     void checkName();
     void checkNameDelayed();
-
+    void updateChildren();
+    bool validateParent(QString code);
+    void viewParentClient();
+    void viewChildClient(int row,int col);
 
   private:
     ClientEditorUI *ui;

@@ -24,19 +24,19 @@
          for widescreens at 1280x800. and changed the name below.
 */
 
-LoginWindow#passwordDialog {
-   background-image: url([STYLE_PATH]passwordBackground_wide.png); /* choose resolution and provide the image */
-   background-position: top left;
-   background-attachment: fixed;
-   background-repeat:no-repeat;
-}
-
-LoginWindow#loginDialog {
-   background-image: url([STYLE_PATH]loginBackground_1280x1024.png); /* choose resolution and provide the image */
-   background-position: center center;
-   background-attachment: fixed;
-   background-repeat:no-repeat;
-}
+// LoginWindow#passwordDialog {
+//    background-image: url([STYLE_PATH]passwordBackground_wide.png); /* choose resolution and provide the image */
+//    background-position: top left;
+//    background-attachment: fixed;
+//    background-repeat:no-repeat;
+// }
+// 
+// LoginWindow#loginDialog {
+//    background-image: url([STYLE_PATH]loginBackground_1280x1024.png); /* choose resolution and provide the image */
+//    background-position: center center;
+//    background-attachment: fixed;
+//    background-repeat:no-repeat;
+// }
 
 
 LoginWindow#passwordDialog > QLabel#labelCaption {

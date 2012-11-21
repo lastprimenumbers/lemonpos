@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 5.5.24, for debian-linux-gnu (x86_64)
+-- MySQL dump 10.13  Distrib 5.5.28, for debian-linux-gnu (x86_64)
 --
 -- Host: localhost    Database: lemondb
 -- ------------------------------------------------------
--- Server version	5.5.24-0ubuntu0.12.04.1
+-- Server version	5.5.28-0ubuntu0.12.04.2
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -39,7 +39,7 @@ CREATE TABLE `balances` (
   `done` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `SEC` (`datetime_start`,`datetime_end`,`userid`)
-) ENGINE=MyISAM AUTO_INCREMENT=52 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=54 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -48,7 +48,7 @@ CREATE TABLE `balances` (
 
 LOCK TABLES `balances` WRITE;
 /*!40000 ALTER TABLE `balances` DISABLE KEYS */;
-INSERT INTO `balances` VALUES (1,'2012-01-23 22:26:15','2012-01-23 22:26:15',1,'admin',0,0,0,0,0,'',1,'',0),(2,'2012-01-23 22:26:15','2012-01-23 22:26:15',1,'admin',0,0,0,0,0,'',1,'',0),(3,'2012-01-23 22:26:15','2012-01-23 22:26:15',1,'admin',0,0,0,0,0,'',1,'',0),(4,'2012-01-23 22:28:15','2012-01-23 22:28:36',1,'admin',100,0,0,100,0,'',1,NULL,1),(5,'2012-01-23 22:29:38','2012-01-23 22:31:45',1,'admin',1,0,0,1,0,'',1,NULL,1),(6,'2012-01-23 22:35:20','2012-01-23 22:36:52',1,'admin',0,2,0,2,0,'3',1,NULL,1),(7,'2012-01-23 22:38:03','2012-01-23 22:38:17',1,'admin',1,0,0,1,0,'',1,NULL,1),(8,'2012-01-24 11:53:05','2012-01-24 11:53:05',1,'admin',0,0,0,0,0,'',1,NULL,0),(9,'2012-05-14 21:40:36','2012-05-14 21:41:36',2,'daniele',100,0,0,100,0,'',1,NULL,1),(10,'2012-05-14 22:21:15','2012-05-14 22:21:15',2,'daniele',0,0,0,0,0,'',1,'',0),(11,'2012-05-14 22:44:06','2012-05-14 22:44:07',2,'daniele',0,0,0,0,0,'',1,NULL,0),(12,'2012-05-14 23:26:47','2012-05-14 23:26:47',2,'daniele',0,0,0,0,0,'',1,'',0),(13,'2012-06-15 04:38:15','2012-06-15 04:40:03',2,'daniele',0,0,0,0,33,'20',1,NULL,1),(14,'2012-06-15 04:40:18','2012-06-15 04:43:01',2,'daniele',0,0,0,0,3,'22',1,NULL,1),(15,'2012-06-15 04:44:31','2012-06-15 04:44:31',2,'daniele',0,0,0,0,0,'',1,'',0),(16,'2012-06-15 04:46:01','2012-06-15 04:47:58',2,'daniele',0,0,0,0,18,'25',1,NULL,1),(17,'2012-06-15 04:50:52','2012-06-15 04:50:52',2,'daniele',0,0,0,0,0,'',1,'',0),(18,'2012-06-15 05:03:49','2012-06-15 05:03:49',2,'daniele',0,0,0,0,0,'',1,'',0),(19,'2012-06-15 16:31:19','2012-06-15 16:32:53',2,'daniele',0,0,0,0,0,'',1,NULL,0),(20,'2012-06-15 22:16:24','2012-06-15 22:16:24',2,'daniele',0,0,0,0,0,'',1,'',0),(21,'2012-06-15 22:26:35','2012-06-15 22:28:33',2,'daniele',0,0,0,0,0,'',1,NULL,0),(22,'2012-06-15 22:29:51','2012-06-15 22:30:13',2,'daniele',0,0,0,0,0,'',1,NULL,0),(23,'2012-06-15 22:31:01','2012-06-15 22:31:05',2,'daniele',0,0,0,0,0,'',1,NULL,0),(24,'2012-06-15 22:32:52','2012-06-15 22:32:56',2,'daniele',0,0,0,0,0,'',1,NULL,0),(25,'2012-06-15 22:36:12','2012-06-15 22:36:19',2,'daniele',0,0,0,0,0,'',1,NULL,0),(26,'2012-06-15 22:41:10','2012-06-15 22:41:10',2,'daniele',0,0,0,0,0,'',1,'',0),(27,'2012-06-16 00:36:43','2012-06-16 00:36:44',2,'daniele',0,0,0,0,0,'',1,NULL,0),(28,'2012-06-16 01:06:55','2012-06-16 01:07:30',2,'daniele',0,0,0,0,4,'38',1,NULL,1),(29,'2012-07-02 22:23:11','2012-07-02 22:23:24',2,'daniele',0,0,0,0,0,'',1,NULL,0),(30,'2012-07-02 22:25:25','2012-07-02 22:25:28',2,'daniele',0,0,0,0,0,'',1,NULL,0),(31,'2012-07-18 15:18:57','2012-07-18 15:19:14',2,'daniele',0,0,0,0,0,'',1,NULL,0),(32,'2012-07-18 15:24:27','2012-07-18 15:24:31',2,'daniele',0,0,0,0,0,'',1,NULL,0),(33,'2012-07-18 15:26:26','2012-07-18 15:26:27',2,'daniele',0,0,0,0,0,'',1,NULL,0),(34,'2012-07-18 15:27:21','2012-07-18 15:27:24',2,'daniele',0,0,0,0,0,'',1,NULL,0),(35,'2012-07-18 15:31:26','2012-07-18 15:31:27',2,'daniele',0,0,0,0,0,'',1,NULL,0),(36,'2012-07-18 15:35:31','2012-07-18 15:35:32',2,'daniele',0,0,0,0,0,'',1,NULL,0),(37,'2012-07-18 15:40:02','2012-07-18 15:40:19',2,'daniele',0,0,0,0,60,'48',1,NULL,1),(38,'2012-07-18 15:40:35','2012-07-18 15:40:53',2,'daniele',0,0,0,0,45,'50',1,NULL,1),(39,'2012-07-18 15:41:41','2012-07-18 15:41:43',2,'daniele',0,0,0,0,0,'',1,NULL,0),(40,'2012-07-18 15:57:34','2012-07-18 15:57:36',2,'daniele',0,0,0,0,0,'',1,NULL,0),(41,'2012-07-20 22:18:22','2012-07-20 22:18:24',2,'daniele',0,0,0,0,0,'',1,NULL,0),(42,'2012-07-20 22:23:18','2012-07-20 22:23:20',2,'daniele',0,0,0,0,0,'',1,NULL,0),(43,'2012-07-20 22:25:11','2012-07-20 22:25:20',2,'daniele',0,0,0,0,0,'',1,NULL,0),(44,'2012-07-20 22:28:04','2012-07-20 22:28:09',2,'daniele',0,0,0,0,0,'',1,NULL,0),(45,'2012-07-20 22:40:13','2012-07-20 22:40:15',2,'daniele',0,0,0,0,0,'',1,NULL,0),(46,'2012-07-20 22:43:03','2012-07-20 22:43:11',2,'daniele',0,0,0,0,0,'',1,NULL,0),(47,'2012-07-23 20:05:32','2012-07-23 20:05:32',2,'daniele',0,0,0,0,0,'',1,'',0),(48,'2012-09-17 21:46:57','2012-09-17 21:47:30',2,'daniele',0,0,0,0,0,'',1,NULL,0),(49,'2012-09-17 22:40:34','2012-09-17 22:41:36',2,'daniele',0,0,0,0,0,'',1,NULL,0),(50,'2012-09-17 23:17:53','2012-09-17 23:17:53',2,'daniele',0,0,0,0,0,'',1,'',0),(51,'2012-09-17 23:19:50','2012-09-17 23:19:50',2,'daniele',0,0,0,0,0,'',1,'',0);
+INSERT INTO `balances` VALUES (1,'2012-01-23 22:26:15','2012-01-23 22:26:15',1,'admin',0,0,0,0,0,'',1,'',0),(2,'2012-01-23 22:26:15','2012-01-23 22:26:15',1,'admin',0,0,0,0,0,'',1,'',0),(3,'2012-01-23 22:26:15','2012-01-23 22:26:15',1,'admin',0,0,0,0,0,'',1,'',0),(4,'2012-01-23 22:28:15','2012-01-23 22:28:36',1,'admin',100,0,0,100,0,'',1,NULL,1),(5,'2012-01-23 22:29:38','2012-01-23 22:31:45',1,'admin',1,0,0,1,0,'',1,NULL,1),(6,'2012-01-23 22:35:20','2012-01-23 22:36:52',1,'admin',0,2,0,2,0,'3',1,NULL,1),(7,'2012-01-23 22:38:03','2012-01-23 22:38:17',1,'admin',1,0,0,1,0,'',1,NULL,1),(8,'2012-01-24 11:53:05','2012-01-24 11:53:05',1,'admin',0,0,0,0,0,'',1,NULL,0),(9,'2012-05-14 21:40:36','2012-05-14 21:41:36',2,'daniele',100,0,0,100,0,'',1,NULL,1),(10,'2012-05-14 22:21:15','2012-05-14 22:21:15',2,'daniele',0,0,0,0,0,'',1,'',0),(11,'2012-05-14 22:44:06','2012-05-14 22:44:07',2,'daniele',0,0,0,0,0,'',1,NULL,0),(12,'2012-05-14 23:26:47','2012-05-14 23:26:47',2,'daniele',0,0,0,0,0,'',1,'',0),(13,'2012-06-15 04:38:15','2012-06-15 04:40:03',2,'daniele',0,0,0,0,33,'20',1,NULL,1),(14,'2012-06-15 04:40:18','2012-06-15 04:43:01',2,'daniele',0,0,0,0,3,'22',1,NULL,1),(15,'2012-06-15 04:44:31','2012-06-15 04:44:31',2,'daniele',0,0,0,0,0,'',1,'',0),(16,'2012-06-15 04:46:01','2012-06-15 04:47:58',2,'daniele',0,0,0,0,18,'25',1,NULL,1),(17,'2012-06-15 04:50:52','2012-06-15 04:50:52',2,'daniele',0,0,0,0,0,'',1,'',0),(18,'2012-06-15 05:03:49','2012-06-15 05:03:49',2,'daniele',0,0,0,0,0,'',1,'',0),(19,'2012-06-15 16:31:19','2012-06-15 16:32:53',2,'daniele',0,0,0,0,0,'',1,NULL,0),(20,'2012-06-15 22:16:24','2012-06-15 22:16:24',2,'daniele',0,0,0,0,0,'',1,'',0),(21,'2012-06-15 22:26:35','2012-06-15 22:28:33',2,'daniele',0,0,0,0,0,'',1,NULL,0),(22,'2012-06-15 22:29:51','2012-06-15 22:30:13',2,'daniele',0,0,0,0,0,'',1,NULL,0),(23,'2012-06-15 22:31:01','2012-06-15 22:31:05',2,'daniele',0,0,0,0,0,'',1,NULL,0),(24,'2012-06-15 22:32:52','2012-06-15 22:32:56',2,'daniele',0,0,0,0,0,'',1,NULL,0),(25,'2012-06-15 22:36:12','2012-06-15 22:36:19',2,'daniele',0,0,0,0,0,'',1,NULL,0),(26,'2012-06-15 22:41:10','2012-06-15 22:41:10',2,'daniele',0,0,0,0,0,'',1,'',0),(27,'2012-06-16 00:36:43','2012-06-16 00:36:44',2,'daniele',0,0,0,0,0,'',1,NULL,0),(28,'2012-06-16 01:06:55','2012-06-16 01:07:30',2,'daniele',0,0,0,0,4,'38',1,NULL,1),(29,'2012-07-02 22:23:11','2012-07-02 22:23:24',2,'daniele',0,0,0,0,0,'',1,NULL,0),(30,'2012-07-02 22:25:25','2012-07-02 22:25:28',2,'daniele',0,0,0,0,0,'',1,NULL,0),(31,'2012-07-18 15:18:57','2012-07-18 15:19:14',2,'daniele',0,0,0,0,0,'',1,NULL,0),(32,'2012-07-18 15:24:27','2012-07-18 15:24:31',2,'daniele',0,0,0,0,0,'',1,NULL,0),(33,'2012-07-18 15:26:26','2012-07-18 15:26:27',2,'daniele',0,0,0,0,0,'',1,NULL,0),(34,'2012-07-18 15:27:21','2012-07-18 15:27:24',2,'daniele',0,0,0,0,0,'',1,NULL,0),(35,'2012-07-18 15:31:26','2012-07-18 15:31:27',2,'daniele',0,0,0,0,0,'',1,NULL,0),(36,'2012-07-18 15:35:31','2012-07-18 15:35:32',2,'daniele',0,0,0,0,0,'',1,NULL,0),(37,'2012-07-18 15:40:02','2012-07-18 15:40:19',2,'daniele',0,0,0,0,60,'48',1,NULL,1),(38,'2012-07-18 15:40:35','2012-07-18 15:40:53',2,'daniele',0,0,0,0,45,'50',1,NULL,1),(39,'2012-07-18 15:41:41','2012-07-18 15:41:43',2,'daniele',0,0,0,0,0,'',1,NULL,0),(40,'2012-07-18 15:57:34','2012-07-18 15:57:36',2,'daniele',0,0,0,0,0,'',1,NULL,0),(41,'2012-07-20 22:18:22','2012-07-20 22:18:24',2,'daniele',0,0,0,0,0,'',1,NULL,0),(42,'2012-07-20 22:23:18','2012-07-20 22:23:20',2,'daniele',0,0,0,0,0,'',1,NULL,0),(43,'2012-07-20 22:25:11','2012-07-20 22:25:20',2,'daniele',0,0,0,0,0,'',1,NULL,0),(44,'2012-07-20 22:28:04','2012-07-20 22:28:09',2,'daniele',0,0,0,0,0,'',1,NULL,0),(45,'2012-07-20 22:40:13','2012-07-20 22:40:15',2,'daniele',0,0,0,0,0,'',1,NULL,0),(46,'2012-07-20 22:43:03','2012-07-20 22:43:11',2,'daniele',0,0,0,0,0,'',1,NULL,0),(47,'2012-07-23 20:05:32','2012-07-23 20:05:32',2,'daniele',0,0,0,0,0,'',1,'',0),(48,'2012-09-17 21:46:57','2012-09-17 21:47:30',2,'daniele',0,0,0,0,0,'',1,NULL,0),(49,'2012-09-17 22:40:34','2012-09-17 22:41:36',2,'daniele',0,0,0,0,0,'',1,NULL,0),(50,'2012-09-17 23:17:53','2012-09-17 23:17:53',2,'daniele',0,0,0,0,0,'',1,'',0),(51,'2012-09-17 23:19:50','2012-09-17 23:19:50',2,'daniele',0,0,0,0,0,'',1,'',0),(52,'2012-11-08 21:58:46','2012-11-08 21:58:47',2,'daniele',0,0,0,0,0,'',1,NULL,0),(53,'2012-11-16 21:47:24','2012-11-16 21:48:04',1,'admin',0,0,0,0,0,'',1,NULL,0);
 /*!40000 ALTER TABLE `balances` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -314,7 +314,7 @@ CREATE TABLE `logs` (
   `time` varchar(20) NOT NULL DEFAULT '00:00',
   `action` varchar(512) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=56 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=58 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -323,7 +323,7 @@ CREATE TABLE `logs` (
 
 LOCK TABLES `logs` WRITE;
 /*!40000 ALTER TABLE `logs` DISABLE KEYS */;
-INSERT INTO `logs` VALUES (1,1,'2012-01-23','22:28','[ LEMON ] Operation Started by Administrator at terminal 1'),(2,1,'2012-01-23','22:28','[ LEMON ] End of Day report printed by Administrator at terminal 1 on 2012-01-23 22:28'),(3,1,'2012-01-23','22:29','[ LEMON ] Operation Started by Administrator at terminal 1'),(4,1,'2012-01-23','22:35','[ LEMON ] Operation Started by Administrator at terminal 1'),(5,1,'2012-01-23','22:38','[ LEMON ] Operation Started by Administrator at terminal 1'),(6,1,'2012-01-24','11:53','[ LEMON ] Operation Started by Administrator at terminal 1'),(7,2,'2012-05-14','21:40','[ LEMON ] Operation Started by Administrator at terminal 1'),(8,1,'2012-05-14','22:04','[SQUEEZE] Purchase #15 - 2 x Ciao2 (1.111)'),(9,2,'2012-05-14','22:21','[ LEMON ] Operation Started by Administrator at terminal 1'),(10,2,'2012-05-14','22:44','[ LEMON ] Operation Started by Administrator at terminal 1'),(11,2,'2012-05-14','23:26','[ LEMON ] Operation Started by Administrator at terminal 1'),(12,2,'2012-06-15','04:38','[ LEMON ] Operation Started by Administrator at terminal 1'),(13,2,'2012-06-15','04:40','[ LEMON ] Operation Started by Administrator at terminal 1'),(14,1,'2012-06-15','04:43','[SQUEEZE] Stock Correction: [Product 1.111] from 0 to 100. Reason:add'),(15,1,'2012-06-15','04:43','[SQUEEZE] Stock Correction: [Product 4.950.232.123.566] from 0 to 200. Reason:add'),(16,2,'2012-06-15','04:44','[ LEMON ] Operation Started by Administrator at terminal 1'),(17,2,'2012-06-15','04:46','[ LEMON ] Operation Started by Administrator at terminal 1'),(18,2,'2012-06-15','04:50','[ LEMON ] Operation Started by Administrator at terminal 1'),(19,2,'2012-06-15','05:03','[ LEMON ] Operation Started by Administrator at terminal 1'),(20,2,'2012-06-15','16:31','[ LEMON ] Operation Started by Administrator at terminal 1'),(21,2,'2012-06-15','22:16','[ LEMON ] Operation Started by Administrator at terminal 1'),(22,2,'2012-06-15','22:26','[ LEMON ] Operation Started by Administrator at terminal 1'),(23,2,'2012-06-15','22:29','[ LEMON ] Operation Started by Administrator at terminal 1'),(24,2,'2012-06-15','22:31','[ LEMON ] Operation Started by Administrator at terminal 1'),(25,2,'2012-06-15','22:32','[ LEMON ] Operation Started by Administrator at terminal 1'),(26,2,'2012-06-15','22:36','[ LEMON ] Operation Started by Administrator at terminal 1'),(27,2,'2012-06-15','22:41','[ LEMON ] Operation Started by Administrator at terminal 1'),(28,2,'2012-06-16','00:36','[ LEMON ] Operation Started by Administrator at terminal 1'),(29,2,'2012-06-16','01:06','[ LEMON ] Operation Started by Administrator at terminal 1'),(30,2,'2012-07-02','22:23','[ LEMON ] Operation Started by Administrator at terminal 1'),(31,2,'2012-07-02','22:25','[ LEMON ] Operation Started by Administrator at terminal 1'),(32,2,'2012-07-18','15:18','[ LEMON ] Operation Started by Administrator at terminal 1'),(33,2,'2012-07-18','15:24','[ LEMON ] Operation Started by Administrator at terminal 1'),(34,2,'2012-07-18','15:26','[ LEMON ] Operation Started by Administrator at terminal 1'),(35,2,'2012-07-18','15:27','[ LEMON ] Operation Started by Administrator at terminal 1'),(36,2,'2012-07-18','15:31','[ LEMON ] Operation Started by Administrator at terminal 1'),(37,2,'2012-07-18','15:35','[ LEMON ] Operation Started by Administrator at terminal 1'),(38,2,'2012-07-18','15:40','[ LEMON ] Operation Started by Administrator at terminal 1'),(39,2,'2012-07-18','15:40','[ LEMON ] Operation Started by Administrator at terminal 1'),(40,2,'2012-07-18','15:41','[ LEMON ] Operation Started by Administrator at terminal 1'),(41,2,'2012-07-18','15:57','[ LEMON ] Operation Started by Administrator at terminal 1'),(42,2,'2012-07-20','22:18','[ LEMON ] Operation Started by Administrator at terminal 1'),(43,2,'2012-07-20','22:23','[ LEMON ] Operation Started by Administrator at terminal 1'),(44,2,'2012-07-20','22:25','[ LEMON ] Operation Started by Administrator at terminal 1'),(45,2,'2012-07-20','22:28','[ LEMON ] Operation Started by Administrator at terminal 1'),(46,2,'2012-07-20','22:40','[ LEMON ] Operation Started by Administrator at terminal 1'),(47,2,'2012-07-20','22:43','[ LEMON ] Operation Started by Administrator at terminal 1'),(48,2,'2012-07-23','20:05','[ LEMON ] Operation Started by Administrator at terminal 1'),(49,1,'2012-07-23','20:45','[SQUEEZE] Purchase #61 - 100 x Ciao2 (1.111)'),(50,1,'2012-09-17','21:30','[SQUEEZE] Purchase #62 - 0 x sdrgs (12)'),(51,1,'2012-09-17','21:31','[SQUEEZE] Purchase #63 - 0 x sdrfsr (213)'),(52,2,'2012-09-17','21:46','[ LEMON ] Operation Started by Administrator at terminal 1'),(53,2,'2012-09-17','22:40','[ LEMON ] Operation Started by Administrator at terminal 1'),(54,2,'2012-09-17','23:17','[ LEMON ] Operation Started by Administrator at terminal 1'),(55,2,'2012-09-17','23:19','[ LEMON ] Operation Started by Administrator at terminal 1');
+INSERT INTO `logs` VALUES (1,1,'2012-01-23','22:28','[ LEMON ] Operation Started by Administrator at terminal 1'),(2,1,'2012-01-23','22:28','[ LEMON ] End of Day report printed by Administrator at terminal 1 on 2012-01-23 22:28'),(3,1,'2012-01-23','22:29','[ LEMON ] Operation Started by Administrator at terminal 1'),(4,1,'2012-01-23','22:35','[ LEMON ] Operation Started by Administrator at terminal 1'),(5,1,'2012-01-23','22:38','[ LEMON ] Operation Started by Administrator at terminal 1'),(6,1,'2012-01-24','11:53','[ LEMON ] Operation Started by Administrator at terminal 1'),(7,2,'2012-05-14','21:40','[ LEMON ] Operation Started by Administrator at terminal 1'),(8,1,'2012-05-14','22:04','[SQUEEZE] Purchase #15 - 2 x Ciao2 (1.111)'),(9,2,'2012-05-14','22:21','[ LEMON ] Operation Started by Administrator at terminal 1'),(10,2,'2012-05-14','22:44','[ LEMON ] Operation Started by Administrator at terminal 1'),(11,2,'2012-05-14','23:26','[ LEMON ] Operation Started by Administrator at terminal 1'),(12,2,'2012-06-15','04:38','[ LEMON ] Operation Started by Administrator at terminal 1'),(13,2,'2012-06-15','04:40','[ LEMON ] Operation Started by Administrator at terminal 1'),(14,1,'2012-06-15','04:43','[SQUEEZE] Stock Correction: [Product 1.111] from 0 to 100. Reason:add'),(15,1,'2012-06-15','04:43','[SQUEEZE] Stock Correction: [Product 4.950.232.123.566] from 0 to 200. Reason:add'),(16,2,'2012-06-15','04:44','[ LEMON ] Operation Started by Administrator at terminal 1'),(17,2,'2012-06-15','04:46','[ LEMON ] Operation Started by Administrator at terminal 1'),(18,2,'2012-06-15','04:50','[ LEMON ] Operation Started by Administrator at terminal 1'),(19,2,'2012-06-15','05:03','[ LEMON ] Operation Started by Administrator at terminal 1'),(20,2,'2012-06-15','16:31','[ LEMON ] Operation Started by Administrator at terminal 1'),(21,2,'2012-06-15','22:16','[ LEMON ] Operation Started by Administrator at terminal 1'),(22,2,'2012-06-15','22:26','[ LEMON ] Operation Started by Administrator at terminal 1'),(23,2,'2012-06-15','22:29','[ LEMON ] Operation Started by Administrator at terminal 1'),(24,2,'2012-06-15','22:31','[ LEMON ] Operation Started by Administrator at terminal 1'),(25,2,'2012-06-15','22:32','[ LEMON ] Operation Started by Administrator at terminal 1'),(26,2,'2012-06-15','22:36','[ LEMON ] Operation Started by Administrator at terminal 1'),(27,2,'2012-06-15','22:41','[ LEMON ] Operation Started by Administrator at terminal 1'),(28,2,'2012-06-16','00:36','[ LEMON ] Operation Started by Administrator at terminal 1'),(29,2,'2012-06-16','01:06','[ LEMON ] Operation Started by Administrator at terminal 1'),(30,2,'2012-07-02','22:23','[ LEMON ] Operation Started by Administrator at terminal 1'),(31,2,'2012-07-02','22:25','[ LEMON ] Operation Started by Administrator at terminal 1'),(32,2,'2012-07-18','15:18','[ LEMON ] Operation Started by Administrator at terminal 1'),(33,2,'2012-07-18','15:24','[ LEMON ] Operation Started by Administrator at terminal 1'),(34,2,'2012-07-18','15:26','[ LEMON ] Operation Started by Administrator at terminal 1'),(35,2,'2012-07-18','15:27','[ LEMON ] Operation Started by Administrator at terminal 1'),(36,2,'2012-07-18','15:31','[ LEMON ] Operation Started by Administrator at terminal 1'),(37,2,'2012-07-18','15:35','[ LEMON ] Operation Started by Administrator at terminal 1'),(38,2,'2012-07-18','15:40','[ LEMON ] Operation Started by Administrator at terminal 1'),(39,2,'2012-07-18','15:40','[ LEMON ] Operation Started by Administrator at terminal 1'),(40,2,'2012-07-18','15:41','[ LEMON ] Operation Started by Administrator at terminal 1'),(41,2,'2012-07-18','15:57','[ LEMON ] Operation Started by Administrator at terminal 1'),(42,2,'2012-07-20','22:18','[ LEMON ] Operation Started by Administrator at terminal 1'),(43,2,'2012-07-20','22:23','[ LEMON ] Operation Started by Administrator at terminal 1'),(44,2,'2012-07-20','22:25','[ LEMON ] Operation Started by Administrator at terminal 1'),(45,2,'2012-07-20','22:28','[ LEMON ] Operation Started by Administrator at terminal 1'),(46,2,'2012-07-20','22:40','[ LEMON ] Operation Started by Administrator at terminal 1'),(47,2,'2012-07-20','22:43','[ LEMON ] Operation Started by Administrator at terminal 1'),(48,2,'2012-07-23','20:05','[ LEMON ] Operation Started by Administrator at terminal 1'),(49,1,'2012-07-23','20:45','[SQUEEZE] Purchase #61 - 100 x Ciao2 (1.111)'),(50,1,'2012-09-17','21:30','[SQUEEZE] Purchase #62 - 0 x sdrgs (12)'),(51,1,'2012-09-17','21:31','[SQUEEZE] Purchase #63 - 0 x sdrfsr (213)'),(52,2,'2012-09-17','21:46','[ LEMON ] Operation Started by Administrator at terminal 1'),(53,2,'2012-09-17','22:40','[ LEMON ] Operation Started by Administrator at terminal 1'),(54,2,'2012-09-17','23:17','[ LEMON ] Operation Started by Administrator at terminal 1'),(55,2,'2012-09-17','23:19','[ LEMON ] Operation Started by Administrator at terminal 1'),(56,2,'2012-11-08','21:58','[ LEMON ] Operation Started by Administrator at terminal 1'),(57,1,'2012-11-16','21:47','[ LEMON ] Operation Started by Administrator at terminal 1');
 /*!40000 ALTER TABLE `logs` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -742,7 +742,7 @@ CREATE TABLE `transactions` (
   `totalTax` double NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `SEC` (`clientid`,`type`,`date`,`time`,`state`)
-) ENGINE=MyISAM AUTO_INCREMENT=68 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=70 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -823,7 +823,7 @@ CREATE TABLE `users` (
   `photo` blob,
   PRIMARY KEY (`id`),
   KEY `SEC` (`username`)
-) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -832,7 +832,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (1,'admin','','h60VK','Administrator',NULL,NULL,NULL,2,NULL),(2,'daniele','0E511F5A42903F6DD1E9F54E6D2D923729FBAC06','_z~uW','Daniele Paganelli','','','',2,NULL);
+INSERT INTO `users` VALUES (1,'admin','C07B1E799DC80B95060391DDF92B3C7EF6EECDCB','h60VK','Administrator',NULL,NULL,NULL,2,NULL),(2,'daniele','0E511F5A42903F6DD1E9F54E6D2D923729FBAC06','_z~uW','Daniele Paganelli','','','',2,NULL),(3,'m','6B06A8DF3488ABAC3D2CFB389CD8442024BEDDF1','L9vkR','','','','',1,NULL);
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -845,22 +845,22 @@ DROP TABLE IF EXISTS `v_groupedSO`;
 SET @saved_cs_client     = @@character_set_client;
 SET character_set_client = utf8;
 /*!50001 CREATE TABLE `v_groupedSO` (
-  `orderid` bigint(20) unsigned,
-  `name` varchar(255),
-  `groupElements` varchar(1000),
-  `qty` double unsigned,
-  `price` double unsigned,
-  `cost` double unsigned,
-  `units` int(10) unsigned,
-  `status` int(10),
-  `saleid` bigint(20) unsigned,
-  `notes` varchar(800),
-  `payment` double unsigned,
-  `completePayment` tinyint(1),
-  `dateTime` datetime,
-  `deliveryDateTime` datetime,
-  `clientId` bigint(20) unsigned,
-  `userId` bigint(20) unsigned
+  `orderid` tinyint NOT NULL,
+  `name` tinyint NOT NULL,
+  `groupElements` tinyint NOT NULL,
+  `qty` tinyint NOT NULL,
+  `price` tinyint NOT NULL,
+  `cost` tinyint NOT NULL,
+  `units` tinyint NOT NULL,
+  `status` tinyint NOT NULL,
+  `saleid` tinyint NOT NULL,
+  `notes` tinyint NOT NULL,
+  `payment` tinyint NOT NULL,
+  `completePayment` tinyint NOT NULL,
+  `dateTime` tinyint NOT NULL,
+  `deliveryDateTime` tinyint NOT NULL,
+  `clientId` tinyint NOT NULL,
+  `userId` tinyint NOT NULL
 ) ENGINE=MyISAM */;
 SET character_set_client = @saved_cs_client;
 
@@ -873,15 +873,15 @@ DROP TABLE IF EXISTS `v_transS`;
 SET @saved_cs_client     = @@character_set_client;
 SET character_set_client = utf8;
 /*!50001 CREATE TABLE `v_transS` (
-  `id` bigint(20) unsigned,
-  `userid` int(10),
-  `clientid` int(10) unsigned,
-  `date` date,
-  `time` time,
-  `state` int(10),
-  `itemslist` varchar(1000),
-  `terminalnum` int(10) unsigned,
-  `itemcount` int(10) unsigned
+  `id` tinyint NOT NULL,
+  `userid` tinyint NOT NULL,
+  `clientid` tinyint NOT NULL,
+  `date` tinyint NOT NULL,
+  `time` tinyint NOT NULL,
+  `state` tinyint NOT NULL,
+  `itemslist` tinyint NOT NULL,
+  `terminalnum` tinyint NOT NULL,
+  `itemcount` tinyint NOT NULL
 ) ENGINE=MyISAM */;
 SET character_set_client = @saved_cs_client;
 
@@ -894,20 +894,20 @@ DROP TABLE IF EXISTS `v_transactionitems`;
 SET @saved_cs_client     = @@character_set_client;
 SET character_set_client = utf8;
 /*!50001 CREATE TABLE `v_transactionitems` (
-  `datetime` varchar(21),
-  `id` bigint(20) unsigned,
-  `points` double,
-  `name` varchar(255),
-  `price` double,
-  `disc` double,
-  `total` double,
-  `clientid` int(10) unsigned,
-  `userid` int(10),
-  `date` date,
-  `time` time,
-  `position` int(10) unsigned,
-  `product_id` bigint(20) unsigned,
-  `cost` double
+  `datetime` tinyint NOT NULL,
+  `id` tinyint NOT NULL,
+  `points` tinyint NOT NULL,
+  `name` tinyint NOT NULL,
+  `price` tinyint NOT NULL,
+  `disc` tinyint NOT NULL,
+  `total` tinyint NOT NULL,
+  `clientid` tinyint NOT NULL,
+  `userid` tinyint NOT NULL,
+  `date` tinyint NOT NULL,
+  `time` tinyint NOT NULL,
+  `position` tinyint NOT NULL,
+  `product_id` tinyint NOT NULL,
+  `cost` tinyint NOT NULL
 ) ENGINE=MyISAM */;
 SET character_set_client = @saved_cs_client;
 
@@ -920,14 +920,14 @@ DROP TABLE IF EXISTS `v_transactions`;
 SET @saved_cs_client     = @@character_set_client;
 SET character_set_client = utf8;
 /*!50001 CREATE TABLE `v_transactions` (
-  `datetime` varchar(21),
-  `id` bigint(20) unsigned,
-  `clientid` int(10) unsigned,
-  `userid` int(10),
-  `itemcount` int(10) unsigned,
-  `disc` double,
-  `amount` double unsigned,
-  `date` date
+  `datetime` tinyint NOT NULL,
+  `id` tinyint NOT NULL,
+  `clientid` tinyint NOT NULL,
+  `userid` tinyint NOT NULL,
+  `itemcount` tinyint NOT NULL,
+  `disc` tinyint NOT NULL,
+  `amount` tinyint NOT NULL,
+  `date` tinyint NOT NULL
 ) ENGINE=MyISAM */;
 SET character_set_client = @saved_cs_client;
 
@@ -940,10 +940,10 @@ DROP TABLE IF EXISTS `v_transactionsbydate`;
 SET @saved_cs_client     = @@character_set_client;
 SET character_set_client = utf8;
 /*!50001 CREATE TABLE `v_transactionsbydate` (
-  `date` date,
-  `transactions` bigint(21),
-  `items` decimal(32,0),
-  `total` double
+  `date` tinyint NOT NULL,
+  `transactions` tinyint NOT NULL,
+  `items` tinyint NOT NULL,
+  `total` tinyint NOT NULL
 ) ENGINE=MyISAM */;
 SET character_set_client = @saved_cs_client;
 
@@ -1051,4 +1051,4 @@ SET character_set_client = @saved_cs_client;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2012-10-29  9:12:09
+-- Dump completed on 2012-11-16 22:08:06

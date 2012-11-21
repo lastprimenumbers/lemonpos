@@ -84,6 +84,7 @@ struct ClientInfo
   unsigned int id;
   QString      code;
   QString      name;
+  QString      parentClient;
   QString      address;
   QString      phone;
   QString      cell;
