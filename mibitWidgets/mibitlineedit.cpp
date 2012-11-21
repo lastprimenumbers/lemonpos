@@ -28,7 +28,6 @@
 MibitLineEdit::MibitLineEdit( QWidget *parent )
     : QLineEdit( parent )
 {
-  qDebug()<<"creating MibitLineEdit";
     drawEmptyMsg = false;
     actualColor  = 0;
     timer = new QTimer(this);

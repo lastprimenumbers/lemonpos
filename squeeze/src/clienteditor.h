@@ -66,8 +66,8 @@ class ClientEditor : public KDialog
     QString getPhone(){ return ui->editClientPhone->text();};
     QString getCell(){ return ui->editClientCell->text();};
     qulonglong getPoints() { return ui->editClientPoints->text().toULongLong(); };
-    double getMonthly() { return ui->editMonthlyPoints->text().toDouble(); };
-    double  getDiscount() {return ui->editClientDiscount->text().toDouble(); }
+    double getMonthly() {return ui->editMonthlyPoints->text().toDouble(); }
+    double  getDiscount() {return ui->editClientDiscount->text().toDouble(); };
     QPixmap getPhoto(){ return pix;};
     QDate   getSinceDate() { return ui->sinceDatePicker->date(); }
     QDate   getExpiryDate() { return ui->expiryDatePicker->date(); }

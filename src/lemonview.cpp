@@ -2176,7 +2176,7 @@ void lemonView::finishCurrentTransaction()
       tInfo.state = tCompletedOwnCreditPending; ///setting pending payment status for the OwnCredit.
       //create the credit record
       credit = myDb->getCreditInfoForClient(clientInfo.id); //this creates a new one if no one exists for the client.
-      qDebug()<<__FUNCTION__<<" :: Getting credit info...";
+      qDebug()<<__FUNCTION__<<" :: Getting credit info..."<<clientInfo.monthly;
       credit.total += totalSum;
       // credit will be committed to database after last canfinish check
       //now create the credit history

@@ -133,6 +133,7 @@ class Azahar : public QObject
     bool         decrementClientPoints(qulonglong id, qulonglong points);
     ClientInfo   getClientInfo(qulonglong clientId);
     ClientInfo   getClientInfo(QString clientCode);
+    qulonglong         checkParent(ClientInfo &info);
     QHash<QString, ClientInfo> getClientsHash();
     QStringList  getClientsList();
     void getChildrenClientsList(QString parentClient, QStringList &codes, QStringList &names);
@@ -251,7 +252,6 @@ class Azahar : public QObject
     bool     deleteCurrency(const qulonglong &cid);
 
     //Credits and its history
-    CreditInfo        getCreditInfo(const qulonglong &id);
     CreditInfo        getCreditInfoForClient(const qulonglong &clientId, const bool &create=true); //by default it creates a new credit record if no one found for the customer.
     QList<CreditHistoryInfo> getCreditHistoryForClient(const qulonglong &clientId, const int &lastDays=0);
     
@@ -259,6 +259,9 @@ class Azahar : public QObject
     bool              updateCredit(const CreditInfo &info);
     qulonglong        insertCreditHistory(const CreditHistoryInfo &info);
 
+private:
+    ClientInfo   _getClientInfo(qulonglong clientId);
+    ClientInfo   _getClientInfo(QString clientCode);
 };
 
 #endif

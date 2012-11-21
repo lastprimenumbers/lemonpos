@@ -1681,10 +1681,26 @@ bool Azahar::decrementClientPoints(qulonglong id, qulonglong points)
   return result;
 }
 
-ClientInfo Azahar::getClientInfo(qulonglong clientId)
+qulonglong Azahar::checkParent(ClientInfo &info)
+{
+    ClientInfo parentInfo;
+    if (info.parentClient.count()>0){
+        parentInfo.id=0;
+        parentInfo=_getClientInfo(info.parentClient);
+        if (parentInfo.id > 0){
+            info.monthly=parentInfo.monthly;
+            return parentInfo.id;
+        }
+    }
+    return info.id;
+}
+
+
+ClientInfo Azahar::_getClientInfo(qulonglong clientId)
 {
   ClientInfo info;
   info.name = "";
+  info.parentClient="";
   info.id = 0;//to recognize errors.
     if (!db.isOpen()) db.open();
     if (db.isOpen()) {
@@ -1702,6 +1718,7 @@ ClientInfo Azahar::getClientInfo(qulonglong clientId)
           int fieldCell   = qC.record().indexOf("phone_movil");
           int fieldAdd    = qC.record().indexOf("address");
           int fieldParent = qC.record().indexOf("parent");
+          int fieldMonthly = qC.record().indexOf("monthly");
           //Should be only one
           info.id         = qC.value(fieldId).toUInt();
           info.code       = qC.value(fieldCode).toString();
@@ -1714,6 +1731,7 @@ ClientInfo Azahar::getClientInfo(qulonglong clientId)
           info.phone      = qC.value(fieldPhone).toString();
           info.cell       = qC.value(fieldCell).toString();
           info.address    = qC.value(fieldAdd).toString();
+          info.monthly   = qC.value(fieldMonthly).toDouble();
         }
       }
       else {
@@ -1723,11 +1741,23 @@ ClientInfo Azahar::getClientInfo(qulonglong clientId)
  return info;
 }
 
-ClientInfo Azahar::getClientInfo(QString clientCode)
+
+
+ClientInfo Azahar::getClientInfo(qulonglong clientId)
+{
+  ClientInfo info;
+  info=_getClientInfo(clientId);
+  checkParent(info);
+  return info;
+}
+
+
+ClientInfo Azahar::_getClientInfo(QString clientCode)
 {
     ClientInfo info;
     info.name = "";
     info.id = 0;//to recognize errors.
+    info.parentClient="";
     if (!db.isOpen()) db.open();
     if (db.isOpen()) {
         QSqlQuery qC(db);
@@ -1736,7 +1766,8 @@ ClientInfo Azahar::getClientInfo(QString clientCode)
                 int fieldId     = qC.record().indexOf("id");
                 int fieldCode   = qC.record().indexOf("code");
                 int fieldName   = qC.record().indexOf("name");
-                int fieldParent   = qC.record().indexOf("parent");
+                int fieldParent = qC.record().indexOf("parent");
+                int fieldMonthly = qC.record().indexOf("monthly");
                 int fieldPoints = qC.record().indexOf("points");
                 int fieldPhoto  = qC.record().indexOf("photo");
                 int fieldDisc   = qC.record().indexOf("discount");
@@ -1748,6 +1779,7 @@ ClientInfo Azahar::getClientInfo(QString clientCode)
                 info.code       = qC.value(fieldCode).toString();
                 info.name       = qC.value(fieldName).toString();
                 info.parentClient       = qC.value(fieldParent).toString();
+                info.monthly    = qC.value(fieldMonthly).toDouble();
                 info.points     = qC.value(fieldPoints).toULongLong();
                 info.discount   = qC.value(fieldDisc).toDouble();
                 info.photo      = qC.value(fieldPhoto).toByteArray();
@@ -1761,10 +1793,17 @@ ClientInfo Azahar::getClientInfo(QString clientCode)
             qDebug()<<"ERROR: "<<qC.lastError();
         }
     }
+
     return info;
 }
 
-
+ClientInfo Azahar::getClientInfo(QString clientCode)
+{
+    ClientInfo info;
+    info=_getClientInfo(clientCode);
+    checkParent(info);
+    return info;
+}
 
 QString Azahar::getMainClient()
 {
@@ -1817,6 +1856,7 @@ QHash<QString, ClientInfo> Azahar::getClientsHash()
         info.photo      = qC.value(fieldPhoto).toByteArray();
         info.since      = qC.value(fieldSince).toDate();
         info.expiry      = qC.value(fieldExpiry).toDate();
+        checkParent(info);
         result.insert(info.name, info);
         if (info.id == 1) m_mainClient = info.name;
       }
@@ -4197,39 +4237,14 @@ ReservationInfo  Azahar::getReservationInfoFromTr(const qulonglong &trId)
     return result;
 }
 
-
-
-//credits
-CreditInfo Azahar::getCreditInfo(const qulonglong &id)
-{
-    CreditInfo result;  //NOTE: This method is not used.
-//     result.id=0;
-//     result.clientId = 0;
-//     result.total = 0;
-//     if (!db.isOpen()) db.open();
-//     if (db.isOpen()) {
-//         QSqlQuery myQuery(db);
-//         myQuery.prepare("SELECT * FROM credits WHERE id=:id;");
-//         myQuery.bindValue(":id", id);
-//         if (myQuery.exec() ) {
-//             while (myQuery.next()) {
-//                 int fieldClient  = myQuery.record().indexOf("customerid");
-//                 int fieldTotal   = myQuery.record().indexOf("total");
-//                 result.id = id;
-//                 result.clientId = myQuery.value(fieldClient).toULongLong();
-//                 result.total    = myQuery.value(fieldTotal).toDouble();
-//             }
-//         }
-//         else {
-//             setError(myQuery.lastError().text());
-//         }
-//     }
-    return result;
-}
-
 CreditInfo Azahar::getCreditInfoForClient(const qulonglong &clientId, const bool &create)
 {
     CreditInfo result;
+    ClientInfo info;
+    qulonglong cid;
+    info= getClientInfo(clientId);
+    cid=checkParent(info);
+    qDebug()<<"getCreditInfoForClient: SOSTITUZIONE?"<<cid<<clientId;
     result.id=0;
     result.clientId = 0;
     result.total = 0;
@@ -4237,12 +4252,12 @@ CreditInfo Azahar::getCreditInfoForClient(const qulonglong &clientId, const bool
     if (db.isOpen()) {
         QSqlQuery myQuery(db);
         myQuery.prepare("SELECT * FROM credits WHERE customerid=:id;");
-        myQuery.bindValue(":id", clientId);
+        myQuery.bindValue(":id", cid);
         if (myQuery.exec() ) {
             while (myQuery.next()) {
                 int fieldId     = myQuery.record().indexOf("id");
                 int fieldTotal  = myQuery.record().indexOf("total");
-                result.clientId = clientId;
+                result.clientId = cid;
                 result.id       = myQuery.value(fieldId).toULongLong();
                 result.total    = myQuery.value(fieldTotal).toDouble();
                 qDebug()<<__FUNCTION__<<" ----> Got credit:"<<result.id<<" for $"<<result.total;
@@ -4250,9 +4265,9 @@ CreditInfo Azahar::getCreditInfoForClient(const qulonglong &clientId, const bool
             qDebug()<<__FUNCTION__<<" Getting CREDIT INFO FOR CLIENT ID:"<<clientId<<" .. create="<<create<<" query size:"<<myQuery.size();
             if (myQuery.size() <= 0 && create) {
                 //NO RECORD FOUND, CREATE A NEW ONE.
-                if ( getClientInfo(clientId).id > 0 ) {
+                if ( getClientInfo(cid).id > 0 ) {
                     qDebug()<<__FUNCTION__<<" Creating new credit for client ID:"<<clientId;
-                    result.clientId = clientId;
+                    result.clientId = cid;
                     result.total = 0;
                     qulonglong newId = insertCredit(result);
                     result.id = newId; //now we can return result with the new credit.

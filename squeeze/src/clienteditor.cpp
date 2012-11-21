@@ -120,8 +120,8 @@ void ClientEditor::setParentClient(QString code)
 
     if (code.count()>0) {
         qDebug()<<"setParentClient "<<code;
-        ui->editParentClient->setText(code);
         validateParent(code);
+        ui->editParentClient->setText(code);
     }
     else {
         qDebug()<<"Empty parent client"<<code;
@@ -157,12 +157,14 @@ bool ClientEditor::validateParent(QString code)
         }
     }
     else {
+        r=true;
         col.setNamedColor("green");
         photo.loadFromData(info.photo);
     }
     ui->parentClientLabel->setText(info.name);
     ui->parentClientPhoto->setPixmap(photo);
     hasParent=r;
+    ui->editMonthlyPoints->setEnabled(false);
     pal.setColor(QPalette::Text,col);
     ui->editParentClient->setPalette(pal);
     return r;
@@ -224,7 +226,6 @@ void ClientEditor::viewChildClient(int row, int col)
 
 void ClientEditor::setClientInfo(ClientInfo info)
 {
-    qDebug()<<"setClientInfo: parentClient"<<info.parentClient;
     setCode(info.code);
     setId(info.id);
     setName(info.name);
@@ -247,7 +248,6 @@ void ClientEditor::setClientInfo(QString code)
     Azahar *myDb=new Azahar;
     myDb->setDatabase(db);
     ClientInfo info=myDb->getClientInfo(code);
-    qDebug()<<"setClientInfo result from myDb: parentClient"<<info.parentClient;
     setClientInfo(info);
 }
 
@@ -274,7 +274,7 @@ ClientInfo ClientEditor::getClientInfo()
 void ClientEditor::commitClientInfo()
 {
     ClientInfo cInfo = getClientInfo();
-    qDebug()<<"commitClientInfo: "<<cInfo.id<<cInfo.code<<cInfo.name<<cInfo.parentClient;
+    qDebug()<<"commitClientInfo: "<<cInfo.id<<cInfo.code<<cInfo.name<<cInfo.parentClient<<cInfo.monthly;
     if (!db.isOpen()) db.open();
     Azahar *myDb = new Azahar;
     myDb->setDatabase(db);
