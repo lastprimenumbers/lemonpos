@@ -262,6 +262,7 @@ class Azahar : public QObject
 private:
     ClientInfo   _getClientInfo(qulonglong clientId);
     ClientInfo   _getClientInfo(QString clientCode);
+    bool   getClientInfoFromQuery(QSqlQuery &qC, ClientInfo &info);
 };
 
 #endif

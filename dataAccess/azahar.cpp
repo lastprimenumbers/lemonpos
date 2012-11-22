@@ -1681,6 +1681,42 @@ bool Azahar::decrementClientPoints(qulonglong id, qulonglong points)
   return result;
 }
 
+
+bool Azahar::getClientInfoFromQuery(QSqlQuery &qC, ClientInfo &info){
+    info.id=0;
+    info.parentClient="";
+    info.name="";
+    if (qC.next()) {
+      int fieldId     = qC.record().indexOf("id");
+      int fieldCode   = qC.record().indexOf("code");
+      int fieldName   = qC.record().indexOf("name");
+      int fieldPoints = qC.record().indexOf("points");
+      int fieldPhoto  = qC.record().indexOf("photo");
+      int fieldDisc   = qC.record().indexOf("discount");
+      int fieldSince  = qC.record().indexOf("since");
+      int fieldPhone  = qC.record().indexOf("phone");
+      int fieldCell   = qC.record().indexOf("phone_movil");
+      int fieldAdd    = qC.record().indexOf("address");
+      int fieldParent = qC.record().indexOf("parent");
+      int fieldMonthly = qC.record().indexOf("monthly");
+      //Should be only one
+      info.id         = qC.value(fieldId).toUInt();
+      info.code       = qC.value(fieldCode).toString();
+      info.name       = qC.value(fieldName).toString();
+      info.parentClient = qC.value(fieldParent).toString();
+      info.points     = qC.value(fieldPoints).toULongLong();
+      info.discount   = qC.value(fieldDisc).toDouble();
+      info.photo      = qC.value(fieldPhoto).toByteArray();
+      info.since      = qC.value(fieldSince).toDate();
+      info.phone      = qC.value(fieldPhone).toString();
+      info.cell       = qC.value(fieldCell).toString();
+      info.address    = qC.value(fieldAdd).toString();
+      info.monthly   = qC.value(fieldMonthly).toDouble();
+      return true;
+    }
+    return false;
+}
+
 qulonglong Azahar::checkParent(ClientInfo &info)
 {
     ClientInfo parentInfo;
@@ -1699,40 +1735,14 @@ qulonglong Azahar::checkParent(ClientInfo &info)
 ClientInfo Azahar::_getClientInfo(qulonglong clientId)
 {
   ClientInfo info;
-  info.name = "";
-  info.parentClient="";
-  info.id = 0;//to recognize errors.
+//  info.name = "";
+//  info.parentClient="";
+//  info.id = 0;//to recognize errors.
     if (!db.isOpen()) db.open();
     if (db.isOpen()) {
       QSqlQuery qC(db);
       if (qC.exec(QString("select * from clients where id=%1;").arg(clientId))) {
-        while (qC.next()) {
-          int fieldId     = qC.record().indexOf("id");
-          int fieldCode   = qC.record().indexOf("code");
-          int fieldName   = qC.record().indexOf("name");
-          int fieldPoints = qC.record().indexOf("points");
-          int fieldPhoto  = qC.record().indexOf("photo");
-          int fieldDisc   = qC.record().indexOf("discount");
-          int fieldSince  = qC.record().indexOf("since");
-          int fieldPhone  = qC.record().indexOf("phone");
-          int fieldCell   = qC.record().indexOf("phone_movil");
-          int fieldAdd    = qC.record().indexOf("address");
-          int fieldParent = qC.record().indexOf("parent");
-          int fieldMonthly = qC.record().indexOf("monthly");
-          //Should be only one
-          info.id         = qC.value(fieldId).toUInt();
-          info.code       = qC.value(fieldCode).toString();
-          info.name       = qC.value(fieldName).toString();
-          info.parentClient = qC.value(fieldParent).toString();
-          info.points     = qC.value(fieldPoints).toULongLong();
-          info.discount   = qC.value(fieldDisc).toDouble();
-          info.photo      = qC.value(fieldPhoto).toByteArray();
-          info.since      = qC.value(fieldSince).toDate();
-          info.phone      = qC.value(fieldPhone).toString();
-          info.cell       = qC.value(fieldCell).toString();
-          info.address    = qC.value(fieldAdd).toString();
-          info.monthly   = qC.value(fieldMonthly).toDouble();
-        }
+        getClientInfoFromQuery(qC,info);
       }
       else {
         qDebug()<<"ERROR: "<<qC.lastError();
@@ -1762,32 +1772,7 @@ ClientInfo Azahar::_getClientInfo(QString clientCode)
     if (db.isOpen()) {
         QSqlQuery qC(db);
         if (qC.exec(QString("select * from clients WHERE code='%1';").arg(clientCode))) {
-            while (qC.next()) {
-                int fieldId     = qC.record().indexOf("id");
-                int fieldCode   = qC.record().indexOf("code");
-                int fieldName   = qC.record().indexOf("name");
-                int fieldParent = qC.record().indexOf("parent");
-                int fieldMonthly = qC.record().indexOf("monthly");
-                int fieldPoints = qC.record().indexOf("points");
-                int fieldPhoto  = qC.record().indexOf("photo");
-                int fieldDisc   = qC.record().indexOf("discount");
-                int fieldSince  = qC.record().indexOf("since");
-                int fieldPhone  = qC.record().indexOf("phone");
-                int fieldCell   = qC.record().indexOf("phone_movil");
-                int fieldAdd    = qC.record().indexOf("address");
-                info.id         = qC.value(fieldId).toUInt();
-                info.code       = qC.value(fieldCode).toString();
-                info.name       = qC.value(fieldName).toString();
-                info.parentClient       = qC.value(fieldParent).toString();
-                info.monthly    = qC.value(fieldMonthly).toDouble();
-                info.points     = qC.value(fieldPoints).toULongLong();
-                info.discount   = qC.value(fieldDisc).toDouble();
-                info.photo      = qC.value(fieldPhoto).toByteArray();
-                info.since      = qC.value(fieldSince).toDate();
-                info.phone      = qC.value(fieldPhone).toString();
-                info.cell       = qC.value(fieldCell).toString();
-                info.address    = qC.value(fieldAdd).toString();
-            }
+            getClientInfoFromQuery(qC,info);
         }
         else {
             qDebug()<<"ERROR: "<<qC.lastError();
@@ -1837,25 +1822,8 @@ QHash<QString, ClientInfo> Azahar::getClientsHash()
   if (db.isOpen()) {
     QSqlQuery qC(db);
     if (qC.exec("select * from clients;")) {
-      while (qC.next()) {
-        int fieldId     = qC.record().indexOf("id");
-        int fieldName   = qC.record().indexOf("name");
-        int fieldParent   = qC.record().indexOf("parent");
-        int fieldPoints = qC.record().indexOf("points");
-        int fieldMonthly = qC.record().indexOf("monthly");
-        int fieldPhoto  = qC.record().indexOf("photo");
-        int fieldDisc   = qC.record().indexOf("discount");
-        int fieldSince  = qC.record().indexOf("since");
-        int fieldExpiry  = qC.record().indexOf("expiry");
-        info.id = qC.value(fieldId).toUInt();
-        info.name       = qC.value(fieldName).toString();
-        info.parentClient       = qC.value(fieldParent).toString();
-        info.points     = qC.value(fieldPoints).toULongLong();
-        info.monthly   = qC.value(fieldMonthly).toDouble();
-        info.discount   = qC.value(fieldDisc).toDouble();
-        info.photo      = qC.value(fieldPhoto).toByteArray();
-        info.since      = qC.value(fieldSince).toDate();
-        info.expiry      = qC.value(fieldExpiry).toDate();
+
+      while (getClientInfoFromQuery(qC,info)) {
         checkParent(info);
         result.insert(info.name, info);
         if (info.id == 1) m_mainClient = info.name;
