@@ -248,6 +248,7 @@ lemonView::lemonView(QWidget *parent) //: QWidget(parent)
   connect(ui_mainview.splitter, SIGNAL(splitterMoved(int, int)), SLOT(setUpTable()));
   connect(ui_mainview.splitterGrid, SIGNAL(splitterMoved(int, int)), SLOT(setUpTable()));
   connect(ui_mainview.comboClients, SIGNAL(currentIndexChanged(int)), SLOT(comboClientsOnChange()));
+  (ui_mainview.comboClients) ->setEditable(true);
   connect(ui_mainview.btnChangeSaleDate, SIGNAL(clicked()), SLOT(showChangeDate()));
 
   ui_mainview.editTicketDatePicker->setDate(QDate::currentDate());
