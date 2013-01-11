@@ -1825,6 +1825,7 @@ QHash<QString, ClientInfo> Azahar::getClientsHash()
 
       while (getClientInfoFromQuery(qC,info)) {
         checkParent(info);
+        info.photo = "";
         result.insert(info.name, info);
         if (info.id == 1) m_mainClient = info.name;
       }

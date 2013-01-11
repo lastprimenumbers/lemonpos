@@ -299,6 +299,7 @@ public:
 
 
     void doEmitSignalQueryDb();
+    void loadClient();
 
     void settingsChanged();
     void settingsChangedOnInitConfig();

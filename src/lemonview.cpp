@@ -230,6 +230,7 @@ lemonView::lemonView(QWidget *parent) //: QWidget(parent)
   //connect(ui_mainview.editItemDescSearch, SIGNAL(returnPressed()), this, SLOT(doSearchItemDesc()));
   connect(ui_mainview.editItemDescSearch, SIGNAL(textEdited(const QString&)), this, SLOT(doSearchItemDesc()));
   connect(ui_mainview.editItemCode, SIGNAL(returnPressed()), this, SLOT(doEmitSignalQueryDb()));
+  connect(ui_mainview.editClientCode, SIGNAL(returnPressed()), this, SLOT(loadClient()));
   connect(this, SIGNAL(signalQueryDb(QString)), this, SLOT(insertItem(QString)) );
   connect(ui_mainview.tableWidget, SIGNAL(itemDoubleClicked(QTableWidgetItem*)), SLOT(itemDoubleClicked(QTableWidgetItem*)) );
   connect(ui_mainview.tableSearch, SIGNAL(itemDoubleClicked(QTableWidgetItem*)), SLOT(itemSearchDoubleClicked(QTableWidgetItem*)) );
@@ -345,6 +346,7 @@ lemonView::lemonView(QWidget *parent) //: QWidget(parent)
  //    }
 
   ui_mainview.editItemCode->setFocus();
+
 }
 
 void lemonView::showChangeDate()
@@ -835,6 +837,7 @@ void lemonView::login()
       loggedUserName = getLoggedUserName(loggedUser);
       loggedUserId   = getLoggedUserId(loggedUser);
       loggedUserRole = getUserRole(loggedUserId);
+      startOperation(loggedUser);
       emit signalLoggedUser();
       //Now check roles instead of names
       if (loggedUserRole == roleAdmin) {
@@ -1209,6 +1212,26 @@ RoundingInfo lemonView::roundUsStandard(const double &number)
     qDebug()<<__FUNCTION__<<"Original number: "<<number<<"doubleResult:"<<result.doubleResult<<" strResult:"<<result.strResult<<" |  intIntPart:"<<result.intIntPart<<" intDecPart:"<<result.intDecPart;
 
     return result;
+}
+
+void lemonView::loadClient()
+{
+    ClientInfo info;
+    Azahar *myDb = new Azahar;
+  myDb->setDatabase(db);
+  info = myDb->getClientInfo(ui_mainview.editClientCode->text());
+  if ( info.id == 0)  {
+      qDebug()<<"KNOT";
+      QMessageBox::warning(this,
+                           i18n("Warning: Client Code Not Found"),
+                           i18n("Please provide a correct client code."),
+                           QMessageBox::Abort,
+                           QMessageBox::Abort);
+  } else {
+    clientInfo=info;
+  updateClientInfo();
+  }
+
 }
 
 void lemonView::doEmitSignalQueryDb()
@@ -3225,13 +3248,14 @@ void lemonView::startOperation(const QString &adminUser)
   operationStarted = false;
   bool ok=false;
   double qty=0.0; //TODO:preset as the money on the drawer on the last user.
-  InputDialog *dlg = new InputDialog(this, false, dialogMoney, i18n("Enter the amount of money to deposit in the drawer"));
-  dlg->setEnabled(true);
-  if (dlg->exec() ) {
-    qty = dlg->dValue;
-    if (qty >= 0) ok = true; //allow no deposit...
-  }
-
+//  InputDialog *dlg = new InputDialog(this, false, dialogMoney, i18n("Enter the amount of money to deposit in the drawer"));
+//  dlg->setEnabled(true);
+//  if (dlg->exec() ) {
+//    qty = dlg->dValue;
+//    if (qty >= 0) ok = true; //allow no deposit...
+//  }
+  qty=0;
+  ok=true;
   if (ok) {
     if (!drawerCreated) {
       drawer = new Gaveta();
@@ -4050,12 +4074,15 @@ void lemonView::updateClientInfo()
   //dStr = dStr + "\n"+KGlobal::locale()->formatMoney(discMoney);
   ui_mainview.lblClientDiscount->setText(dStr);
   ui_mainview.labelClientDiscounted->setText(pStr);
-  QPixmap pix;
-  pix.loadFromData(clientInfo.photo);
-  ui_mainview.lblClientPhoto->setPixmap(pix);
+
 
   Azahar *myDb = new Azahar;
   myDb->setDatabase(db); //NOTE:maybe its better to add creditInfo to clientInfo, and from azahar::getClientInfo() get the creditInfoForClient. Need more code review at azahar.
+
+  QPixmap pix;
+  clientInfo = myDb->getClientInfo(clientInfo.code);
+  pix.loadFromData(clientInfo.photo);
+  ui_mainview.lblClientPhoto->setPixmap(pix);
 
   CreditInfo credit = myDb->getCreditInfoForClient(clientInfo.id, false);//do not create new credit if not found.
   if (credit.id > 0 and credit.total != 0 )
