@@ -1433,7 +1433,7 @@ p, li { white-space: pre-wrap; }
            <item>
             <widget class="QStackedWidget" name="stackedWidget2">
              <property name="currentIndex">
-              <number>4</number>
+              <number>1</number>
              </property>
              <widget class="QWidget" name="cashF_2">
               <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -2488,14 +2488,14 @@ color:black;</string>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>KPlotWidget</class>
-   <extends>QFrame</extends>
-   <header>kplotwidget.h</header>
-  </customwidget>
-  <customwidget>
    <class>KDateWidget</class>
    <extends>QWidget</extends>
    <header>kdatewidget.h</header>
+  </customwidget>
+  <customwidget>
+   <class>KPlotWidget</class>
+   <extends>QFrame</extends>
+   <header>kplotwidget.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

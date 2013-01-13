@@ -1303,6 +1303,11 @@ void squeezeView::setupTransactionsModel()
     ui_mainview.transactionsTable->setModel(transactionsModel);
     ui_mainview.transactionsTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui_mainview.transactionsTable->setColumnHidden(transItemsListIndex, true);
+    ui_mainview.transactionsTable->setColumnHidden(transPaidWithIndex, true);
+    ui_mainview.transactionsTable->setColumnHidden(transChangeGivenIndex, true);
+    ui_mainview.transactionsTable->setColumnHidden(transPayMethodIndex, true);
+    ui_mainview.transactionsTable->setColumnHidden(transCardNumIndex, true);
+    ui_mainview.transactionsTable->setColumnHidden(transCardAuthNumberIndex, true);
     ui_mainview.transactionsTable->setColumnHidden(transSOIndex, true);
 
     transactionsModel->setRelation(transTypeIndex, QSqlRelation("transactiontypes", "ttypeid", "text"));
