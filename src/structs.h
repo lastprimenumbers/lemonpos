@@ -79,6 +79,16 @@ struct UserInfo
   int role;
 };
 
+struct Limit
+{
+    int clientId;
+    QString clientTag;
+    int productId;
+    int productCat;
+    double limit;
+    double current;
+};
+
 struct ClientInfo
 {
   unsigned int id;
@@ -94,6 +104,8 @@ struct ClientInfo
   QByteArray   photo;
   QDate        since;
   QDate        expiry;
+  QStringList   tags;
+  QList<Limit>         limits;
 };
 
 struct OfferInfo

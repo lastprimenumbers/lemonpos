@@ -141,6 +141,15 @@ class Azahar : public QObject
     unsigned int getClientId(QString uname);
     bool         deleteClient(qulonglong id);
 
+    // TAGS
+    QStringList getClientTags(qulonglong clientId);
+    QStringList getAvailableTags();
+    void setClientTags(ClientInfo info);
+
+    // LIMITS
+    void getClientLimits(ClientInfo &info);
+    Limit getLimitFromQuery(QSqlQuery &query);
+
     //TRANSACTIONS
     TransactionInfo getTransactionInfo(qulonglong id);
     qulonglong  insertTransaction(TransactionInfo info);

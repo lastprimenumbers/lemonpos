@@ -66,6 +66,14 @@ ClientEditor::ClientEditor( QSqlDatabase parentDb, QWidget *parent )
     ui->editClientDiscount->setEmptyMessage(i18n("Personal discount"));
     ui->editParentClient->setEmptyMessage(i18n("Parent client"));
 
+    // Tags
+    connect(ui->tagAddButton, SIGNAL(clicked()), SLOT( addTag() ));
+    connect(ui->tagRemoveButton, SIGNAL(clicked()), SLOT( removeTag() ));
+    connect(ui->tagCreateButton, SIGNAL(clicked()), SLOT( createTag() ));
+
+    // Limits
+    connect(ui->addLimitButton, SIGNAL(clicked()), SLOT( createLimit() ));
+
     //since date picker
     ui->sinceDatePicker->setDate(QDate::currentDate());
     
@@ -80,6 +88,8 @@ ClientEditor::ClientEditor( QSqlDatabase parentDb, QWidget *parent )
     connect(ui->editParentClient, SIGNAL(textChanged(QString)), SLOT(validateParent(QString)));
     connect(ui->viewClientButton, SIGNAL(clicked()), SLOT(viewParentClient()));
     connect(ui->childrenTable, SIGNAL(cellDoubleClicked(int,int)), SLOT(viewChildClient(int,int)));
+
+
 }
 
 ClientEditor::~ClientEditor()
@@ -224,6 +234,44 @@ void ClientEditor::viewChildClient(int row, int col)
 
 }
 
+void ClientEditor::setTags(QStringList tags)
+{
+    for (int i = 0; i<tags.count(); ++i) {
+        ui->clientTagsList->addItem(tags.at(i));
+    }
+    Azahar *myDb=new Azahar;
+    myDb->setDatabase(db);
+    QStringList avail=myDb->getAvailableTags();
+    for (int i = 0; i<avail.count(); ++i) {
+        if (tags.contains(avail.at(i))) { continue; }
+        ui->availableTagsList->addItem(avail.at(i));
+    }
+
+}
+
+QStringList ClientEditor::getTags()
+{
+    QStringList tags;
+    for (int i =0; i < ui->clientTagsList->count(); ++i) {
+        tags.append(ui->clientTagsList->item(i)->text());
+    }
+    return tags;
+}
+
+void ClientEditor::loadLimits(ClientInfo info)
+{
+    ui->clientLimitsList->setColumnCount(4);
+    ui->globalLimitsList->setColumnCount(5);
+    for (int i; i<info.limits.count(); ++i) {
+        Limit lim=info.limits.at(i);
+        if (lim.clientId == info.id) {
+            ui->clientLimitsList->setItem()
+        } else {
+            ui->globalLimitsList->addItem()
+        }
+    }
+}
+
 void ClientEditor::setClientInfo(ClientInfo info)
 {
     setCode(info.code);
@@ -241,6 +289,8 @@ void ClientEditor::setClientInfo(ClientInfo info)
     QPixmap photo;
     photo.loadFromData(info.photo);
     setPhoto(photo);
+    setTags(info.tags);
+    loadLimits(info);
 }
 //Overloaded: imposta le informazioni basandosi sul codice!
 void ClientEditor::setClientInfo(QString code)
@@ -268,6 +318,7 @@ ClientInfo ClientEditor::getClientInfo()
     QPixmap photo=getPhoto();
     info.photo = Misc::pixmap2ByteArray(new QPixmap(photo));
     info.parentClient=getParentClient();
+    info.tags=getTags();
     return info;
 }
 
@@ -279,8 +330,34 @@ void ClientEditor::commitClientInfo()
     Azahar *myDb = new Azahar;
     myDb->setDatabase(db);
     bool result=myDb->updateClient(cInfo);
+    myDb->setClientTags(cInfo);
     db.commit();
     delete myDb;
+}
+
+void ClientEditor::addTag()
+{
+    QString item=ui->availableTagsList->takeItem(ui->availableTagsList->currentRow())->text();
+    ui->clientTagsList->addItem(item);
+}
+
+void ClientEditor::removeTag()
+{
+    QString item=ui->clientTagsList->takeItem(ui->clientTagsList->currentRow())->text();
+    ui->availableTagsList->addItem(item);
+}
+void ClientEditor::createTag()
+{
+    QString item = QInputDialog::getText(this,"Create a new tag","Enter the new tag:");
+    if (item.count()==0){
+        return;
+    }
+    ui->clientTagsList->addItem(item);
+}
+
+void ClientEditor::createLimit()
+{
+
 }
 
 #include "clienteditor.moc"

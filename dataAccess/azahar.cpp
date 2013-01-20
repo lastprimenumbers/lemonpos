@@ -1732,6 +1732,118 @@ qulonglong Azahar::checkParent(ClientInfo &info)
 }
 
 
+Limit Azahar::getLimitFromQuery(QSqlQuery &query)
+{
+    int fieldClientId     = query.record().indexOf("clientId");
+    int fieldClientTag     = query.record().indexOf("clientTag");
+    int fieldProductId     = query.record().indexOf("productTag");
+    int fieldProductCat     = query.record().indexOf("productCat");
+    int fieldLimit     = query.record().indexOf("limit");
+    int fieldCurrent     = query.record().indexOf("current");
+    Limit result;
+    result.clientId=query.value(fieldClientId).toInt();
+    result.clientTag=query.value(fieldClientTag).toString();
+    result.productId=query.value(fieldProductId).toInt();
+    result.productCat=query.value(fieldProductCat).toInt();
+    result.limit=query.value(fieldLimit).toFloat();
+    result.current=query.value(fieldCurrent).toFloat();
+    return result;
+}
+
+void Azahar::getClientLimits(ClientInfo &info)
+{
+    QList<Limit> limits;
+    if (!db.isOpen()) db.open();
+    if (db.isOpen()) {
+        QSqlQuery query(db);
+        // Specific client limits
+        query.exec(QString("select * from limits where clientId=%1;").arg(info.id));
+        while (query.next()) {
+            limits.append(getLimitFromQuery(query));
+        }
+
+        // General client limits
+        query.exec("select * from limits where clientId=0;");
+        while (query.next()) {
+            Limit lim=getLimitFromQuery(query);
+            // Appending only if not specific to certain tag
+            if (info.tags.contains(lim.clientTag)) {
+                limits.append(lim);
+            }
+        }
+        }
+    info.limits=limits;
+}
+
+QStringList Azahar::getClientTags(qulonglong clientId)
+{
+    QStringList tags;
+    if (clientId == 0) {
+        return tags;
+    }
+    if (!db.isOpen()) db.open();
+    if (db.isOpen()) {
+        QSqlQuery qC(db);
+        if (qC.exec(QString("select * from tags where idclient=%1;").arg(clientId))) {
+            int fieldTag     = qC.record().indexOf("tag");
+            while (qC.next()) {
+                tags.append(qC.value(fieldTag).toString());
+            }
+        }
+    }
+    return tags;
+}
+
+void Azahar::setClientTags(ClientInfo info)
+{
+    qDebug()<<"setClientTags"<<info.tags;
+    // Recupero vecchi tag
+    QStringList old = getClientTags(info.id);
+    if (!db.isOpen()) db.open();
+    if (db.isOpen()) {
+        QSqlQuery query(db);
+        // Aggiungo tag mancanti
+        for (int i = 0; i<info.tags.count(); ++i) {
+            if (old.contains(info.tags.at(i))) { continue ;}
+            qDebug()<<"ADDING"<<info.tags.at(i);
+            query.prepare("INSERT INTO tags (idclient, tag) VALUES (:idclient, :tag);");
+            query.bindValue(":idclient",info.id);
+            query.bindValue(":tag",info.tags.at(i));
+            if (!query.exec()){
+                qDebug()<<"ERROR ADDING"<<info.tags.at(i)<<query.lastError();
+            }
+        }
+        // Rimuovo tag non più validi
+
+        for (int i = 0; i<old.count(); ++i) {
+            if (info.tags.contains(old.at(i))) { continue ; }
+            qDebug()<<"REMOVING"<<old.at(i);
+            query.prepare("DELETE FROM tags WHERE idclient=:idclient and tag=:tag");
+            query.bindValue(":idclient",info.id);
+            query.bindValue(":tag",old.at(i));
+            query.exec();
+        }
+    }
+}
+
+QStringList Azahar::getAvailableTags()
+{
+    QStringList tags;
+    if (!db.isOpen()) db.open();
+    if (db.isOpen()) {
+        QSqlQuery qC(db);
+        if (qC.exec(QString("select * from tags"))) {
+            int fieldTag     = qC.record().indexOf("tag");
+            while (qC.next()) {
+                tags.append(qC.value(fieldTag).toString());
+                qDebug()<<"TAG FOUND"<<tags.last();
+            }
+        }
+    }
+    tags.removeDuplicates();
+    return tags;
+}
+
 ClientInfo Azahar::_getClientInfo(qulonglong clientId)
 {
   ClientInfo info;
@@ -1743,6 +1855,8 @@ ClientInfo Azahar::_getClientInfo(qulonglong clientId)
       QSqlQuery qC(db);
       if (qC.exec(QString("select * from clients where id=%1;").arg(clientId))) {
         getClientInfoFromQuery(qC,info);
+        info.tags=getClientTags(clientId);
+        getClientLimits(info);
       }
       else {
         qDebug()<<"ERROR: "<<qC.lastError();
@@ -1761,6 +1875,13 @@ ClientInfo Azahar::getClientInfo(qulonglong clientId)
   return info;
 }
 
+ClientInfo Azahar::getClientInfo(QString clientCode)
+{
+    ClientInfo info;
+    info=_getClientInfo(clientCode);
+    checkParent(info);
+    return info;
+}
 
 ClientInfo Azahar::_getClientInfo(QString clientCode)
 {
@@ -1773,6 +1894,8 @@ ClientInfo Azahar::_getClientInfo(QString clientCode)
         QSqlQuery qC(db);
         if (qC.exec(QString("select * from clients WHERE code='%1';").arg(clientCode))) {
             getClientInfoFromQuery(qC,info);
+            info.tags=getClientTags(info.id);
+            getClientLimits(info);
         }
         else {
             qDebug()<<"ERROR: "<<qC.lastError();
@@ -1782,13 +1905,7 @@ ClientInfo Azahar::_getClientInfo(QString clientCode)
     return info;
 }
 
-ClientInfo Azahar::getClientInfo(QString clientCode)
-{
-    ClientInfo info;
-    info=_getClientInfo(clientCode);
-    checkParent(info);
-    return info;
-}
+
 
 QString Azahar::getMainClient()
 {
