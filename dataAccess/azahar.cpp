@@ -1756,20 +1756,16 @@ void Azahar::getClientLimits(ClientInfo &info)
     if (!db.isOpen()) db.open();
     if (db.isOpen()) {
         QSqlQuery query(db);
+        Limit lim;
         // Specific client limits
-        query.exec(QString("select * from limits where clientId=%1;").arg(info.id));
+        QString q=QString("select * from limits where (clientId=%1 or clientId=0) and (clientTag in (###));").arg(info.id);
+        query.exec(q);
         while (query.next()) {
-            limits.append(getLimitFromQuery(query));
-        }
-
-        // General client limits
-        query.exec("select * from limits where clientId=0;");
-        while (query.next()) {
-            Limit lim=getLimitFromQuery(query);
-            // Appending only if not specific to certain tag
-            if (info.tags.contains(lim.clientTag)) {
-                limits.append(lim);
+            lim=getLimitFromQuery(query);
+            if (lim.clientId==0) {
+                 if (!info.tags.contains(lim.clientTag)) { continue; }
             }
+            limits.append(lim);
         }
         }
     info.limits=limits;

@@ -89,6 +89,8 @@ ClientEditor::ClientEditor( QSqlDatabase parentDb, QWidget *parent )
     connect(ui->viewClientButton, SIGNAL(clicked()), SLOT(viewParentClient()));
     connect(ui->childrenTable, SIGNAL(cellDoubleClicked(int,int)), SLOT(viewChildClient(int,int)));
 
+    limitsModel=new QSqlTableModel();
+
 
 }
 
@@ -260,16 +262,25 @@ QStringList ClientEditor::getTags()
 
 void ClientEditor::loadLimits(ClientInfo info)
 {
-    ui->clientLimitsList->setColumnCount(4);
-    ui->globalLimitsList->setColumnCount(5);
-    for (int i; i<info.limits.count(); ++i) {
-        Limit lim=info.limits.at(i);
-        if (lim.clientId == info.id) {
-            ui->clientLimitsList->setItem()
-        } else {
-            ui->globalLimitsList->addItem()
-        }
+    Azahar *myDb=new Azahar;
+    myDb->setDatabase(db);
+    limitsModel->setTable("limits");
+    ui->clientLimitsList->setModel(limitsModel);
+    ui->clientLimitsList->setColumnHidden(0,true);
+    QString f;
+    QString tag;
+
+    f=QString("clientId=%1 or (clientId=0 and clientTag in ('*',###))").arg(info.id);
+    for (int i=0; i<info.tags.count();++i) {
+        tag.append("'");
+        tag.append(info.tags.at(i));
+        tag.append("',");
     }
+    tag.remove(-1,1);
+    f.replace("###",tag);
+    qDebug()<<f;
+    limitsModel->setFilter(f);
+    limitsModel->select();
 }
 
 void ClientEditor::setClientInfo(ClientInfo info)

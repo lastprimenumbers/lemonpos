@@ -79,7 +79,7 @@
 //TODO: Change all qDebug to errorDialogs or remove them.
 //NOTE: Common configuration fields need to be shared between lemon and squeeze (low stock alarm value).
 
-enum {pWelcome=0, pBrowseProduct=1, pBrowseOffers=2, pBrowseUsers=3, pBrowseMeasures=4, pBrowseCategories=5, pBrowseClients=6, pBrowseRandomMessages=7, pBrowseLogs=8, pBrowseSO=9, pReports=10, pBrowseCurrencies=11, pBrowseReservations=12};
+enum {pWelcome=0, pBrowseProduct=1, pBrowseOffers=2, pBrowseUsers=3, pBrowseMeasures=4, pBrowseCategories=5, pBrowseClients=6, pBrowseLimits=7, pBrowseRandomMessages=8, pBrowseLogs=9, pBrowseSO=10, pReports=11, pBrowseCurrencies=12, pBrowseReservations=13};
 
 
 squeezeView::squeezeView(QWidget *parent)
@@ -482,6 +482,18 @@ void squeezeView::showClientsPage()
   ui_mainview.btnPrintBalance->hide();
 }
 
+
+void squeezeView::showLimitsPage()
+{
+  qDebug()<<"showLimitsPage";
+  ui_mainview.stackedWidget->setCurrentIndex(pBrowseLimits);
+  if (limitsModel->tableName().isEmpty()) setupLimitsModel();
+  qDebug()<<"Set up";
+  ui_mainview.headerLabel->setText(i18n("Limits"));
+  ui_mainview.headerImg->setPixmap((DesktopIcon("lemon-user",48)));
+  ui_mainview.btnPrintBalance->hide();
+}
+
 void squeezeView::showTransactionsPage()
 {
   ui_mainview.stackedWidget->setCurrentIndex(pReports);
@@ -839,6 +851,7 @@ void squeezeView::setupDb()
     measuresModel   = new QSqlTableModel();
     categoriesModel = new QSqlTableModel();
     clientsModel    = new QSqlTableModel();
+    limitsModel     = new QSqlRelationalTableModel();
     transactionsModel = new QSqlRelationalTableModel();
     balancesModel   = new QSqlTableModel();
     cashflowModel   = new QSqlRelationalTableModel();
@@ -851,6 +864,7 @@ void squeezeView::setupDb()
     setupProductsModel();
     setupMeasuresModel();
     setupClientsModel();
+    setupLimitsModel();
     setupUsersModel();
     setupTransactionsModel();
     setupCategoriesModel();
@@ -1266,6 +1280,31 @@ void squeezeView::setupClientsModel()
     QString details = db.lastError().text();
     KMessageBox::detailedError(this, i18n("Squeeze has encountered an error, click details to see the error details."), details, i18n("Error"));
     QTimer::singleShot(10000, this, SLOT(setupClientsModel()));
+  }
+}
+
+void squeezeView::setupLimitsModel()
+{
+  qDebug()<<"Setting up Limits Model";
+  if (db.isOpen()) {
+    limitsModel->setTable("limits");
+    //PROBLEMA: E se non sono definite?
+    limitsModel->setRelation(2, QSqlRelation("tags", "tag", "tag"));
+    limitsModel->setRelation(3, QSqlRelation("products", "code", "name"));
+    limitsModel->setRelation(4, QSqlRelation("categories", "catid", "text"));
+
+    ui_mainview.limitsView->setModel(limitsModel);
+    ui_mainview.limitsView->setColumnHidden(0,true);
+    ui_mainview.limitsView->setItemDelegate(new QSqlRelationalDelegate(ui_mainview.limitsView));
+    limitsModel->select();
+
+  }
+  else {
+      //At this point, what to do?
+     // inform to the user about the error and finish app  or retry again some time later?
+    QString details = db.lastError().text();
+    KMessageBox::detailedError(this, i18n("Squeeze has encountered an error, click details to see the error details."), details, i18n("Error"));
+    QTimer::singleShot(10000, this, SLOT(setupLimitsModel()));
   }
 }
 

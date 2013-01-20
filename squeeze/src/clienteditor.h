@@ -79,7 +79,7 @@ class ClientEditor : public KDialog
     ClientInfo getClientInfo();
     void commitClientInfo();
     void loadLimits(ClientInfo info);
-
+    QSqlTableModel *limitsModel;
 
 
   private slots:

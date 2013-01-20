@@ -71,6 +71,7 @@ public:
     QSqlTableModel *categoriesModel;
     QSqlTableModel *balancesModel;
     QSqlTableModel *clientsModel;
+    QSqlRelationalTableModel *limitsModel;
     QSqlTableModel *randomMsgModel;
     QSqlRelationalTableModel *reservationsModel;
     QSqlRelationalTableModel *logsModel;
@@ -135,6 +136,7 @@ signals:
    void showMeasuresPage();
    void showCategoriesPage();
    void showClientsPage();
+   void showLimitsPage();
    void showTransactionsPage();
    void showReports();
    void showRandomMsgs();
@@ -206,6 +208,7 @@ signals:
    void setupMeasuresModel();
    void setupCategoriesModel();
    void setupClientsModel();
+   void setupLimitsModel();
    void setupTransactionsModel();
    void setupCurrenciesModel();
    void checkDBStatus();
