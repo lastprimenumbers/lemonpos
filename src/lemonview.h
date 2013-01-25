@@ -98,7 +98,7 @@ public:
     QSqlTableModel *productsModel;
     QHash<QString, int> categoriesHash;
     ClientInfo clientInfo;
-    QHash<QString, ClientInfo> clientsHash;
+    QHash<int, ClientInfo> clientsHash;
     qulonglong buyPoints;
     double discMoney;
     double totalSumWODisc;
@@ -314,7 +314,7 @@ public:
 
     void listViewOnMouseMove(const QModelIndex & index);
     void listViewOnClick( const QModelIndex & index );
-    void comboClientsOnChange();
+    void comboClientsOnChange(int idx);
     void updateClientInfo();
     void updateModelView();
     void showProductsGrid(bool show);

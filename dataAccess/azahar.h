@@ -134,7 +134,7 @@ class Azahar : public QObject
     ClientInfo   getClientInfo(qulonglong clientId);
     ClientInfo   getClientInfo(QString clientCode);
     qulonglong         checkParent(ClientInfo &info);
-    QHash<QString, ClientInfo> getClientsHash();
+    QHash<int, ClientInfo> getClientsHash();
     QStringList  getClientsList();
     void getChildrenClientsList(QString parentClient, QStringList &codes, QStringList &names);
     QString      getMainClient();

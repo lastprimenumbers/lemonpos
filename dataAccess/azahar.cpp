@@ -1927,9 +1927,9 @@ QString Azahar::getMainClient()
 return result;
 }
 
-QHash<QString, ClientInfo> Azahar::getClientsHash()
+QHash<int, ClientInfo> Azahar::getClientsHash()
 {
- QHash<QString, ClientInfo> result;
+ QHash<int, ClientInfo> result;
  ClientInfo info;
   if (!db.isOpen()) db.open();
   if (db.isOpen()) {
@@ -1939,7 +1939,7 @@ QHash<QString, ClientInfo> Azahar::getClientsHash()
       while (getClientInfoFromQuery(qC,info)) {
         checkParent(info);
         info.photo = "";
-        result.insert(info.name, info);
+        result.insert(info.id, info);
         if (info.id == 1) m_mainClient = info.name;
       }
     }

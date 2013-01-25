@@ -248,7 +248,7 @@ lemonView::lemonView(QWidget *parent) //: QWidget(parent)
   connect(ui_mainview.editCardAuthNumber, SIGNAL(returnPressed()), SLOT(finishCurrentTransaction()) );
   connect(ui_mainview.splitter, SIGNAL(splitterMoved(int, int)), SLOT(setUpTable()));
   connect(ui_mainview.splitterGrid, SIGNAL(splitterMoved(int, int)), SLOT(setUpTable()));
-  connect(ui_mainview.comboClients, SIGNAL(currentIndexChanged(int)), SLOT(comboClientsOnChange()));
+  connect(ui_mainview.comboClients, SIGNAL(currentIndexChanged(int)), SLOT(comboClientsOnChange(int)));
   (ui_mainview.comboClients) ->setEditable(true);
   connect(ui_mainview.btnChangeSaleDate, SIGNAL(clicked()), SLOT(showChangeDate()));
 
@@ -2551,8 +2551,8 @@ void lemonView::finishCurrentTransaction()
 
     //update client info in the hash....
     clientInfo.points += buyPoints;
-    clientsHash.remove(QString::number(clientInfo.id));
-    clientsHash.insert(QString::number(clientInfo.id), clientInfo);
+    clientsHash.remove(clientInfo.id);
+    clientsHash.insert(clientInfo.id, clientInfo);
     updateClientInfo();
     refreshTotalLabel();
 
@@ -4021,23 +4021,22 @@ void lemonView::setupClients()
   mainClient  = myDb->getMainClient();
 
     //Set by default the 'general' client.
-    QHashIterator<QString, ClientInfo> i(clientsHash);
+    QHashIterator<int, ClientInfo> i(clientsHash);
     while (i.hasNext()) {
       i.next();
       info = i.value();
-      ui_mainview.comboClients->addItem(info.name);
+      ui_mainview.comboClients->addItem(info.name, info.id);
     }
-
     int idx = ui_mainview.comboClients->findText(mainClient,Qt::MatchCaseSensitive);
     if (idx>-1) ui_mainview.comboClients->setCurrentIndex(idx);
-    clientInfo = clientsHash.value(mainClient);
+    clientInfo = clientsHash.value(1);
     updateClientInfo();
     refreshTotalLabel();
 
     delete myDb;
 }
 
-void lemonView::comboClientsOnChange()
+void lemonView::comboClientsOnChange(int idx)
 {
   if ( !specialOrders.isEmpty() ) {
     // There are special orders, from now, we cannot change client
@@ -4047,9 +4046,10 @@ void lemonView::comboClientsOnChange()
     //maybe the client combo box is changed, but not the data (points, discount...)
   }
   QString newClientName    = ui_mainview.comboClients->currentText();
+  int newClientIdx = ui_mainview.comboClients->itemData(idx).toInt();
   qDebug()<<"Client info changed by user.";
-  if (clientsHash.contains(newClientName)) {
-    clientInfo = clientsHash.value(newClientName);
+  if (clientsHash.contains(newClientIdx)) {
+    clientInfo = clientsHash.value(newClientIdx);
     updateClientInfo();
     refreshTotalLabel();
     ui_mainview.editItemCode->setFocus();
@@ -4075,6 +4075,10 @@ void lemonView::updateClientInfo()
   ui_mainview.lblClientDiscount->setText(dStr);
   ui_mainview.labelClientDiscounted->setText(pStr);
 
+  int comboIdx = ui_mainview.comboClients->findData(clientInfo.id);
+  ui_mainview.comboClients->setCurrentIndex(comboIdx);
+
+  ui_mainview.editClientCode->setText(clientInfo.code);
 
   Azahar *myDb = new Azahar;
   myDb->setDatabase(db); //NOTE:maybe its better to add creditInfo to clientInfo, and from azahar::getClientInfo() get the creditInfoForClient. Need more code review at azahar.
@@ -4649,7 +4653,7 @@ void lemonView::specialOrderComplete()
 
     if (clientIdForDiscount == 0) {
       // no client id.. this happens on completeley paid orders.
-      clientInfo = clientsHash.value(myDb->getMainClient());
+      clientInfo = clientsHash.value(1);
       clientIdForDiscount = clientInfo.id;
     } else  clientInfo = myDb->getClientInfo(clientIdForDiscount);
     int idx = ui_mainview.comboClients->findText(clientInfo.name,Qt::MatchCaseSensitive);
