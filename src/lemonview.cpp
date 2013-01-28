@@ -259,6 +259,7 @@ lemonView::lemonView(QWidget *parent) //: QWidget(parent)
   connect(ui_mainview.ticketView, SIGNAL(doubleClicked(const QModelIndex &)), SLOT(itemHIDoubleClicked(const QModelIndex &)) );
 
   connect(ui_mainview.editItemCode, SIGNAL(plusKeyPressed()), this, SLOT(plusPressed()));
+  connect(ui_mainview.DeleteItem, SIGNAL(clicked()), this, SLOT(switchColor()));
 
   connect(ui_mainview.btnCurrency, SIGNAL( clicked() ), currencyPanel, SLOT( showPanel() ) );
   connect(ui_mainview.btnCurrency, SIGNAL( clicked() ), this, SLOT( getCurrencies() ) );
@@ -694,6 +695,16 @@ void lemonView::plusPressed()
   else 
     focusPayInput();
 }
+
+void lemonView::switchColor()
+{
+  if ( ui_mainview.DeleteItem->isChecked()   )
+    ui_mainview.labelItem->setStyleSheet("background:red");
+  else
+    ui_mainview.labelItem->setStyleSheet("background:none");
+}
+
+
 
 void lemonView::goSelectCardAuthNumber()
 {

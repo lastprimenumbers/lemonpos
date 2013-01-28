@@ -295,6 +295,7 @@ public:
     void checksChanged();
     void focusPayInput();
     void plusPressed();
+    void switchColor();
     void setupGridView();
 
 

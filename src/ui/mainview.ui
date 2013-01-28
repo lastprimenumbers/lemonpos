@@ -1088,7 +1088,7 @@
               </property>
               <layout class="QHBoxLayout" name="productcodeLayout">
                <item>
-                <widget class="QLabel" name="label">
+                <widget class="QLabel" name="labelItem">
                  <property name="text">
                   <string>&amp;Code:</string>
                  </property>
@@ -1368,6 +1368,25 @@
               </property>
               <property name="indent">
                <number>12</number>
+              </property>
+             </widget>
+             <widget class="QPushButton" name="DeleteItem">
+              <property name="geometry">
+               <rect>
+                <x>210</x>
+                <y>10</y>
+                <width>31</width>
+                <height>27</height>
+               </rect>
+              </property>
+              <property name="text">
+               <string>X</string>
+              </property>
+              <property name="checkable">
+               <bool>true</bool>
+              </property>
+              <property name="checked">
+               <bool>false</bool>
               </property>
              </widget>
             </widget>
