@@ -4326,7 +4326,6 @@ CreditInfo Azahar::getCreditInfoForClient(const qulonglong &clientId, const bool
     qulonglong cid;
     info= getClientInfo(clientId);
     cid=checkParent(info);
-    qDebug()<<"getCreditInfoForClient: SOSTITUZIONE?"<<cid<<clientId;
     result.id=0;
     result.clientId = 0;
     result.total = 0;

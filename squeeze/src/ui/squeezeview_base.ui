@@ -99,7 +99,7 @@
       </sizepolicy>
      </property>
      <property name="currentIndex">
-      <number>7</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="pageWelcome">
       <layout class="QGridLayout" name="gridLayout">
@@ -871,56 +871,73 @@
            <property name="title">
             <string/>
            </property>
-           <layout class="QHBoxLayout" name="horizontalLayout">
-            <item>
-             <widget class="QLabel" name="label">
-              <property name="text">
-               <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+           <widget class="QLabel" name="label">
+            <property name="geometry">
+             <rect>
+              <x>17</x>
+              <y>25</y>
+              <width>151</width>
+              <height>16</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Lucida Grande'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600; font-style:italic;&quot;&gt;View Products List As&lt;/span&gt;:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QRadioButton" name="chViewProductsListAsTable">
-              <property name="text">
-               <string>Table</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QRadioButton" name="chViewProductsListAsGrid">
-              <property name="text">
-               <string>Grid</string>
-              </property>
-              <property name="checkable">
-               <bool>true</bool>
-              </property>
-              <property name="checked">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-           </layout>
+            </property>
+           </widget>
+           <widget class="QRadioButton" name="chViewProductsListAsTable">
+            <property name="geometry">
+             <rect>
+              <x>174</x>
+              <y>25</y>
+              <width>67</width>
+              <height>22</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>Table</string>
+            </property>
+           </widget>
+           <widget class="QRadioButton" name="chViewProductsListAsGrid">
+            <property name="geometry">
+             <rect>
+              <x>247</x>
+              <y>25</y>
+              <width>58</width>
+              <height>22</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>Grid</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+           <widget class="QPushButton" name="btnLoadStock">
+            <property name="geometry">
+             <rect>
+              <x>0</x>
+              <y>0</y>
+              <width>98</width>
+              <height>27</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>Load Stock</string>
+            </property>
+           </widget>
            <zorder>chViewProductsListAsGrid</zorder>
            <zorder>chViewProductsListAsTable</zorder>
            <zorder>label</zorder>
+           <zorder>btnLoadStock</zorder>
           </widget>
-         </item>
-         <item>
-          <spacer>
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
          </item>
          <item>
           <widget class="QPushButton" name="btnAddProduct">
@@ -945,16 +962,16 @@ p, li { white-space: pre-wrap; }
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="btnDeleteProduct">
+          <widget class="QPushButton" name="btnExportProducts">
            <property name="text">
-            <string>Delete Product</string>
+            <string>Export</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="btnExportProducts">
+          <widget class="QPushButton" name="btnDeleteProduct">
            <property name="text">
-            <string>Export</string>
+            <string>Delete Product</string>
            </property>
           </widget>
          </item>

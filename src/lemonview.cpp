@@ -1118,6 +1118,14 @@ void lemonView::refreshTotalLabel()
     long double paid, change;
     bool isNum;
     paid = ui_mainview.editAmount->text().toDouble(&isNum);
+    isNum=true;
+    Azahar *myDb = new Azahar;
+    CreditInfo credit;
+    myDb->setDatabase(db);
+    credit = myDb->getCreditInfoForClient(clientInfo.id);
+    paid=clientInfo.monthly-credit.total;
+   // qDebug()<<"PAID (credit.total):"<<paid;
+           //<<"TOTSUM:"<<totalSum;
     if (isNum) change = paid - totalSum; else change = 0.0;
     if (paid <= 0) change = 0.0;
     
@@ -1242,7 +1250,8 @@ void lemonView::loadClient()
                            QMessageBox::Abort);
   } else {
     clientInfo=info;
-  updateClientInfo();
+    qDebug()<<"loadClient"<<info.name<<info.monthly;
+    updateClientInfo();
   }
 
 }
@@ -4061,11 +4070,17 @@ void lemonView::comboClientsOnChange(int idx)
   QString newClientName    = ui_mainview.comboClients->currentText();
   int newClientIdx = ui_mainview.comboClients->itemData(idx).toInt();
   qDebug()<<"Client info changed by user.";
+  qDebug()<<"comboClientsOnChange"<<newClientIdx;
   if (clientsHash.contains(newClientIdx)) {
     clientInfo = clientsHash.value(newClientIdx);
+    qDebug()<<'OK comboClientsOnChange'<<clientInfo.id<<clientInfo.name<<clientInfo.monthly;
+    Azahar *myDb = new Azahar;
+    myDb->setDatabase(db);
+    clientInfo=myDb->getClientInfo(newClientIdx);
     updateClientInfo();
     refreshTotalLabel();
     ui_mainview.editItemCode->setFocus();
+    qDebug()<<"FINE comboClients";
   }
 }
 
@@ -4103,11 +4118,11 @@ void lemonView::updateClientInfo()
 
   CreditInfo credit = myDb->getCreditInfoForClient(clientInfo.id, false);//do not create new credit if not found.
   if (credit.id > 0 and credit.total != 0 )
-      ui_mainview.lblCreditInfo->setText(i18n("Credit Total: %1", KGlobal::locale()->formatMoney(credit.total)));
+      ui_mainview.lblCreditInfo->setText(i18n("Credito Residuo: %1", KGlobal::locale()->formatMoney(clientInfo.monthly-credit.total)));
   else
       ui_mainview.lblCreditInfo->setText("");
   delete myDb;
-  qDebug()<<"Updating client info...";
+  qDebug()<<"Updating client info..."<<clientInfo.id<<clientInfo.name<<clientInfo.monthly;
 }
 
 void lemonView::setHistoryFilter() {
