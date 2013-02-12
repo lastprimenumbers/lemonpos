@@ -288,6 +288,10 @@ void squeezeView::setupSignalConnections()
   connect(ui_mainview.btnDeleteClient, SIGNAL(clicked()), SLOT(deleteSelectedClient()));
   //connect(ui_mainview.btnConfigure, SIGNAL(clicked()),  SLOT( showPrefs()));
 
+  connect(ui_mainview.btnDeleteLimit, SIGNAL(clicked()), SLOT(deleteLimit()));
+  connect(ui_mainview.btnCreateLimit, SIGNAL(clicked()), SLOT(createLimit()));
+  connect(ui_mainview.btnSearchLimit, SIGNAL(clicked()), SLOT(searchLimit()));
+
   connect(ui_mainview.btnAddRandomMsg, SIGNAL(clicked()), SLOT(createRandomMsg()));
 
   connect(timerCheckDb, SIGNAL(timeout()), this, SLOT(checkDBStatus()));
@@ -1296,6 +1300,9 @@ void squeezeView::setupLimitsModel()
     ui_mainview.limitsView->setModel(limitsModel);
     ui_mainview.limitsView->setColumnHidden(0,true);
     ui_mainview.limitsView->setItemDelegate(new QSqlRelationalDelegate(ui_mainview.limitsView));
+    QString f;
+    f=QString("clientId=0");
+    limitsModel->setFilter(f);
     limitsModel->select();
 
   }
@@ -2396,6 +2403,19 @@ void squeezeView::createProduct()
  }
  setProductsFilter();
 }
+
+void squeezeView::createLimit() {
+
+}
+
+void squeezeView::deleteLimit() {
+
+}
+
+void squeezeView::searchLimit() {
+
+}
+
 
 TransactionInfo squeezeView::createPurchase(ProductInfo info)
 {

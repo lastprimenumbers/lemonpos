@@ -268,17 +268,7 @@ void ClientEditor::loadLimits(ClientInfo info)
     ui->clientLimitsList->setModel(limitsModel);
     ui->clientLimitsList->setColumnHidden(0,true);
     QString f;
-    QString tag;
-
-    f=QString("clientId=%1 or (clientId=0 and clientTag in ('*',###))").arg(info.id);
-    for (int i=0; i<info.tags.count();++i) {
-        tag.append("'");
-        tag.append(info.tags.at(i));
-        tag.append("',");
-    }
-    tag.remove(-1,1);
-    f.replace("###",tag);
-    qDebug()<<f;
+    f=QString("clientId=%1").arg(info.id);
     limitsModel->setFilter(f);
     limitsModel->select();
 }

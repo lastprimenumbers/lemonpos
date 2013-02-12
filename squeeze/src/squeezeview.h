@@ -184,6 +184,9 @@ signals:
    void createMeasure();
    void createCategory();
    void createClient();
+   void createLimit();
+   void deleteLimit();
+   void searchLimit();
    void createRandomMsg();
    void createCurrency();
    void deleteSelectedCurrency();
