@@ -75,6 +75,7 @@
 #include <kplotpoint.h>
 
 #include <KNotification>
+#include <limiteditor.h>
 
 //TODO: Change all qDebug to errorDialogs or remove them.
 //NOTE: Common configuration fields need to be shared between lemon and squeeze (low stock alarm value).
@@ -2405,7 +2406,8 @@ void squeezeView::createProduct()
 }
 
 void squeezeView::createLimit() {
-
+    limiteditor *limed = new limiteditor;
+    limed->show();
 }
 
 void squeezeView::deleteLimit() {

@@ -29,6 +29,8 @@
 #include "../../src/misc.h"
 #include "../../dataAccess/azahar.h"
 
+#include "limiteditor.h"
+
 ClientEditorUI::ClientEditorUI( QWidget *parent )
 : QFrame( parent )
 {
@@ -358,7 +360,8 @@ void ClientEditor::createTag()
 
 void ClientEditor::createLimit()
 {
-
+    limiteditor *limed = new limiteditor();
+    limed->show();
 }
 
 #include "clienteditor.moc"

@@ -6,7 +6,7 @@
 
 limiteditor::limiteditor(QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::limiteditor)
+    ui(new Ui::limit_editor)
 {
     ui->setupUi(this);
 }

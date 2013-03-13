@@ -316,8 +316,6 @@ lemonView::lemonView(QWidget *parent) //: QWidget(parent)
 
   //hide or show the subtotal labels
   if (!Settings::addTax()) {
-    ui_mainview.lblSubtotalPre->hide();
-    ui_mainview.lblSubtotal->hide();
     qDebug()<<"hiding subtotal label, not using addTax option.";
   }
 
@@ -604,13 +602,10 @@ void lemonView::clearUsedWidgets()
   ui_mainview.tableWidget->setRowCount(0);
   totalSum = 0.0;
   buyPoints = 0;
-  ui_mainview.labelDetailTax1->setText("");
-  ui_mainview.labelDetailTax2->setText("");
   ui_mainview.labelDetailUnits->setText("");
   ui_mainview.labelDetailDesc->setText(i18n("No product selected"));
   ui_mainview.labelDetailPrice->setText("");
   ui_mainview.labelDetailDiscount->setText("");
-  ui_mainview.labelDetailTotalTaxes->setText("");
   ui_mainview.labelDetailPhoto->clear();
   ui_mainview.labelDetailPoints->clear();
 
@@ -1159,9 +1154,7 @@ void lemonView::refreshTotalLabel()
     
     ///refresh labels.
     ui_mainview.labelTotal->setText(QString("%1").arg(KGlobal::locale()->formatMoney(totalSum)));
-    ui_mainview.lblSubtotal->setText(QString("%1").arg(KGlobal::locale()->formatMoney(subTotalSum)));
     ui_mainview.labelChange->setText(QString("%1") .arg(KGlobal::locale()->formatMoney(change)));
-    ui_mainview.lblSaleTaxes->setText(QString("%1") .arg(KGlobal::locale()->formatMoney(totalTax)));
     //update client discount
     QString dStr;
     if (clientInfo.discount >0) {
@@ -1659,6 +1652,13 @@ void lemonView::updateItem(ProductInfo prod)
 
 int lemonView::doInsertItem(QString itemCode, QString itemDesc, double itemQty, double itemPrice, double itemDiscount, QString itemUnits)
 {
+//    TODO: finire rimozione prodotti con pistola
+//    if (ui_mainview.deleteItem->isChecked()) {
+//        ProductInfo pi;
+//        pi=productsHash.value(itemCode);
+//        ui_mainview.tableWidget->setCurrentCell(pi.row,0);
+//    }
+
   int rowCount = ui_mainview.tableWidget->rowCount();
   ui_mainview.tableWidget->insertRow(rowCount);
   ui_mainview.tableWidget->setItem(rowCount, colCode, new QTableWidgetItem(itemCode));
@@ -1971,17 +1971,7 @@ void lemonView::displayItemInfo(QTableWidgetItem* item)
 
     ui_mainview.labelDetailPhoto->setPixmap(pix);
     str = QString("%1 (%2 %)")
-        .arg(KGlobal::locale()->formatMoney(info.totaltax)).arg(info.tax+info.extratax);
-    ui_mainview.labelDetailTotalTaxes->setText(QString("<html>%1 <b>%2</b></html>")
-        .arg(tTotalTax).arg(str));
-    str = QString("%1 (%2 %)")
-        .arg(KGlobal::locale()->formatMoney(tax1m)).arg(info.tax);
-    ui_mainview.labelDetailTax1->setText(QString("<html>%1 <b>%2</b></html>")
-        .arg(tTax).arg(str));
-    str = QString("%1 (%2 %)")
         .arg(KGlobal::locale()->formatMoney(tax2m)).arg(info.extratax);
-    ui_mainview.labelDetailTax2->setText(QString("<html>%1 <b>%2</b></html>")
-        .arg(tOTax).arg(str));
     ui_mainview.labelDetailUnits->setText(QString("<html>%1 <b>%2</b></html>")
         .arg(tUnits).arg(uLabel));
     ui_mainview.labelDetailDesc->setText(QString("<html><b>%1</b></html>").arg(desc));

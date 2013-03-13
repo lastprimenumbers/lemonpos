@@ -3,9 +3,10 @@
 
 #include <QDialog>
 #include "../../dataAccess/azahar.h"
+#include "ui_limiteditor.h"
 
 namespace Ui {
-class limiteditor;
+class limit_editor;
 }
 
 class limiteditor : public QDialog
@@ -17,7 +18,7 @@ public:
     ~limiteditor();
     
 private:
-    Ui::limiteditor *ui;
+    Ui::limit_editor *ui;
 };
 
 #endif // LIMIT_EDITOR_H
