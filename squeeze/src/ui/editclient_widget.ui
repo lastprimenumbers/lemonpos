@@ -20,10 +20,10 @@
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="1">
+   <item row="0" column="0">
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="basePage">
       <property name="enabled">
@@ -396,89 +396,14 @@
       <attribute name="title">
        <string>Advanced</string>
       </attribute>
-      <widget class="QLabel" name="label_11">
+      <widget class="clienttag" name="clientTagEditor" native="true">
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>10</y>
-         <width>101</width>
-         <height>17</height>
+         <y>9</y>
+         <width>441</width>
+         <height>221</height>
         </rect>
-       </property>
-       <property name="text">
-        <string>Client Tags:</string>
-       </property>
-      </widget>
-      <widget class="QListWidget" name="clientTagsList">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>30</y>
-         <width>181</width>
-         <height>141</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QListWidget" name="availableTagsList">
-       <property name="geometry">
-        <rect>
-         <x>270</x>
-         <y>30</y>
-         <width>171</width>
-         <height>141</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="tagRemoveButton">
-       <property name="geometry">
-        <rect>
-         <x>200</x>
-         <y>40</y>
-         <width>51</width>
-         <height>27</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>&gt;&gt;</string>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="tagAddButton">
-       <property name="geometry">
-        <rect>
-         <x>200</x>
-         <y>80</y>
-         <width>51</width>
-         <height>27</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>&lt;&lt;</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_12">
-       <property name="geometry">
-        <rect>
-         <x>310</x>
-         <y>10</y>
-         <width>81</width>
-         <height>17</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>(Available)</string>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="tagCreateButton">
-       <property name="geometry">
-        <rect>
-         <x>200</x>
-         <y>120</y>
-         <width>51</width>
-         <height>27</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>+</string>
        </property>
       </widget>
      </widget>
@@ -670,6 +595,12 @@
    <class>MibitLineEdit</class>
    <extends>QLineEdit</extends>
    <header>../../mibitWidgets/mibitlineedit.h</header>
+  </customwidget>
+  <customwidget>
+   <class>clienttag</class>
+   <extends>QWidget</extends>
+   <header>clienttag.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>

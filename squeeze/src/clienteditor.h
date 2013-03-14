@@ -58,7 +58,7 @@ class ClientEditor : public KDialog
     void setId(long int id) { clientId = id; };
     void setSinceDate(QDate date) { ui->sinceDatePicker->setDate(date); }
     void setExpiryDate(QDate date) { ui->expiryDatePicker->setDate(date); }
-    void setTags(QStringList tags);
+//    void setTags(QStringList tags);
 
     QString getCode(){ return ui->editClientCode->text();};
     QString getName(){ return ui->editClientName->text();};
@@ -72,7 +72,7 @@ class ClientEditor : public KDialog
     QPixmap getPhoto(){ return pix;};
     QDate   getSinceDate() { return ui->sinceDatePicker->date(); }
     QDate   getExpiryDate() { return ui->expiryDatePicker->date(); }
-    QStringList getTags();
+//    QStringList getTags();
 
     void setClientInfo(ClientInfo info);
     void setClientInfo(QString code);
@@ -83,9 +83,6 @@ class ClientEditor : public KDialog
 
 
   private slots:
-    void addTag();
-    void removeTag();
-    void createTag();
     void createLimit();
     void changePhoto();
     void checkName();

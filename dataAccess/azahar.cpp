@@ -1824,19 +1824,30 @@ void Azahar::setClientTags(ClientInfo info)
 
 QStringList Azahar::getAvailableTags()
 {
+    qDebug()<<"getAvail";
     QStringList tags;
     if (!db.isOpen()) db.open();
+    qDebug()<<"DB OPEN"<<db.isOpen();
     if (db.isOpen()) {
         QSqlQuery qC(db);
+        qDebug()<<" Query";
         if (qC.exec(QString("select * from tags"))) {
             int fieldTag     = qC.record().indexOf("tag");
+            qDebug()<<" Tag field"<<fieldTag;
             while (qC.next()) {
+                qDebug()<<"Iterating";
                 tags.append(qC.value(fieldTag).toString());
                 qDebug()<<"TAG FOUND"<<tags.last();
             }
+            qDebug()<<"Last query"<<qC.lastQuery();
         }
+    } else {
+        qDebug() <<"NOT OPENED";
     }
+
+
     tags.removeDuplicates();
+    qDebug()<<"Returning"<<tags;
     return tags;
 }
 
