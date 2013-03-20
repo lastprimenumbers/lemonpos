@@ -16,6 +16,8 @@ class limiteditor : public QDialog
 public:
     explicit limiteditor(QWidget *parent = 0);
     ~limiteditor();
+    QSqlDatabase db;
+    void setDb(QSqlDatabase pippo);
     
 private:
     Ui::limit_editor *ui;

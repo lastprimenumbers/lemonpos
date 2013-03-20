@@ -1,8 +1,8 @@
-//#ifndef CLIENTTAG_H
-//#define CLIENTTAG_H
+#ifndef CLIENTTAG_H
+#define CLIENTTAG_H
 #include <QWidget>
 #include <QtSql>
-
+#include "ui_clienttag.h"
 namespace Ui {
 class clienttag;
 }
@@ -28,4 +28,4 @@ private slots:
   void createTag();
 };
 
-//#endif // CLIENTTAG_H
+#endif // CLIENTTAG_H

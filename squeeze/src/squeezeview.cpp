@@ -2407,6 +2407,7 @@ void squeezeView::createProduct()
 
 void squeezeView::createLimit() {
     limiteditor *limed = new limiteditor;
+    limed->setDb(db);
     limed->show();
 }
 

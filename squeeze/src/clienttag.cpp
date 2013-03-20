@@ -1,7 +1,5 @@
-#ifndef CLIENTTAG_H
-#define CLIENTTAG_H
+
 #include "clienttag.h"
-#include "ui_clienttag.h"
 #include "../../dataAccess/azahar.h"
 #include <QtGui>
 
@@ -30,7 +28,6 @@ void clienttag::setDb(QSqlDatabase parentDb)
         db.open();
     }
     qDebug()<<'setDb'<<db.lastError();
-    setTags(QStringList());
 }
 
 void clienttag::setTags(QStringList tags)
@@ -78,4 +75,4 @@ void clienttag::createTag()
     ui->clientTagsList->addItem(item);
 }
 
-#endif CLIENTTAG_H
+
