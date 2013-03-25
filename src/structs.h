@@ -83,10 +83,11 @@ struct Limit
 {
     int clientId;
     QString clientTag;
-    int productId;
+    QString productCode;
     int productCat;
     double limit;
     double current;
+    int parent;
 };
 
 struct ClientInfo

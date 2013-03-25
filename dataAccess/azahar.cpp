@@ -1736,14 +1736,14 @@ Limit Azahar::getLimitFromQuery(QSqlQuery &query)
 {
     int fieldClientId     = query.record().indexOf("clientId");
     int fieldClientTag     = query.record().indexOf("clientTag");
-    int fieldProductId     = query.record().indexOf("productTag");
+    int fieldProductCode    = query.record().indexOf("productCode");
     int fieldProductCat     = query.record().indexOf("productCat");
     int fieldLimit     = query.record().indexOf("limit");
     int fieldCurrent     = query.record().indexOf("current");
     Limit result;
     result.clientId=query.value(fieldClientId).toInt();
     result.clientTag=query.value(fieldClientTag).toString();
-    result.productId=query.value(fieldProductId).toInt();
+    result.productCode=query.value(fieldProductCode).toInt();
     result.productCat=query.value(fieldProductCat).toInt();
     result.limit=query.value(fieldLimit).toFloat();
     result.current=query.value(fieldCurrent).toFloat();

@@ -3,7 +3,10 @@
 
 #include <QDialog>
 #include "../../dataAccess/azahar.h"
+#include "../../src/structs.h"
 #include "ui_limiteditor.h"
+
+
 
 namespace Ui {
 class limit_editor;
@@ -18,6 +21,7 @@ public:
     ~limiteditor();
     QSqlDatabase db;
     void setDb(QSqlDatabase pippo);
+    void addLimit();
     
 private:
     Ui::limit_editor *ui;

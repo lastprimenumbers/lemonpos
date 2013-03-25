@@ -39,7 +39,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="pageClient">
     <property name="geometry">
@@ -92,7 +92,7 @@
       <string>Una o più categorie di clienti:</string>
      </property>
     </widget>
-    <widget class="QLineEdit" name="lineEdit">
+    <widget class="QLineEdit" name="editClientCode">
      <property name="geometry">
       <rect>
        <x>230</x>
@@ -125,7 +125,7 @@
     <attribute name="label">
      <string>Selezione Prodotto</string>
     </attribute>
-    <widget class="QRadioButton" name="radioButton">
+    <widget class="QRadioButton" name="radioProductCat">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -138,7 +138,7 @@
       <string>Una categoria di prodotti:</string>
      </property>
     </widget>
-    <widget class="QRadioButton" name="radioButton_2">
+    <widget class="QRadioButton" name="radioProductCode">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -158,6 +158,16 @@
        <y>16</y>
        <width>151</width>
        <height>31</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="editProductCode">
+     <property name="geometry">
+      <rect>
+       <x>270</x>
+       <y>90</y>
+       <width>151</width>
+       <height>27</height>
       </rect>
      </property>
     </widget>
