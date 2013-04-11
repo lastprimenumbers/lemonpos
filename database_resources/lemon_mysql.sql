@@ -371,7 +371,7 @@ t.disc AS disc,
 t.amount AS amount,
 t.date AS date
 from transactions t
-where t.type = 1 and t.state=2 order by datetime; #group by hides some transactions
+where t.type = 1 and (t.state=8) order by datetime; #group by hides some transactions
 
 CREATE OR REPLACE VIEW `v_transactionitems` AS
 select
@@ -390,7 +390,7 @@ ti.position AS position,
 ti.product_id AS product_id,
 ti.cost AS cost
 from (transactions t join transactionitems ti)
-where ((t.id = ti.transaction_id) and (t.type = 1) and (t.state=2));
+where ((t.id = ti.transaction_id) and (t.type = 1) and (t.state=8));
 
 
 CREATE OR REPLACE VIEW `v_transactionsbydate` AS
@@ -399,7 +399,7 @@ count(1) AS `transactions`,
 sum(`transactions`.`itemcount`) AS `items`,
 sum(`transactions`.`amount`) AS `total`
 from `transactions`
-where ((`transactions`.`type` = 1) and (`transactions`.`itemcount` > 0) and (`transactions`.`state`=2))
+where ((`transactions`.`type` = 1) and (`transactions`.`itemcount` > 0) and (`transactions`.`state`=8))
 group by `transactions`.`date`;
 
 CREATE OR REPLACE VIEW `v_groupedSO` AS

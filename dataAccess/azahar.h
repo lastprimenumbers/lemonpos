@@ -149,6 +149,7 @@ class Azahar : public QObject
     // LIMITS
     void getClientLimits(ClientInfo &info);
     Limit getLimitFromQuery(QSqlQuery &query);
+    bool insertLimit(Limit &lim);
 
     //TRANSACTIONS
     TransactionInfo getTransactionInfo(qulonglong id);
@@ -183,6 +184,7 @@ class Azahar : public QObject
     qulonglong  insertBalance(BalanceInfo info);
     bool        updateBalance(BalanceInfo info);
     BalanceInfo getBalanceInfo(qulonglong id);
+    double      getClientCredit(ClientInfo clientInfo, double totalSum=0);
 
     //CASHOUTS
     qulonglong insertCashFlow(CashFlowInfo info);

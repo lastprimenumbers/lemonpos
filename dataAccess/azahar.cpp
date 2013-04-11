@@ -1743,7 +1743,7 @@ Limit Azahar::getLimitFromQuery(QSqlQuery &query)
     Limit result;
     result.clientId=query.value(fieldClientId).toInt();
     result.clientTag=query.value(fieldClientTag).toString();
-    result.productCode=query.value(fieldProductCode).toInt();
+    result.productCode=query.value(fieldProductCode).toString();
     result.productCat=query.value(fieldProductCat).toInt();
     result.limit=query.value(fieldLimit).toFloat();
     result.current=query.value(fieldCurrent).toFloat();
@@ -1771,23 +1771,39 @@ void Azahar::getClientLimits(ClientInfo &info)
     info.limits=limits;
 }
 
+bool Azahar::insertLimit(Limit &lim)
+{
+    return true;
+//    if (!db.isOpen()) db.open();
+//    if (!db.isOpen()) {
+//        return false;
+//    }
+//    QSqlQuery query(db);
+//    qDebug()<<"ADDING LIMIT";
+//    query.prepare("INSERT INTO limits () VALUES (:idclient, :tag);");
+//    query.bindValue(":idclient",info.id);
+//    query.bindValue(":tag",info.tags.at(i));
+}
+
+
 QStringList Azahar::getClientTags(qulonglong clientId)
 {
-    QStringList tags;
-    if (clientId == 0) {
-        return tags;
-    }
-    if (!db.isOpen()) db.open();
-    if (db.isOpen()) {
-        QSqlQuery qC(db);
-        if (qC.exec(QString("select * from tags where idclient=%1;").arg(clientId))) {
-            int fieldTag     = qC.record().indexOf("tag");
-            while (qC.next()) {
-                tags.append(qC.value(fieldTag).toString());
-            }
-        }
-    }
-    return tags;
+    return QStringList() ;
+//    QStringList tags;
+//    if (clientId == 0) {
+//        return tags;
+//    }
+//    if (!db.isOpen()) db.open();
+//    if (db.isOpen()) {
+//        QSqlQuery qC(db);
+//        if (qC.exec(QString("select * from tags where idclient=%1;").arg(clientId))) {
+//            int fieldTag     = qC.record().indexOf("tag");
+//            while (qC.next()) {
+//                tags.append(qC.value(fieldTag).toString());
+//            }
+//        }
+//    }
+//    return tags;
 }
 
 void Azahar::setClientTags(ClientInfo info)
@@ -2898,6 +2914,17 @@ QList<TransactionItemInfo> Azahar::getTransactionItems(qulonglong id)
 }
 
 //BALANCES
+
+double Azahar::getClientCredit(ClientInfo clientInfo, double totalSum)
+{
+    CreditInfo credit = getCreditInfoForClient(clientInfo.id);
+    double paid=clientInfo.monthly-credit.total;
+   // qDebug()<<"PAID (credit.total):"<<paid;
+           //<<"TOTSUM:"<<totalSum;
+    double change = paid - totalSum;
+    if (paid <= 0) change = 0.0;
+    return change;
+}
 
 qulonglong Azahar::insertBalance(BalanceInfo info)
 {

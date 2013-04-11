@@ -1117,12 +1117,12 @@ void lemonView::refreshTotalLabel()
     Azahar *myDb = new Azahar;
     CreditInfo credit;
     myDb->setDatabase(db);
-    credit = myDb->getCreditInfoForClient(clientInfo.id);
-    paid=clientInfo.monthly-credit.total;
-   // qDebug()<<"PAID (credit.total):"<<paid;
-           //<<"TOTSUM:"<<totalSum;
-    if (isNum) change = paid - totalSum; else change = 0.0;
-    if (paid <= 0) change = 0.0;
+//    credit = myDb->getCreditInfoForClient(clientInfo.id);
+//    paid=clientInfo.monthly-credit.total;
+//   // qDebug()<<"PAID (credit.total):"<<paid;
+//           //<<"TOTSUM:"<<totalSum;
+     if (isNum) change = myDb->getClientCredit(clientInfo,totalSum); else change = 0.0;
+
     
     if (reservationPayment > 0) qDebug()<<" RESERVATION PAYMENT:"<<reservationPayment;
 
@@ -3015,8 +3015,7 @@ void lemonView::printTicket(TicketInfo ticket)
       ptInfo.paymentStrComplete = hCompletePayment + signM;
       ptInfo.nextPaymentStr = hNextPaymentStr;
       ptInfo.lastPaymentStr = hLastPaymentStr;
-      ptInfo.deliveryDateStr = hDeliveryDT;
-      
+      ptInfo.deliveryDateStr = hDeliveryDT;    
       
       QPrinter printer;
       printer.setFullPage( true );
@@ -4230,6 +4229,7 @@ void lemonView::printTicketFromTransaction(qulonglong transactionNumber)
   myDb->setDatabase(db);
   
   TransactionInfo trInfo = myDb->getTransactionInfo(transactionNumber);
+  ClientInfo cInfo = myDb->getClientInfo(trInfo.clientid);
   QList<TransactionItemInfo> pListItems = myDb->getTransactionItems(transactionNumber);
   double itemsDiscount=0;
   double soGTotal = 0;
@@ -4329,6 +4329,9 @@ void lemonView::printTicketFromTransaction(qulonglong transactionNumber)
   ticket.lines = ticketLines;
   ticket.terminal = QString::number(trInfo.terminalnum);
   ticket.totalTax = trInfo.totalTax;
+  ticket.monthly=cInfo.monthly;
+  ticket.expiry=cInfo.expiry;
+  ticket.balance=myDb->getClientCredit(cInfo);
 
   double subtotal = ticket.total + itemsDiscount + trInfo.discmoney; // - trInfo.totaltax;
   if (Settings::addTax())

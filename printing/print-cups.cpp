@@ -832,39 +832,39 @@ bool PrintCUPS::printSmallTicket(const PrintTicketInfo &ptInfo, QPrinter &printe
     tmpFont.setWeight(QFont::Normal);
     painter.setFont(tmpFont);
     fm = painter.fontMetrics();
-    //TENDERED
-    textWidth = fm.size(Qt::TextExpandTabs | Qt::TextDontClip, ptInfo.thTendered);
-    painter.drawText(printer.width()-(printer.width()/3)-textWidth.width(), Margin+yPos, ptInfo.thTendered);
-    textWidth = fm.size(Qt::TextExpandTabs | Qt::TextDontClip, ptInfo.thPaid);
-    painter.drawText((printer.width() - textWidth.width() - Margin), Margin+yPos, ptInfo.thPaid);
-    yPos = yPos + fm.lineSpacing();
-    //CHANGE
-    textWidth = fm.size(Qt::TextExpandTabs | Qt::TextDontClip, ptInfo.thChangeStr);
-    painter.drawText(printer.width()-(printer.width()/3)-textWidth.width(), Margin+yPos, ptInfo.thChangeStr);
-    textWidth = fm.size(Qt::TextExpandTabs | Qt::TextDontClip, ptInfo.thChange);
-    painter.drawText((printer.width() - textWidth.width() - Margin), Margin+yPos, ptInfo.thChange);
-    yPos = yPos + fm.lineSpacing();
+//    //TENDERED
+//    textWidth = fm.size(Qt::TextExpandTabs | Qt::TextDontClip, ptInfo.thTendered);
+//    painter.drawText(printer.width()-(printer.width()/3)-textWidth.width(), Margin+yPos, ptInfo.thTendered);
+//    textWidth = fm.size(Qt::TextExpandTabs | Qt::TextDontClip, ptInfo.thPaid);
+//    painter.drawText((printer.width() - textWidth.width() - Margin), Margin+yPos, ptInfo.thPaid);
+//    yPos = yPos + fm.lineSpacing();
+//    //CHANGE
+//    textWidth = fm.size(Qt::TextExpandTabs | Qt::TextDontClip, ptInfo.thChangeStr);
+//    painter.drawText(printer.width()-(printer.width()/3)-textWidth.width(), Margin+yPos, ptInfo.thChangeStr);
+//    textWidth = fm.size(Qt::TextExpandTabs | Qt::TextDontClip, ptInfo.thChange);
+//    painter.drawText((printer.width() - textWidth.width() - Margin), Margin+yPos, ptInfo.thChange);
+//    yPos = yPos + fm.lineSpacing();
     //TODO: Verify THIS!!!
-    if (ptInfo.ticketInfo.paidWithCard) {
-      painter.setFont(tmpFont);
-      text = ptInfo.thCard;
-      painter.drawText(Margin, Margin + yPos , text);
-      yPos = yPos + fm.lineSpacing();
-      painter.setFont(tmpFont);
-      text = ptInfo.thCardAuth;
-      painter.drawText(Margin, Margin + yPos , text);
-      yPos = yPos + fm.lineSpacing();
-    }
+//    if (ptInfo.ticketInfo.paidWithCard) {
+//      painter.setFont(tmpFont);
+//      text = ptInfo.thCard;
+//      painter.drawText(Margin, Margin + yPos , text);
+//      yPos = yPos + fm.lineSpacing();
+//      painter.setFont(tmpFont);
+//      text = ptInfo.thCardAuth;
+//      painter.drawText(Margin, Margin + yPos , text);
+//      yPos = yPos + fm.lineSpacing();
+//    }
     
     //Points if is not the default user TODO: configure this to allow or not to print this info in case the store does not use points
-    if (ptInfo.ticketInfo.clientid > 1) { //no default user
-      yPos = yPos + fm.lineSpacing();
-      QStringList strPoints = ptInfo.thPoints.split("|");
-      foreach(QString strTmp, strPoints) {
-        painter.drawText(Margin, Margin+yPos, strTmp);
-        yPos = yPos + fm.lineSpacing();
-      }
-    }
+//    if (ptInfo.ticketInfo.clientid > 1) { //no default user
+//      yPos = yPos + fm.lineSpacing();
+//      QStringList strPoints = ptInfo.thPoints.split("|");
+//      foreach(QString strTmp, strPoints) {
+//        painter.drawText(Margin, Margin+yPos, strTmp);
+//        yPos = yPos + fm.lineSpacing();
+//      }
+//    }
 //     if ( (Margin + yPos +fm.lineSpacing()*2) > printer.height() - Margin ) {
 //       printer.newPage();             // no more room on this page
 //       yPos = 0;                       // back to top of page

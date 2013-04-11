@@ -37,39 +37,50 @@ void limiteditor::addLimit()
     Limit lim;
     Azahar *myDb = new Azahar;
     myDb->setDatabase(db);
+    // An empty limit
+    lim.clientId=0;
+    lim.clientTag=QString("*");
+    lim.productCat=-1;
+    lim.productCode=QString("*");
+    lim.parent=-1;
+    lim.limit=-1;
+    lim.current=0;
+
+// CLIENT SELECTION
+    // All clients
     if (ui->radioAllClients->isChecked()) {
         lim.clientId = 0;
         lim.clientTag = QString("*");
-
+    // A single, specific client
     }else if (ui->radioSingleClient->isChecked()) {
         ClientInfo info;
         info = myDb->getClientInfo(ui->editClientCode->text());
         lim.clientId = info.id;
-
-
+    // All clients having a tag
     }else if (ui->radioTagClient->isChecked()) {
         QStringList tags;
         tags = ui->clientTagWidget->getTags();
         if (tags.count()==0) {
             return;
             }
-
+    // For the moment keep just the first tag. Should be generalized.
         lim.clientTag = tags.at (0);
-
     }
+
+// PRODUCT SELECTION
+    // A product category
     if (ui->radioProductCat->isChecked()){
         int i;
         i = ui->comboProductCat->currentIndex();
-
         lim.productCat = ui->comboProductCat->itemData(i).toInt();
+    // A single product
     }else if (ui->radioProductCode->isChecked()) {
-
         lim.productCode = ui->editProductCode->text();
-
-
     }
-    lim.limit = ui->inputLimit->value();
 
+    // The limit threshold
+    lim.limit = ui->inputLimit->value();
+    myDb->insertLimit(lim);
 }
 
 limiteditor::~limiteditor()

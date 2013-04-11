@@ -259,6 +259,10 @@ struct TicketInfo {
   double reservationPayment;
   double purchaseTotal;
   qulonglong reservationId;
+  //Portobello
+  double     balance;
+  double    monthly;
+  QDate expiry;
 };
 
 struct PrintTicketInfo {
