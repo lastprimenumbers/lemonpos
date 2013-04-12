@@ -126,6 +126,13 @@ class Azahar : public QObject
     UserInfo     getUserInfo(const qulonglong &userid);
     bool         deleteUser(qulonglong id);
 
+
+    //DONORS
+    bool         insertDonor(DonorInfo info);
+    bool         updateDonor(DonorInfo info);
+    DonorInfo   getDonorInfo(qulonglong clientId);
+    DonorInfo   getDonorInfo(QString clientCode);
+
     //CLIENTS
     bool         insertClient(ClientInfo info);
     bool         updateClient(ClientInfo info);
@@ -274,6 +281,11 @@ private:
     ClientInfo   _getClientInfo(qulonglong clientId);
     ClientInfo   _getClientInfo(QString clientCode);
     bool   getClientInfoFromQuery(QSqlQuery &qC, ClientInfo &info);
+
+    DonorInfo   _getDonorInfo(qulonglong clientId);
+    DonorInfo   _getDonorInfo(QString clientCode);
+    bool   getDonorInfoFromQuery(QSqlQuery &qC, DonorInfo &info);
+
 };
 
 #endif

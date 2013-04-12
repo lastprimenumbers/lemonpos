@@ -99,7 +99,7 @@
       </sizepolicy>
      </property>
      <property name="currentIndex">
-      <number>11</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="pageWelcome">
       <layout class="QGridLayout" name="gridLayout">
@@ -837,6 +837,54 @@
           </color>
          </property>
         </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="pageDonors">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_10">
+       <item>
+        <widget class="QListView" name="donorsView"/>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="_5">
+         <item>
+          <spacer>
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnAddDonor">
+           <property name="text">
+            <string>Add Donor</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnDeleteDonor">
+           <property name="text">
+            <string>Delete Selected</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnExportDonors">
+           <property name="text">
+            <string>Export</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
       </layout>
      </widget>

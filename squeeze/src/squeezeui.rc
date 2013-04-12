@@ -3,6 +3,7 @@
 <ToolBar name="aGeneral">
   <text>General ToolBar</text>
   <Action name="quickViewPlots" />
+  <Action name="donorsBrowse" />
   <Action name="productsBrowse" />
   <Action name="offersBrowse" />
   <Action name="usersBrowse" />
@@ -39,6 +40,7 @@
 <MenuBar>
     <Menu noMerge="1" name="Data"><text>&amp;Data</text>
       <Action name="productsBrowse" />
+      <Action name="donorsBrowse" />
       <Action name="offersBrowse" />
       <Action name="usersBrowse" />
       <Action name="measuresBrowse" />

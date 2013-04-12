@@ -174,6 +174,8 @@ void squeeze::enableUI()
     action->setEnabled(true);
     action = actionCollection()->action("balancesBrowse");
     action->setEnabled(true);
+    action = actionCollection()->action("donorsBrowse");
+    action->setEnabled(true);
     action = actionCollection()->action("limitsBrowse");
     action->setEnabled(true);
     action = actionCollection()->action("transactionsBrowse");
@@ -241,6 +243,8 @@ void squeeze::disableUI()
   action->setDisabled(true);
   action = actionCollection()->action("clientsBrowse");
   action->setDisabled(true);
+  action = actionCollection()->action("donorsBrowse");
+  action->setDisabled(true);
   action = actionCollection()->action("limitsBrowse");
   action->setDisabled(true);
   action = actionCollection()->action("usersBrowse");
@@ -307,6 +311,12 @@ void squeeze::setupActions()
     limitsBrowseAction->setIcon(KIcon("lemon-user"));//TODO:Create an icon for this...
     limitsBrowseAction->setShortcut(Qt::CTRL+Qt::Key_S);
     connect(limitsBrowseAction, SIGNAL(triggered(bool)),m_view, SLOT(showLimitsPage()));
+
+    QAction* donorsBrowseAction =  actionCollection()->addAction( "donorsBrowse" );
+    donorsBrowseAction->setText(i18n("Donors"));
+    donorsBrowseAction->setIcon(KIcon("lemon-user"));//TODO:Create an icon for this...
+//    limitsBrowseAction->setShortcut(Qt::CTRL+Qt::Key_S);
+    connect(donorsBrowseAction, SIGNAL(triggered(bool)),m_view, SLOT(showDonorsPage()));
 
     QAction* prodBrowseAction =  actionCollection()->addAction( "productsBrowse" );
     prodBrowseAction->setText(i18n("Products"));

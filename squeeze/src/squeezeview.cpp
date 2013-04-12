@@ -76,11 +76,12 @@
 
 #include <KNotification>
 #include <limiteditor.h>
+#include <donoreditor.h>
 
 //TODO: Change all qDebug to errorDialogs or remove them.
 //NOTE: Common configuration fields need to be shared between lemon and squeeze (low stock alarm value).
 
-enum {pWelcome=0, pBrowseProduct=1, pBrowseOffers=2, pBrowseUsers=3, pBrowseMeasures=4, pBrowseCategories=5, pBrowseClients=6, pBrowseLimits=7, pBrowseRandomMessages=8, pBrowseLogs=9, pBrowseSO=10, pReports=11, pBrowseCurrencies=12, pBrowseReservations=13};
+enum {pWelcome=0, pBrowseDonors=1, pBrowseProduct=2, pBrowseOffers=3, pBrowseUsers=4, pBrowseMeasures=5, pBrowseCategories=6, pBrowseClients=7, pBrowseLimits=8, pBrowseRandomMessages=9, pBrowseLogs=10, pBrowseSO=11, pReports=12, pBrowseCurrencies=13, pBrowseReservations=14};
 
 
 squeezeView::squeezeView(QWidget *parent)
@@ -262,6 +263,7 @@ void squeezeView::setupSignalConnections()
   //      last case, it make sense to let "single click activates" setting on kde systemsettings since is rarely used lemon and squeeze in the same pc.
   
   connect(ui_mainview.usersView, SIGNAL(activated(const QModelIndex &)), SLOT(usersViewOnSelected(const QModelIndex &)));
+  connect(ui_mainview.donorsView, SIGNAL(activated(const QModelIndex &)), SLOT(donorsViewOnSelected(const QModelIndex &)));
   connect(ui_mainview.clientsView, SIGNAL(activated(const QModelIndex &)), SLOT(clientsViewOnSelected(const QModelIndex &)));
   connect(ui_mainview.productsView, SIGNAL(activated(const QModelIndex &)), SLOT(productsViewOnSelected(const QModelIndex &)));
   connect(ui_mainview.productsViewAlt, SIGNAL(activated(const QModelIndex &)), SLOT(productsViewOnSelected(const QModelIndex &)));
@@ -283,6 +285,7 @@ void squeezeView::setupSignalConnections()
   connect(ui_mainview.btnAddMeasure, SIGNAL(clicked()), SLOT(createMeasure()) );
   connect(ui_mainview.btnAddCategory, SIGNAL(clicked()), SLOT(createCategory()) );
   connect(ui_mainview.btnAddClient, SIGNAL(clicked()), SLOT(createClient()));
+  connect(ui_mainview.btnAddDonor, SIGNAL(clicked()), SLOT(createDonor()));
   connect(ui_mainview.btnDeleteProduct, SIGNAL(clicked()), SLOT(deleteSelectedProduct()) );
   connect(ui_mainview.btnDeleteMeasure, SIGNAL(clicked()), SLOT(deleteSelectedMeasure()) );
   connect(ui_mainview.btnDeleteCategory, SIGNAL(clicked()), SLOT(deleteSelectedCategory()) );
@@ -495,6 +498,17 @@ void squeezeView::showLimitsPage()
   if (limitsModel->tableName().isEmpty()) setupLimitsModel();
   qDebug()<<"Set up";
   ui_mainview.headerLabel->setText(i18n("Limits"));
+  ui_mainview.headerImg->setPixmap((DesktopIcon("lemon-user",48)));
+  ui_mainview.btnPrintBalance->hide();
+}
+
+void squeezeView::showDonorsPage()
+{
+  qDebug()<<"showDonorsPage";
+  ui_mainview.stackedWidget->setCurrentIndex(pBrowseDonors);
+  if (limitsModel->tableName().isEmpty()) setupDonorsModel();
+  qDebug()<<"Set up";
+  ui_mainview.headerLabel->setText(i18n("Donors"));
   ui_mainview.headerImg->setPixmap((DesktopIcon("lemon-user",48)));
   ui_mainview.btnPrintBalance->hide();
 }
@@ -855,6 +869,7 @@ void squeezeView::setupDb()
     usersModel      = new QSqlTableModel();
     measuresModel   = new QSqlTableModel();
     categoriesModel = new QSqlTableModel();
+    donorsModel    = new QSqlTableModel();
     clientsModel    = new QSqlTableModel();
     limitsModel     = new QSqlRelationalTableModel();
     transactionsModel = new QSqlRelationalTableModel();
@@ -869,6 +884,7 @@ void squeezeView::setupDb()
     setupProductsModel();
     setupMeasuresModel();
     setupClientsModel();
+    setupDonorsModel();
     setupLimitsModel();
     setupUsersModel();
     setupTransactionsModel();
@@ -924,6 +940,7 @@ void squeezeView::connectToDb()
       measuresModel   = new QSqlTableModel();
       categoriesModel = new QSqlTableModel();
       clientsModel    = new QSqlTableModel();
+      donorsModel    = new QSqlTableModel();
       transactionsModel = new QSqlRelationalTableModel();
       balancesModel   = new QSqlTableModel();
       cashflowModel   = new QSqlRelationalTableModel();
@@ -940,6 +957,7 @@ void squeezeView::connectToDb()
     setupProductsModel();
     setupMeasuresModel();
     setupClientsModel();
+    setupDonorsModel();
     setupUsersModel();
     setupTransactionsModel();
     setupCategoriesModel();
@@ -1259,6 +1277,35 @@ void squeezeView::setupCategoriesModel()
     QTimer::singleShot(10000, this, SLOT(setupMeasuresModel()));
   }
 }
+
+void squeezeView::setupDonorsModel()
+{
+  if (db.isOpen()) {
+    donorsModel->setTable("donors");
+    ui_mainview.donorsView->setViewMode(QListView::IconMode);
+    ui_mainview.donorsView->setGridSize(QSize(170,170));
+    ui_mainview.donorsView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    ui_mainview.donorsView->setResizeMode(QListView::Adjust);
+    ui_mainview.donorsView->setModel(donorsModel);
+    ui_mainview.donorsView->setModelColumn(donorsModel->fieldIndex("photo"));
+    ui_mainview.donorsView->setSelectionMode(QAbstractItemView::SingleSelection);
+
+    UsersDelegate *delegate = new UsersDelegate(ui_mainview.donorsView);
+    ui_mainview.donorsView->setItemDelegate(delegate);
+
+    donorsModel->select();
+    ui_mainview.donorsView->setCurrentIndex(donorsModel->index(0, 0));
+
+  }
+  else {
+      //At this point, what to do?
+     // inform to the user about the error and finish app  or retry again some time later?
+    QString details = db.lastError().text();
+    KMessageBox::detailedError(this, i18n("Squeeze has encountered an error, click details to see the error details."), details, i18n("Error"));
+    QTimer::singleShot(10000, this, SLOT(setupDonorsModel()));
+  }
+}
+
 
 void squeezeView::setupClientsModel()
 {
@@ -2060,6 +2107,32 @@ void squeezeView::productsViewOnSelected(const QModelIndex &index)
   }
 }
 
+void squeezeView::donorsViewOnSelected(const QModelIndex & index)
+{
+  if (db.isOpen()) {
+    //getting data from model...
+    DonorInfo info;
+    const QAbstractItemModel *model = index.model();
+    int row = index.row();
+
+    QModelIndex indx = model->index(row, donorsModel->fieldIndex("id"));
+    indx = model->index(row, donorsModel->fieldIndex("code"));
+    info.code = model->data(indx, Qt::DisplayRole).toString();
+
+
+    //Launch Edit dialog
+    DonorEditor *donorEditorDlg = new DonorEditor(db, this);
+    donorEditorDlg->setClientInfo(info.code);
+
+    if (donorEditorDlg->exec() ) {
+      donorEditorDlg->commitClientInfo();
+      donorsModel->select();
+    }
+//    Tasto Canc premuto
+    delete donorEditorDlg;
+  }
+}
+
 void squeezeView::clientsViewOnSelected(const QModelIndex & index)
 {
   if (db.isOpen()) {
@@ -2524,7 +2597,64 @@ void squeezeView::updateCategoriesCombo()
     ui_mainview.comboProductsFilterByCategory->addItem(item.key());
   }
 }
+//
+// DONORS
+//
+void squeezeView::createDonor()
+{
+  Azahar *myDb = new Azahar;
+  myDb->setDatabase(db);
 
+  if (db.isOpen()) {
+    DonorEditor *donorEditorDlg = new DonorEditor(db,this);
+    QPixmap photo;
+
+    if (donorEditorDlg->exec() ) {
+        DonorInfo info = donorEditorDlg->getClientInfo();
+      if (!db.isOpen()) openDB();
+      if (!myDb->insertDonor(info)) qDebug()<<myDb->lastError();
+
+      clientsModel->select();
+    }
+    delete donorEditorDlg;
+  }
+  delete myDb;
+}
+
+void squeezeView::deleteSelectedDonor()
+{
+  if (db.isOpen()) {
+    QModelIndex index = ui_mainview.donorsView->currentIndex();
+    if (clientsModel->tableName().isEmpty()) setupDonorsModel();
+    if (index == clientsModel->index(-1,-1) ) {
+      KMessageBox::information(this, i18n("Please select a client to delete, then press the delete button again."), i18n("Cannot delete"));
+    }
+    else  {
+      QString uname = clientsModel->record(index.row()).value("name").toString();
+      qulonglong clientId = clientsModel->record(index.row()).value("id").toULongLong();
+      if (clientId > 1) {
+        int answer = KMessageBox::questionYesNo(this, i18n("Do you really want to delete the client named %1?",uname),
+                                              i18n("Delete"));
+        if (answer == KMessageBox::Yes) {
+          Azahar *myDb = new Azahar;
+          myDb->setDatabase(db);
+          if (!clientsModel->removeRow(index.row(), index)) {
+            // weird:  since some time, removeRow does not work... it worked fine on versions < 0.9 ..
+            bool d = myDb->deleteClient(clientId); qDebug()<<"Deleteing client ("<<clientId<<") manually...";
+            if (d) qDebug()<<"Deletion succed...";
+          }
+          clientsModel->submitAll();
+          clientsModel->select();
+          delete myDb;
+        }
+    } else KMessageBox::information(this, i18n("Default client cannot be deleted."), i18n("Cannot delete"));
+   }
+ }
+}
+
+//
+// CLIENTS
+//
 void squeezeView::createClient()
 {
   Azahar *myDb = new Azahar;

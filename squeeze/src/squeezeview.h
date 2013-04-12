@@ -71,6 +71,7 @@ public:
     QSqlTableModel *categoriesModel;
     QSqlTableModel *balancesModel;
     QSqlTableModel *clientsModel;
+    QSqlTableModel *donorsModel;
     QSqlRelationalTableModel *limitsModel;
     QSqlTableModel *randomMsgModel;
     QSqlRelationalTableModel *reservationsModel;
@@ -137,11 +138,13 @@ signals:
    void showCategoriesPage();
    void showClientsPage();
    void showLimitsPage();
+   void showDonorsPage();
    void showTransactionsPage();
    void showReports();
    void showRandomMsgs();
    void usersViewOnSelected(const QModelIndex & index);
    void productsViewOnSelected(const QModelIndex &index);
+   void donorsViewOnSelected(const QModelIndex &index);
    void clientsViewOnSelected(const QModelIndex &index);
    void doPurchase();
    void stockCorrection();
@@ -184,6 +187,7 @@ signals:
    void createMeasure();
    void createCategory();
    void createClient();
+   void createDonor();
    void createLimit();
    void deleteLimit();
    void searchLimit();
@@ -196,6 +200,7 @@ signals:
    void deleteSelectedMeasure();
    void deleteSelectedCategory();
    void deleteSelectedClient();
+   void deleteSelectedDonor();
    void populateCategoriesHash();
    void setProductsFilter();
    void setTransactionsFilter();
@@ -211,6 +216,7 @@ signals:
    void setupMeasuresModel();
    void setupCategoriesModel();
    void setupClientsModel();
+   void setupDonorsModel();
    void setupLimitsModel();
    void setupTransactionsModel();
    void setupCurrenciesModel();

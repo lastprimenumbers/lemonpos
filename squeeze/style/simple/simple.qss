@@ -96,7 +96,7 @@ QTableView#productsViewAlt, QTableView#tableBrowseOffers, QTableView#tableMeasur
   background-repeat:no-repeat;
 }
 
-QListView#usersView, QListView#clientsView, QListView#productsView
+QListView#usersView, QListView#clientsView, QListView#productsView, QListView#donorsView
 {
   background-position: top left;
   background-repeat: no-repeat;

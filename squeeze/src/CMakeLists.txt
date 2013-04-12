@@ -11,6 +11,7 @@ set(squeeze_SRCS
    purchaseeditor.cpp
    offersdelegate.cpp
    limiteditor.cpp
+   donoreditor.cpp
    clienttag.cpp
    ../../src/inputdialog.cpp
    ../../src/loginwindow.cpp
@@ -38,6 +39,7 @@ kde4_add_ui_files( squeeze_SRCS
   ui/producteditor.ui
   ui/purchaseeditor.ui
   ui/limiteditor.ui
+  ui/editdonor_widget.ui
   ui/clienttag.ui
   )
 

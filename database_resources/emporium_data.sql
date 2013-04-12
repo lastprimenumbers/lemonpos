@@ -302,6 +302,36 @@ INSERT INTO `currencies` VALUES (1,'Ã¢â€šÂ¬',1),(2,'U',1);
 UNLOCK TABLES;
 
 --
+-- Table structure for table `donors`
+--
+
+DROP TABLE IF EXISTS `donors`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `donors` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `code` varchar(16) DEFAULT '0000000000000',
+  `name` varchar(255) DEFAULT '',
+  `since` date NOT NULL DEFAULT '2009-01-01',
+  `address` varchar(255) DEFAULT NULL,
+  `phone` varchar(50) DEFAULT NULL,
+  `phone_movil` varchar(50) DEFAULT NULL,
+  `photo` blob,
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=MyISAM AUTO_INCREMENT=9 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `donors`
+--
+
+LOCK TABLES `donors` WRITE;
+/*!40000 ALTER TABLE `donors` DISABLE KEYS */;
+INSERT INTO `donors` VALUES (8,'23425335','asdfsadf','2013-04-12','asdf','2342','2341234','ÿØÿà\0JFIF\0\0`\0`\0\0ÿÛ\0C\0		\n\r\Z\Z $.\' \",#(7),01444\'9=82<.342ÿÛ\0C			\r\r2!!22222222222222222222222222222222222222222222222222ÿÀ\0\0^\0–\"\0ÿÄ\0\0\0\0\0\0\0\0\0\0\0	\nÿÄ\0µ\0\0\0}\0!1AQa\"q2‘¡#B±ÁRÑð$3br‚	\n\Z%&\'()*456789:CDEFGHIJSTUVWXYZcdefghijstuvwxyzƒ„…†‡ˆ‰Š’“”•–—˜™š¢£¤¥¦§¨©ª²³´µ¶·¸¹ºÂÃÄÅÆÇÈÉÊÒÓÔÕÖ×ØÙÚáâãäåæçèéêñòóôõö÷øùúÿÄ\0\0\0\0\0\0\0\0	\nÿÄ\0µ\0\0w\0!1AQaq\"2B‘¡±Á	#3RðbrÑ\n$4á%ñ\Z&\'()*56789:CDEFGHIJSTUVWXYZcdefghijstuvwxyz‚ƒ„…†‡ˆ‰Š’“”•–—˜™š¢£¤¥¦§¨©ª²³´µ¶·¸¹ºÂÃÄÅÆÇÈÉÊÒÓÔÕÖ×ØÙÚâãäåæçèéêòóôõö÷øùúÿÚ\0\0\0?\0ÌÔlÌÚ´·\"8±‘Û¡þµÎ]x6)äÞ\'‘óÃ¨ÁxW£›$¹¼¹ˆ”óT2$	ÀëŒÌVªhŽdÆÒÃ¡éýkã>¹R”šëÆŒgÌÂ\Z…¤¨Ë$.ªë´ò\0Aéøt\'œs]\néÉ\naKÆ«É\'§ær+Ð—Ã­&ö¡Gò´y=Ï¿aùÖg‰4‡Ó|=©Þ#H¦+Y\n€ß0RG$ã¿µTñuk4¤kNŒ)&Ñà\ZÜŽúÝöò2&eãÀéì+>”îsžI¤éÔW×B<±Q<y]»…?Å,1™´Eù°iNi8|4ª+ô3vœgVç„äŸûzÖ(DŒTÞ±¨,ÀÀ\'§8ýj§².v‘Ÿ­}ðÏá•®šö:ÊÏmx¬´‘ËÐ¥0\09ç9Œq×šŸv¥á-.*ôçA)ÇS£º[iqK©Þ@±ªä’y@BåPnfÁdÓpÍ Õô(îÞãUµ´˜£¹†v¸pÙÝŒ`†ú€H8®ÊçE°¹,ïiš_Ìó@}ûBîÈç;@_uùOV4~±µºY™LŽw7¡K6ÕÈ^Wîÿ\0²8¯T—4•Í!‰oFÄ\Zl0*\0vžUyÉ\'øñÀý*T¶œoUEW~çŽp=O§O|Õ¸Ú¢Š(÷Jª±ˆ×åŽ0zcüäSÉ,	 Ûšòd’e:³{“Ûñ±Iõ8â¯…f¡ÇO­XIÈë^®Jš´Ö½ÎJl¶\0¨ Õ\ZÌ¦¤z÷aVºîck´*zqEKEc,	;¸•ÌÏ0Ð¼BšUÅÐÁ¾W\nÎËóas€Hç\'¶O­oZjñ­ŒÒKk§\\jï$qýž9›¢îûíÂ…ç§AÒ¼‡D‚ÐtæhÕdò\"bè6’vÉxâ´sr’#CxÃkó¨>¸§Oóë_;õŠôŸ$gt»¯øsÓ„)M{ÊÌõä:|I¤W%wòH—srÄÈÜ’Häã <\nÂø‡¥Åªx7X´‚úX&6RN®±\\G†eÜ‡ËŒäŒà\rp©®ëPº`ó•>oÝIö8\'ò?ÊŸyñ\"òÒÒá\Z+“y2ó`à‘ŽFq[ÒÄÉÉ7M7åÿ\0\0o‚g‚Y(K©#m¤àŽ ãÐŽµ,öêÀ¶0}ª˜fŠpÉAã5©#îNW¿5ôU¥t<\"J.œ·DvÐªDsÞ–Db01íš’»Š›ƒÔV.N÷=(Q‹¦¢ŒÏ%ÉÎ··Júcàæ­iZDó\\j+>—)Å´B\']Äyª\\•—`A1_;°…+é‚ºÄ—Ÿ¢·gìSÉn	êG?ô<~ªUŠ…äíæy¸Ì;§Åúžæ9ZÉÔí\'»™d‚ö[vÊväŽT€pNÜ‚sÈ9ÀíZÂd=EG0‰—Írâ?v¢gÊö2m º‚ÖêþK™0ïå*<à;€cÎO5`ýàp=2zÕ{Ëu,,n.\"òX¶ØŸh|©\\7¨Á?CƒÔ\n™FŠƒq\0\0	%âM|ÝFt‹“ÆûSƒóŒ‚G¥V–â8-¹WÙ	þUV]@m8\rÈþá\"°s±q¥)luZKŽõÈÜëélÛJÊ8ˆÛÜãF_*»)ö)“WD–ÅýNOs¾ûCŽôWžYøªëS’ê(nÞ[FA*¢î?8$`£N8õ¢»>µŠ]ÉX4ú£ƒ²U¶³‚\'lqªÀb¬‰9ªŠÞh–êdó\'•\"QÝÛ\r9H¸š‘>1Í\Z…»Ý\'Ú;å\rŽ†)qß“\\f£ã»kPRÂ3q\'gnqùŸÒ¹{ßëW·iºò@*B6…ç¯oZïÃåõåï5oQ¹¤u^7ÐôhtÕºŠ(í¯\ZGÇ˜;ü£ŽœçqÏ5ÃJ§h<ñM¶`ÊGqÍLÜŽk×£NT¢¡\'{t©ÅÁÉu!†Aœf¦,@ã“éUdˆ†Ü´	Jzú\ZÙÆú¡B«‡»2t‰äqóeÏEâ½×Á¿´Ý#Ã°YÍ¡]‹¼³ÎÖVöÑFìIÁÂºŒíÚ3ŽÕáqÞÈ*sÉÇ?kÙjê\Z@£Üâ¹q4å8ìg[’K–çÒö^:Ðîí£™æ–ÙÛ¬3Fw§=Êå}ø\'­Y›Æ\ZÒÜK¨Š$.íå9Â’p¥xEø–5e0=Õ­Fí†‘t«–y#1\"ã9gùWŽü‘^:æSQkv`ðñµÏq>#Ò\"ñOü¿Â›ÿ\0	’z^/ýðßá^7ªÞË‡{$2:H¶îUÐà©ÚpAãRÞÝÍrnf¹îäÊîK“ë“ÍVñiÊö±•U\nVÝŸEüWñ…¬–ßK×~É©y±°Ž\"Vic$çi¨ÈÉ<}Ò;óOÃž5·²ðÕ¥þª÷Ka:ÿ\0­q$æÞMÌ;¿–ØFLï#sØ	_?\\]\\ÝÉæ\\Ï,ÒcärÇó5j]YŸM\ZlÚ½ü–µ{—1œuç¥zŸÙ0tU&úÝ»~F*»‹ºG·xãÆš\\žºþÌ¹·¹–â0­’yN±H1¼#a˜àŒë» 5âòGnÂd·v’rG‰™GB@Î:Çêk\'$òI©iadeç<9®Œ.XrSïsE‹æ•æ´=.-J÷Àº&™ýšë§wÉ#¼hì‘á~u+†`zsò^Jó™¯ï.dó\'¼žW\n3ÈXà“ÚŠ¸á¬½ë6O·‡X— ¾¼³dw×…YX*þæ«K3ÊÛ¤fcžç4…·/=GZ¨¤ïÔ˜;+<Ó(¡>fÇ½Q£}	c;H#üŠµ»œƒImg,ŽT’N9õ­ì¥¶Of\\~_­c)+›Ó«*~…¤×Ñž!ð…´ÿ\0h\Z°Uã³)d!£fi2$ulü£s	0I_—ôÇømðúÎy,µ+Í.Èˆ$¤ës#K¸®UdØGB½«¢øÎ«…àÕIbtû•fURr­…êÌGRãÅi>VÑ|J©%±âß~Már÷:g›w¦ÛŠâRw:;\0Êì\0#\00à0*Np[MÝ²OLb½ÇÂþ6:Ö‹}ý¡¤<ZrÛ&Ÿç¦a2	Í¸8“6[$€™?xW«ø/þ¿Š6¾º%¬§½ˆC\"J¬íÉ…\'‡ÇPTr3‚ÍÞÈå½˜Ë\rNIîçGu9@{Å°=9$þ&¶învÛDÝÖâùJµ‹Ÿ‡ˆ5+;yã¶ãËõáÙFxáA«·r ‰#Ü7‰¡;Içbó^%x/l­äz~áµ¨?™£Ý§÷ qø	¯$¸feÆ1^›¨Ï³Nä€?3^ouÍÜ¿Zß**‘†*îÉI^gñúš6¯§ëOP\0ñ\rz­ö8ÜÜsÙ”÷‘“èOõ§[iw·²ˆ¬íe¹“û°!sù\nˆòi)]•ìµ\ZðI”uÚÀàƒÁê*®/d<ô¦Ò“M5(iè»±ÅØ_¼zR—ýÒ ÏRO¿L*’ÎÞ[‹¨¢€âFa†fÚú–ìRON´úÛw;[Z¹”]\\nˆWÃ9Úƒ\'€=O¯¦+Ø4›]*îÒ]7TµYmÜì2p\Z?FÏQŽ¹ö¯ŸÐM¥jÃöûŸ=b­R…“óËÜvÎEt±øêú;)–I$yÜG¾U¶Cn-—\n‘´½Íg“¸Ûº=ŸÃ÷+à}7QÒu±5´¦XîœYb=	b},âªøËU¶×|9uii}ou$ê±,QHŽI!=û¼duµOIñ•‡Œ<*.5kXMîŸr©3H«çeZ6BrY›iwÆ0>Só`×˜øÊÒmÇš•Äq¤¶¶óý¬[¸`†5Æ»‚ã€Ã\0öÞ=M[ÚÈ”í-I,†£¦ø¾÷Ã6Wæ}15	%fEÚW~WØYÀ\nIÎ\0Èö­3_¸±Ó.µ¡]FIõHRú5ŸæµFHâ2c\ngn“Œ\ZùsMÔníîGwqW÷nWå9Èös~gÖ½³àßˆ­-no4Ù¢Q\rÞwmÇ€pïœ‘Àý+Úü²êjãx]·Þ6ð7ˆuã×!Ö-&Š/³•2ÌÑ‰Ü»mÜŽp321œÄÑü$ð&µ{©¢_Î‹jË‰<jë‚3¼9Î\nü¤ãâ²t¿„0Ýx³R’o	ôØ¥ÊÇ\Zá·Næû©†ã€s†á{zž“áÝ#C,të w2rÎGn98àqœgšæöõi>XËO]–×<¿â?‡ìô¯jš5ì’Ä`	ª³G\nƒ\"dyq²’NXgËÎO\\\'rnd8šúÓãˆþëz)·?ù:ùØ3–õ­°z§\"e\'mÅßíúÓËÆ{\0*\Z—¥u±Á¶ÂŽ£4QHmêRE0ºD¬¸Ú{0¨Ï$\n‘ò	Lð¤Ô|\Z”sÂW˜U­>þm:ö;«|y±œŒçªÒ¶ü&<]¥DQ$[›…¶a ÈÛ!ØH÷‰ôÚÐÑJÛ¾‘á¹¼máV–ÂÕäÔ´ûd†$â‡í$¹/!éÎÅ(s’ÙV<“\\tÖ·:=íÝµâ¿œ›¡yyÃ2:Ÿ ˜ôô©ôíkXðŠ%6óFg·mŽ€±‡¸­Ï\n­×‹­o%Ô.›R1•ËJYœ†g\'?*¡zcoM¼Å®4íèsözµåœ&ÊÚäÀ²È²@˜®\nú¨:ûúó¿â[ë«½	.oŸÚLÓLÄ+ªã™B«)–ÉÂF?€cck?20AXîv©Ç ã9ýåF±y&©~±c`Â[¦\n;ñùþu\nLÖ+˜À·t8ëž¿¥jGw*Ý¹§aÁÅ{Á†Zuí„>.Õ¶Ý1ýŠß±”|oVÊð:Ï$¹ßþÙøbDñcƒO»œE%JAlÇÛaÚ~^6žœ.•)ßT^´T¹dŒÏüH¼Ð&A3oLm$ä†‡úßbëv>\'ñÊ\\KzšÀ6-Çš¨Ûw#8,}zõÀ®eIÅ^±Ô.,fY ‘‘”öè\ná?e.h[Ñÿ\0ZÍJ1¬¯´»ÿ\0™g]Òµ}2ÎëlvñZN\0-Ê…¥U‹üÅwmîyÚ¹ žâ½†æìë>þÚ³ »ÓeOƒtsÇ±÷&9á†àAøâüS¥XÃ%”Ö0˜¡¼µ‘‚Ù1ÆX§–Gr¬†Ï#ç&º(Tv³<Jðq¥º9#¡¥Ü	æµ´ý-5]Q4ø\\Å<€ªå7€O=À8÷©tÝ	5š!pÊæ<M·»¶Ã×$VÜë©Îæ£±Š0N;n)ÓBö·2ÀÅKFÅI	bãUÔní£¶¹¿ºšÞ qI32 \0\0NÒ«ÐjWW*`fŠ‘nF\nÆ@õAŸÏR»+–“ÕËðÿ\0‚ÿÙ');
+/*!40000 ALTER TABLE `donors` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `limits`
 --
 
@@ -473,7 +503,7 @@ CREATE TABLE `products` (
 
 LOCK TABLES `products` WRITE;
 /*!40000 ALTER TABLE `products` DISABLE KEYS */;
-INSERT INTO `products` VALUES (4950232123566,'Ciao',2,194,1,7,'2013-04-10',1,0,0,NULL,1,10,'-NA-',1,0,0,'',0,1,0,0),(2345,'sdfsdf',3.03,76,3,9,'2013-04-10',1,1,0,'ÿØÿà\0JFIF\0\0`\0`\0\0ÿÛ\0C\0		\n\r\Z\Z $.\' \",#(7),01444\'9=82<.342ÿÛ\0C			\r\r2!!22222222222222222222222222222222222222222222222222ÿÀ\0\0^\0–\"\0ÿÄ\0\0\0\0\0\0\0\0\0\0\0	\nÿÄ\0µ\0\0\0}\0!1AQa\"q2‘¡#B±ÁRÑð$3br‚	\n\Z%&\'()*456789:CDEFGHIJSTUVWXYZcdefghijstuvwxyzƒ„…†‡ˆ‰Š’“”•–—˜™š¢£¤¥¦§¨©ª²³´µ¶·¸¹ºÂÃÄÅÆÇÈÉÊÒÓÔÕÖ×ØÙÚáâãäåæçèéêñòóôõö÷øùúÿÄ\0\0\0\0\0\0\0\0	\nÿÄ\0µ\0\0w\0!1AQaq\"2B‘¡±Á	#3RðbrÑ\n$4á%ñ\Z&\'()*56789:CDEFGHIJSTUVWXYZcdefghijstuvwxyz‚ƒ„…†‡ˆ‰Š’“”•–—˜™š¢£¤¥¦§¨©ª²³´µ¶·¸¹ºÂÃÄÅÆÇÈÉÊÒÓÔÕÖ×ØÙÚâãäåæçèéêòóôõö÷øùúÿÚ\0\0\0?\0ë·1\'=p3<ñKÝrO·jfpHn1\\`àiÀÏz[œf¤R7P€²@\'Ò¥^@ô¨ŽCdTˆàŽTqÓ\0çQ·–sÉÍX SÕAnÄWŽ2?Þì;\Z¸Ü ÁäÐ­!ÈŒÐaKPç\rÆjU\'¸ ÍZ!£%Qœò½WŒ…ub2è{ÔñlW’AóíL¨<óïô®\\dèµÿ\0«þÑiM\\Môo¨¥Wˆ!|ãpðj/2¾QÅ§fzê7Ø±.ÐøG,¸‘Ž{ÔmO”å÷*qQµö4ZöjÇ5i4-™¢´$Ç“p8¨õ¨VPàääúÔÅsÔž¾µZ\"CtÈ==)L:u§ $ç)X`™§ÙÀ9ãšJƒvp=ià`ñHŒ|¼~Tõ^:õæ€\'=M<JŒâ¤.Œ“éLC³“HÎ\0÷¤\'ê)mÎpqÅ\0a¸u§ð>µY$RyÈ5 >œÐ2pqŽzóN¡Q:€ÌØ#œãð5VUwÉçžH¥k¸U‚íu…›“°v$q\\˜¶”uix¶ö¹³+Ã\"›æS.®žêåçp9è£\0TAýM|Ô’»¶Ç·é©¬«¶4j¸+»Œü¾ÜŽ´›h¢°Ùòé@|ô¯«¡\ZQŠì|ýWy¶(\0QA¢µ32TÔ*ŒèQ·gŽ˜5tóÑqQ´yëÉ÷¤YZ	_ÍÆIÈ#¬ìýØmÃ“ŒTf6BÌ£’3¹sš\0¹\néCHp:àÔ@àuühÎHÔY.Dl¿.wçSÎBœŽqžßLÔN‹´\\çÖ¨1+˜”åIàPŒ—ü‘ÛŠDrà\rÍV¶CF:õ«@\n©9Ç94açÞ¬p8*¤r–nHÈ÷ÅZ¦!Ê»œ*)f<\0;š¡4òÜ`>w¦wÔœ÷­kÆàÝ1€qÓ&¨ÞÄ–DQåŸ—pÏ$uÎ{×—™&âšg¡—µÌÓ*ç©¤É=é½Í#âržÉµœƒòŠ—¥Ee,Odª™F¼ÙÏ¯¿éRC_SB\\Ôâüš­Z’^c²h¥Æh­ŒŠ\n@;UG±\0c>µ8ƒÁ=Å@#Û\'Lúb‘D›É]§Z¬ä$…GAV|²qUç_âî(I÷È¦©ËåNžÔß0ç ~t¼Ž{ó@ÅšRÉÆâOLUHÝ‰ÆÂÌ$®sRI~‘¨»Š÷’ÞëÍ”·Ý^œô £˜Ÿ,¸ƒµ=¥i\\*)Ú9,?•6Dó\'ÂxäÕ«keåsÎ?3@[Æc;ÉJ»ÝÉÉÉ¬˜nI›`<ú{ç§ò­…e„ƒ $p§¨ß\0Å£Wàdpyÿ\0=ê­ýÂ¼¢8‚ˆÐc+üGÔûÕ›µ¶eU2„˜åvÈs·ëéÿ\0×¬Õãc¦ùšþ´=Œ*—õ¨¤óžô˜`ô¦–Å!›myÖ=åƒíÌ%¶«rYA-ô¨’|Û‘ŽAî:VZ»ZÛCsåà£–p3ôŸZ»©å¬Œªùq–Ï\\W³‚n1´Ÿü1ããR”®——Ì´âŠc>ÞÜÑ^‘æ™Ì¸8ÍXE^Ã‘Kå)Áô§·‘ÞÄß¥QŸ‚A9Íhî<Õ9¢19Á\rÎü(1áH=}é]H8<Ñœ‚:P36[Wf%î\Zu²ðÌ0{äâ§g1¿ùŠ«usç89Æ0iØ³„3HÒ2Äm\0óÒ¬G²&.Np0*«ê¬ß1>Æ­à°$žGjd•nƒ«,hpÃc~~O5×“˜È=qU®\06æHóÀÆju&\0“#o¤û\r;j-ã›‰müÉ¥/´#eyöÇO­V™âFˆæÜ1†î8&§•ÃÀÎŒÑ¾0·ô’ÌI#vïZññ””e~ç»Ÿ´‡¡0¸ÜpÜzS|Ð³uÏ=3U¤ÊðE3¶k•AŠŠ6¾ß:Åpƒc\0»€Æ\0éùÍkY¤{\ná¦ˆœì!€Äu;×$¨Ò«9a…õ<Ÿ¥t6P‰\nÜ[ÆÊ¡váääœrx^œ×fsSKò<ÜmF›iÛüÍaEG:ŒHª`¤ž?*+×Nç‚ÕˆÈô†Bs¸÷íUÃ`ñÅHŸ6É¡¥êi|îãÒ¥\n1@ŠW(ylu÷ª¸$õâ´f¢n•EäUtP§y?{=(\Z,E£/Œ²Ž}ë6%tÜ6¶Þ¼Œgë[Ãç_`ÕÈ£°l0ÉoC@Ð°M\nÝåbwg­iÆLd•PÙàz×?°£6â7AÅj[Í ŒÙÏ­\0ÑnxÔD<Þ»w¬éÈÏ=½2*T¸7e‹‚ééTQî×qWŽ‡$S0ó¢B\0ûì·5AÌiu\"/Ê€ð	ä\nÛ‰K¾Hf\\tõÿ\0>Õ^ïHY´É®ã+\ZÙ€\\ŽIV `lú×*—<nºž¼a>Y=ôþ¿#=”>\rC/Ëòâ§»´›M0#Ê®&%@=ª\0s×­yn..ÌöãÝl[ÓcŽ\n8uÚèÃ;ãÓ çßÒÛ)·+7O’Td‰DŒ+€dä^xÓšÙ@3Ò½Œ,‚k©ó˜ú®uZ}*(\0€\0QN¢ºNÿÙ',1,0,'-NA-',1,0,0,'',0,1,0,0),(1111,'Ciao2',15,186,12,16,'2013-02-06',1,0,0,NULL,1,10,'aereg',1,0,0,'',0,1,0,0),(123,'Olio123',15,0,0,0,'0000-00-00',1,0,0,NULL,1,0,'sdrfsdr',1,0,0,'',0,1,0,0);
+INSERT INTO `products` VALUES (4950232123566,'Ciao',2,194,1,7,'2013-04-10',1,0,0,NULL,1,10,'-NA-',1,0,0,NULL,10,1,0,0),(2345,'sdfsdf',3.03,76,3,9,'2013-04-10',1,1,0,'ÿØÿà\0JFIF\0\0`\0`\0\0ÿÛ\0C\0		\n\r\Z\Z $.\' \",#(7),01444\'9=82<.342ÿÛ\0C			\r\r2!!22222222222222222222222222222222222222222222222222ÿÀ\0\0^\0–\"\0ÿÄ\0\0\0\0\0\0\0\0\0\0\0	\nÿÄ\0µ\0\0\0}\0!1AQa\"q2‘¡#B±ÁRÑð$3br‚	\n\Z%&\'()*456789:CDEFGHIJSTUVWXYZcdefghijstuvwxyzƒ„…†‡ˆ‰Š’“”•–—˜™š¢£¤¥¦§¨©ª²³´µ¶·¸¹ºÂÃÄÅÆÇÈÉÊÒÓÔÕÖ×ØÙÚáâãäåæçèéêñòóôõö÷øùúÿÄ\0\0\0\0\0\0\0\0	\nÿÄ\0µ\0\0w\0!1AQaq\"2B‘¡±Á	#3RðbrÑ\n$4á%ñ\Z&\'()*56789:CDEFGHIJSTUVWXYZcdefghijstuvwxyz‚ƒ„…†‡ˆ‰Š’“”•–—˜™š¢£¤¥¦§¨©ª²³´µ¶·¸¹ºÂÃÄÅÆÇÈÉÊÒÓÔÕÖ×ØÙÚâãäåæçèéêòóôõö÷øùúÿÚ\0\0\0?\0ë·1\'=p3<ñKÝrO·jfpHn1\\`àiÀÏz[œf¤R7P€²@\'Ò¥^@ô¨ŽCdTˆàŽTqÓ\0çQ·–sÉÍX SÕAnÄWŽ2?Þì;\Z¸Ü ÁäÐ­!ÈŒÐaKPç\rÆjU\'¸ ÍZ!£%Qœò½WŒ…ub2è{ÔñlW’AóíL¨<óïô®\\dèµÿ\0«þÑiM\\Môo¨¥Wˆ!|ãpðj/2¾QÅ§fzê7Ø±.ÐøG,¸‘Ž{ÔmO”å÷*qQµö4ZöjÇ5i4-™¢´$Ç“p8¨õ¨VPàääúÔÅsÔž¾µZ\"CtÈ==)L:u§ $ç)X`™§ÙÀ9ãšJƒvp=ià`ñHŒ|¼~Tõ^:õæ€\'=M<JŒâ¤.Œ“éLC³“HÎ\0÷¤\'ê)mÎpqÅ\0a¸u§ð>µY$RyÈ5 >œÐ2pqŽzóN¡Q:€ÌØ#œãð5VUwÉçžH¥k¸U‚íu…›“°v$q\\˜¶”uix¶ö¹³+Ã\"›æS.®žêåçp9è£\0TAýM|Ô’»¶Ç·é©¬«¶4j¸+»Œü¾ÜŽ´›h¢°Ùòé@|ô¯«¡\ZQŠì|ýWy¶(\0QA¢µ32TÔ*ŒèQ·gŽ˜5tóÑqQ´yëÉ÷¤YZ	_ÍÆIÈ#¬ìýØmÃ“ŒTf6BÌ£’3¹sš\0¹\néCHp:àÔ@àuühÎHÔY.Dl¿.wçSÎBœŽqžßLÔN‹´\\çÖ¨1+˜”åIàPŒ—ü‘ÛŠDrà\rÍV¶CF:õ«@\n©9Ç94açÞ¬p8*¤r–nHÈ÷ÅZ¦!Ê»œ*)f<\0;š¡4òÜ`>w¦wÔœ÷­kÆàÝ1€qÓ&¨ÞÄ–DQåŸ—pÏ$uÎ{×—™&âšg¡—µÌÓ*ç©¤É=é½Í#âržÉµœƒòŠ—¥Ee,Odª™F¼ÙÏ¯¿éRC_SB\\Ôâüš­Z’^c²h¥Æh­ŒŠ\n@;UG±\0c>µ8ƒÁ=Å@#Û\'Lúb‘D›É]§Z¬ä$…GAV|²qUç_âî(I÷È¦©ËåNžÔß0ç ~t¼Ž{ó@ÅšRÉÆâOLUHÝ‰ÆÂÌ$®sRI~‘¨»Š÷’ÞëÍ”·Ý^œô £˜Ÿ,¸ƒµ=¥i\\*)Ú9,?•6Dó\'ÂxäÕ«keåsÎ?3@[Æc;ÉJ»ÝÉÉÉ¬˜nI›`<ú{ç§ò­…e„ƒ $p§¨ß\0Å£Wàdpyÿ\0=ê­ýÂ¼¢8‚ˆÐc+üGÔûÕ›µ¶eU2„˜åvÈs·ëéÿ\0×¬Õãc¦ùšþ´=Œ*—õ¨¤óžô˜`ô¦–Å!›myÖ=åƒíÌ%¶«rYA-ô¨’|Û‘ŽAî:VZ»ZÛCsåà£–p3ôŸZ»©å¬Œªùq–Ï\\W³‚n1´Ÿü1ããR”®——Ì´âŠc>ÞÜÑ^‘æ™Ì¸8ÍXE^Ã‘Kå)Áô§·‘ÞÄß¥QŸ‚A9Íhî<Õ9¢19Á\rÎü(1áH=}é]H8<Ñœ‚:P36[Wf%î\Zu²ðÌ0{äâ§g1¿ùŠ«usç89Æ0iØ³„3HÒ2Äm\0óÒ¬G²&.Np0*«ê¬ß1>Æ­à°$žGjd•nƒ«,hpÃc~~O5×“˜È=qU®\06æHóÀÆju&\0“#o¤û\r;j-ã›‰müÉ¥/´#eyöÇO­V™âFˆæÜ1†î8&§•ÃÀÎŒÑ¾0·ô’ÌI#vïZññ””e~ç»Ÿ´‡¡0¸ÜpÜzS|Ð³uÏ=3U¤ÊðE3¶k•AŠŠ6¾ß:Åpƒc\0»€Æ\0éùÍkY¤{\ná¦ˆœì!€Äu;×$¨Ò«9a…õ<Ÿ¥t6P‰\nÜ[ÆÊ¡váääœrx^œ×fsSKò<ÜmF›iÛüÍaEG:ŒHª`¤ž?*+×Nç‚ÕˆÈô†Bs¸÷íUÃ`ñÅHŸ6É¡¥êi|îãÒ¥\n1@ŠW(ylu÷ª¸$õâ´f¢n•EäUtP§y?{=(\Z,E£/Œ²Ž}ë6%tÜ6¶Þ¼Œgë[Ãç_`ÕÈ£°l0ÉoC@Ð°M\nÝåbwg­iÆLd•PÙàz×?°£6â7AÅj[Í ŒÙÏ­\0ÑnxÔD<Þ»w¬éÈÏ=½2*T¸7e‹‚ééTQî×qWŽ‡$S0ó¢B\0ûì·5AÌiu\"/Ê€ð	ä\nÛ‰K¾Hf\\tõÿ\0>Õ^ïHY´É®ã+\ZÙ€\\ŽIV `lú×*—<nºž¼a>Y=ôþ¿#=”>\rC/Ëòâ§»´›M0#Ê®&%@=ª\0s×­yn..ÌöãÝl[ÓcŽ\n8uÚèÃ;ãÓ çßÒÛ)·+7O’Td‰DŒ+€dä^xÓšÙ@3Ò½Œ,‚k©ó˜ú®uZ}*(\0€\0QN¢ºNÿÙ',1,0,'-NA-',1,0,0,'',0,1,0,0),(1111,'Ciao2',15,186,12,16,'2013-02-06',1,0,0,NULL,1,10,'aereg',1,0,0,'',0,1,0,0),(123,'Olio123',15,0,0,0,'0000-00-00',1,0,0,NULL,1,0,'sdrfsdr',1,0,0,'',0,1,0,0);
 /*!40000 ALTER TABLE `products` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1108,4 +1138,4 @@ SET character_set_client = @saved_cs_client;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2013-04-10 23:17:00
+-- Dump completed on 2013-04-13  0:16:25

@@ -109,6 +109,18 @@ struct ClientInfo
   QList<Limit>         limits;
 };
 
+struct DonorInfo
+{
+  unsigned int id;
+  QString      code;
+  QString      name;
+  QString      address;
+  QString      phone;
+  QString      cell;
+  QByteArray   photo;
+  QDate        since;
+};
+
 struct OfferInfo
 {
   qulonglong productCode;
