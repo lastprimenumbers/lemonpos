@@ -2210,6 +2210,7 @@ TransactionInfo Azahar::getTransactionInfo(qulonglong id)
       int fieldTerminal  = query.record().indexOf("terminalnum");
       int fieldTax       = query.record().indexOf("totalTax");
       int fieldSpecialOrders = query.record().indexOf("specialOrders");
+      int fieldDonor       = query.record().indexOf("totalDonor");
       
       info.id     = query.value(fieldId).toULongLong();
       info.amount = query.value(fieldAmount).toDouble();
@@ -2233,6 +2234,7 @@ TransactionInfo Azahar::getTransactionInfo(qulonglong id)
       info.terminalnum=query.value(fieldTerminal).toInt();
       info.totalTax   = query.value(fieldTax).toDouble();
       info.specialOrders = query.value(fieldSpecialOrders).toString();
+      info.donor = query.value(fieldDonor).toString();
     }
   }
   return info;
@@ -2541,13 +2543,13 @@ qulonglong Azahar::insertTransaction(TransactionInfo info)
     paidwith,  paymethod, changegiven, state,    \
     cardnumber, itemcount, itemslist, points, \
     discmoney, disc, discmoney, cardauthnumber, profit,  \
-    terminalnum, providerid, specialOrders, balanceId, totalTax) \
+    terminalnum, providerid, specialOrders, balanceId, totalTax, donor) \
     VALUES ( \
     :clientid, :userid, :type, :amount, :date, :time, \
     :paidwith, :paymethod, :changegiven, :state,  \
     :cardnumber, :itemcount, :itemslist, :points, \
     :discmoney, :disc, :discm, :cardauthnumber, :utility, \
-    :terminalnum, :providerid, :specialOrders, :balanceId, :totalTax)");
+    :terminalnum, :providerid, :specialOrders, :balanceId, :totalTax, :donor)");
     **/
     
     query2.bindValue(":type", info.type);
@@ -2570,6 +2572,7 @@ qulonglong Azahar::insertTransaction(TransactionInfo info)
     query2.bindValue(":tax", info.totalTax);
     query2.bindValue(":specialOrders", info.specialOrders);
     query2.bindValue(":balance", info.balanceId);
+    query2.bindValue(":donor", info.donor);
     if (!query2.exec() ) {
       int errNum = query2.lastError().number();
       QSqlError::ErrorType errType = query2.lastError().type();
@@ -2586,7 +2589,7 @@ bool Azahar::updateTransaction(TransactionInfo info)
 {
   bool result=false;
   QSqlQuery query2(db);
-  query2.prepare("UPDATE transactions SET disc=:disc, discmoney=:discMoney, amount=:amount, date=:date,  time=:time, paidwith=:paidw, changegiven=:change, paymethod=:paymethod, state=:state, cardnumber=:cardnumber, itemcount=:itemcount, itemslist=:itemlist, cardauthnumber=:cardauthnumber, utility=:utility, terminalnum=:terminalnum, points=:points, clientid=:clientid, specialOrders=:sorders, balanceId=:balance, totalTax=:tax WHERE id=:code");
+  query2.prepare("UPDATE transactions SET disc=:disc, discmoney=:discMoney, amount=:amount, date=:date,  time=:time, paidwith=:paidw, changegiven=:change, paymethod=:paymethod, state=:state, cardnumber=:cardnumber, itemcount=:itemcount, itemslist=:itemlist, cardauthnumber=:cardauthnumber, utility=:utility, terminalnum=:terminalnum, points=:points, clientid=:clientid, specialOrders=:sorders, balanceId=:balance, totalTax=:tax, donor=:donor WHERE id=:code");
   query2.bindValue(":disc", info.disc);
   query2.bindValue(":discMoney", info.discmoney);
   query2.bindValue(":code", info.id);
@@ -2608,6 +2611,7 @@ bool Azahar::updateTransaction(TransactionInfo info)
   query2.bindValue(":tax", info.totalTax);
   query2.bindValue(":sorders", info.specialOrders);
   query2.bindValue(":balance", info.balanceId);
+  query2.bindValue(":donor", info.donor);
   qDebug()<<"Transaction ID:"<<info.id;
   if (!query2.exec() ) {
     int errNum = query2.lastError().number();
@@ -2815,6 +2819,7 @@ QList<TransactionInfo> Azahar::getLastTransactions(int pageNumber,int numItems,Q
       int fieldTax    = query.record().indexOf("totalTax");
       int fieldSOrd      = query.record().indexOf("specialOrders");
       int fieldBalance   = query.record().indexOf("balanceId");
+      int fieldDonor   = query.record().indexOf("donor");
       info.id     = query.value(fieldId).toULongLong();
       info.amount = query.value(fieldAmount).toDouble();
       info.date   = query.value(fieldDate).toDate();
@@ -2838,6 +2843,7 @@ QList<TransactionInfo> Azahar::getLastTransactions(int pageNumber,int numItems,Q
       info.totalTax  = query.value(fieldTax).toDouble();
       info.specialOrders  = query.value(fieldSOrd).toString();
       info.balanceId = query.value(fieldBalance).toULongLong();
+      info.donor  = query.value(fieldDonor).toString();
       result.append(info);
     }
   }

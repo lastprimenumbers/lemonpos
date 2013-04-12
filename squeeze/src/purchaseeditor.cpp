@@ -54,9 +54,6 @@ PurchaseEditor::PurchaseEditor( QWidget *parent )
     QRegExp regexpC("[0-9]*[A-Za-z_0-9\\\\/\\-]{0,30}"); // Instead of {0,13} fro EAN13, open for up to 30 chars.
     QRegExpValidator * validatorEAN13 = new QRegExpValidator(regexpC, this);
     ui->editCode->setValidator(validatorEAN13);
-    ui->editTax->setValidator(new QDoubleValidator(0.00, 999999999999.99, 3,ui->editTax));
-    ui->editExtraTaxes->setValidator(new QDoubleValidator(0.00, 999999999999.99, 3,ui->editExtraTaxes));
-    ui->editCost->setValidator(new QDoubleValidator(0.00, 999999999999.99, 3, ui->editCost));
     ui->editPoints->setValidator(new QIntValidator(0,999999999, ui->editPoints));
     ui->editFinalPrice->setValidator(new QDoubleValidator(0.00,999999999999.99, 3, ui->editFinalPrice));
     ui->editItemsPerBox->setValidator(new QDoubleValidator(0.00,999999999999.99, 2, ui->editItemsPerBox));
@@ -64,13 +61,6 @@ PurchaseEditor::PurchaseEditor( QWidget *parent )
     ui->editQty->setValidator(new QDoubleValidator(-99999.00,999999999999.99, 2, ui->editQty));
 
     connect( ui->btnPhoto          , SIGNAL( clicked() ), this, SLOT( changePhoto() ) );
-    connect( ui->btnCalculatePrice , SIGNAL( clicked() ), this, SLOT( calculatePrice() ) );
-    connect( ui->editItemsPerBox , SIGNAL( textEdited(const QString &) ), this, SLOT( calculatePrice() ) );
-    connect( ui->editPricePerBox , SIGNAL( textEdited(const QString &) ), this, SLOT( calculatePrice() ) );
-    connect( ui->editCost , SIGNAL( textEdited(const QString &) ), this, SLOT( calculatePrice() ) );
-    connect( ui->editTax , SIGNAL( textEdited(const QString &) ), this, SLOT( calculatePrice() ) );
-    connect( ui->editExtraTaxes , SIGNAL( textEdited(const QString &) ), this, SLOT( calculatePrice() ) );
-    connect( ui->editUtility , SIGNAL( textEdited(const QString &) ), this, SLOT( calculatePrice() ) );
     connect( ui->editCode, SIGNAL(textEdited(const QString &)), SLOT(timerCheck()));
     connect( ui->editCode, SIGNAL(returnPressed()), SLOT(checkIfCodeExists()));
     connect( ui->editCode, SIGNAL(returnPressed()), ui->editQty, SLOT(setFocus()));
@@ -108,7 +98,6 @@ void PurchaseEditor::focusItemsPerBox(bool set)
   if (set) {
     ui->editItemsPerBox->setFocus();
   }
-  else ui->editCost->setFocus();
 }
 
 void PurchaseEditor::setDb(QSqlDatabase database)
@@ -206,129 +195,13 @@ QString PurchaseEditor::getMeasureStr(int c)
   return str;
 }
 
+
 void PurchaseEditor::changePhoto()
 {
  QString fname = KFileDialog::getOpenFileName();
   if (!fname.isEmpty()) {
     QPixmap p = QPixmap(fname);
     setPhoto(p);
-  }
-}
-
-void PurchaseEditor::calculatePrice()
-{
- double finalPrice=0.0;
- bool costOk,profitOk,taxOk,etaxOk;
- 
- if (ui->editCost->text().isEmpty() && !ui->groupBoxedItem->isChecked() ) {
-   ui->editCost->setText("0.0");
-   //ui->editCost->setFocus();
-   ui->editCost->setStyleSheet("background-color: rgb(255,100,0); color:white; selection-color: white; font-weight:bold;");
-   costOk = false;
- } else {
-   ui->editCost->setStyleSheet("");
-   costOk=true;
- }
- 
- if (ui->editUtility->text().isEmpty()) {
-   //ui->editUtility->setFocus();
-   ui->editUtility->setText("0.0");
-   ui->editUtility->setStyleSheet("background-color: rgb(255,100,0); color:white; selection-color: white; font-weight:bold;");
-   profitOk=false;
- } else {
-   ui->editUtility->setStyleSheet("");
-   profitOk=true;
- }
- 
- if (ui->editTax->text().isEmpty()) {
-   ui->editTax->setText("0.0");
-   //ui->editTax->setFocus();
-   ui->editTax->selectAll();
-   ui->editTax->setStyleSheet("background-color: rgb(255,100,0); color:white; selection-color: white; font-weight:bold;");
-   taxOk=false;
- } else {
-   ui->editTax->setStyleSheet("");
-   taxOk=true;
- }
-
- if (ui->editExtraTaxes->text().isEmpty()) {
-   ui->editExtraTaxes->setText("0.0");
-   //ui->editExtraTaxes->setFocus();
-   ui->editExtraTaxes->selectAll();
-   ui->editExtraTaxes->setStyleSheet("background-color: rgb(255,100,0); color:white; selection-color: white; font-weight:bold;");
-   etaxOk = false;
-  } else {
-    etaxOk = true;
-    ui->editExtraTaxes->setStyleSheet("");
-  }
-
-  //now check which are ZEROs
-//   if (!ui->editExtraTaxes->text().isEmpty() && ui->editExtraTaxes->text().toDouble()<=0)
-//     ui->editExtraTaxes->setStyleSheet("background-color: rgb(255,100,0); color:white; selection-color: white; font-weight:bold;");
-//   else ui->editExtraTaxes->setStyleSheet("");
-  if (!ui->editTax->text().isEmpty() && ui->editTax->text().toDouble()<=0)
-    ui->editTax->setStyleSheet("background-color: rgb(255,100,0); color:white; selection-color: white; font-weight:bold;");
-  else ui->editTax->setStyleSheet("");
-  if (!ui->editUtility->text().isEmpty() && ui->editUtility->text().toDouble()<=0)
-    ui->editUtility->setStyleSheet("background-color: rgb(255,100,0); color:white; selection-color: white; font-weight:bold;");
-  else ui->editUtility->setStyleSheet("");
-  if (!ui->editCost->text().isEmpty() && ui->editCost->text().toDouble()<=0)
-    ui->editCost->setStyleSheet("background-color: rgb(255,100,0); color:white; selection-color: white; font-weight:bold;");
-  else ui->editCost->setStyleSheet("");
-
-  if (costOk && profitOk && taxOk && etaxOk ) {
-  //TODO: if TAXes are included in cost...
-  double cWOTax = 0;
-  double tax     = ui->editTax->text().toDouble();
-  double tax2    = ui->editExtraTaxes->text().toDouble();
-  double utility = ui->editUtility->text().toDouble();
-
-  Azahar *myDb = new Azahar;
-  myDb->setDatabase(db);
-
-  // We assume that tax rules for prices also apply to costs.
-  if (myDb->getConfigTaxIsIncludedInPrice())
-    cWOTax= (ui->editCost->text().toDouble())/(1+((tax+tax2)/100));
-  else
-    cWOTax = ui->editCost->text().toDouble();
-  
-  double cost    = cWOTax;
-  utility = ((utility/100)*cost);
-  double cu=cost+utility;
-  //We need the tax recalculated from the costs+utility, this time taxes are expressed in $
-  tax     = ((tax/100)*(cost)); ///NOTE fixed:when paying for a product we pay taxes for the cost not the cost+profit
-  tax2    = ((tax2/100)*(cost));
-
-
-  if (ui->groupBoxedItem->isChecked()){
-    double itemsPerBox = 0;
-    double pricePerBox = 0;
-    if (!ui->editItemsPerBox->text().isEmpty()) itemsPerBox = ui->editItemsPerBox->text().toDouble();
-    if (!ui->editPricePerBox->text().isEmpty()) pricePerBox = ui->editPricePerBox->text().toDouble();
-    if (!ui->editItemsPerBox->text().isEmpty() || !ui->editPricePerBox->text().isEmpty()) return;
-    tax     = ui->editTax->text().toDouble();
-    tax2    = ui->editExtraTaxes->text().toDouble();
-    if (myDb->getConfigTaxIsIncludedInPrice())
-      cWOTax= (pricePerBox/itemsPerBox)/(1+((tax+tax2)/100));
-    else
-      cWOTax = pricePerBox/itemsPerBox;
-
-    cost = cWOTax;
-    ui->editCost->setText(QString::number(cost));
-    utility = ((ui->editUtility->text().toDouble()/100)*cost);
-    cu = cost + utility;
-    tax     = ((tax/100)*(cost));///NOTE fixed:when paying for a product we pay taxes for the cost not the cost+profit
-    tax2    = ((tax2/100)*(cost));
-    finalPrice = cu + tax + tax2;
-    
-  }
-  else finalPrice = cost + utility + tax + tax2;
-
-  qDebug()<<"cWOTax ="<<cWOTax<<" tax1="<<tax<<" tax2="<<tax2<<" FinalPrice:"<<finalPrice;
-
-  ui->editFinalPrice->setText(QString::number(finalPrice));
-  ui->editFinalPrice->selectAll();
-  delete myDb;
   }
 }
 
@@ -371,9 +244,6 @@ void PurchaseEditor::checkIfCodeExists()
     ui->editDesc->setText(pInfo.desc);
     setCategory(pInfo.category);
     setMeasure(pInfo.units);
-    ui->editCost->setText(QString::number(pInfo.cost));
-    ui->editTax->setText(QString::number(pInfo.tax));
-    ui->editExtraTaxes->setText(QString::number(pInfo.extratax));
     ui->editFinalPrice->setText(QString::number(pInfo.price));
     ui->editPoints->setText(QString::number(pInfo.points));
     ui->chIsAGroup->setChecked(pInfo.isAGroup);
@@ -430,11 +300,9 @@ void PurchaseEditor::addItemToList()
   if (ui->editCode->text().isEmpty()) ui->editCode->setFocus();
   else if (ui->editDesc->text().isEmpty()) ui->editDesc->setFocus();
   else if (ui->editPoints->text().isEmpty()) ui->editPoints->setFocus();
-  else if (ui->editCost->text().isEmpty()) ui->editCost->setFocus();
-  else if (ui->editTax->text().isEmpty()) ui->editTax->setFocus();
   else if (ui->editFinalPrice->text().isEmpty()) ui->editFinalPrice->setFocus();
   else if (ui->editQty->text().isEmpty() || ui->editQty->text()=="0") ui->editQty->setFocus();
-  else if ((ui->editUtility->text().isEmpty() && ui->editFinalPrice->text().isEmpty()) || ui->editFinalPrice->text().toDouble() < ui->editCost->text().toDouble() ) ui->editFinalPrice->setFocus();
+  else if ((ui->editFinalPrice->text().isEmpty()) || ui->editFinalPrice->text().toDouble() < 0.0 ) ui->editFinalPrice->setFocus();
   else if (ui->groupBoxedItem->isChecked() && (ui->editItemsPerBox->text().isEmpty() || ui->editItemsPerBox->text()=="0"))  ui->editItemsPerBox->setFocus();
   else if (ui->groupBoxedItem->isChecked() && (ui->editPricePerBox->text().isEmpty() || ui->editPricePerBox->text()=="0")) ui->editPricePerBox->setFocus();
   else ok = true;
@@ -633,11 +501,7 @@ void PurchaseEditor::resetEdits()
 {
   ui->editCode->setText("");
   ui->editDesc->setText("");
-  ui->editCost->setText("");
-  ui->editTax->setText("");
-  ui->editExtraTaxes->setText("0.0");
   ui->editFinalPrice->setText("");
-  ui->editUtility->setText("");
   qtyOnDb = 0;
   pix = QPixmap(0,0); //null pixmap.
   ui->labelPhoto->setText(i18n("No Photo"));

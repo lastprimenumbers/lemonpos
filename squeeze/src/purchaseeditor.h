@@ -56,11 +56,11 @@ class PurchaseEditor : public KDialog
     int     getMeasureId();
     QString getCategoryStr(int c);
     QString getMeasureStr(int c);
-    double  getCost()        { return ui->editCost->text().toDouble(); };
-    double  getTax1()        { return ui->editTax->text().toDouble(); };
-    double  getTax2()        { return ui->editExtraTaxes->text().toDouble(); };
+    double  getCost()        { return 0.0; };
+    double  getTax1()        { return 0.0; };
+    double  getTax2()        { return 0.0; };
     double  getPrice()       { return ui->editFinalPrice->text().toDouble(); };
-    double  getProfit()      { return ui->editUtility->text().toDouble(); };
+    double  getProfit()      { return 0.0; };
     double  getQtyOnDb()     { return qtyOnDb; }
     qulonglong getPoints()   { return ui->editPoints->text().toULongLong(); };
     QPixmap getPhoto()       { return pix; };
@@ -68,7 +68,7 @@ class PurchaseEditor : public KDialog
     QHash<qulonglong, ProductInfo> getHash()    { return productsHash; };
     double  getTotalBuy()    { return totalBuy; };
     double  getItemCount()   { return itemCount; };
-    double  getTotalTaxes()  { return totalTaxes; };
+    double  getTotalTaxes()  { return 0.0; };
 
     void    populateCategoriesCombo();
     void    populateMeasuresCombo();
@@ -95,7 +95,6 @@ class PurchaseEditor : public KDialog
     
 private slots:
     void    changePhoto();
-    void    calculatePrice();
     void    timerCheck();
     void    justCheck();
     void    checkIfCodeExists();
