@@ -2210,7 +2210,7 @@ TransactionInfo Azahar::getTransactionInfo(qulonglong id)
       int fieldTerminal  = query.record().indexOf("terminalnum");
       int fieldTax       = query.record().indexOf("totalTax");
       int fieldSpecialOrders = query.record().indexOf("specialOrders");
-      int fieldDonor       = query.record().indexOf("totalDonor");
+      int fieldDonor       = query.record().indexOf("donor");
       
       info.id     = query.value(fieldId).toULongLong();
       info.amount = query.value(fieldAmount).toDouble();
@@ -2535,7 +2535,7 @@ qulonglong Azahar::insertTransaction(TransactionInfo info)
   //else {
     // insert a new one.
     QSqlQuery query2(db);
-    query2.prepare("INSERT INTO transactions (clientid, type, amount, date,  time, paidwith, changegiven, paymethod, state, userid, cardnumber, itemcount, itemslist, cardauthnumber, utility, terminalnum, providerid, specialOrders, balanceId, totalTax) VALUES (:clientid, :type, :amount, :date, :time, :paidwith, :changegiven, :paymethod, :state, :userid, :cardnumber, :itemcount, :itemslist, :cardauthnumber, :utility, :terminalnum, :providerid, :specialOrders, :balance, :tax)"); //removed groups 29DIC09
+    query2.prepare("INSERT INTO transactions (clientid, type, amount, date,  time, paidwith, changegiven, paymethod, state, userid, cardnumber, itemcount, itemslist, cardauthnumber, utility, terminalnum, providerid, specialOrders, balanceId, totalTax, donor) VALUES (:clientid, :type, :amount, :date, :time, :paidwith, :changegiven, :paymethod, :state, :userid, :cardnumber, :itemcount, :itemslist, :cardauthnumber, :utility, :terminalnum, :providerid, :specialOrders, :balance, :tax, :donor)"); //removed groups 29DIC09
 
     /** Remember to improve queries readability:
      * query2.prepare("INSERT INTO transactions ( \

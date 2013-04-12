@@ -2027,7 +2027,7 @@ void lemonView::createNewTransaction(TransactionType type)
     info.providerid = 1; //default one... for no.. FIXME!
     info.terminalnum=Settings::editTerminalNumber();
     info.balanceId = currentBalanceId;
-
+    info.donor="";
     Azahar *myDb = new Azahar;
     myDb->setDatabase(db);
     currentTransaction = myDb->insertTransaction(info);
@@ -2130,6 +2130,7 @@ void lemonView::finishCurrentTransaction()
   }
 
   TransactionInfo tInfo;
+  tInfo.donor="";
   PaymentType      pType;
   double           payWith = 0.0;
   double           payTotal = 0.0;
@@ -4843,6 +4844,7 @@ void lemonView::updateTransaction()
   info.points     = buyPoints;
   info.terminalnum= Settings::editTerminalNumber();
   info.providerid=1;
+  info.donor="";
 
   double profit = 0;
   double cant   = 0;
