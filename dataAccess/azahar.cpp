@@ -1795,6 +1795,23 @@ bool Azahar::decrementClientPoints(qulonglong id, qulonglong points)
 }
 
 
+bool Azahar::getBasicInfoFromQuery(QSqlQuery &qC, BasicInfo &info){
+    info.id=0;
+    info.name="";
+    info.code="";
+    if (qC.next()) {
+      int fieldId     = qC.record().indexOf("id");
+      int fieldCode   = qC.record().indexOf("code");
+      int fieldName   = qC.record().indexOf("name");
+      //Should be only one
+      info.id         = qC.value(fieldId).toUInt();
+      info.code       = qC.value(fieldCode).toString();
+      info.name       = qC.value(fieldName).toString();
+      return true;
+    }
+    return false;
+}
+
 bool Azahar::getClientInfoFromQuery(QSqlQuery &qC, ClientInfo &info){
     info.id=0;
     info.parentClient="";
@@ -2065,6 +2082,28 @@ QString Azahar::getMainClient()
     }
   } else result = m_mainClient;
 return result;
+}
+
+QHash<int, BasicInfo> Azahar::getBasicHash(QString table)
+{
+ QHash<int, BasicInfo> result;
+ BasicInfo info;
+ QString select;
+ select="select * from " + table + ";";
+  if (!db.isOpen()) db.open();
+  if (db.isOpen()) {
+    QSqlQuery qC(db);
+    if (qC.exec(select)) {
+
+      while (getBasicInfoFromQuery(qC,info)) {
+        result.insert(info.id, info);
+      }
+    }
+    else {
+      qDebug()<<"ERROR: "<<qC.lastError();
+    }
+  }
+  return result;
 }
 
 QHash<int, ClientInfo> Azahar::getClientsHash()

@@ -13,6 +13,7 @@ set(squeeze_SRCS
    limiteditor.cpp
    donoreditor.cpp
    clienttag.cpp
+   searchcode.cpp
    ../../src/inputdialog.cpp
    ../../src/loginwindow.cpp
    ../../src/misc.cpp
@@ -41,6 +42,7 @@ kde4_add_ui_files( squeeze_SRCS
   ui/limiteditor.ui
   ui/editdonor_widget.ui
   ui/clienttag.ui
+  ui/searchcode.ui
   )
 
 

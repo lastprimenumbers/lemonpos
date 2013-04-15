@@ -54,7 +54,7 @@ class Azahar : public QObject
     QString lastError();
     void initDatabase(QString user, QString server, QString password, QString dbname);
     void setDatabase(const QSqlDatabase& database);
-
+    QHash<int, BasicInfo> getBasicHash(QString table);
     // PRODUCTS
     ProductInfo  getProductInfo(const QString &code, const bool &notConsiderDiscounts = false); //the 2nd parameter is to get the taxes for the group (not considering discounts)
     qulonglong   getProductOfferCode(qulonglong code);
@@ -278,6 +278,7 @@ class Azahar : public QObject
     qulonglong        insertCreditHistory(const CreditHistoryInfo &info);
 
 private:
+    bool   getBasicInfoFromQuery(QSqlQuery &qC, BasicInfo &info);
     ClientInfo   _getClientInfo(qulonglong clientId);
     ClientInfo   _getClientInfo(QString clientCode);
     bool   getClientInfoFromQuery(QSqlQuery &qC, ClientInfo &info);

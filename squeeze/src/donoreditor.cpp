@@ -29,8 +29,6 @@
 #include "../../src/misc.h"
 #include "../../dataAccess/azahar.h"
 
-#include "limiteditor.h"
-
 DonorEditorUI::DonorEditorUI( QWidget *parent )
 : QFrame( parent )
 {

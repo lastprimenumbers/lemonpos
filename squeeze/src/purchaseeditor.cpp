@@ -54,7 +54,6 @@ PurchaseEditor::PurchaseEditor( QWidget *parent )
     QRegExp regexpC("[0-9]*[A-Za-z_0-9\\\\/\\-]{0,30}"); // Instead of {0,13} fro EAN13, open for up to 30 chars.
     QRegExpValidator * validatorEAN13 = new QRegExpValidator(regexpC, this);
     ui->editCode->setValidator(validatorEAN13);
-    ui->editDonor->setValidator(validatorEAN13);
     ui->editFinalPrice->setValidator(new QDoubleValidator(0.00,999999999999.99, 3, ui->editFinalPrice));
     ui->editItemsPerBox->setValidator(new QDoubleValidator(0.00,999999999999.99, 2, ui->editItemsPerBox));
     ui->editPricePerBox->setValidator(new QDoubleValidator(0.00,999999999999.99, 2, ui->editPricePerBox));
@@ -106,6 +105,7 @@ void PurchaseEditor::setDb(QSqlDatabase database)
   if (!db.isOpen()) db.open();
   populateCategoriesCombo();
   populateMeasuresCombo();
+  ui->editDonor->setDb(db,"donors");
 }
 
 void PurchaseEditor::populateCategoriesCombo()

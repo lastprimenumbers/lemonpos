@@ -30,6 +30,7 @@
 #include "../../dataAccess/azahar.h"
 
 #include "limiteditor.h"
+#include "searchcode.h"
 
 ClientEditorUI::ClientEditorUI( QWidget *parent )
 : QFrame( parent )

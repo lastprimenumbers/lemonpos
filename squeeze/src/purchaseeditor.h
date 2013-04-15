@@ -49,7 +49,7 @@ class PurchaseEditor : public KDialog
     ~PurchaseEditor();
 
     qulonglong getCode()     { return ui->editCode->text().toULongLong(); };
-    QString getDonor()     { return ui->editDonor->text(); };
+    QString getDonor()     { return ui->editDonor->getCode(); };
     QString    getCodeStr()  { return ui->editCode->text(); };
     QString getDescription() { return ui->editDesc->text(); };
     double  getPurchaseQty();

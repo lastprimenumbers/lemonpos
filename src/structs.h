@@ -28,6 +28,13 @@
 #include <QDate>
 #include <QHash>
 
+struct BasicInfo {
+    qulonglong id;
+    QString code;
+    QString name;
+};
+
+
 struct ProductInfo {
   qulonglong code;
   QString desc;
