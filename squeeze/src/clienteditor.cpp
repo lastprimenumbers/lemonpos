@@ -49,6 +49,7 @@ ClientEditor::ClientEditor( QSqlDatabase parentDb, QWidget *parent )
     enableButton(KDialog::Ok, false);
 
     connect( ui->btnChangeClientPhoto   , SIGNAL( clicked() ), this, SLOT( changePhoto() ) );
+    connect( ui->btnOpenCamera   , SIGNAL( clicked() ), this, SLOT( openCamera() ) );
     connect( ui->editClientName, SIGNAL(textEdited(const QString &)),this, SLOT( checkNameDelayed()) );
     connect(ui->editClientCode, SIGNAL(returnPressed()),ui->editClientName, SLOT(setFocus()) );
     connect(ui->editClientCode, SIGNAL(editingFinished()),this, SLOT( checkNameDelayed() )); //both returnPressed and lost focus fires this signal. But only fired if validator is accepted.
@@ -58,7 +59,7 @@ ClientEditor::ClientEditor( QSqlDatabase parentDb, QWidget *parent )
     ui->editClientPoints->setValidator(validator);
     ui->editClientDiscount->setValidator((new QDoubleValidator(0.00, 100.000, 3,ui->editClientDiscount)));
     ui->editMonthlyPoints->setValidator((new QDoubleValidator(0.00, 1000.000, 3,ui->editMonthlyPoints)));
-    ui->editClientCode->setValidator(validator);
+//    ui->editClientCode->setValidator(validator);
 
     ui->editClientCode->setEmptyMessage(i18n("Enter a 6, 12, or 13 digits Bar Code."));
     ui->editClientName->setEmptyMessage(i18n("Enter client full name"));
@@ -97,12 +98,41 @@ ClientEditor::~ClientEditor()
     delete ui;
 }
 
-void ClientEditor::changePhoto()
+void ClientEditor::changePhoto(bool del)
 {
-  QString fname = KFileDialog::getOpenFileName();
+  QDir img=QDir::home();
+  img.cd("Immagini/Webcam");
+  QString fname = QFileDialog::getOpenFileName(this,"Seleziona Fotografia",img.path());
   if (!fname.isEmpty()) {
     QPixmap p = QPixmap(fname);
     setPhoto(p);
+    if (del==true) {
+        QFile file(fname);
+        file.remove();
+    }
+  }
+
+}
+
+void ClientEditor::openCamera()
+{
+  QProcess cam;
+  cam.start("cheese");
+  cam.waitForFinished();
+  QDir img=QDir::home();
+  img.cd("Immagini/Webcam");
+  img.setSorting(QDir::Time);
+  QStringList imgs =img.entryList();
+  QString fname=img.filePath(imgs.at(1));
+  qDebug()<<"Camera "<<fname;
+  if (!fname.isEmpty()) {
+      qDebug()<<"Name OK";
+    QPixmap p = QPixmap(fname);
+    qDebug()<<"Pixmap";
+    setPhoto(p);
+    qDebug()<<"Removing"<<fname;
+    QFile file(fname);
+    file.remove();
   }
 }
 

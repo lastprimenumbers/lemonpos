@@ -84,7 +84,8 @@ class ClientEditor : public KDialog
 
   private slots:
     void createLimit();
-    void changePhoto();
+    void changePhoto(bool del=false);
+    void openCamera();
     void checkName();
     void checkNameDelayed();
     void updateChildren();
