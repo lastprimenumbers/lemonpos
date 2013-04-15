@@ -49,6 +49,7 @@ class PurchaseEditor : public KDialog
     ~PurchaseEditor();
 
     qulonglong getCode()     { return ui->editCode->text().toULongLong(); };
+    QString getDonor()     { return ui->editDonor->text(); };
     QString    getCodeStr()  { return ui->editCode->text(); };
     QString getDescription() { return ui->editDesc->text(); };
     double  getPurchaseQty();
@@ -62,7 +63,7 @@ class PurchaseEditor : public KDialog
     double  getPrice()       { return ui->editFinalPrice->text().toDouble(); };
     double  getProfit()      { return 0.0; };
     double  getQtyOnDb()     { return qtyOnDb; }
-    qulonglong getPoints()   { return ui->editPoints->text().toULongLong(); };
+    qulonglong getPoints()   { return 0; };
     QPixmap getPhoto()       { return pix; };
     QByteArray getPhotoBA()  { return Misc::pixmap2ByteArray(new QPixmap(pix)); };
     QHash<qulonglong, ProductInfo> getHash()    { return productsHash; };
@@ -82,10 +83,10 @@ class PurchaseEditor : public KDialog
     void    setMeasure(QString str);
     void    setMeasure(int i);
     void    setCost(double c)          {ui->editCost->setText(QString::number(c)); };
-    void    setTax1(double t)          {ui->editTax->setText(QString::number(t)); };
-    void    setTax2(double t)          {ui->editExtraTaxes->setText(QString::number(t)); };
+    void    setTax1(double t)          {return; };
+    void    setTax2(double t)          {return; };
     void    setPrice(double p)         {ui->editFinalPrice->setText(QString::number(p)); };
-    void    setPoints(qulonglong p)    {ui->editPoints->setText(QString::number(p)); };
+    void    setPoints(qulonglong p)    {return; };
     void    setPhoto(QPixmap p)        {ui->labelPhoto->setPixmap(p); pix=p; };
     void    setIsAGroup(bool value);
     

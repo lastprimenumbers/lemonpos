@@ -1432,7 +1432,10 @@ void squeezeView::setupTransactionsModel()
     transactionsModel->setHeaderData(transTerminalNumIndex, Qt::Horizontal, i18n("Terminal #") );
     transactionsModel->setHeaderData(transProvIdIndex, Qt::Horizontal, i18n("Provider") );
 
-    ui_mainview.transactionsTable->setColumnHidden(transactionsModel->fieldIndex("totalTax"), true);
+    ui_mainview.transactionsTable->setColumnHidden(transactionsModel->fieldIndex("disc"), true);
+    ui_mainview.transactionsTable->setColumnHidden(transactionsModel->fieldIndex("discmoney"), true);
+    ui_mainview.transactionsTable->setColumnHidden(transactionsModel->fieldIndex("cardnumber"), true);
+    ui_mainview.transactionsTable->setColumnHidden(transactionsModel->fieldIndex("cardauthnumber"), true);
     ui_mainview.transactionsTable->setColumnHidden(transactionsModel->fieldIndex("specialOrders"), true);
     ui_mainview.transactionsTable->setColumnHidden(transactionsModel->fieldIndex("itemlist"), true);
     //ui_mainview.transactionsTable->setColumnHidden(transactionsModel->fieldIndex("disc"), true);
@@ -2219,10 +2222,10 @@ void squeezeView::doPurchase()
       tInfo.utility     = 0; //FIXME: utility is calculated until products are sold, not before.
       tInfo.terminalnum = 0; //NOTE: Not really a terminal... from admin computer.
       tInfo.providerid  = 1; //FIXME!
-      //tInfo.groups      = ""; //DEPRECATED
       tInfo.specialOrders = "";
       tInfo.balanceId = 0;
       tInfo.totalTax  = purchaseEditorDlg->getTotalTaxes();
+      tInfo.donor       = purchaseEditorDlg->getDonor();
       qulonglong trnum = myDb->insertTransaction(tInfo); //to get the transaction number to insert in the log.
       if ( trnum <= 0 ) {
           qDebug()<<"ERROR: Could not create a Purchase Transaction ::doPurchase()";

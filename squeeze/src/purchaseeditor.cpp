@@ -54,7 +54,7 @@ PurchaseEditor::PurchaseEditor( QWidget *parent )
     QRegExp regexpC("[0-9]*[A-Za-z_0-9\\\\/\\-]{0,30}"); // Instead of {0,13} fro EAN13, open for up to 30 chars.
     QRegExpValidator * validatorEAN13 = new QRegExpValidator(regexpC, this);
     ui->editCode->setValidator(validatorEAN13);
-    ui->editPoints->setValidator(new QIntValidator(0,999999999, ui->editPoints));
+    ui->editDonor->setValidator(validatorEAN13);
     ui->editFinalPrice->setValidator(new QDoubleValidator(0.00,999999999999.99, 3, ui->editFinalPrice));
     ui->editItemsPerBox->setValidator(new QDoubleValidator(0.00,999999999999.99, 2, ui->editItemsPerBox));
     ui->editPricePerBox->setValidator(new QDoubleValidator(0.00,999999999999.99, 2, ui->editPricePerBox));
@@ -245,7 +245,6 @@ void PurchaseEditor::checkIfCodeExists()
     setCategory(pInfo.category);
     setMeasure(pInfo.units);
     ui->editFinalPrice->setText(QString::number(pInfo.price));
-    ui->editPoints->setText(QString::number(pInfo.points));
     ui->chIsAGroup->setChecked(pInfo.isAGroup);
     gelem = pInfo.groupElementsStr;
     if (!(pInfo.photo).isEmpty()) {
@@ -299,7 +298,6 @@ void PurchaseEditor::addItemToList()
 
   if (ui->editCode->text().isEmpty()) ui->editCode->setFocus();
   else if (ui->editDesc->text().isEmpty()) ui->editDesc->setFocus();
-  else if (ui->editPoints->text().isEmpty()) ui->editPoints->setFocus();
   else if (ui->editFinalPrice->text().isEmpty()) ui->editFinalPrice->setFocus();
   else if (ui->editQty->text().isEmpty() || ui->editQty->text()=="0") ui->editQty->setFocus();
   else if ((ui->editFinalPrice->text().isEmpty()) || ui->editFinalPrice->text().toDouble() < 0.0 ) ui->editFinalPrice->setFocus();
@@ -335,7 +333,6 @@ void PurchaseEditor::addItemToList()
     info.points  = getPoints();
     info.purchaseQty = getPurchaseQty();
     info.validDiscount = productExists; //used to check if product is already on db.
-
     if (info.isAGroup) {
       // get each product fo the group/pack
       QStringList list = gelem.split(",");
@@ -505,7 +502,6 @@ void PurchaseEditor::resetEdits()
   qtyOnDb = 0;
   pix = QPixmap(0,0); //null pixmap.
   ui->labelPhoto->setText(i18n("No Photo"));
-  ui->editPoints->setText("0");
   ui->editItemsPerBox->setText("");
   ui->editPricePerBox->setText("");
   ui->editQty->setText("");
