@@ -30,32 +30,46 @@
 
 class SearchCodeUI : public QFrame, public Ui::searchCode
 {
-  Q_OBJECT
-  public:
+    Q_OBJECT
+public:
     SearchCodeUI( QWidget *parent=0 );
 };
 
 class SearchCode : public QWidget
 {
-  Q_OBJECT
-  public:
+    Q_OBJECT
+public:
     SearchCode(  QWidget *parent=0 );
     ~SearchCode();
     QSqlDatabase db;
     QString table;
     qulonglong id;
     QHash<int,BasicInfo> entries;
-    void setCode(QString code);
-    void setName(QString name);
-
-    QString getCode(){ return ui->editCode->text();};
-    QString getName(){ return ui->comboName->currentText();};
+    bool setCode(QString code);
+    bool setName(QString name);
+    void setCustomLayout(int direction);
+    QString getCode() { return ui->editCode->text(); };
+    QString getName() { return ui->comboName->currentText(); };
     qulonglong getId();
-
     void setDb(QSqlDatabase db, QString targetTable);
 
-  private:
+
+
+private:
     SearchCodeUI *ui;
+
+    bool validate();
+
+
+signals:
+    void select();
+    void selectCode(QString code);
+    void selectName(QString code);
+
+private slots:
+    void updatedCode();
+    void updatedName(int idx);
+
 };
 
 #endif

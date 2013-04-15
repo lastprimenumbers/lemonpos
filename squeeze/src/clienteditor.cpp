@@ -68,8 +68,8 @@ ClientEditor::ClientEditor( QSqlDatabase parentDb, QWidget *parent )
     ui->editClientCell->setEmptyMessage(i18n("Cell phone number"));
     ui->editClientPoints->setEmptyMessage(i18n("Accumulated points"));
     ui->editClientDiscount->setEmptyMessage(i18n("Personal discount"));
-    ui->editParentClient->setEmptyMessage(i18n("Parent client"));
 
+    ui->editParentClient->setCustomLayout(0);
 
 
     // Limits
@@ -86,12 +86,13 @@ ClientEditor::ClientEditor( QSqlDatabase parentDb, QWidget *parent )
     hl<<tr("Code")<<tr("Name");
     ui->childrenTable->setHorizontalHeaderLabels( hl);
     connect(ui->editClientCode, SIGNAL(textChanged(QString)), SLOT(updateChildren()));
-    connect(ui->editParentClient, SIGNAL(textChanged(QString)), SLOT(validateParent(QString)));
+    connect(ui->editParentClient, SIGNAL(selectCode(QString)), SLOT(validateParent(QString)));
     connect(ui->viewClientButton, SIGNAL(clicked()), SLOT(viewParentClient()));
     connect(ui->childrenTable, SIGNAL(cellDoubleClicked(int,int)), SLOT(viewChildClient(int,int)));
 
     limitsModel=new QSqlTableModel();
     ui->clientTagEditor->setDb(db);
+    ui->editParentClient->setDb(db,"clients");
 }
 
 ClientEditor::~ClientEditor()
@@ -162,7 +163,7 @@ void ClientEditor::setParentClient(QString code)
     if (code.count()>0) {
         qDebug()<<"setParentClient "<<code;
         validateParent(code);
-        ui->editParentClient->setText(code);
+        ui->editParentClient->setCode(code);
     }
     else {
         qDebug()<<"Empty parent client"<<code;
@@ -237,7 +238,7 @@ void ClientEditor::updateChildren()
     }
     hasChild=true;
     hasParent=false;
-    ui->editParentClient->setText("");
+    ui->editParentClient->setName("");
     ui->parentClientLabel->setText(tr("Disabled"));
     ui->editParentClient->setEnabled(false);
 }

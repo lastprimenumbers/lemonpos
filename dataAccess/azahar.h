@@ -130,6 +130,7 @@ class Azahar : public QObject
     //DONORS
     bool         insertDonor(DonorInfo info);
     bool         updateDonor(DonorInfo info);
+    bool         deleteDonor(qulonglong id);
     DonorInfo   getDonorInfo(qulonglong clientId);
     DonorInfo   getDonorInfo(QString clientCode);
 

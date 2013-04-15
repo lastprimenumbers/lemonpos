@@ -23,7 +23,7 @@
    <item row="0" column="0">
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="basePage">
       <property name="enabled">
@@ -424,25 +424,6 @@
       <attribute name="title">
        <string>Related</string>
       </attribute>
-      <widget class="MibitLineEdit" name="editParentClient">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>30</y>
-         <width>191</width>
-         <height>27</height>
-        </rect>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>200</width>
-         <height>16777215</height>
-        </size>
-       </property>
-       <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Specifica il codice di un cliente da cui questo cliente attingerà i punti. &lt;/p&gt;&lt;p&gt;&amp;lt;br&amp;gt;&lt;/p&gt;&lt;p&gt;Se il cliente pagante è definito, i punti verranno sottratti a lui anzichè al cliente la cui tessera venga riconosciuta in cassa.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-       </property>
-      </widget>
       <widget class="QLabel" name="label_7">
        <property name="geometry">
         <rect>
@@ -469,24 +450,11 @@
         <string>This Client Pays Also For:</string>
        </property>
       </widget>
-      <widget class="QToolButton" name="searchClientButton">
-       <property name="geometry">
-        <rect>
-         <x>210</x>
-         <y>30</y>
-         <width>23</width>
-         <height>25</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>...</string>
-       </property>
-      </widget>
       <widget class="QPushButton" name="viewClientButton">
        <property name="geometry">
         <rect>
-         <x>240</x>
-         <y>30</y>
+         <x>30</x>
+         <y>90</y>
          <width>71</width>
          <height>27</height>
         </rect>
@@ -498,7 +466,7 @@
       <widget class="QLabel" name="parentClientPhoto">
        <property name="geometry">
         <rect>
-         <x>320</x>
+         <x>330</x>
          <y>10</y>
          <width>128</width>
          <height>128</height>
@@ -532,14 +500,17 @@
       <widget class="QLabel" name="parentClientLabel">
        <property name="geometry">
         <rect>
-         <x>40</x>
-         <y>60</y>
-         <width>141</width>
-         <height>17</height>
+         <x>10</x>
+         <y>30</y>
+         <width>121</width>
+         <height>61</height>
         </rect>
        </property>
        <property name="text">
         <string>Paying Client Name</string>
+       </property>
+       <property name="wordWrap">
+        <bool>true</bool>
        </property>
       </widget>
       <widget class="QTableWidget" name="childrenTable">
@@ -549,6 +520,16 @@
          <y>150</y>
          <width>431</width>
          <height>311</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="SearchCode" name="editParentClient" native="true">
+       <property name="geometry">
+        <rect>
+         <x>150</x>
+         <y>10</y>
+         <width>171</width>
+         <height>101</height>
         </rect>
        </property>
       </widget>
@@ -605,15 +586,21 @@
    <header>kdatewidget.h</header>
   </customwidget>
   <customwidget>
+   <class>MibitLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>../../mibitWidgets/mibitlineedit.h</header>
+  </customwidget>
+  <customwidget>
    <class>clienttag</class>
    <extends>QWidget</extends>
    <header location="global">clienttag.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>MibitLineEdit</class>
-   <extends>QLineEdit</extends>
-   <header>../../mibitWidgets/mibitlineedit.h</header>
+   <class>SearchCode</class>
+   <extends>QWidget</extends>
+   <header location="global">searchcode.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>

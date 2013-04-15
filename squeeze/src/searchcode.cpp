@@ -41,14 +41,38 @@ SearchCode::SearchCode( QWidget *parent )
 {
     ui = new SearchCodeUI( this );
 //    setMainWidget( ui );
-    connect( ui->editCode, SIGNAL(returnPressed()), SLOT(validate()));
-
+    //ui.comboName
+    connect( ui->editCode, SIGNAL(editingFinished()), SLOT(updatedCode()));
+    connect( ui->comboName, SIGNAL(currentIndexChanged(int)), SLOT(updatedName(int)));
 }
 
 SearchCode::~SearchCode()
 {
     delete ui;
 }
+
+void SearchCode::setCustomLayout(int direction) {
+    delete ui->layout();
+    if (direction==0) { // Vertical grid
+        QGridLayout *lay=new QGridLayout;
+        lay->addWidget(ui->lblCode,0,0);
+        lay->addWidget(ui->editCode,0,1);
+        lay->addWidget(ui->lblName,1,0);
+        lay->addWidget(ui->comboName,1,1);
+        setLayout(lay);
+
+    } else {    // Horizontal grid
+        QHBoxLayout *lay=new QHBoxLayout;
+        lay->addWidget(ui->lblCode);
+        lay->addWidget(ui->editCode);
+        lay->addWidget(ui->lblName);
+        lay->addWidget(ui->comboName);
+        setLayout(lay);
+    }
+
+    return;
+}
+
 
 void SearchCode::setDb(QSqlDatabase parentDb, QString targetTable){
     db=parentDb;
@@ -57,8 +81,9 @@ void SearchCode::setDb(QSqlDatabase parentDb, QString targetTable){
     Azahar *myDb = new Azahar;
     myDb->setDatabase(db);
     entries = myDb->getBasicHash(table);
-    //Set by default the 'general' client.
+   // Fill the comboName list
     QHashIterator<int, BasicInfo> i(entries);
+    ui->comboName->addItem("", -1);
     while (i.hasNext()) {
         i.next();
         info = i.value();
@@ -67,30 +92,72 @@ void SearchCode::setDb(QSqlDatabase parentDb, QString targetTable){
     delete myDb;
 }
 
-void SearchCode::setName(QString name) {
+// External function to set the initial name
+bool SearchCode::setName(QString name) {
     int idx = ui->comboName->findText(name,Qt::MatchCaseSensitive);
     if (idx>-1) {
         ui->comboName->setCurrentIndex(idx);
+        return true;
     } else {
-        return;
+        return false;
     }
-    return;
 }
 
-void SearchCode::setCode(QString name) {
-    return;
+// External function to set the initial code
+bool SearchCode::setCode(QString name) {
+    ui->editCode->setText(name);
+    updatedCode();
+    return (getId() > 0);
+
 }
+
+// Called when a new code is entered (return pressed)
+void SearchCode::updatedCode() {
+    qulonglong id;
+    BasicInfo info;
+    id=getId();
+    qDebug()<<"updated code "<<id;
+    info=entries[id];
+    qDebug()<<"got info "<<info.name<<id;
+    setName(info.name);
+}
+
+// Called when a new name is selected
+void SearchCode::updatedName(int idx) {
+    int id;
+    id=ui->comboName->itemData(idx).toInt();
+    qDebug()<<"updated name "<<id;
+    setCode(entries[id].code);
+}
+
 
 qulonglong SearchCode::getId() {
-    return -1;
+    BasicInfo info;
+    QString code;
+    code = getCode();
+    QHashIterator<int, BasicInfo> i(entries);
+    while (i.hasNext()) {
+        i.next();
+        info = i.value();
+
+        if ( info.code==code ) {
+            emit select();
+            emit selectCode(code);
+            emit selectName(info.name);
+            return info.id;
+        }
+    }
+    return 0;
 }
 
-bool validate() {
-    // controlla validità name
-    // emette selectedName(QString name)
-    // selectedCode(QString code)
-    // selectedId(qulonglong id)
-    return true;
+bool SearchCode::validate(){
+    int id;
+    id=getId();
+    if ( entries[id].name==getName() and entries[id].code==getCode() ) {
+        return true;
+    }
+    return false;
+
 }
 
 

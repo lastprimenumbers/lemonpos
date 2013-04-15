@@ -62,7 +62,7 @@ class ClientEditor : public KDialog
 
     QString getCode(){ return ui->editClientCode->text();};
     QString getName(){ return ui->editClientName->text();};
-    QString getParentClient(){ return ui->editParentClient->text();};
+    QString getParentClient(){ return ui->editParentClient->getCode();};
     QString getAddress(){ return ui->editClientAddress->toPlainText();};
     QString getPhone(){ return ui->editClientPhone->text();};
     QString getCell(){ return ui->editClientCell->text();};

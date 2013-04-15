@@ -67,6 +67,8 @@ class UserEditor : public KDialog
     UserEditorUI *ui;
     long int userId;
     QPixmap pix;
+
+
 };
 
 #endif

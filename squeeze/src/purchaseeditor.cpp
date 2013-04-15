@@ -45,6 +45,9 @@ PurchaseEditor::PurchaseEditor( QWidget *parent )
     setCaption( i18n("Purchase") );
     setButtons( KDialog::Ok|KDialog::Cancel );
     setDefaultButton(KDialog::None);
+
+    ui->editDonor->setCustomLayout(1);
+
     ui->btnAddItem->setDefault(true);
 
     //Set Validators for input boxes

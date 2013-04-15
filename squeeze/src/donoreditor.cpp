@@ -50,9 +50,9 @@ DonorEditor::DonorEditor( QSqlDatabase parentDb, QWidget *parent )
     connect(ui->editClientCode, SIGNAL(returnPressed()),ui->editClientName, SLOT(setFocus()) );
     connect(ui->editClientCode, SIGNAL(editingFinished()),this, SLOT( checkNameDelayed() )); //both returnPressed and lost focus fires this signal. But only fired if validator is accepted.
 
-    QRegExp regexpC("[0-9]{1,13}");
-    QRegExpValidator * validator = new QRegExpValidator(regexpC, this);
-    ui->editClientCode->setValidator(validator);
+//    QRegExp regexpC("[0-9]{1,13}");
+//    QRegExpValidator * validator = new QRegExpValidator(regexpC, this);
+//    ui->editClientCode->setValidator(validator);
     ui->editClientCode->setEmptyMessage(i18n("Enter a 6, 12, or 13 digits Bar Code."));
     ui->editClientName->setEmptyMessage(i18n("Enter client full name"));
     ui->editClientPhone->setEmptyMessage(i18n("Phone number"));

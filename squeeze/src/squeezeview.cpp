@@ -290,6 +290,7 @@ void squeezeView::setupSignalConnections()
   connect(ui_mainview.btnDeleteMeasure, SIGNAL(clicked()), SLOT(deleteSelectedMeasure()) );
   connect(ui_mainview.btnDeleteCategory, SIGNAL(clicked()), SLOT(deleteSelectedCategory()) );
   connect(ui_mainview.btnDeleteClient, SIGNAL(clicked()), SLOT(deleteSelectedClient()));
+   connect(ui_mainview.btnDeleteDonor, SIGNAL(clicked()), SLOT(deleteSelectedDonor()));
   //connect(ui_mainview.btnConfigure, SIGNAL(clicked()),  SLOT( showPrefs()));
 
   connect(ui_mainview.btnDeleteLimit, SIGNAL(clicked()), SLOT(deleteLimit()));
@@ -2617,7 +2618,7 @@ void squeezeView::createDonor()
       if (!db.isOpen()) openDB();
       if (!myDb->insertDonor(info)) qDebug()<<myDb->lastError();
 
-      clientsModel->select();
+      donorsModel->select();
     }
     delete donorEditorDlg;
   }
@@ -2628,29 +2629,29 @@ void squeezeView::deleteSelectedDonor()
 {
   if (db.isOpen()) {
     QModelIndex index = ui_mainview.donorsView->currentIndex();
-    if (clientsModel->tableName().isEmpty()) setupDonorsModel();
-    if (index == clientsModel->index(-1,-1) ) {
-      KMessageBox::information(this, i18n("Please select a client to delete, then press the delete button again."), i18n("Cannot delete"));
+    if (donorsModel->tableName().isEmpty()) setupDonorsModel();
+    if (index == donorsModel->index(-1,-1) ) {
+      KMessageBox::information(this, i18n("Please select a donor to delete, then press the delete button again."), i18n("Cannot delete"));
     }
     else  {
-      QString uname = clientsModel->record(index.row()).value("name").toString();
-      qulonglong clientId = clientsModel->record(index.row()).value("id").toULongLong();
+      QString uname = donorsModel->record(index.row()).value("name").toString();
+      qulonglong clientId = donorsModel->record(index.row()).value("id").toULongLong();
       if (clientId > 1) {
-        int answer = KMessageBox::questionYesNo(this, i18n("Do you really want to delete the client named %1?",uname),
+        int answer = KMessageBox::questionYesNo(this, i18n("Do you really want to delete the donor named %1?",uname),
                                               i18n("Delete"));
         if (answer == KMessageBox::Yes) {
           Azahar *myDb = new Azahar;
           myDb->setDatabase(db);
-          if (!clientsModel->removeRow(index.row(), index)) {
+          if (!donorsModel->removeRow(index.row(), index)) {
             // weird:  since some time, removeRow does not work... it worked fine on versions < 0.9 ..
-            bool d = myDb->deleteClient(clientId); qDebug()<<"Deleteing client ("<<clientId<<") manually...";
+            bool d = myDb->deleteDonor(clientId); qDebug()<<"Deleteing donor ("<<clientId<<") manually...";
             if (d) qDebug()<<"Deletion succed...";
           }
-          clientsModel->submitAll();
-          clientsModel->select();
+          donorsModel->submitAll();
+          donorsModel->select();
           delete myDb;
         }
-    } else KMessageBox::information(this, i18n("Default client cannot be deleted."), i18n("Cannot delete"));
+    } else KMessageBox::information(this, i18n("Default donor cannot be deleted."), i18n("Cannot delete"));
    }
  }
 }

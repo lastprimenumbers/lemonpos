@@ -1722,6 +1722,16 @@ bool Azahar::getDonorInfoFromQuery(QSqlQuery &qC, DonorInfo &info){
     return false;
 }
 
+bool Azahar::deleteDonor(qulonglong id)
+{
+  bool result = false;
+  if (!db.isOpen()) db.open();
+  QSqlQuery query(db);
+  query = QString("DELETE FROM donors WHERE id=%1").arg(id);
+  if (!query.exec()) setError(query.lastError().text()); else result=true;
+  return result;
+}
+
 //CLIENTS
 bool Azahar::insertClient(ClientInfo info)
 {
