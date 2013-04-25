@@ -32,6 +32,7 @@ struct BasicInfo {
     qulonglong id;
     QString code;
     QString name;
+    QString surname;
 };
 
 
@@ -102,16 +103,20 @@ struct ClientInfo
   unsigned int id;
   QString      code;
   QString      name;
+  QString      surname;
+  QString      email;
   QString      parentClient;
   QString      address;
+  QString      nation;
   QString      phone;
-  QString      cell;
-  qulonglong   points;
-  double monthly;
-  double discount;
+  double       monthly;
   QByteArray   photo;
   QDate        since;
   QDate        expiry;
+  QDate        beginsusp;
+  QDate        endsusp;
+  QString      msgsusp;
+  QString      notes;
   QStringList   tags;
   QList<Limit>         limits;
 };
@@ -121,11 +126,17 @@ struct DonorInfo
   unsigned int id;
   QString      code;
   QString      name;
+  QString      surname; //dummy
   QString      address;
   QString      phone;
-  QString      cell;
+  QString      email;
+  QString      refname;
+  QString      refsurname;
+  QString      refemail;
+  QString      refphone;
   QByteArray   photo;
   QDate        since;
+  QString      notes;
 };
 
 struct OfferInfo

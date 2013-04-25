@@ -562,7 +562,7 @@ QString SpecialOrderEditor::getDescription()
   myDb->setDatabase(db);
   
   ClientInfo info = myDb->getClientInfo(getClientId());
-  QStringList phones; phones << info.phone << info.cell;
+  QStringList phones; phones << info.phone << info.email;
   delete myDb;
   return ui->clientsCombo->currentText() + "  [ " +phones.join(", ")+" ]";
 }
@@ -584,9 +584,6 @@ void SpecialOrderEditor::createClient()
     info.name    = ui->editClientName->text();
     info.address = ui->editClientAddress->toPlainText();
     info.phone   = ui->editClientPhone->text();
-    info.cell    = ui->editClientCell->text();
-    info.points  = 0;
-    info.discount= 0;
     info.since   = QDate::currentDate();
     info.photo   = "";
 

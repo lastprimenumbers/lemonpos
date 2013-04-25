@@ -87,7 +87,7 @@ void SearchCode::setDb(QSqlDatabase parentDb, QString targetTable){
     while (i.hasNext()) {
         i.next();
         info = i.value();
-        ui->comboName->addItem(info.name, info.id);
+        ui->comboName->addItem(info.surname+" "+info.name, info.id);
     }
     delete myDb;
 }
@@ -118,16 +118,18 @@ void SearchCode::updatedCode() {
     id=getId();
     qDebug()<<"updated code "<<id;
     info=entries[id];
-    qDebug()<<"got info "<<info.name<<id;
-    setName(info.name);
+    qDebug()<<"got info "<<info.name<<info.surname<<id;
+    setName(info.surname+" "+info.name);
 }
 
 // Called when a new name is selected
 void SearchCode::updatedName(int idx) {
+    blockSignals(true);
     int id;
     id=ui->comboName->itemData(idx).toInt();
     qDebug()<<"updated name "<<id;
     setCode(entries[id].code);
+    blockSignals(false);
 }
 
 
@@ -143,7 +145,7 @@ qulonglong SearchCode::getId() {
         if ( info.code==code ) {
             emit select();
             emit selectCode(code);
-            emit selectName(info.name);
+            emit selectName(info.surname+" "+info.name);
             return info.id;
         }
     }
@@ -153,7 +155,9 @@ qulonglong SearchCode::getId() {
 bool SearchCode::validate(){
     int id;
     id=getId();
-    if ( entries[id].name==getName() and entries[id].code==getCode() ) {
+    BasicInfo info=entries[id];
+    QString cmpname=info.surname+" "+info.name;
+    if ( cmpname==getName() and info.code==getCode() ) {
         return true;
     }
     return false;

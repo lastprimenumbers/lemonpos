@@ -75,22 +75,6 @@
     </size>
    </property>
   </widget>
-  <widget class="MibitLineEdit" name="editClientCell">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>294</y>
-     <width>129</width>
-     <height>27</height>
-    </rect>
-   </property>
-   <property name="maximumSize">
-    <size>
-     <width>200</width>
-     <height>16777215</height>
-    </size>
-   </property>
-  </widget>
   <widget class="Line" name="line">
    <property name="geometry">
     <rect>
@@ -224,22 +208,6 @@
    </property>
    <property name="buddy">
     <cstring>editClientPhone</cstring>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_18">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>271</y>
-     <width>75</width>
-     <height>17</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Cell Phone:</string>
-   </property>
-   <property name="buddy">
-    <cstring>editClientCell</cstring>
    </property>
   </widget>
   <widget class="MibitLineEdit" name="editClientCode">

@@ -1000,10 +1000,6 @@ void lemonView::refreshTotalLabel()
         
         if (soDiscount > 0)
             iPrice -= soDiscount*iPrice;
-        //client and ocassional discounts.
-        if (clientInfo.discount>0)
-            iPrice -= (clientInfo.discount/100)*iPrice; //applied over the discounted price (if it has discount)
-        ///NOTE: SO are not allowed (implemented) for price change.
             
         sum_pre += iPrice * soInfo.qty;
         delete myDb; //NOTE:create and delete this on every so item ??
@@ -1015,8 +1011,6 @@ void lemonView::refreshTotalLabel()
     
     ///Now we need to get and apply GENERAL DISCOUNTS (applied to the whole sale) like client discount or ocassional discounts.
     double gDiscount = 0; //in money.
-    if (clientInfo.discount >0 && !notApply)
-        gDiscountPercentage = clientInfo.discount/100;
     if (oDiscountMoney > 0 && !notApply)
         gDiscount += oDiscountMoney;
     
@@ -1025,7 +1019,7 @@ void lemonView::refreshTotalLabel()
         gDiscountPercentage = gDiscount/sum_pre;
     
     qDebug()<<"SUM_PRE:"<<sum_pre<<" DOLLAR DISCOUNT TO PERCENTAGE:"<<gDiscountPercentage;
-    qDebug()<<"notApply:"<<notApply<<" nonDiscountables:"<<nonDiscountables<<" clientInfo.discount:"<<clientInfo.discount<<" oDiscountMoney:"<<oDiscountMoney<<" gDiscount:"<<gDiscount;
+    qDebug()<<"notApply:"<<notApply<<" nonDiscountables:"<<nonDiscountables<<" oDiscountMoney:"<<oDiscountMoney<<" gDiscount:"<<gDiscount;
     
     ///iterate each product in the hash. to calculate the total sum and taxes.
     QHashIterator<qulonglong, ProductInfo> i(productsHash);
@@ -1076,10 +1070,6 @@ void lemonView::refreshTotalLabel()
         
         if (soDiscount > 0)
             iPrice -= soDiscount*iPrice;
-        //client and ocassional discounts.
-        if (clientInfo.discount>0)
-            iPrice -= (clientInfo.discount/100)*iPrice; //applied over the discounted price (if it has discount)
-        ///NOTE: SO are not allowed (implemented) for price change.
         
         sum += iPrice * soInfo.qty;
         totalSumWODisc += iPriceWD * soInfo.qty; //total sum without discounts and taxes if addtax...
@@ -1157,9 +1147,7 @@ void lemonView::refreshTotalLabel()
     ui_mainview.labelChange->setText(QString("%1") .arg(KGlobal::locale()->formatMoney(change)));
     //update client discount
     QString dStr;
-    if (clientInfo.discount >0) {
-        dStr = i18n("Discount: %1%  [%2]",clientInfo.discount, KGlobal::locale()->formatMoney(discMoney));
-    } else if (oDiscountMoney >0 ){
+    if (oDiscountMoney >0 ){
         dStr = i18n("Discount: %1", KGlobal::locale()->formatMoney(oDiscountMoney));
     }
     ui_mainview.lblClientDiscount->setText(dStr);
@@ -2194,7 +2182,7 @@ void lemonView::finishCurrentTransaction()
   tInfo.cardauthnum= authnumber;
   tInfo.itemcount= 0;//later
   tInfo.itemlist = ""; //at the for..
-  tInfo.disc = clientInfo.discount;
+  tInfo.disc = 0;
   tInfo.discmoney = discMoney; //global variable... Now included the oDiscountMoney
   qDebug()<<"tInfo.disc:"<<tInfo.disc; qDebug()<<" tInfo.discmoney:"<<tInfo.discmoney;
   tInfo.points = buyPoints; //global variable...
@@ -2535,8 +2523,6 @@ void lemonView::finishCurrentTransaction()
 
     //update transactions
     myDb->updateTransaction(tInfo);
-    //increment client points
-    myDb->incrementClientPoints(tInfo.clientid, tInfo.points);
 
     if (drawerCreated) {
         //FIXME: What to di first?... add or substract?... when there is No money or there is less money than the needed for the change.. what to do?
@@ -2563,7 +2549,6 @@ void lemonView::finishCurrentTransaction()
     }
 
     //update client info in the hash....
-    clientInfo.points += buyPoints;
     clientsHash.remove(clientInfo.id);
     clientsHash.insert(clientInfo.id, clientInfo);
     updateClientInfo();
@@ -2588,10 +2573,10 @@ void lemonView::finishCurrentTransaction()
     ticket.cardnum = cardNum;
     ticket.cardAuthNum = authnumber;
     ticket.paidWithCard = ui_mainview.checkCard->isChecked();
-    ticket.clientDisc = clientInfo.discount;
+    ticket.clientDisc = 0;
     ticket.clientDiscMoney = discMoney;
     ticket.buyPoints = buyPoints;
-    ticket.clientPoints = clientInfo.points;
+    ticket.clientPoints = 0;
     ticket.lines = ticketLines;
     ticket.clientid = clientInfo.id;
     ticket.hasSpecialOrders = !specialOrders.isEmpty();
@@ -4077,17 +4062,11 @@ void lemonView::comboClientsOnChange(int idx)
 void lemonView::updateClientInfo()
 {
   QString dStr;
-  if (clientInfo.discount >0) {
-      double discMoney = (clientInfo.discount/100)*totalSumWODisc;
-      dStr = i18n("Discount: %1%  [%2]",clientInfo.discount, KGlobal::locale()->formatMoney(discMoney));
-  } else if (oDiscountMoney >0 ){
+  if (oDiscountMoney >0 ){
       dStr = i18n("Discount: %1% ", KGlobal::locale()->formatMoney(oDiscountMoney));
   }
-  QString pStr = i18n("%1 points", clientInfo.points);
-  if (clientInfo.points <= 0)
-      pStr = "";
-  //QString dStr = i18n("Discount: %1% ",clientInfo.discount);
-  //double discMoney = (clientInfo.discount/100)*totalSumWODisc;
+  QString pStr = "";
+
   //QString frmDisc = i18n("[%1]", KGlobal::locale()->formatMoney(discMoney));
   //dStr = dStr + "\n"+KGlobal::locale()->formatMoney(discMoney);
   ui_mainview.lblClientDiscount->setText(dStr);
@@ -4326,7 +4305,7 @@ void lemonView::printTicketFromTransaction(qulonglong transactionNumber)
   ticket.clientDisc = trInfo.disc;
   ticket.clientDiscMoney = trInfo.discmoney;
   ticket.buyPoints = trInfo.points;
-  ticket.clientPoints = myDb->getClientInfo(ticket.clientid).points;
+  ticket.clientPoints = 0;
   ticket.lines = ticketLines;
   ticket.terminal = QString::number(trInfo.terminalnum);
   ticket.totalTax = trInfo.totalTax;
@@ -4839,7 +4818,7 @@ void lemonView::updateTransaction()
   info.clientid  = clientInfo.id;
   info.cardnumber= "NA";
   info.cardauthnum= "NA";
-  info.disc       = clientInfo.discount;
+  info.disc       = 0;
   info.discmoney  = discMoney;
   info.points     = buyPoints;
   info.terminalnum= Settings::editTerminalNumber();
@@ -5022,13 +5001,10 @@ void lemonView::applyOccasionalDiscount()
     //validate discount: the input has a proper validator.
     if (ui_mainview.rbPercentage->isChecked()) {
         oDiscountMoney = 0; //this is 0 when applying a percentage discount.
-        clientInfo.discount = ui_mainview.editDiscount->text().toDouble();
     } else if (ui_mainview.rbMoney->isChecked()) {
         oDiscountMoney = ui_mainview.editDiscount->text().toDouble();
-        clientInfo.discount = 0;
     } else if (ui_mainview.rbPriceChange->isChecked()) {
         double priceDiff = 0;
-        clientInfo.discount = 0; //reset
         oDiscountMoney = 0; //reset
         ///To change price to an item, it must be selected (obviously already in the purchase list). Only to normal items, no SpecialOrders.
         ///Discount to the whole sale is allowed too.
@@ -5087,7 +5063,6 @@ void lemonView::applyOccasionalDiscount()
     } else { //by coupon.
         //FIXME:CODE IT!
         oDiscountMoney = 0; //reset
-        clientInfo.discount = 0; //reset
     }
     qDebug()<<"Continuing with discount...";
     //clientInfo.discount = discPercent;
@@ -5260,10 +5235,10 @@ void lemonView::reserveItems()
         ticket.cardnum = cardNum;
         ticket.cardAuthNum = authnumber;
         ticket.paidWithCard = ui_mainview.checkCard->isChecked();
-        ticket.clientDisc = clientInfo.discount;
+        ticket.clientDisc = 0;
         ticket.clientDiscMoney = discMoney;
         ticket.buyPoints = buyPoints;
-        ticket.clientPoints = clientInfo.points;
+        ticket.clientPoints = 0;
         ticket.lines = ticketLines;
         ticket.clientid = clientInfo.id;
         ticket.hasSpecialOrders = false;

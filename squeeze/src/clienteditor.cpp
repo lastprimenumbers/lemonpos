@@ -57,17 +57,12 @@ ClientEditor::ClientEditor( QSqlDatabase parentDb, QWidget *parent )
 
     QRegExp regexpC("[0-9]{1,13}");
     QRegExpValidator * validator = new QRegExpValidator(regexpC, this);
-    ui->editClientPoints->setValidator(validator);
-    ui->editClientDiscount->setValidator((new QDoubleValidator(0.00, 100.000, 3,ui->editClientDiscount)));
     ui->editMonthlyPoints->setValidator((new QDoubleValidator(0.00, 1000.000, 3,ui->editMonthlyPoints)));
 //    ui->editClientCode->setValidator(validator);
 
     ui->editClientCode->setEmptyMessage(i18n("Enter a 6, 12, or 13 digits Bar Code."));
     ui->editClientName->setEmptyMessage(i18n("Enter client full name"));
     ui->editClientPhone->setEmptyMessage(i18n("Phone number"));
-    ui->editClientCell->setEmptyMessage(i18n("Cell phone number"));
-    ui->editClientPoints->setEmptyMessage(i18n("Accumulated points"));
-    ui->editClientDiscount->setEmptyMessage(i18n("Personal discount"));
 
     ui->editParentClient->setCustomLayout(0);
 
@@ -288,10 +283,7 @@ void ClientEditor::setClientInfo(ClientInfo info)
     setParentClient(info.parentClient);
     setAddress(info.address);
     setPhone(info.phone);
-    setCell(info.cell);
-    setPoints(info.points);
     setMonthly(info.monthly);
-    setDiscount(info.discount);
     setSinceDate(info.since);
     setExpiryDate(info.expiry);
     QPixmap photo;
@@ -317,27 +309,33 @@ ClientInfo ClientEditor::getClientInfo()
     info.name     = getName();
     info.address  = getAddress();
     info.phone    = getPhone();
-    info.cell     = getCell();
-    info.points   = getPoints();
     info.monthly   = getMonthly();
-    info.discount = getDiscount();
     info.since    = getSinceDate();
     info.expiry    = getExpiryDate();
     QPixmap photo=getPhoto();
     info.photo = Misc::pixmap2ByteArray(new QPixmap(photo));
     info.parentClient=getParentClient();
     info.tags=ui->clientTagEditor->getTags();
+    //TODO: complete!
+    info.beginsusp=getExpiryDate();
+    info.endsusp=getExpiryDate();
+    info.surname=QString("");
+    info.notes=QString("");
+    info.msgsusp=QString("");
+    info.email=QString("");
+    info.nation=QString("");
     return info;
 }
 
 void ClientEditor::commitClientInfo()
 {
     ClientInfo cInfo = getClientInfo();
-    qDebug()<<"commitClientInfo: "<<cInfo.id<<cInfo.code<<cInfo.name<<cInfo.parentClient<<cInfo.monthly;
+    qDebug()<<"commitClientInfo: "<<cInfo.id<<cInfo.code<<cInfo.name<<cInfo.surname<<cInfo.parentClient<<cInfo.monthly;
     if (!db.isOpen()) db.open();
     Azahar *myDb = new Azahar;
     myDb->setDatabase(db);
     bool result=myDb->updateClient(cInfo);
+    qDebug()<<"Client updated:"<<result<<myDb->lastError();
     myDb->setClientTags(cInfo);
     db.commit();
     delete myDb;

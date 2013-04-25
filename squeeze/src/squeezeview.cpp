@@ -1075,7 +1075,6 @@ void squeezeView::setupProductsModel()
     ui_mainview.productsViewAlt->setColumnHidden(productAlphaCodeIndex, true);
 
     productsModel->setRelation(productCategoryIndex, QSqlRelation("categories", "catid", "text"));
-    productsModel->setRelation(productLastProviderIndex, QSqlRelation("providers", "id", "name"));
 
     productsModel->setHeaderData(productCodeIndex, Qt::Horizontal, i18n("Code"));
     productsModel->setHeaderData(productDescIndex, Qt::Horizontal, i18n("Name"));
@@ -1410,7 +1409,6 @@ void squeezeView::setupTransactionsModel()
     transactionsModel->setRelation(transPayMethodIndex, QSqlRelation("paytypes", "typeid", "text"));
     transactionsModel->setRelation(transClientidIndex, QSqlRelation("clients", "id", "name"));
     transactionsModel->setRelation(transUseridIndex, QSqlRelation("users", "id", "username"));
-    transactionsModel->setRelation(transProvIdIndex, QSqlRelation("providers", "id", "name"));
     
     transactionsModel->setHeaderData(transIdIndex, Qt::Horizontal, i18n("Id"));
     transactionsModel->setHeaderData(transClientidIndex, Qt::Horizontal, i18n("Client"));

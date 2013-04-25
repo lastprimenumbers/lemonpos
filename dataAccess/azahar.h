@@ -29,6 +29,8 @@
 
 enum AzaharRTypes {rtPercentage=1001, rtMoney=1002};
 
+
+
 class QString;
 
 /**
@@ -47,6 +49,8 @@ class Azahar : public QObject
     QString errorStr;
     void setError(QString err);
     QString m_mainClient;
+    QStringList clientFields;
+    QStringList donorFields;
   public:
     Azahar(QWidget * parent = 0);
     ~ Azahar();
@@ -137,8 +141,6 @@ class Azahar : public QObject
     //CLIENTS
     bool         insertClient(ClientInfo info);
     bool         updateClient(ClientInfo info);
-    bool         incrementClientPoints(qulonglong id, qulonglong points);
-    bool         decrementClientPoints(qulonglong id, qulonglong points);
     ClientInfo   getClientInfo(qulonglong clientId);
     ClientInfo   getClientInfo(QString clientCode);
     qulonglong         checkParent(ClientInfo &info);
@@ -280,10 +282,14 @@ class Azahar : public QObject
 
 private:
     bool   getBasicInfoFromQuery(QSqlQuery &qC, BasicInfo &info);
+    QString     getUpdateString(QStringList list);
+    QString     getInsertString(QStringList list);
+    bool        _bindClient(ClientInfo &info, QSqlQuery &query);
     ClientInfo   _getClientInfo(qulonglong clientId);
     ClientInfo   _getClientInfo(QString clientCode);
     bool   getClientInfoFromQuery(QSqlQuery &qC, ClientInfo &info);
 
+    bool        _bindDonor(DonorInfo &info, QSqlQuery &query);
     DonorInfo   _getDonorInfo(qulonglong clientId);
     DonorInfo   _getDonorInfo(QString clientCode);
     bool   getDonorInfoFromQuery(QSqlQuery &qC, DonorInfo &info);

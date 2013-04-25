@@ -56,7 +56,6 @@ DonorEditor::DonorEditor( QSqlDatabase parentDb, QWidget *parent )
     ui->editClientCode->setEmptyMessage(i18n("Enter a 6, 12, or 13 digits Bar Code."));
     ui->editClientName->setEmptyMessage(i18n("Enter client full name"));
     ui->editClientPhone->setEmptyMessage(i18n("Phone number"));
-    ui->editClientCell->setEmptyMessage(i18n("Cell phone number"));
 
     //since date picker
     ui->sinceDatePicker->setDate(QDate::currentDate());
@@ -109,7 +108,6 @@ void DonorEditor::setClientInfo(DonorInfo info)
     setName(info.name);
     setAddress(info.address);
     setPhone(info.phone);
-    setCell(info.cell);
     setSinceDate(info.since);
     QPixmap photo;
     photo.loadFromData(info.photo);
@@ -132,7 +130,6 @@ DonorInfo DonorEditor::getClientInfo()
     info.name     = getName();
     info.address  = getAddress();
     info.phone    = getPhone();
-    info.cell     = getCell();
     info.since    = getSinceDate();
     QPixmap photo=getPhoto();
     info.photo = Misc::pixmap2ByteArray(new QPixmap(photo));

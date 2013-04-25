@@ -27,6 +27,8 @@ Azahar::Azahar(QWidget * parent): QObject(parent)
 {
   errorStr = "";
   m_mainClient = "undefined";
+  clientFields= QString("name, surname, address, phone, email, nation, monthly, photo, since, expiry, code, beginsusp, endsusp, msgsusp, notes, parent").split(", ");
+  donorFields=QString("name, email, address, phone, photo, since, code, refname, refsurname, refemail, refphone, notes").split(", ");
 }
 
 Azahar::~Azahar()
@@ -201,11 +203,10 @@ ProductInfo Azahar::getProductInfo(const QString &code, const bool &notConsiderD
     P.hasUnlimitedStock as UNLIMITEDSTOCK, \
     U.text as UNITSDESC, \
     C.text as CATEGORY, \
-    PR.name as LASTPROVIDER ,\
     T.tname as TAXNAME, \
     T.elementsid as TAXELEM \
-    FROM products AS P, taxmodels as T, providers as PR, categories as C, measures as U \
-    WHERE PR.id=P.lastproviderid AND T.modelid=P.taxmodel \
+    FROM products AS P, taxmodels as T, categories as C, measures as U \
+    WHERE T.modelid=P.taxmodel \
     AND C.catid=P.category AND U.id=P.units\
     AND (CODE='%1' or ALPHACODE='%1');").arg(code);
     
@@ -1609,6 +1610,26 @@ bool Azahar::deleteUser(qulonglong id)
   return result;
 }
 
+bool Azahar::_bindDonor(DonorInfo &info, QSqlQuery &query)
+{
+    bool result=false;
+    query.bindValue(":id", info.id);
+    query.bindValue(":photo", info.photo);
+    query.bindValue(":name", info.name);
+    query.bindValue(":email", info.email);
+    query.bindValue(":code", info.code);
+    query.bindValue(":address", info.address);
+    query.bindValue(":phone", info.phone);
+    query.bindValue(":since", info.since);
+    query.bindValue(":refname", info.refname);
+    query.bindValue(":refsurname", info.refsurname);
+    query.bindValue(":refemail", info.refemail);
+    query.bindValue(":refphone", info.refphone);
+    query.bindValue(":notes", info.notes);
+    if (!query.exec()) setError(query.lastError().text()); else result = true;
+    return result;
+}
+
 //DONORS
 bool Azahar::insertDonor(DonorInfo info)
 {
@@ -1616,15 +1637,11 @@ bool Azahar::insertDonor(DonorInfo info)
   if (!db.isOpen()) db.open();
   if (db.isOpen()) {
     QSqlQuery query(db);
-    query.prepare("INSERT INTO donors (name, address, phone, phone_movil, photo, since, code) VALUES (:name, :address, :phone, :cell, :photo, :since,  :code )");
-    query.bindValue(":photo", info.photo);
-    query.bindValue(":name", info.name);
-    query.bindValue(":code", info.code);
-    query.bindValue(":address", info.address);
-    query.bindValue(":phone", info.phone);
-    query.bindValue(":cell", info.cell);
-    query.bindValue(":since", info.since);
-    if (!query.exec()) setError(query.lastError().text()); else result = true;
+    QString q="INSERT INTO donors ";
+    q=q+getInsertString(donorFields)+";";
+    qDebug()<<"Insert Donor query: "<<q;
+    query.prepare(q);
+    result=_bindDonor(info,query);
   }
   return result;
 }
@@ -1634,16 +1651,12 @@ bool Azahar::updateDonor(DonorInfo info)
   bool result=false;
   if (!db.isOpen()) db.open();
   QSqlQuery query(db);
-  query.prepare("UPDATE donors SET photo=:photo, name=:name, code=:code, address=:address, phone=:phone, phone_movil=:cell, since=:since WHERE id=:id;");
-  query.bindValue(":id", info.id);
-  query.bindValue(":photo", info.photo);
-  query.bindValue(":name", info.name);
-  query.bindValue(":code", info.code);
-  query.bindValue(":address", info.address);
-  query.bindValue(":phone", info.phone);
-  query.bindValue(":cell", info.cell);
-  query.bindValue(":since", info.since);
-  if (!query.exec()) setError(query.lastError().text()); else result = true;
+  QString q="UPDATE donors SET ";
+  q=q+getUpdateString(donorFields);
+  q=q+" WHERE id=:id;";
+  qDebug()<<"UpdateDonor query:"<<q;
+  query.prepare(q);
+  result=_bindDonor(info,query);
   return result;
 }
 
@@ -1703,20 +1716,25 @@ bool Azahar::getDonorInfoFromQuery(QSqlQuery &qC, DonorInfo &info){
       int fieldId     = qC.record().indexOf("id");
       int fieldCode   = qC.record().indexOf("code");
       int fieldName   = qC.record().indexOf("name");
+      int fieldEmail  = qC.record().indexOf("email");
       int fieldPhoto  = qC.record().indexOf("photo");
       int fieldSince  = qC.record().indexOf("since");
       int fieldPhone  = qC.record().indexOf("phone");
-      int fieldCell   = qC.record().indexOf("phone_movil");
       int fieldAdd    = qC.record().indexOf("address");
       //Should be only one
       info.id         = qC.value(fieldId).toUInt();
       info.code       = qC.value(fieldCode).toString();
       info.name       = qC.value(fieldName).toString();
+      info.email       = qC.value(fieldEmail).toString();
       info.photo      = qC.value(fieldPhoto).toByteArray();
       info.since      = qC.value(fieldSince).toDate();
       info.phone      = qC.value(fieldPhone).toString();
-      info.cell       = qC.value(fieldCell).toString();
       info.address    = qC.value(fieldAdd).toString();
+      info.refname    = qC.value(qC.record().indexOf("refname")).toString();
+      info.refname    = qC.value(qC.record().indexOf("refsurname")).toString();
+      info.refname    = qC.value(qC.record().indexOf("refemail")).toString();
+      info.refname    = qC.value(qC.record().indexOf("refphone")).toString();
+      info.notes    =   qC.value(qC.record().indexOf("notes")).toString();
       return true;
     }
     return false;
@@ -1733,76 +1751,91 @@ bool Azahar::deleteDonor(qulonglong id)
 }
 
 //CLIENTS
+
+bool Azahar::_bindClient(ClientInfo &info, QSqlQuery &query)
+{
+    bool result=false;
+    query.bindValue(":id", info.id);
+    query.bindValue(":code", info.code);
+    query.bindValue(":name", info.name);
+    query.bindValue(":surname", info.surname);
+    query.bindValue(":email", info.email);
+    query.bindValue(":address", info.address);
+    query.bindValue(":nation", info.nation);
+    query.bindValue(":photo", info.photo);
+    query.bindValue(":monthly", info.monthly);
+    query.bindValue(":parent", info.parentClient);
+    query.bindValue(":phone", info.phone);
+    query.bindValue(":since", info.since);
+    query.bindValue(":expiry", info.expiry);
+    query.bindValue(":beginsusp", info.beginsusp);
+    query.bindValue(":endsusp", info.endsusp);
+    query.bindValue(":msgsusp", info.msgsusp);
+    query.bindValue(":notes", info.notes);
+    if (!query.exec()) setError(query.lastError().text()); else result = true;
+    return result;
+}
+
+QString Azahar::getUpdateString(QStringList list)
+{
+    QString msg="";
+    for (int i = 0; i<list.count(); ++i) {
+        QString e=list.at(i);
+        if (i==0) {
+            msg=e+"=:"+e;
+        } else {
+            msg+=", "+e+"=:"+e;
+        }
+    }
+    return msg;
+}
+
+QString Azahar::getInsertString(QStringList list)
+{
+    QString msg="";
+    QString val="";
+    for (int i = 0; i<list.count(); ++i) {
+        QString e=list.at(i);
+        if (i==0) {
+            msg=msg+e;
+            val=val+":"+e;
+        } else {
+            msg=msg+", "+e;
+            val=val+", :"+e;
+        }
+    }
+    return "("+msg+") VALUES("+val+")";
+}
+
 bool Azahar::insertClient(ClientInfo info)
 {
   bool result = false;
   if (!db.isOpen()) db.open();
   if (db.isOpen()) {
     QSqlQuery query(db);
-    query.prepare("INSERT INTO clients (name, address, phone, phone_movil, points, monthly, discount, photo, since, expiry, code, parent) VALUES(:name, :address, :phone, :cell,:points, :monthly, :discount, :photo, :since, :expiry, :code, :parent)");
-    query.bindValue(":photo", info.photo);
-    query.bindValue(":points", info.points);
-    query.bindValue(":monthly", info.monthly);
-    query.bindValue(":discount", info.discount);
-    query.bindValue(":parent", info.parentClient);
-    query.bindValue(":name", info.name);
-    query.bindValue(":code", info.code);
-    query.bindValue(":address", info.address);
-    query.bindValue(":phone", info.phone);
-    query.bindValue(":cell", info.cell);
-    query.bindValue(":since", info.since);
-    query.bindValue(":expiry", info.expiry);
-    if (!query.exec()) setError(query.lastError().text()); else result = true;
+    QString q="INSERT INTO clients ";
+    q=q+getInsertString(clientFields)+";";
+    qDebug()<<"Insert Client query: "<<q;
+    query.prepare(q);
+    result=_bindClient(info,query);
   }
   return result;
 }
 
 bool Azahar::updateClient(ClientInfo info)
 {
-  bool result=false;
+  bool result = false;
   if (!db.isOpen()) db.open();
   QSqlQuery query(db);
-  query.prepare("UPDATE clients SET photo=:photo, name=:name, code=:code, address=:address, phone=:phone, phone_movil=:cell, points=:points, monthly=:monthly, discount=:disc, since=:since, expiry=:expiry, parent=:parent WHERE id=:id;");
-  query.bindValue(":id", info.id);
-  query.bindValue(":photo", info.photo);
-  query.bindValue(":points", info.points);
-  query.bindValue(":monthly", info.monthly);
-  query.bindValue(":disc", info.discount);
-  query.bindValue(":name", info.name);
-  query.bindValue(":parent", info.parentClient);
-  query.bindValue(":code", info.code);
-  query.bindValue(":address", info.address);
-  query.bindValue(":phone", info.phone);
-  query.bindValue(":cell", info.cell);
-  query.bindValue(":since", info.since);
-  query.bindValue(":expiry", info.expiry);
-  if (!query.exec()) setError(query.lastError().text()); else result = true;
+  QString q="UPDATE clients SET ";
+  q=q+getUpdateString(clientFields);
+  q=q+" WHERE id=:id;";
+  qDebug()<<"UpdateClient query:"<<q;
+  query.prepare(q);
+  result=_bindClient(info,query);
   return result;
 }
 
-bool Azahar::incrementClientPoints(qulonglong id, qulonglong points)
-{
-  bool result=false;
-  if (!db.isOpen()) db.open();
-  QSqlQuery query(db);
-  query.prepare("UPDATE clients SET points=points+:points WHERE id=:code;");
-  query.bindValue(":code", id);
-  query.bindValue(":points", points);
-  if (!query.exec()) setError(query.lastError().text()); else result = true;
-  return result;
-}
-
-bool Azahar::decrementClientPoints(qulonglong id, qulonglong points)
-{
-  bool result=false;
-  if (!db.isOpen()) db.open();
-  QSqlQuery query(db);
-  query.prepare("UPDATE clients SET points=points-:points WHERE id=:code;");
-  query.bindValue(":code", id);
-  query.bindValue(":points", points);
-  if (!query.exec()) setError(query.lastError().text()); else result = true;
-  return result;
-}
 
 
 bool Azahar::getBasicInfoFromQuery(QSqlQuery &qC, BasicInfo &info){
@@ -1813,10 +1846,12 @@ bool Azahar::getBasicInfoFromQuery(QSqlQuery &qC, BasicInfo &info){
       int fieldId     = qC.record().indexOf("id");
       int fieldCode   = qC.record().indexOf("code");
       int fieldName   = qC.record().indexOf("name");
+      int fieldSurname   = qC.record().indexOf("surname");
       //Should be only one
       info.id         = qC.value(fieldId).toUInt();
       info.code       = qC.value(fieldCode).toString();
       info.name       = qC.value(fieldName).toString();
+      info.surname       = qC.value(fieldSurname).toString();
       return true;
     }
     return false;
@@ -1830,13 +1865,10 @@ bool Azahar::getClientInfoFromQuery(QSqlQuery &qC, ClientInfo &info){
       int fieldId     = qC.record().indexOf("id");
       int fieldCode   = qC.record().indexOf("code");
       int fieldName   = qC.record().indexOf("name");
-      int fieldPoints = qC.record().indexOf("points");
       int fieldPhoto  = qC.record().indexOf("photo");
-      int fieldDisc   = qC.record().indexOf("discount");
       int fieldSince  = qC.record().indexOf("since");
       int fieldExpiry = qC.record().indexOf("expiry");
       int fieldPhone  = qC.record().indexOf("phone");
-      int fieldCell   = qC.record().indexOf("phone_movil");
       int fieldAdd    = qC.record().indexOf("address");
       int fieldParent = qC.record().indexOf("parent");
       int fieldMonthly = qC.record().indexOf("monthly");
@@ -1845,15 +1877,19 @@ bool Azahar::getClientInfoFromQuery(QSqlQuery &qC, ClientInfo &info){
       info.code       = qC.value(fieldCode).toString();
       info.name       = qC.value(fieldName).toString();
       info.parentClient = qC.value(fieldParent).toString();
-      info.points     = qC.value(fieldPoints).toULongLong();
-      info.discount   = qC.value(fieldDisc).toDouble();
       info.photo      = qC.value(fieldPhoto).toByteArray();
       info.since      = qC.value(fieldSince).toDate();
       info.expiry     = qC.value(fieldExpiry).toDate();
       info.phone      = qC.value(fieldPhone).toString();
-      info.cell       = qC.value(fieldCell).toString();
       info.address    = qC.value(fieldAdd).toString();
       info.monthly   = qC.value(fieldMonthly).toDouble();
+      info.email       = qC.value(qC.record().indexOf("email")).toString();
+      info.nation       = qC.value(qC.record().indexOf("nation")).toString();
+      info.beginsusp       = qC.value(qC.record().indexOf("beginsusp")).toDate();
+      info.endsusp       = qC.value(qC.record().indexOf("endsusp")).toDate();
+      info.msgsusp       = qC.value(qC.record().indexOf("msgsusp")).toString();
+      info.notes       = qC.value(qC.record().indexOf("notes")).toString();
+//      info.       = qC.value(qC.record().indexOf("")).toString();
       return true;
     }
     return false;
@@ -2129,7 +2165,9 @@ QHash<int, ClientInfo> Azahar::getClientsHash()
         checkParent(info);
         info.photo = "";
         result.insert(info.id, info);
-        if (info.id == 1) m_mainClient = info.name;
+        if (info.id == 1) {
+            m_mainClient = info.name+" "+info.surname;
+        }
       }
     }
     else {
@@ -2776,7 +2814,6 @@ bool Azahar::cancelTransaction(qulonglong id, bool inProgress)
       }
       ///not in progress, it means stockqty,points... are affected.
       if (transCompleted) {
-        if (tinfo.points >0) decrementClientPoints(tinfo.clientid,tinfo.points);
         //TODO: when cancelling a transacion, take into account the groups sold to be returned. new feature
         QStringList soProducts;
         ///if there is any special order (product)

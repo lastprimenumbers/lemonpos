@@ -45,7 +45,6 @@ class DonorEditor : public KDialog
     void setName(QString name) { ui->editClientName->setText(name); };
     void setAddress(QString address) { ui->editClientAddress->setText(address); } ;
     void setPhone(QString phone) { ui->editClientPhone->setText(phone); };
-    void setCell(QString cell) { ui->editClientCell->setText(cell); };
     void setPhoto(QPixmap photo) { ui->labelClientPhoto->setPixmap(photo); pix = photo; };
     void setId(long int id) { clientId = id; };
     void setSinceDate(QDate date) { ui->sinceDatePicker->setDate(date); }
@@ -54,7 +53,6 @@ class DonorEditor : public KDialog
     QString getName(){ return ui->editClientName->text();};
     QString getAddress(){ return ui->editClientAddress->toPlainText();};
     QString getPhone(){ return ui->editClientPhone->text();};
-    QString getCell(){ return ui->editClientCell->text();};
     QPixmap getPhoto(){ return pix;};
     QDate   getSinceDate() { return ui->sinceDatePicker->date(); }
 
