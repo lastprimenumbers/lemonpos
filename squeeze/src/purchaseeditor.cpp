@@ -237,8 +237,8 @@ void PurchaseEditor::checkIfCodeExists()
   QString codeStr = ui->editCode->text();
   if (codeStr.isEmpty()) codeStr = "0";
   ProductInfo pInfo = myDb->getProductInfo(codeStr);
-  if (pInfo.code ==0 && pInfo.desc=="Ninguno") productExists = false;
-  if (pInfo.code > 0) {
+  if (pInfo.code =="0" && pInfo.desc=="Ninguno") productExists = false;
+  if (pInfo.code != "0") {
     status = estatusMod;
     productExists = true;
     qtyOnDb  = pInfo.stockqty;
@@ -257,7 +257,7 @@ void PurchaseEditor::checkIfCodeExists()
     }
   } else {
     qDebug()<< "no product found with code "<<codeStr;
-    qulonglong codeSaved = getCode();
+    QString codeSaved = getCode();
     resetEdits();
     if (codeSaved > 0) //do not set code "0" in the input box, just let it empty,
         setCode(codeSaved);
@@ -318,7 +318,7 @@ void PurchaseEditor::addItemToList()
     }
     
     //FIX BUG: dont allow enter new products.. dont know why? new code on 'continue' statement.
-    if (info.code == 0) { //new product
+    if (info.code == "0") { //new product
       info.code = getCode();
       info.stockqty = 0; //new product
       info.lastProviderId=1; //for now.. fixme in the future
@@ -360,7 +360,7 @@ void PurchaseEditor::insertProduct(ProductInfo info)
 {
   //When a product is already on list, increment qty.
   bool existed = false;
-  if (info.code>0) {
+  if (info.code!="0") {
     if (productsHash.contains(info.code)) {
         info = productsHash.take(info.code); //re get it from hash
         double finalStock = info.purchaseQty + info.stockqty;
@@ -429,7 +429,7 @@ void PurchaseEditor::insertProduct(ProductInfo info)
     if (!existed) {
       int rowCount = ui->tableView->rowCount();
       ui->tableView->insertRow(rowCount);
-      ui->tableView->setItem(rowCount, 0, new QTableWidgetItem(QString::number(info.code)));
+      ui->tableView->setItem(rowCount, 0, new QTableWidgetItem(info.code));
       ui->tableView->setItem(rowCount, 1, new QTableWidgetItem(info.desc));
       ui->tableView->setItem(rowCount, 2, new QTableWidgetItem(QString::number(info.purchaseQty)));
       ui->tableView->setItem(rowCount, 3, new QTableWidgetItem(QString::number(finalCount)));
@@ -469,7 +469,7 @@ void PurchaseEditor::deleteSelectedItem() //added on dec 3, 2009
   if (ui->tableView->currentRow()!=-1) {
     int row = ui->tableView->currentRow();
     QTableWidgetItem *item = ui->tableView->item(row, colCode);
-    qulonglong code = item->data(Qt::DisplayRole).toULongLong();
+    QString code = item->data(Qt::DisplayRole).toString();
     if (productsHash.contains(code)) {
       //delete it from hash and from view
       ProductInfo info = productsHash.take(code);

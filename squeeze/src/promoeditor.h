@@ -48,7 +48,7 @@ class PromoEditor : public KDialog
     void    populateCategoriesCombo();
     void    setupModel();
     bool    isProductSelected();
-    qulonglong getSelectedProductCode();
+    QString getSelectedProductCode();
 
   private slots:
     void    checkValid();

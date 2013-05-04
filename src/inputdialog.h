@@ -48,7 +48,7 @@ class InputDialog : public QDialog
     double dValue;
     qulonglong iValue;
     QString reason;
-    qulonglong getPCode() { return productCodeEdit->text().toULongLong(); } ;
+    QString getPCode() { return productCodeEdit->text(); } ;
   public slots:
     void setProductCode(qulonglong theCode);
     void setAmount(double damnt);

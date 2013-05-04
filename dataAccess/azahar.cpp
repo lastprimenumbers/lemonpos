@@ -70,14 +70,14 @@ QString Azahar::lastError()
   return errorStr;
 }
 
-bool  Azahar::correctStock(qulonglong pcode, double oldStockQty, double newStockQty, const QString &reason )
+bool  Azahar::correctStock(QString pcode, double oldStockQty, double newStockQty, const QString &reason )
 { //each correction is an insert to the table.
   bool result1, result2;
   result1 = result2 = false;
   if (!db.isOpen()) db.open();
 
   //Check if the desired product is a a group. Or hasUnlimitedStock
-  ProductInfo p = getProductInfo(QString::number(pcode));
+  ProductInfo p = getProductInfo(pcode);
   if ( p.isAGroup || p.hasUnlimitedStock ) return false;
 
   QSqlQuery query(db);
@@ -101,7 +101,7 @@ bool  Azahar::correctStock(qulonglong pcode, double oldStockQty, double newStock
   return (result1 && result2);
 }
 
-double Azahar::getProductStockQty(qulonglong code)
+double Azahar::getProductStockQty(QString code)
 {
   double result=0.0;
   if (db.isOpen()) {
@@ -128,7 +128,7 @@ double Azahar::getProductStockQty(qulonglong code)
   return result;
 }
 
-qulonglong Azahar::getProductOfferCode(qulonglong code)
+qulonglong Azahar::getProductOfferCode(QString code)
 {
   qulonglong result=0;
   if (db.isOpen()) {
@@ -156,7 +156,7 @@ qulonglong Azahar::getProductOfferCode(qulonglong code)
 ProductInfo Azahar::getProductInfo(const QString &code, const bool &notConsiderDiscounts)
 {
   ProductInfo info;
-  info.code=0;
+  info.code="0";
   info.desc="Ninguno";
   info.price=0;
   info.disc=0;
@@ -247,7 +247,7 @@ ProductInfo Azahar::getProductInfo(const QString &code, const bool &notConsiderD
         int fieldUnlimited = query.record().indexOf("UNLIMITEDSTOCK");
         int fieldNonDiscount = query.record().indexOf("NONDISCOUNT");
 
-        info.code     = query.value(fieldCODE).toULongLong();
+        info.code     = query.value(fieldCODE).toString();
         info.alphaCode = query.value(fieldAlphaCode).toString();
         info.desc     = query.value(fieldDesc).toString();
         info.price    = query.value(fieldPrice).toDouble();
@@ -387,14 +387,14 @@ ProductInfo Azahar::getProductInfo(const QString &code, const bool &notConsiderD
 //   return list;
 // }
 
-qulonglong Azahar::getProductCode(QString text)
+QString Azahar::getProductCode(QString text)
 {
   QSqlQuery query(db);
-  qulonglong code=0;
+  QString code=0;
   if (query.exec(QString("select code from products where name='%1';").arg(text))) {
     while (query.next()) { 
-      int fieldId   = query.record().indexOf("code");
-      code = query.value(fieldId).toULongLong();
+      int fieldCode  = query.record().indexOf("code");
+      code = query.value(fieldCode).toString();
     }
   }
   else {
@@ -404,14 +404,14 @@ qulonglong Azahar::getProductCode(QString text)
   return code;
 }
 
-qulonglong Azahar::getProductCodeFromAlphacode(QString text)
+QString Azahar::getProductCodeFromAlphacode(QString text)
 {
     QSqlQuery query(db);
-    qulonglong code=0;
+    QString code=0;
     if (query.exec(QString("select code from products where alphacode='%1';").arg(text))) {
         while (query.next()) {
-            int fieldId   = query.record().indexOf("code");
-            code = query.value(fieldId).toULongLong();
+            int fieldCode   = query.record().indexOf("code");
+            code = query.value(fieldCode).toString();
         }
     }
     else {
@@ -422,9 +422,9 @@ qulonglong Azahar::getProductCodeFromAlphacode(QString text)
 }
 
 /// UPDATED: This searches products by description and alphacode.   -Dec 28 2011-
-QList<qulonglong> Azahar::getProductsCode(QString regExpName)
+QList<QString> Azahar::getProductsCode(QString regExpName)
 {
-  QList<qulonglong> result;
+  QList<QString> result;
   result.clear();
   QSqlQuery query(db);
   QString qry;
@@ -432,8 +432,8 @@ QList<qulonglong> Azahar::getProductsCode(QString regExpName)
   else qry = QString("select code,name,alphacode from products WHERE `name` REGEXP '%1' OR  `alphacode` REGEXP '%1'").arg(regExpName);
   if (query.exec(qry)) {
     while (query.next()) {
-      int fieldId   = query.record().indexOf("code");
-      qulonglong id = query.value(fieldId).toULongLong();
+      int fieldCode   = query.record().indexOf("code");
+      QString id = query.value(fieldCode).toString();
       result.append(id);
 //       qDebug()<<"APPENDING TO PRODUCTS LIST:"<<id;
     }
@@ -525,7 +525,7 @@ bool Azahar::insertProduct(ProductInfo info)
 }
 
 
-bool Azahar::updateProduct(ProductInfo info, qulonglong oldcode)
+bool Azahar::updateProduct(ProductInfo info, QString oldcode)
 {
   bool result = false;
   if (!db.isOpen()) db.open();
@@ -596,14 +596,14 @@ bool Azahar::updateProduct(ProductInfo info, qulonglong oldcode)
   return result;
 }
 
-bool Azahar::decrementProductStock(qulonglong code, double qty, QDate date)
+bool Azahar::decrementProductStock(QString code, double qty, QDate date)
 {
   bool result = false;
   double qtys=qty;
   double nqty = 0;
   if (!db.isOpen()) db.open();
 
-  ProductInfo p = getProductInfo( QString::number(code) );
+  ProductInfo p = getProductInfo( code );
   if ( p.hasUnlimitedStock )
       nqty = 0; //not let unlimitedStock products to be decremented.
   else
@@ -621,16 +621,16 @@ bool Azahar::decrementProductStock(qulonglong code, double qty, QDate date)
   return result;
 }
 
-bool Azahar::decrementGroupStock(qulonglong code, double qty, QDate date)
+bool Azahar::decrementGroupStock(QString code, double qty, QDate date)
 {
   bool result = true;
   if (!db.isOpen()) db.open();
   QSqlQuery query(db);
 
-  ProductInfo info = getProductInfo(QString::number(code));
+  ProductInfo info = getProductInfo(code);
   QStringList lelem = info.groupElementsStr.split(",");
   foreach(QString ea, lelem) {
-    qulonglong c = ea.section('/',0,0).toULongLong();
+    QString c = ea.section('/',0,0);
     double     q = ea.section('/',1,1).toDouble();
     //ProductInfo pi = getProductInfo(QString::number(c));
     //FOR EACH ELEMENT, DECREMENT PRODUCT STOCK
@@ -642,7 +642,7 @@ bool Azahar::decrementGroupStock(qulonglong code, double qty, QDate date)
 
 /// WARNING: This method is DECREMENTING soldunits... not used in lemonview.cpp nor squeezeview.cpp !!!!!
 ///          Do not use when doing PURCHASES in squeeze!
-bool Azahar::incrementProductStock(qulonglong code, double qty)
+bool Azahar::incrementProductStock(QString code, double qty)
 {
   bool result = false;
   if (!db.isOpen()) db.open();
@@ -650,7 +650,7 @@ bool Azahar::incrementProductStock(qulonglong code, double qty)
   double qtys=qty;
   double nqty=0;
 
-  ProductInfo p = getProductInfo( QString::number(code) );
+  ProductInfo p = getProductInfo( code );
   if ( p.hasUnlimitedStock )
       nqty = 0; //not let unlimitedStock products to be decremented.
   else
@@ -668,16 +668,16 @@ bool Azahar::incrementProductStock(qulonglong code, double qty)
 
 /// WARNING: This method is DECREMENTING soldunits... not used in lemonview.cpp nor squeezeview.cpp !!!!!
 ///          Do not use when doing PURCHASES in squeeze!
-bool Azahar::incrementGroupStock(qulonglong code, double qty)
+bool Azahar::incrementGroupStock(QString code, double qty)
 {
   bool result = true;
   if (!db.isOpen()) db.open();
   QSqlQuery query(db);
   
-  ProductInfo info = getProductInfo(QString::number(code));
+  ProductInfo info = getProductInfo(code);
   QStringList lelem = info.groupElementsStr.split(",");
   foreach(QString ea, lelem) {
-    qulonglong c = ea.section('/',0,0).toULongLong();
+    QString c = ea.section('/',0,0);
     double     q = ea.section('/',1,1).toDouble();
     //ProductInfo pi = getProductInfo(c);
     //FOR EACH ELEMENT, DECREMENT PRODUCT STOCK
@@ -688,7 +688,7 @@ bool Azahar::incrementGroupStock(qulonglong code, double qty)
 }
 
 
-bool Azahar::deleteProduct(qulonglong code)
+bool Azahar::deleteProduct(QString code)
 {
   bool result = false;
   if (!db.isOpen()) db.open();
@@ -713,14 +713,14 @@ bool Azahar::deleteProduct(qulonglong code)
   return result;
 }
 
-double Azahar::getProductDiscount(qulonglong code, bool isGroup)
+double Azahar::getProductDiscount(QString code, bool isGroup)
 {
   double result = 0.0;
   if (!db.isOpen()) db.open();
   if (db.isOpen()) {
     QSqlQuery query2(db);
     
-    ProductInfo p = getProductInfo( QString::number(code) );
+    ProductInfo p = getProductInfo( code );
     if ( p.isNotDiscountable )
         return 0.0;
             
@@ -770,7 +770,7 @@ QList<pieProdInfo> Azahar::getTop5SoldProducts()
       info.name    = query.value(fieldName).toString();
       info.count   = query.value(fieldSoldU).toDouble();
       info.unitStr = getMeasureStr(unit);
-      info.code    = query.value(fieldCode).toULongLong();
+      info.code    = query.value(fieldCode).toString();
       products.append(info);
     }
   }
@@ -830,7 +830,7 @@ QList<pieProdInfo> Azahar::getAlmostSoldOutProducts(int min, int max)
       int unit       = query.value(fieldUnits).toInt();
       info.name    = query.value(fieldName).toString();
       info.count   = query.value(fieldStock).toDouble();
-      info.code    = query.value(fieldCode).toULongLong();
+      info.code    = query.value(fieldCode).toString();
       info.unitStr = getMeasureStr(unit);
       products.append(info);
     }
@@ -906,7 +906,7 @@ QList<ProductInfo> Azahar::getAllProducts()
     return products;
 }
 
-qulonglong Azahar::getLastProviderId(qulonglong code)
+qulonglong Azahar::getLastProviderId(QString code)
 {
   qulonglong result = 0;
   QSqlQuery query(db);
@@ -925,7 +925,7 @@ qulonglong Azahar::getLastProviderId(qulonglong code)
   return result;
 }
 
-bool Azahar::updateProductLastProviderId(qulonglong code, qulonglong provId)
+bool Azahar::updateProductLastProviderId(QString code, qulonglong provId)
 {
   bool result = false;
   if (!db.isOpen()) db.open();
@@ -938,7 +938,7 @@ bool Azahar::updateProductLastProviderId(qulonglong code, qulonglong provId)
   return result;
 }
 
-QList<ProductInfo> Azahar::getGroupProductsList(qulonglong id, bool notConsiderDiscounts)
+QList<ProductInfo> Azahar::getGroupProductsList(QString id, bool notConsiderDiscounts)
 {
   //qDebug()<<"getGroupProductsList...";
   QList<ProductInfo> pList;
@@ -949,10 +949,10 @@ QList<ProductInfo> Azahar::getGroupProductsList(qulonglong id, bool notConsiderD
     if (ge.isEmpty()) return pList;
     QStringList pq = ge.split(",");
     foreach(QString str, pq) {
-      qulonglong c = str.section('/',0,0).toULongLong();
+      QString c = str.section('/',0,0);
       double     q = str.section('/',1,1).toDouble();
       //get info
-      ProductInfo pi = getProductInfo(QString::number(c), notConsiderDiscounts);
+      ProductInfo pi = getProductInfo(c, notConsiderDiscounts);
       pi.qtyOnList = q;
       pList.append(pi);
       //qDebug()<<" code:"<<c<<" qty:"<<q;
@@ -1021,7 +1021,7 @@ GroupInfo Azahar::getGroupPriceAndTax(ProductInfo pi)
   gInfo.priceDrop = pi.groupPriceDrop;
   gInfo.name = pi.desc;
   
-  if ( pi.code <= 0 ) return gInfo;
+  if ( pi.code == "0" ) return gInfo;
 
   QList<ProductInfo> plist = getGroupProductsList(pi.code, true); //for getting products with taxes not including discounts.
   foreach(ProductInfo info, plist) {
@@ -1047,11 +1047,11 @@ GroupInfo Azahar::getGroupPriceAndTax(ProductInfo pi)
   return gInfo;
 }
 
-QString Azahar::getProductGroupElementsStr(qulonglong id)
+QString Azahar::getProductGroupElementsStr(QString code)
 {
   QString result;
   if (db.isOpen()) {
-    QString qry = QString("SELECT groupElements from products WHERE code=%1").arg(id);
+    QString qry = QString("SELECT groupElements from products WHERE code=%1").arg(code);
     QSqlQuery query(db);
     if (!query.exec(qry)) {
       int errNum = query.lastError().number();
@@ -1060,7 +1060,7 @@ QString Azahar::getProductGroupElementsStr(qulonglong id)
       QString details = i18n("Error #%1, Type:%2\n'%3'",QString::number(errNum), QString::number(errType),error);
     }
     if (query.size() <= 0)
-      setError(i18n("Error serching product id %1, Rows affected: %2", id,query.size()));
+      setError(i18n("Error serching product id %1, Rows affected: %2", code,query.size()));
     else {
       while (query.next()) {
         int field = query.record().indexOf("groupElements");
@@ -1071,24 +1071,24 @@ QString Azahar::getProductGroupElementsStr(qulonglong id)
   return result;
 }
 
-void Azahar::updateGroupPriceDrop(qulonglong code, double pd)
+void Azahar::updateGroupPriceDrop(QString code, double pd)
 {
   if (db.isOpen()) {
     QSqlQuery query(db);
-    query.prepare("UPDATE products SET groupPriceDrop=:pdrop WHERE code=:id");
-    query.bindValue(":id", code);
+    query.prepare("UPDATE products SET groupPriceDrop=:pdrop WHERE code=:code");
+    query.bindValue(":code", code);
     query.bindValue(":pdrop", pd);
     if (!query.exec()) setError(query.lastError().text());
     qDebug()<<"<*> updateGroupPriceDrop  | Rows Affected:"<<query.numRowsAffected();
   }
 }
 
-void Azahar::updateGroupElements(qulonglong code, QString elementsStr)
+void Azahar::updateGroupElements(QString code, QString elementsStr)
 {
   if (db.isOpen()) {
     QSqlQuery query(db);
-    query.prepare("UPDATE products SET groupElements=:elements WHERE code=:id");
-    query.bindValue(":id", code);
+    query.prepare("UPDATE products SET groupElements=:elements WHERE code=:code");
+    query.bindValue(":code", code);
     query.bindValue(":elements", elementsStr);
     if (!query.exec()) setError(query.lastError().text());
     qDebug()<<"<*> updateGroupElements  | Rows Affected:"<<query.numRowsAffected();
@@ -1298,7 +1298,7 @@ bool Azahar::createOffer(OfferInfo info)
   QSqlQuery query(db);
   if (!db.isOpen()) db.open();
 
-  ProductInfo p = getProductInfo( QString::number(info.productCode) );
+  ProductInfo p = getProductInfo( info.productCode );
   if ( p.isNotDiscountable ) {
       setError(i18n("Unable to set an offer/discount for the selected produc because it is NOT DISCOUNTABLE"));
       return false;
@@ -1349,8 +1349,8 @@ QString Azahar::getOffersFilterWithText(QString text)
     else {
       codes.clear();
       while (qry.next()) {
-        int fieldId   = qry.record().indexOf("code");
-        qulonglong c = qry.value(fieldId).toULongLong();
+        int fieldCode   = qry.record().indexOf("code");
+        QString c = qry.value(fieldCode).toString();
         codes.append(QString("offers.product_id=%1 ").arg(c));
       }
       result = codes.join(" OR ");
@@ -1359,7 +1359,7 @@ QString Azahar::getOffersFilterWithText(QString text)
   return result;
 }
 
-bool Azahar::moveOffer(qulonglong oldp, qulonglong newp)
+bool Azahar::moveOffer(QString oldp, QString newp)
 {
   bool result=false;
   if (!db.isOpen()) db.open();
@@ -1842,16 +1842,20 @@ bool Azahar::getBasicInfoFromQuery(QSqlQuery &qC, BasicInfo &info){
     info.id=0;
     info.name="";
     info.code="";
+    info.surname="";
     if (qC.next()) {
       int fieldId     = qC.record().indexOf("id");
       int fieldCode   = qC.record().indexOf("code");
       int fieldName   = qC.record().indexOf("name");
       int fieldSurname   = qC.record().indexOf("surname");
       //Should be only one
-      info.id         = qC.value(fieldId).toUInt();
+      info.id         = qC.value(fieldId).toULongLong();
       info.code       = qC.value(fieldCode).toString();
       info.name       = qC.value(fieldName).toString();
-      info.surname       = qC.value(fieldSurname).toString();
+      // Notice: products does not have a surname!
+      if (fieldSurname>=0) {
+        info.surname       = qC.value(fieldSurname).toString();
+      }
       return true;
     }
     return false;
@@ -1916,6 +1920,7 @@ Limit Azahar::getLimitFromQuery(QSqlQuery &query)
     int fieldClientTag     = query.record().indexOf("clientTag");
     int fieldProductCode    = query.record().indexOf("productCode");
     int fieldProductCat     = query.record().indexOf("productCat");
+    int fieldPriority     = query.record().indexOf("priority");
     int fieldLimit     = query.record().indexOf("limit");
     int fieldCurrent     = query.record().indexOf("current");
     Limit result;
@@ -1923,6 +1928,7 @@ Limit Azahar::getLimitFromQuery(QSqlQuery &query)
     result.clientTag=query.value(fieldClientTag).toString();
     result.productCode=query.value(fieldProductCode).toString();
     result.productCat=query.value(fieldProductCat).toInt();
+    result.priority=query.value(fieldPriority).toInt();
     result.limit=query.value(fieldLimit).toFloat();
     result.current=query.value(fieldCurrent).toFloat();
     return result;
@@ -2135,7 +2141,7 @@ QHash<int, BasicInfo> Azahar::getBasicHash(QString table)
  QHash<int, BasicInfo> result;
  BasicInfo info;
  QString select;
- select="select * from " + table + ";";
+ select="select * from " + table;
   if (!db.isOpen()) db.open();
   if (db.isOpen()) {
     QSqlQuery qC(db);
@@ -2143,12 +2149,15 @@ QHash<int, BasicInfo> Azahar::getBasicHash(QString table)
 
       while (getBasicInfoFromQuery(qC,info)) {
         result.insert(info.id, info);
+        qDebug()<<"Inserted "<<info.name<<result.count()<<qC.lastError();
+
       }
     }
     else {
       qDebug()<<"ERROR: "<<qC.lastError();
     }
   }
+  qDebug()<<"getBasicHash count:"<<result.count();
   return result;
 }
 
@@ -2842,9 +2851,9 @@ bool Azahar::cancelTransaction(qulonglong id, bool inProgress)
             //NOTE: rawProducts ? affect stock when cancelling = YES but only if affected when sold one of its parents (specialOrders) and stockqty is set. But they would not be here, if not at specialOrders List
             ProductInfo pi = getProductInfo(l.at(0));
             if ( pi.isAGroup ) 
-              incrementGroupStock(l.at(0).toULongLong(), l.at(1).toDouble()); //code at 0, qty at 1
+                incrementGroupStock(l.at(0), l.at(1).toDouble()); //code at 0, qty at 1
             else //there is a normal product
-              incrementProductStock(l.at(0).toULongLong(), l.at(1).toDouble()); //code at 0, qty at 1
+                incrementProductStock(l.at(0), l.at(1).toDouble()); //code at 0, qty at 1
           }
         }//for each product
         ///save cashout for the money return
@@ -3980,7 +3989,7 @@ bool Azahar::decrementSOStock(qulonglong id, double qty, QDate date)
 
   QList<QString> lelem = getSpecialOrderProductsStr(id).split(",");
   foreach(QString ea, lelem) {
-    qulonglong c = ea.section('/',0,0).toULongLong();
+    QString c = ea.section('/',0,0);
     double     q = ea.section('/',1,1).toDouble();
     //FOR EACH ELEMENT, DECREMENT PRODUCT STOCK
     result = result && decrementProductStock(c, q*qty, date);

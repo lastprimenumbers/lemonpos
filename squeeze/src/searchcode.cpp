@@ -88,6 +88,7 @@ void SearchCode::setDb(QSqlDatabase parentDb, QString targetTable){
         i.next();
         info = i.value();
         ui->comboName->addItem(info.surname+" "+info.name, info.id);
+        qDebug()<<"Inserted in combo"<<info.name;
     }
     delete myDb;
 }
