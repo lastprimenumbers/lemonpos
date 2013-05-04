@@ -225,7 +225,7 @@ void SpecialOrderEditor::addItem()
   QItemSelectionModel *selectionModel = ui->sourcePView->selectionModel();
   QModelIndexList indexList = selectionModel->selectedRows(); // pasar el indice que quiera (0=code, 1=name)
   foreach(QModelIndex index, indexList) {
-    qulonglong code    = index.data().toULongLong();
+    QString code    = index.data().toString();
     QString    codeStr = index.data().toString();
     bool exists = false;
     ProductInfo pInfo;
@@ -360,7 +360,7 @@ void SpecialOrderEditor::removeItem()
     Azahar *myDb = new Azahar;
     myDb->setDatabase(db);
     //get code from db
-    qulonglong code = myDb->getProductCode(name);
+    QString code = myDb->getProductCode(name);
     ProductInfo pInfo = groupInfo.productsList.take(code); //insert it later...
     double qty = pInfo.qtyOnList; //from hash | must be the same on groupView
     if (qty>1) {
@@ -406,7 +406,7 @@ void SpecialOrderEditor::itemDoubleClicked(QTableWidgetItem* item)
   Azahar *myDb = new Azahar;
   myDb->setDatabase(db);
   //get code from db
-  qulonglong code = myDb->getProductCode(name);
+  QString code = myDb->getProductCode(name);
   ProductInfo pInfo = groupInfo.productsList.take(code); //insert it later...
   double qty = pInfo.qtyOnList+1; //from hash | must be the same on groupView
 
@@ -438,7 +438,7 @@ QString SpecialOrderEditor::getGroupElementsStr()
 {
   QStringList list;
   foreach(ProductInfo info, groupInfo.productsList) {
-    list.append(QString::number(info.code)+"/"+QString::number(info.qtyOnList));
+    list.append(info.code+"/"+QString::number(info.qtyOnList));
   }
   return list.join(",");
 }
@@ -453,7 +453,7 @@ void SpecialOrderEditor::setGroupElements(QString e)
   for (int i=0; i<list.count(); ++i) {
     QStringList tmp = list.at(i).split("/");
     if (tmp.count() == 2) { //ok 2 fields
-      qulonglong  code    = tmp.at(0).toULongLong();
+      QString  code    = tmp.at(0);
       QString     codeStr = tmp.at(0);
       double      qty     = tmp.at(1).toDouble();
       pInfo = myDb->getProductInfo(codeStr);

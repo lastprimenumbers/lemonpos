@@ -94,7 +94,7 @@ public:
     QSqlDatabase db;
     LoginWindow *dlgLogin;
     LoginWindow *dlgPassword;
-    QHash<qulonglong, ProductInfo> productsHash;
+    QHash<QString, ProductInfo> productsHash;
     QSqlTableModel *productsModel;
     QHash<QString, int> categoriesHash;
     ClientInfo clientInfo;
