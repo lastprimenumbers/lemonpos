@@ -369,7 +369,7 @@ msgstr "Nessun articolo trovato."
 #: lemonview.cpp:1143
 #: lemonview.cpp:4039
 msgid "Discount: %1%  [%2]"
-msgstr "Sconto: %1%  [%2]""
+msgstr "Sconto: %1%  [%2]"
 
 #: lemonview.cpp:1145
 msgid "Discount: %1"
@@ -1092,8 +1092,8 @@ msgid "Portobello, Emporio Sociale di Modena"
 msgstr "Portobello, Emporio Sociale di Modena"
 
 #: main.cpp:50
-msgid "portobello"
-msgstr "portobello"
+msgid "PortoBelloPos"
+msgstr "PortoBelloPos"
 
 #: main.cpp:50
 msgid "(C) 2007-2011 Miguel Chavez Gamboa"
@@ -1234,7 +1234,7 @@ msgstr "Stato"
 #: soselector.cpp:173
 #: sostatus.cpp:169
 msgid "Tr. Id"
-msgstr ""
+msgstr "Tr. Id"
 
 #: sostatus.cpp:45
 msgid "Change Status"
