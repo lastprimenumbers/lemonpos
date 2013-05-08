@@ -1088,8 +1088,8 @@ msgid "Invalid username or password"
 msgstr "Nome utente o password non validi"
 
 #: main.cpp:43
-msgid "Portobello, Emporio Sociale di Modena"
-msgstr "Portobello, Emporio Sociale di Modena"
+msgid "PortoBello, Emporio Sociale di Modena"
+msgstr "PortoBello, Emporio Sociale di Modena"
 
 #: main.cpp:50
 msgid "PortoBelloPos"
