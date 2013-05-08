@@ -83,9 +83,9 @@ void PromoEditor::populateCategoriesCombo()
 
 
 //FIXME: How to detect when a product does not exists? code=-1, but here codes are unsigned, to allow a broader range.
-qulonglong PromoEditor::getSelectedProductCode()
+QString PromoEditor::getSelectedProductCode()
 {
-  qulonglong code=0;
+  QString code="0";
   Azahar *myDb = new Azahar;
   myDb->setDatabase(db);
 
@@ -102,11 +102,11 @@ qulonglong PromoEditor::getSelectedProductCode()
 // BFB: New spinboxPrice. We need to obtain product price, and then calculate offer price
 void PromoEditor::productChanged()
 {
-  qulonglong code = getSelectedProductCode();
-  if (code != 0){
+  QString code = getSelectedProductCode();
+  if (code != "0"){
     Azahar *myDb = new Azahar;
     myDb->setDatabase(db);
-    ProductInfo info = myDb->getProductInfo(QString::number(code));
+    ProductInfo info = myDb->getProductInfo(code);
     ui->spinboxPrice->setValue(info.price*(100.0-ui->spinboxDiscount->value())/100);
   }
   checkValid();
@@ -116,11 +116,11 @@ void PromoEditor::productChanged()
 void PromoEditor::discountChanged()
 {
   if (isProductSelected()){
-    qulonglong code = getSelectedProductCode();
+    QString code = getSelectedProductCode();
     if (code != 0){
       Azahar *myDb = new Azahar;
       myDb->setDatabase(db);
-      ProductInfo info = myDb->getProductInfo(QString::number(code));
+      ProductInfo info = myDb->getProductInfo(code);
       ui->spinboxPrice->setValue(info.price*(100.0-ui->spinboxDiscount->value())/100);
     }
   }
@@ -131,11 +131,11 @@ void PromoEditor::discountChanged()
 void PromoEditor::priceChanged()
 {
   if (isProductSelected()){
-    qulonglong code = getSelectedProductCode();
+    QString code = getSelectedProductCode();
     if (code != 0){
       Azahar *myDb = new Azahar;
       myDb->setDatabase(db);
-      ProductInfo info = myDb->getProductInfo(QString::number(code));
+      ProductInfo info = myDb->getProductInfo(code);
       ui->spinboxDiscount->setValue(100.0-(ui->spinboxPrice->value()*100/info.price));
     }
   }

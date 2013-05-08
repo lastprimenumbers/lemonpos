@@ -1,6 +1,6 @@
 #include "limiteditor.h"
 #include "../../dataAccess/azahar.h"
-
+#include "searchcode.h"
 
 
 
@@ -29,6 +29,9 @@ void limiteditor::setDb(QSqlDatabase parentDb)
       i.next();
       ui->comboProductCat->addItem(i.key(), i.value());
     }
+    ui->codeProduct->setDb(parentDb,"products");
+    ui->codeClient->setDb(parentDb,"clients");
+
 }
 
 void limiteditor::addLimit()
@@ -54,7 +57,7 @@ void limiteditor::addLimit()
     // A single, specific client
     }else if (ui->radioSingleClient->isChecked()) {
         ClientInfo info;
-        info = myDb->getClientInfo(ui->editClientCode->text());
+        info = myDb->getClientInfo(ui->codeClient->getCode());
         lim.clientId = info.id;
     // All clients having a tag
     }else if (ui->radioTagClient->isChecked()) {
@@ -75,7 +78,7 @@ void limiteditor::addLimit()
         lim.productCat = ui->comboProductCat->itemData(i).toInt();
     // A single product
     }else if (ui->radioProductCode->isChecked()) {
-        lim.productCode = ui->editProductCode->text();
+        lim.productCode = ui->codeProduct->getCode();
     }
 
     // The limit threshold

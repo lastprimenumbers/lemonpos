@@ -49,7 +49,7 @@ class ProductEditor : public KDialog
     ProductEditor( QWidget *parent=0, bool newProduct = false  );
     ~ProductEditor();
 
-    qulonglong getCode()     { return ui->editCode->text().toULongLong(); };
+    QString getCode()     { return ui->editCode->text(); };
     QString getAlphacode()   { return ui->editAlphacode->text(); };
     QString getDescription() { return ui->editDesc->text(); };
     double  getStockQty()    { return ui->editStockQty->text().toDouble(); };
@@ -77,7 +77,7 @@ class ProductEditor : public KDialog
     void    calculateGroupValues();
 
     void    setDb(QSqlDatabase database);
-    void    setCode(qulonglong c)      {ui->editCode->setText(QString::number(c)); };
+    void    setCode(QString c)      {ui->editCode->setText(c); };
     void    setAlphacode(QString c)    { ui->editAlphacode->setText(c); };
     void    setDescription(QString d)  {ui->editDesc->setText(d); };
     void    setStockQty(double q)      {ui->editStockQty->setText(QString::number(q)); };

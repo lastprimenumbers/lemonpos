@@ -61,19 +61,19 @@ class Azahar : public QObject
     QHash<int, BasicInfo> getBasicHash(QString table);
     // PRODUCTS
     ProductInfo  getProductInfo(const QString &code, const bool &notConsiderDiscounts = false); //the 2nd parameter is to get the taxes for the group (not considering discounts)
-    qulonglong   getProductOfferCode(qulonglong code);
-    qulonglong   getProductCode(QString text);
-    qulonglong   getProductCodeFromAlphacode(QString text);
-    QList<qulonglong> getProductsCode(QString regExpName);
+    qulonglong   getProductOfferCode(QString code);
+    QString   getProductCode(QString text);
+    QString   getProductCodeFromAlphacode(QString text);
+    QList<QString> getProductsCode(QString regExpName);
     QStringList  getProductsList();
     bool         insertProduct(ProductInfo info);
-    bool         updateProduct(ProductInfo info, qulonglong oldcode);
-    bool         decrementProductStock(qulonglong code, double qty, QDate date);
-    bool         decrementGroupStock(qulonglong code, double qty, QDate date);
-    bool         incrementGroupStock(qulonglong code, double qty);
-    bool         incrementProductStock(qulonglong code, double qty);
-    bool         deleteProduct(qulonglong code);
-    double       getProductDiscount(qulonglong code, bool isGroup=false); //returns the discount percentage!
+    bool         updateProduct(ProductInfo info, QString oldcode);
+    bool         decrementProductStock(QString code, double qty, QDate date);
+    bool         decrementGroupStock(QString code, double qty, QDate date);
+    bool         incrementGroupStock(QString code, double qty);
+    bool         incrementProductStock(QString code, double qty);
+    bool         deleteProduct(QString code);
+    double       getProductDiscount(QString code, bool isGroup=false); //returns the discount percentage!
     QList<pieProdInfo>  getTop5SoldProducts();
     double       getTopFiveMaximum();
     QList<pieProdInfo>  getAlmostSoldOutProducts(int min, int max);
@@ -81,20 +81,20 @@ class Azahar : public QObject
     QList<ProductInfo>  getSoldOutProducts();
     QList<ProductInfo>  getLowStockProducts(double min);
     QList<ProductInfo>  getAllProducts();
-    double       getProductStockQty(qulonglong code);
-    qulonglong   getLastProviderId(qulonglong code);
-    bool         updateProductLastProviderId(qulonglong code, qulonglong provId);
-    QList<ProductInfo> getGroupProductsList(qulonglong id, bool notConsiderDiscounts = false);
+    double       getProductStockQty(QString code);
+    qulonglong   getLastProviderId(QString code);
+    bool         updateProductLastProviderId(QString code, qulonglong provId);
+    QList<ProductInfo> getGroupProductsList(QString id, bool notConsiderDiscounts = false);
     /* DEPRECATED double       getGroupAverageTax(qulonglong id);
        DEPRECATED double       getGroupTotalTax(qulonglong id); */
     GroupInfo    getGroupPriceAndTax(ProductInfo pi);
-    QString      getProductGroupElementsStr(qulonglong id);
-    void         updateGroupPriceDrop(qulonglong code, double pd);
-    void         updateGroupElements(qulonglong code, QString elementsStr);
+    QString      getProductGroupElementsStr(QString id);
+    void         updateGroupPriceDrop(QString code, double pd);
+    void         updateGroupElements(QString code, QString elementsStr);
 
     
     //PRODUCT STOCK CORRECTION
-    bool         correctStock(qulonglong pcode, double oldStockQty, double newStockQty, const QString &reason );
+    bool         correctStock(QString pcode, double oldStockQty, double newStockQty, const QString &reason );
 
     //CATEGORIES
     QHash<QString, int> getCategoriesHash();
@@ -115,7 +115,7 @@ class Azahar : public QObject
     bool         createOffer(OfferInfo info);
     bool         deleteOffer(qlonglong id);
     QString      getOffersFilterWithText(QString text); //get all products with desc=text as a regexp that has discounts.
-    bool         moveOffer(qulonglong oldp, qulonglong newp);
+    bool         moveOffer(QString oldp, QString newp);
 
     //USERS
     bool         updateUser(UserInfo info);

@@ -206,7 +206,7 @@ signals:
    void setTransactionsFilter();
    void setBalancesFilter();
 
-   void correctStock(qulonglong code, double oldStock, double newStock, const QString &reason);
+   void correctStock(QString code, double oldStock, double newStock, const QString &reason);
    TransactionInfo createPurchase(ProductInfo info);
 
    void setupDb();

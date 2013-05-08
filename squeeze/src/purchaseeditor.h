@@ -48,7 +48,7 @@ class PurchaseEditor : public KDialog
     PurchaseEditor( QWidget *parent=0 );
     ~PurchaseEditor();
 
-    qulonglong getCode()     { return ui->editCode->text().toULongLong(); };
+    QString getCode()     { return ui->editCode->text(); };
     QString getDonor()     { return ui->editDonor->getCode(); };
     QString    getCodeStr()  { return ui->editCode->text(); };
     QString getDescription() { return ui->editDesc->text(); };
@@ -66,7 +66,7 @@ class PurchaseEditor : public KDialog
     qulonglong getPoints()   { return 0; };
     QPixmap getPhoto()       { return pix; };
     QByteArray getPhotoBA()  { return Misc::pixmap2ByteArray(new QPixmap(pix)); };
-    QHash<qulonglong, ProductInfo> getHash()    { return productsHash; };
+    QHash<QString, ProductInfo> getHash()    { return productsHash; };
     double  getTotalBuy()    { return totalBuy; };
     double  getItemCount()   { return itemCount; };
     double  getTotalTaxes()  { return 0.0; };
@@ -75,7 +75,7 @@ class PurchaseEditor : public KDialog
     void    populateMeasuresCombo();
 
     void    setDb(QSqlDatabase database);
-    void    setCode(qulonglong c)      {ui->editCode->setText(QString::number(c)); };
+    void    setCode(QString c)      {ui->editCode->setText(c); };
     void    setDescription(QString d)  {ui->editDesc->setText(d); };
     void    setPurchaseQty(double q)   {ui->editQty->setText(QString::number(q)); };
     void    setCategory(QString str);
@@ -117,7 +117,7 @@ protected slots:
     double itemCount;
     double totalTaxes;
     QString gelem;
-    QHash<qulonglong, ProductInfo> productsHash;
+    QHash<QString, ProductInfo> productsHash;
     QString lastCode;
 
     MibitTip *errorPanel;

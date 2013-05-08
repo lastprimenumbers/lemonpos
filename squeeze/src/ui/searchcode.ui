@@ -38,7 +38,11 @@
     </widget>
    </item>
    <item row="1" column="1">
-    <widget class="QComboBox" name="comboName"/>
+    <widget class="QComboBox" name="comboName">
+     <property name="editable">
+      <bool>true</bool>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>

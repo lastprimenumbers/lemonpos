@@ -37,7 +37,7 @@ struct BasicInfo {
 
 
 struct ProductInfo {
-  qulonglong code;
+  QString code;
   QString desc;
   double price;
   double disc;
@@ -95,6 +95,7 @@ struct Limit
     int productCat;
     double limit;
     double current;
+    int priority;
     int parent;
 };
 
@@ -141,7 +142,7 @@ struct DonorInfo
 
 struct OfferInfo
 {
-  qulonglong productCode;
+  QString productCode;
   double     discount;
   QDate      dateStart;
   QDate      dateEnd;
@@ -235,7 +236,7 @@ struct pieProdInfo
   double count;
   QString name;
   QString unitStr;
-  qulonglong code;
+  QString code;
 };
 
 struct ProfitRange
@@ -348,7 +349,7 @@ struct TransactionItemInfo
 {
   qulonglong transactionid;
   int        position;
-  qulonglong productCode;
+  QString productCode;
   double     qty;
   double     points;
   QString    unitStr;
@@ -460,7 +461,7 @@ struct GroupInfo
   double  priceDrop;
   double  count; // total of items in the group
   bool    isAvailable; //based on stockqty for each product (and its qtys).
-  QHash<qulonglong, ProductInfo> productsList;
+  QHash<QString, ProductInfo> productsList;
 };
 
 struct CurrencyInfo

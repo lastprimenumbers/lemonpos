@@ -900,12 +900,12 @@ void lemonView::doSearchItemDesc()
 
   Azahar *myDb = new Azahar;
   myDb->setDatabase(db);
-  QList<qulonglong> pList = myDb->getProductsCode(desc); //busca con regexp...
+  QList<QString> pList = myDb->getProductsCode(desc); //busca con regexp...
   int numRaw = 0;
   //iteramos la lista
   for (int i = 0; i < pList.size(); ++i) {
-     qulonglong c = pList.at(i);
-     ProductInfo pInfo = myDb->getProductInfo(QString::number(c));
+     QString c = pList.at(i);
+     ProductInfo pInfo = myDb->getProductInfo(c);
      if (pInfo.isARawProduct) numRaw++;
      if (pInfo.code==0 || pInfo.isARawProduct) continue; //discard this item, continue loop.
      //insert each product to the search table...
@@ -925,7 +925,7 @@ void lemonView::doSearchItemDesc()
       // if it is passed a numer as the only parameter to QTableWidgetItem, it is taken as a type
       // and not as a data to display.
       ui_mainview.tableSearch->setItem(rowCount, 1, new QTableWidgetItem(QString::number(pInfo.price)));
-      ui_mainview.tableSearch->setItem(rowCount, 2, new QTableWidgetItem(QString::number(pInfo.code)));
+      ui_mainview.tableSearch->setItem(rowCount, 2, new QTableWidgetItem(pInfo.code));
       ui_mainview.tableSearch->resizeRowsToContents();
     }
     if (pList.count()>0) ui_mainview.labelSearchMsg->setText(i18np("%1 item found","%1 items found.", pList.count()-numRaw));
@@ -1022,7 +1022,7 @@ void lemonView::refreshTotalLabel()
     qDebug()<<"notApply:"<<notApply<<" nonDiscountables:"<<nonDiscountables<<" oDiscountMoney:"<<oDiscountMoney<<" gDiscount:"<<gDiscount;
     
     ///iterate each product in the hash. to calculate the total sum and taxes.
-    QHashIterator<qulonglong, ProductInfo> i(productsHash);
+    QHashIterator<QString, ProductInfo> i(productsHash);
     while (i.hasNext()) {
         i.next();
         ProductInfo prod = i.value();
@@ -1251,9 +1251,9 @@ bool lemonView::incrementTableItemQty(QString code, double q)
   bool done=false;
   ProductInfo info;
 
-   if (productsHash.contains(code.toULongLong())) {
+   if (productsHash.contains(code)) {
     //get product info...
-    info = productsHash.value(code.toULongLong());
+    info = productsHash.value(code);
 
     stockqty = info.stockqty;
     qty = info.qtyOnList;
@@ -1321,7 +1321,7 @@ bool lemonView::incrementTableItemQty(QString code, double q)
 
     info.qtyOnList = qty;
     //qDebug()<<"  New qty on list:"<<info.qtyOnList;
-    productsHash.remove(code.toULongLong());
+    productsHash.remove(code);
     productsHash.insert(info.code, info);
 
     //get item Due to update it.
@@ -1368,7 +1368,7 @@ if ( doNotAddMoreItems ) { //only for reservations
   bool qtyWritten = false;
   QString codeX = code;
   ProductInfo info;
-  info.code = 0;
+  info.code = "0";
   info.desc = "[INVALID]";
 
   //now code could contain number of items to insert,example:  10*1234567890
@@ -1488,7 +1488,7 @@ if ( doNotAddMoreItems ) { //only for reservations
 
   if ( qty <= 0) {return;}
   
-  if (!incrementTableItemQty( QString::number(info.code) /*codeX*/, qty) ) {
+  if (!incrementTableItemQty( info.code /*codeX*/, qty) ) {
     info.qtyOnList = qty;
 
     
@@ -1533,7 +1533,7 @@ if ( doNotAddMoreItems ) { //only for reservations
           //CHECK AVAILABILITY
           if (available || availabilityDoesNotMatters ) {
             if (availabilityDoesNotMatters) qDebug() << __FUNCTION__ <<" Availability DOES NOT MATTERS! ";
-            insertedAtRow = doInsertItem( QString::number(info.code) /*codeX*/, iname, qty, info.price, descuento, info.unitStr);
+            insertedAtRow = doInsertItem( info.code /*codeX*/, iname, qty, info.price, descuento, info.unitStr);
           }
           else
             msg = i18n("<html><font color=red><b>The group/pack is not available because:<br>%1</b></font></html>", itemsNotAvailable.join("<br>"));
@@ -1543,7 +1543,7 @@ if ( doNotAddMoreItems ) { //only for reservations
         double onList = getTotalQtyOnList(info); // item itself and contained in any gruped product.
         if (info.stockqty >=  qty+onList || availabilityDoesNotMatters) {
           if (availabilityDoesNotMatters) qDebug() << __FUNCTION__ <<" Availability DOES NOT MATTERS! ";
-          insertedAtRow = doInsertItem( QString::number(info.code) /*codeX*/, iname, qty, info.price, descuento, info.unitStr);
+          insertedAtRow = doInsertItem(info.code /*codeX*/, iname, qty, info.price, descuento, info.unitStr);
         }
         else
           msg = i18n("<html><font color=red><b>There are only %1 articles of your choice at stock.<br> You requested %2</b></font></html>", info.stockqty,qty+onList);
@@ -1588,7 +1588,7 @@ double lemonView::getTotalQtyOnList(const ProductInfo &info)
       if (pi.isAGroup) {
         QStringList lelem = pi.groupElementsStr.split(",");
         foreach(QString ea, lelem) {
-          qulonglong c  = ea.section('/',0,0).toULongLong();
+          QString c  = ea.section('/',0,0);
           double     qq = ea.section('/',1,1).toDouble();
           if (c == info.code) { //YES its contained in this group
             double qqq = qq*pi.qtyOnList;
@@ -1674,8 +1674,8 @@ int lemonView::doInsertItem(QString itemCode, QString itemDesc, double itemQty, 
   //This resizes the heigh... looks beter...
   ui_mainview.tableWidget->resizeRowsToContents();
 
-  if (productsHash.contains(itemCode.toULongLong())) { 
-    ProductInfo  info = productsHash.value(itemCode.toULongLong());
+  if (productsHash.contains(itemCode)) {
+    ProductInfo  info = productsHash.value(itemCode);
     if (info.units != uPiece) itemDoubleClicked(item);//NOTE: Pieces must be id=1 at database!!!! its a workaround.
   }
 
@@ -1772,7 +1772,7 @@ void lemonView::deleteSelectedItem()
         return; //to exit the method, we dont need to continue.
       }
       
-      qulonglong code = item->data(Qt::DisplayRole).toULongLong();
+      QString code = item->data(Qt::DisplayRole).toString();
       ProductInfo info = productsHash.take(code); //insert it later...
       qty = info.qtyOnList; //this must be the same as obtaining from the table... this arrived on Dec 18 2007
       //if the itemQty is more than 1, decrement it, if its 1, delete it
@@ -1832,7 +1832,7 @@ void lemonView::itemDoubleClicked(QTableWidgetItem* item)
   int    iqty = 0;
   
   QTableWidgetItem *i2Modify = ui_mainview.tableWidget->item(row, colCode);
-  qulonglong code = i2Modify->data(Qt::DisplayRole).toULongLong();
+  QString code = i2Modify->data(Qt::DisplayRole).toString();
   if (!productsHash.contains(code)) {
     //its not a product, its a s.o.
     QString oid = i2Modify->data(Qt::DisplayRole).toString();
@@ -1909,19 +1909,19 @@ void lemonView::itemSearchDoubleClicked(QTableWidgetItem *item)
 {
   int row = item->row();
   QTableWidgetItem *cItem = ui_mainview.tableSearch->item(row,2); //get item code
-  qulonglong code = cItem->data(Qt::DisplayRole).toULongLong();
+  QString code = cItem->data(Qt::DisplayRole).toString();
   //qDebug()<<"Linea 981: Data at column 2:"<<cItem->data(Qt::DisplayRole).toString();
   if (productsHash.contains(code)) {
-    int pos = getItemRow(QString::number(code));
+    int pos = getItemRow(code);
     if (pos>=0) {
       QTableWidgetItem *thisItem = ui_mainview.tableWidget->item(pos, colCode);
       ProductInfo info = productsHash.value(code);
-      if (info.units == uPiece) incrementTableItemQty(QString::number(code), 1);
+      if (info.units == uPiece) incrementTableItemQty(code, 1);
       else itemDoubleClicked(thisItem);
     }
   }
   else {
-    insertItem(QString::number(code));
+    insertItem(code);
   }
   ui_mainview.mainPanel->setCurrentIndex(pageMain);
 }
@@ -1929,7 +1929,7 @@ void lemonView::itemSearchDoubleClicked(QTableWidgetItem *item)
 void lemonView::displayItemInfo(QTableWidgetItem* item)
 {
   int row = item->row();
-  qulonglong code  = (ui_mainview.tableWidget->item(row, colCode))->data(Qt::DisplayRole).toULongLong();
+  QString code  = (ui_mainview.tableWidget->item(row, colCode))->data(Qt::DisplayRole).toString();
   QString desc  = (ui_mainview.tableWidget->item(row, colDesc))->data(Qt::DisplayRole).toString();
   double price = (ui_mainview.tableWidget->item(row, colPrice))->data(Qt::DisplayRole).toDouble();
   if (productsHash.contains(code)) {
@@ -2270,7 +2270,7 @@ void lemonView::finishCurrentTransaction()
     }
 
 
-    QHashIterator<qulonglong, ProductInfo> i(productsHash);
+    QHashIterator<QString, ProductInfo> i(productsHash);
     int position=0;
     QList<TicketLineInfo> ticketLines;
     ticketLines.clear();
@@ -2283,7 +2283,7 @@ void lemonView::finishCurrentTransaction()
       QString iname = "";
       i.next();
       position++;
-      productIDs.append(QString::number(i.key())+"/"+QString::number(i.value().qtyOnList));
+      productIDs.append(i.key()+"/"+QString::number(i.value().qtyOnList));
       if (i.value().units == uPiece) cantidad += i.value().qtyOnList; else cantidad += 1; // :)
       utilidad  += (i.value().price - i.value().cost - i.value().disc) * i.value().qtyOnList; //FIXME: Now with REWRITTEN TOTALS CALCULATION!! WARNING with discount
       pDiscounts+= i.value().disc * i.value().qtyOnList;
@@ -2406,7 +2406,7 @@ void lemonView::finishCurrentTransaction()
         tItemInfo.disc = 0;
         tItemInfo.transactionid   = tInfo.id;
         tItemInfo.position        = position;
-        tItemInfo.productCode     = 0; //are qulonlong... and they are not normal products
+        tItemInfo.productCode     = "0";
         tItemInfo.points          = 0;
         tItemInfo.unitStr         = siInfo.unitStr;
         tItemInfo.qty             = siInfo.qty;
@@ -3870,8 +3870,8 @@ void lemonView::listViewOnMouseMove(const QModelIndex & index)
   QString code = model->data(indx, Qt::DisplayRole).toString();
   ProductInfo pInfo;
   bool onList=false;
-  if (productsHash.contains(code.toULongLong())) {
-    pInfo = productsHash.value(code.toULongLong());
+  if (productsHash.contains(code)) {
+    pInfo = productsHash.value(code);
     onList = true;
   }
 
@@ -4831,7 +4831,7 @@ void lemonView::updateTransaction()
   foreach(ProductInfo pi, productsHash) {
     profit += (pi.price - pi.cost - pi.disc) * pi.qtyOnList;
     if ( pi.units == uPiece ) cant   += pi.qtyOnList; else cant   += 1;
-    tmpList << QString::number(pi.code) + "/" + QString::number(pi.qtyOnList);
+    tmpList << pi.code + "/" + QString::number(pi.qtyOnList);
   }
   info.itemlist   = tmpList.join(","); //Only save normal products. Its almost DEPRECATED.
   
@@ -4901,7 +4901,7 @@ void lemonView::resumeSale()
     //NOTE: change sale date ?
     //get each product - the availability and group verification will do the insertItem method
     foreach(ProductInfo info, pList) {
-      QString qtyXcode = QString::number(info.qtyOnList) + "*" + QString::number(info.code);
+      QString qtyXcode = QString::number(info.qtyOnList) + "*" + info.code;
       insertItem(qtyXcode);
     }
     foreach(SpecialOrderInfo info, sList) {
@@ -5011,7 +5011,7 @@ void lemonView::applyOccasionalDiscount()
         if (ui_mainview.tableWidget->currentRow()!=-1 && ui_mainview.tableWidget->selectedItems().count()>4) {
             int row = ui_mainview.tableWidget->currentRow();
             QTableWidgetItem *item = ui_mainview.tableWidget->item(row, colCode);
-            qulonglong code = item->data(Qt::DisplayRole).toULongLong();
+            QString code = item->data(Qt::DisplayRole).toString();
             if (code <= 0) {
                 //it is an special order, not a normal product.
                 ///TODO: Implement price change for Special Orders, or is it not a good idea?
@@ -5327,7 +5327,7 @@ void lemonView::resumeReservation()
         //HERE the availability does not matter, the item is Physically Reserved.
         //FIXME: Consider the total amount when reserved, because product price could be changed.
         foreach(ProductInfo info, pList) {
-            QString qtyXcode = QString::number(info.qtyOnList) + "*" + QString::number(info.code);
+            QString qtyXcode = QString::number(info.qtyOnList) + "*" + info.code;
             availabilityDoesNotMatters = true;
             insertItem(qtyXcode);
             availabilityDoesNotMatters = false;

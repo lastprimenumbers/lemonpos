@@ -409,7 +409,7 @@ void ProductEditor::checkIfCodeExists()
     pInfo = myDb->getProductInfo(codeStr, true); //the 2nd parameter is to get the taxes for the group (not considering discounts)
   }
 
-  if (pInfo.code > 0) {
+  if (pInfo.code != "0") {
     //code exists...
     status = statusMod;
     if (!modifyCode){
@@ -553,7 +553,7 @@ void ProductEditor::addItem()
   QItemSelectionModel *selectionModel = ui->sourcePView->selectionModel();
   QModelIndexList indexList = selectionModel->selectedRows(); // pasar el indice que quiera (0=code, 1=name)
   foreach(QModelIndex index, indexList) {
-    qulonglong code    = index.data().toULongLong();
+    QString code    = index.data().toString();
     QString    codeStr = index.data().toString();
 
     bool exists = false;
@@ -567,7 +567,7 @@ void ProductEditor::addItem()
           pInfo.qtyOnList += addQty;      //increment it  (OTHER MEASURES)
       exists = true;
     } else {
-      pInfo = myDb->getProductInfo(codeStr, true); //the 2nd parameter is to get the taxes for the group (not considering discounts)
+      pInfo = myDb->getProductInfo(code, true); //the 2nd parameter is to get the taxes for the group (not considering discounts)
       if ( pInfo.units == 1 )
           pInfo.qtyOnList = int(addQty); //increment it  (PIECES)
       else
@@ -575,7 +575,7 @@ void ProductEditor::addItem()
       exists = true;
     }
     //check if the product to be added is not the same of the pack product
-    if (pInfo.code == ui->editCode->text().toULongLong()) continue;
+    if (pInfo.code == ui->editCode->text()) continue;
       
     // Insert product to the group hash
     groupInfo.productsList.insert(code, pInfo);
@@ -605,7 +605,7 @@ void ProductEditor::removeItem()
     Azahar *myDb = new Azahar;
     myDb->setDatabase(db);
     //get code from db
-    qulonglong code = myDb->getProductCode(name);
+    QString code = myDb->getProductCode(name);
     ProductInfo pInfo = groupInfo.productsList.take(code); //insert it later...
     double qty = 0;
     qty = pInfo.qtyOnList; //from hash | must be the same on groupView
@@ -644,7 +644,7 @@ void ProductEditor::itemDoubleClicked(QTableWidgetItem* item)
   Azahar *myDb = new Azahar;
   myDb->setDatabase(db);
   //get code from db
-  qulonglong code = myDb->getProductCode(name);
+  QString code = myDb->getProductCode(name);
   ProductInfo pInfo = groupInfo.productsList.take(code); //insert it later...
   double qty = 0;
   qty = pInfo.qtyOnList+1; //from hash | must be the same on groupView
@@ -664,7 +664,7 @@ QString ProductEditor::getGroupElementsStr()
 {
   QStringList list;
   foreach(ProductInfo info, groupInfo.productsList) {
-    list.append(QString::number(info.code)+"/"+QString::number(info.qtyOnList));
+    list.append(info.code+"/"+QString::number(info.qtyOnList));
   }
   return list.join(",");
 }
@@ -809,11 +809,11 @@ void ProductEditor::updatePriceDrop(double value)
   myDb->setDatabase(db);
   myDb->updateGroupPriceDrop(getCode(), value);
   myDb->updateGroupElements(getCode(), getGroupElementsStr());
-  ProductInfo info = myDb->getProductInfo( QString::number( getCode() ) ); /// NOTE: this info is for the method below..
+  ProductInfo info = myDb->getProductInfo(getCode() ); /// NOTE: this info is for the method below..
   GroupInfo giTemp = myDb->getGroupPriceAndTax(info);
   delete myDb;
   //if there is a new product, it will not be updated because it does not exists on db yet... so fix the groupPrice drop
-  if (info.code == 0 ) {
+  if (info.code == "0" ) {
     groupInfo.priceDrop = ui->editGroupPriceDrop->value();
     calculateGroupValues();
   } else {

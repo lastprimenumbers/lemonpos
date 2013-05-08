@@ -2030,7 +2030,7 @@ void squeezeView::productsViewOnSelected(const QModelIndex &index)
     const QAbstractItemModel *model = index.model();
     int row = index.row();
     QModelIndex indx = model->index(row, productsModel->fieldIndex("code"));
-    qulonglong id = model->data(indx, Qt::DisplayRole).toULongLong();
+    QString id = model->data(indx, Qt::DisplayRole).toString();
     
     indx = model->index(row, productsModel->fieldIndex("photo"));
     QByteArray photoBA = model->data(indx, Qt::DisplayRole).toByteArray();
@@ -2048,7 +2048,7 @@ void squeezeView::productsViewOnSelected(const QModelIndex &index)
     productEditorDlg->setDb(db);
     productEditorDlg->setCode(id);
    
-    qulonglong newcode=0;
+    QString newcode="0";
     //Launch dialog, and if dialog is accepted...
     if (productEditorDlg->exec() ) {
       //get changed|unchanged values
@@ -2237,10 +2237,10 @@ void squeezeView::doPurchase()
       //assigning new transaction id to the tInfo.
       tInfo.id = trnum;
 
-      QHash<qulonglong, ProductInfo> hash = purchaseEditorDlg->getHash();
+      QHash<QString, ProductInfo> hash = purchaseEditorDlg->getHash();
       ProductInfo info;
       //Iterate the hash
-      QHashIterator<qulonglong, ProductInfo> i(hash);
+      QHashIterator<QString, ProductInfo> i(hash);
       while (i.hasNext()) {
           i.next();
           info = i.value();
@@ -2265,7 +2265,7 @@ void squeezeView::doPurchase()
           }
           
           productsModel->select();
-          items.append(QString::number(info.code)+"/"+QString::number(info.purchaseQty));
+          items.append(info.code+"/"+QString::number(info.purchaseQty));
       }
       //update items in transaction data
       tInfo.itemlist = items.join(";");
@@ -2280,7 +2280,7 @@ void squeezeView::stockCorrection()
   //launch a dialong asking: Item code, New stockQty, and reason.
   double newStockQty =0;
   double oldStockQty = 0;
-  qulonglong pcode=0;
+  QString pcode="0";
   QString reason;
   bool ok = false;
   InputDialog *dlg = new InputDialog(this, true, dialogStockCorrection, i18n("Enter the quantity and reason for the change, then press <ENTER> to accept, <ESC> to cancel"));
@@ -2295,7 +2295,7 @@ void squeezeView::stockCorrection()
     Azahar *myDb = new Azahar;
     myDb->setDatabase(db);
     oldStockQty = myDb->getProductStockQty(pcode);
-    ProductInfo p = myDb->getProductInfo(QString::number(pcode));
+    ProductInfo p = myDb->getProductInfo(pcode);
     bool isAGroup = p.isAGroup;
 
     //if is an Unlimited stock product, do not allow to make the correction.
@@ -2322,7 +2322,7 @@ void squeezeView::stockCorrection()
   }
 }
 
-void squeezeView::correctStock(qulonglong code, double oldStock, double newStock, const QString &reason)
+void squeezeView::correctStock(QString code, double oldStock, double newStock, const QString &reason)
 {
   Azahar *myDb = new Azahar;
   myDb->setDatabase(db);
@@ -2415,7 +2415,7 @@ void squeezeView::createProduct()
   prodEditorDlg->setDb(db);
   prodEditorDlg->enableCode();
   prodEditorDlg->setStockQtyReadOnly(false);
-  qulonglong newcode = 0;
+  QString newcode = "0";
 
   if (prodEditorDlg->exec()) {
     int resultado = prodEditorDlg->result();
@@ -2791,7 +2791,7 @@ void squeezeView::deleteSelectedProduct()
                                               i18n("Delete"));
       if (answer == KMessageBox::Yes) {
         //first we obtain the product code to be deleted.
-        qulonglong  iD = productsModel->record(index.row()).value("code").toULongLong();
+        QString  iD = productsModel->record(index.row()).value("code").toString();
         if (!productsModel->removeRow(index.row(), index)) {
           // weird:  since some time, removeRow does not work... it worked fine on versions < 0.9 ..
           bool d = myDb->deleteProduct(iD); qDebug()<<"Deleteing product ("<<iD<<") manually...";
@@ -3388,7 +3388,7 @@ void squeezeView::printLowStockProducts()
   { 
     QLocale localeForPrinting;
     ProductInfo info = products.at(i);
-    QString code  = QString::number(info.code);
+    QString code  = info.code;
     QString stock = localeForPrinting.toString(info.stockqty,'f',2);
     QString soldU = localeForPrinting.toString(info.soldUnits,'f',2); 
     
@@ -3469,7 +3469,7 @@ void squeezeView::printStock()
     {
         QLocale localeForPrinting;
         ProductInfo info = products.at(i);
-        QString code  = QString::number(info.code);
+        QString code  = info.code;
         QString stock = localeForPrinting.toString(info.stockqty,'f',2);
         QString soldU = localeForPrinting.toString(info.soldUnits,'f',2);
         
@@ -3549,7 +3549,7 @@ void squeezeView::printSoldOutProducts()
   { 
     QLocale localeForPrinting;
     ProductInfo info = products.at(i);
-    QString code  = QString::number(info.code);
+    QString code  = info.code;
     QString stock = localeForPrinting.toString(info.stockqty,'f',2);
     QString soldU = localeForPrinting.toString(info.soldUnits,'f',2); 
     
