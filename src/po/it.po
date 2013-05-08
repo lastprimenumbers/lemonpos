@@ -266,10 +266,6 @@ msgstr "Riprendi vendita"
 msgid "Reserve Items"
 msgstr "Prenota articolo"
 
-#: lemon.cpp:315
-msgid "Reserve Items"
-msgstr "Prenota Oggetti"
-
 #: lemon.cpp:322
 #: reservations.cpp:57
 msgid "Reservations"
