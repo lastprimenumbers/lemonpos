@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: es\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "atid=1011570&group_id=209899&func=browse\n"
-"POT-Creation-Date: 2012-07-20 21:01+0200\n"
+"POT-Creation-Date: 2013-05-08 21:35+0200\n"
 "PO-Revision-Date: 2007-11-22 23:17-0600\n"
 "Last-Translator: Miguel Chavez Gamboa <miguel@lemonpos.org>\n"
 "Language-Team: Español <es@lemonpos.org>\n"
@@ -19,20 +19,20 @@ msgstr ""
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 "X-Generator: KBabel 1.11.4\n"
 
-#: ../../dataAccess/azahar.cpp:112 ../../dataAccess/azahar.cpp:139
-#: ../../dataAccess/azahar.cpp:217 ../../dataAccess/azahar.cpp:1059
-#: ../../dataAccess/azahar.cpp:1330 ../../dataAccess/azahar.cpp:1991
-#: ../../dataAccess/azahar.cpp:2027 ../../dataAccess/azahar.cpp:2059
-#: ../../dataAccess/azahar.cpp:2096 ../../dataAccess/azahar.cpp:2133
-#: ../../dataAccess/azahar.cpp:2163 ../../dataAccess/azahar.cpp:2196
-#: ../../dataAccess/azahar.cpp:2270 ../../dataAccess/azahar.cpp:2309
-#: ../../dataAccess/azahar.cpp:2329 ../../dataAccess/azahar.cpp:2351
-#: ../../dataAccess/azahar.cpp:2371 ../../dataAccess/azahar.cpp:2411
-#: ../../dataAccess/azahar.cpp:2607 ../../dataAccess/azahar.cpp:2660
-#: ../../dataAccess/azahar.cpp:2750 ../../dataAccess/azahar.cpp:2826
-#: ../../dataAccess/azahar.cpp:2853 ../../dataAccess/azahar.cpp:3360
-#: ../../dataAccess/azahar.cpp:3388 ../../dataAccess/azahar.cpp:3414
-#: ../../dataAccess/azahar.cpp:3607
+#: ../../dataAccess/azahar.cpp:114 ../../dataAccess/azahar.cpp:141
+#: ../../dataAccess/azahar.cpp:218 ../../dataAccess/azahar.cpp:1060
+#: ../../dataAccess/azahar.cpp:1331 ../../dataAccess/azahar.cpp:2396
+#: ../../dataAccess/azahar.cpp:2432 ../../dataAccess/azahar.cpp:2464
+#: ../../dataAccess/azahar.cpp:2501 ../../dataAccess/azahar.cpp:2538
+#: ../../dataAccess/azahar.cpp:2568 ../../dataAccess/azahar.cpp:2601
+#: ../../dataAccess/azahar.cpp:2676 ../../dataAccess/azahar.cpp:2716
+#: ../../dataAccess/azahar.cpp:2736 ../../dataAccess/azahar.cpp:2758
+#: ../../dataAccess/azahar.cpp:2778 ../../dataAccess/azahar.cpp:2818
+#: ../../dataAccess/azahar.cpp:3015 ../../dataAccess/azahar.cpp:3068
+#: ../../dataAccess/azahar.cpp:3169 ../../dataAccess/azahar.cpp:3245
+#: ../../dataAccess/azahar.cpp:3272 ../../dataAccess/azahar.cpp:3779
+#: ../../dataAccess/azahar.cpp:3807 ../../dataAccess/azahar.cpp:3833
+#: ../../dataAccess/azahar.cpp:4026
 msgid ""
 "Error #%1, Type:%2\n"
 "'%3'"
@@ -40,21 +40,21 @@ msgstr ""
 "Error #%1, Tipo:%2\n"
 "'%3'"
 
-#: ../../dataAccess/azahar.cpp:115 ../../dataAccess/azahar.cpp:1062
+#: ../../dataAccess/azahar.cpp:117 ../../dataAccess/azahar.cpp:1063
 msgid "Error serching product id %1, Rows affected: %2"
 msgstr "Error al buscar producto %1, columnas afectadas: %2"
 
-#: ../../dataAccess/azahar.cpp:142
+#: ../../dataAccess/azahar.cpp:144
 msgid "Error serching offer id %1, Rows affected: %2"
 msgstr "Error al buscar oferta para el producto %1, columnas afectadas: %2"
 
-#: ../../dataAccess/azahar.cpp:218
+#: ../../dataAccess/azahar.cpp:219
 msgid "Error getting product information for code %1, Rows affected: %2"
 msgstr ""
 "Error al obtener la información del producto con codigo %1, columnas "
 "afectadas: %2"
 
-#: ../../dataAccess/azahar.cpp:1302
+#: ../../dataAccess/azahar.cpp:1303
 msgid ""
 "Unable to set an offer/discount for the selected produc because it is NOT "
 "DISCOUNTABLE"
@@ -62,20 +62,20 @@ msgstr ""
 "No se pudo agregar el descuento para el producto seleccionado porque el "
 "producto no lo admite."
 
-#: ../../dataAccess/azahar.cpp:1333
+#: ../../dataAccess/azahar.cpp:1334
 msgid "Error deleting offer id %1, Rows affected: %2"
 msgstr "Error al borrar la oferta con codigo %1, columnas afectadas:%2"
 
-#: ../../dataAccess/azahar.cpp:2462
+#: ../../dataAccess/azahar.cpp:2868
 msgid "Money return on cancelling ticket #%1 "
 msgstr "Devolución de dinero debido a cancelación de ticket #%1"
 
-#: ../../dataAccess/azahar.cpp:2469
+#: ../../dataAccess/azahar.cpp:2875
 msgid "Ticket #%1 was already canceled."
 msgstr "El ticket #%1 ya había sido cancelado."
 
-#: ../../dataAccess/azahar.cpp:3361 ../../dataAccess/azahar.cpp:3389
-#: ../../dataAccess/azahar.cpp:3415 ../../dataAccess/azahar.cpp:3608
+#: ../../dataAccess/azahar.cpp:3780 ../../dataAccess/azahar.cpp:3808
+#: ../../dataAccess/azahar.cpp:3834 ../../dataAccess/azahar.cpp:4027
 msgid "Error getting special Order information, id: %1, Rows affected: %2"
 msgstr ""
 "Error al obtener la información de la orden especial %1, columnas afectadas: "
@@ -157,136 +157,136 @@ msgstr "Aceptar"
 msgid "Cancel"
 msgstr "Cancelar"
 
-#: lemon.cpp:155
+#: lemon.cpp:156
 msgid "Login"
 msgstr "Login"
 
-#: lemon.cpp:161
+#: lemon.cpp:162
 msgctxt "Account balance"
 msgid "Balance"
 msgstr "Corte de caja"
 
-#: lemon.cpp:167
+#: lemon.cpp:168
 msgid "Enter Code"
 msgstr "Entrar código"
 
-#: lemon.cpp:173
+#: lemon.cpp:174
 msgid "Search Item"
 msgstr "Buscar Artículo"
 
-#: lemon.cpp:179
+#: lemon.cpp:180
 msgid "Delete Selected Item"
 msgstr "Borrar artículo seleccionado"
 
-#: lemon.cpp:189
+#: lemon.cpp:190
 msgid "Finish transaction"
 msgstr "Terminar transacción"
 
-#: lemon.cpp:195
+#: lemon.cpp:196
 msgid "Cancel transaction"
 msgstr "Cancelar transacción"
 
-#: lemon.cpp:201
+#: lemon.cpp:202
 msgid "Cancel a ticket"
 msgstr "Cancelar ticket"
 
-#: lemon.cpp:208
+#: lemon.cpp:209
 msgid "Start Operation"
 msgstr "Iniciar Operaciones"
 
-#: lemon.cpp:214
+#: lemon.cpp:215
 msgid "Pay focus"
 msgstr "Ir a pagar"
 
-#: lemon.cpp:221
+#: lemon.cpp:222
 msgid "Show/Hide Products Grid"
 msgstr "Mostrar/Ocultar Rejilla de productos"
 
-#: lemon.cpp:228
+#: lemon.cpp:229
 msgid "Show Price Checker"
 msgstr "Mostrar checador de precios"
 
-#: lemon.cpp:234
+#: lemon.cpp:235
 msgid "Reprint ticket"
 msgstr "Reimprimir ticket"
 
-#: lemon.cpp:240 lemonview.cpp:4330
+#: lemon.cpp:241 lemonview.cpp:4363
 msgid "Cash Out"
 msgstr "Salida de efectivo"
 
-#: lemon.cpp:246
+#: lemon.cpp:247
 msgid "Cash in drawer"
 msgstr "Efectivo en gaveta"
 
-#: lemon.cpp:252 lemonview.cpp:4372
+#: lemon.cpp:253 lemonview.cpp:4405
 msgid "Cash In"
 msgstr "Entrada de efectivo"
 
-#: lemon.cpp:258 lemonview.cpp:3641
+#: lemon.cpp:259 lemonview.cpp:3663
 msgid "End of day report"
 msgstr "Reporte de fin del día"
 
-#: lemon.cpp:265
+#: lemon.cpp:266
 msgid "Add Special Order"
 msgstr "Agregar Orden Especial"
 
-#: lemon.cpp:273
+#: lemon.cpp:274
 msgid "Complete Special Order"
 msgstr "Completar Orden Especial"
 
-#: lemon.cpp:280
+#: lemon.cpp:281
 msgid "Lock Screen"
 msgstr "Bloquear pantalla"
 
-#: lemon.cpp:287
+#: lemon.cpp:288
 msgid "Suspend Sale"
 msgstr "Suspender venta"
 
-#: lemon.cpp:294 lemon.cpp:301
+#: lemon.cpp:295 lemon.cpp:302
 msgid "Change Special Order Status"
 msgstr "Cambiar estado de Ordenes Especiales"
 
-#: lemon.cpp:308 resume.cpp:46
+#: lemon.cpp:309 resume.cpp:46
 msgid "Resume Sale"
 msgstr "Retomar venta"
 
-#: lemon.cpp:315
+#: lemon.cpp:316
 msgid "Reserve Items"
 msgstr "Reservar Productos"
 
-#: lemon.cpp:322 reservations.cpp:57
+#: lemon.cpp:323 reservations.cpp:57
 msgid "Reservations"
 msgstr "Apartados"
 
-#: lemon.cpp:329
+#: lemon.cpp:330
 msgid "Show Credits"
 msgstr "Mostrar Créditos"
 
-#: lemon.cpp:419 lemon.cpp:446
+#: lemon.cpp:420 lemon.cpp:447
 msgid "Database"
 msgstr "Base de datos"
 
-#: lemon.cpp:437
+#: lemon.cpp:438
 msgid "General"
 msgstr "General"
 
-#: lemon.cpp:442
+#: lemon.cpp:443
 msgid "Store"
 msgstr "Tienda"
 
-#: lemon.cpp:450
+#: lemon.cpp:451
 msgid "Appearence"
 msgstr "Apariencia"
 
-#: lemon.cpp:457
+#: lemon.cpp:458
 msgid "Security"
 msgstr "Seguridad"
 
-#: lemon.cpp:461
+#: lemon.cpp:462
 msgid "Printer"
 msgstr "Impresora"
 
-#: lemon.cpp:526
+#: lemon.cpp:527
 msgid ""
 "Administrator or Supervisor needs to start operation before you can start "
 "selling..."
@@ -294,7 +294,7 @@ msgstr ""
 "El administrador o supervisor necesita iniciar operaciones antes de poder "
 "vender..."
 
-#: lemon.cpp:761
+#: lemon.cpp:762
 msgid "Transaction #%1"
 msgstr "Transacción #%1"
 
@@ -303,7 +303,8 @@ msgid "Continue"
 msgstr "Continuar"
 
 #: lemonview.cpp:158
-msgid "Welcome to Lemon"
+#, fuzzy
+msgid "Welcome to PortoBelloPos"
 msgstr "Bienvenido a Lemon"
 
 #: lemonview.cpp:159
@@ -318,11 +319,11 @@ msgstr "Autorización requerida"
 msgid "Enter administrator password please."
 msgstr "Escriba la contraseña de administrador"
 
-#: lemonview.cpp:298 lemonview.cpp:299
+#: lemonview.cpp:301 lemonview.cpp:302
 msgid "Enter code or qty*code. <Enter> or <+> Keys to go pay"
 msgstr "Escriba el código o cantidad*código. <Enter> ó <+> para ir a pagar"
 
-#: lemonview.cpp:300
+#: lemonview.cpp:303
 msgid "Enter an amount."
 msgstr "Escriba la cantidad."
 
@@ -330,15 +331,15 @@ msgstr "Escriba la cantidad."
 msgid "No product selected"
 msgstr "No hay productos seleccionados."
 
-#: lemonview.cpp:634
+#: lemonview.cpp:633
 msgid "Enter the ticket number to cancel"
 msgstr "Escriba el numero de ticket a cancelar"
 
-#: lemonview.cpp:666
+#: lemonview.cpp:665
 msgid "Enter the ticket number"
 msgstr "Escriba el numero de ticket"
 
-#: lemonview.cpp:829
+#: lemonview.cpp:840
 msgid ""
 "Could not connect to database, please press 'login' button again to raise a "
 "database configuration."
@@ -346,33 +347,37 @@ msgstr ""
 "No se pudo conectar a la base de datos, presione el boton de login para "
 "lanzar el dialogo de configuración."
 
-#: lemonview.cpp:830
+#: lemonview.cpp:841
 msgid "Error:"
 msgstr "Error:"
 
-#: lemonview.cpp:919
+#: lemonview.cpp:931
 msgid "%1 item found"
 msgid_plural "%1 items found."
 msgstr[0] "%1 artículo encontrado."
 msgstr[1] "%1 artículos encontrados."
 
-#: lemonview.cpp:920
+#: lemonview.cpp:932
 msgid "No items found."
 msgstr "No se encontraron artículos"
 
-#: lemonview.cpp:1143 lemonview.cpp:4039
-msgid "Discount: %1%  [%2]"
-msgstr "Descuento: %1% [%2]"
-
-#: lemonview.cpp:1145
+#: lemonview.cpp:1151
 msgid "Discount: %1"
 msgstr "Descuento: %1"
 
-#: lemonview.cpp:1256 lemonview.cpp:1502
+#: lemonview.cpp:1228
+msgid "Warning: Client Code Not Found"
+msgstr ""
+
+#: lemonview.cpp:1229
+msgid "Please provide a correct client code."
+msgstr ""
+
+#: lemonview.cpp:1283 lemonview.cpp:1529
 msgid "%1 has %2 %3 but requested %4 + %5"
 msgstr "%1 tiene %2 %3 pero se requirió %4 + %5"
 
-#: lemonview.cpp:1271 lemonview.cpp:1512
+#: lemonview.cpp:1298 lemonview.cpp:1539
 msgid ""
 "<html><font color=red><b>The group/pack is not available because:<br>%1</b></"
 "font></html>"
@@ -380,7 +385,7 @@ msgstr ""
 "<html><font color=red><b>Grupo/Paquete no disponible debido a: <br>%1</b></"
 "font></html>"
 
-#: lemonview.cpp:1273 lemonview.cpp:1522
+#: lemonview.cpp:1300 lemonview.cpp:1549
 msgid ""
 "<html><font color=red><b>There are only %1 articles of your choice at stock."
 "<br> You requested %2</b></font></html>"
@@ -388,7 +393,7 @@ msgstr ""
 "<html><font color=red><b>Sólo hay %1 artículos disponibles en inventario."
 "<br> Requirió %2</b></font></html>"
 
-#: lemonview.cpp:1321
+#: lemonview.cpp:1348
 msgid ""
 "Only Special Orders can be added. Please finish the current special order "
 "before adding any other product."
@@ -396,29 +401,29 @@ msgstr ""
 "Solo Ordenes especiales pueden ser agregadas. Por favor termine esta venta "
 "antes de agregar otro producto."
 
-#: lemonview.cpp:1332
+#: lemonview.cpp:1359
 msgid "Cannot Add more items to the Reservation."
 msgstr "No se pueden agregar mas productos al apartado"
 
-#: lemonview.cpp:1371
+#: lemonview.cpp:1398
 msgid "Cannot change client while Special Orders are in Purchase."
 msgstr "No se puede cambiar de cliente mientras toma Ordenes Especiales."
 
-#: lemonview.cpp:1399
+#: lemonview.cpp:1426
 #, fuzzy
 msgid "<b>Welcome</b> <i>%1</i>. You have remaining <b>debit</b> of %2 to use."
 msgstr "<b>Bienvenido</b> <i>%1</i>. Tiene %2 en su cuenta para usarse."
 
-#: lemonview.cpp:1401
+#: lemonview.cpp:1428
 #, fuzzy
 msgid "<b>Welcome</b> <i>%1</i>. You have remaining <b>credit</b> of %2 used."
 msgstr "<b>Bienvenido</b> <i>%1</i>. Tiene %2 en su cuenta para usarse."
 
-#: lemonview.cpp:1413
+#: lemonview.cpp:1440
 msgid "No Client found with code %1."
 msgstr "No se encontró cliente con código %1."
 
-#: lemonview.cpp:1455
+#: lemonview.cpp:1482
 msgid ""
 "The requiered qty is %1 and its not allowed for the required product, please "
 "verify the quantity"
@@ -426,31 +431,31 @@ msgstr ""
 "La cantidad requerida es %1, pero no es permitida para el producto "
 "requerido. Verifique la cantidad."
 
-#: lemonview.cpp:1475
+#: lemonview.cpp:1502
 msgid ""
 "<html><font color=red><b>Product not found in database.</b></font></html>"
 msgstr ""
 "<html><font color=red><b>Producto no encontrado en la base de datos.</b></"
 "font></html>"
 
-#: lemonview.cpp:1664
+#: lemonview.cpp:1698
 msgid "Cannot delete items from a reservation."
 msgstr "No se puede borrar productos de un apartado."
 
-#: lemonview.cpp:1713
+#: lemonview.cpp:1747
 msgid "Removing an Special Item from shopping list. Authorized by %1"
 msgstr ""
 "Removiendo una Orden Especial de la lista de compras. Autorizado por %1"
 
-#: lemonview.cpp:1779
+#: lemonview.cpp:1813
 msgid "Removing an article from shopping list. Authorized by %1"
 msgstr "Removiendo un artículo de la lista de compras. Autorizado por %1"
 
-#: lemonview.cpp:1833
+#: lemonview.cpp:1867
 msgid "Enter the number of %1"
 msgstr "Número de %1"
 
-#: lemonview.cpp:1867
+#: lemonview.cpp:1901
 msgid ""
 "<html><font color=red><b>Product not available in stock for the requested "
 "quantity.</b></font></html>"
@@ -458,47 +463,48 @@ msgstr ""
 "<html><font color=red><b>Producto no disponible en la cantidad solicitada.</"
 "b></font></html>"
 
-#: lemonview.cpp:1908
+#: lemonview.cpp:1942
 msgid "Taxes:"
 msgstr "Impuestos:"
 
-#: lemonview.cpp:1909
+#: lemonview.cpp:1943
 msgid "Tax:"
 msgstr "Impuesto:"
 
-#: lemonview.cpp:1910
+#: lemonview.cpp:1944
 msgid "Other taxes:"
 msgstr "Otros impuestos:"
 
-#: lemonview.cpp:1911
+#: lemonview.cpp:1945
 msgid "Sold by:"
 msgstr "Vendido por:"
 
-#: lemonview.cpp:1912
+#: lemonview.cpp:1946
 msgid "Price:"
 msgstr "Precio:"
 
-#: lemonview.cpp:1913 lemonview.cpp:3833 pricechecker.cpp:53
+#: lemonview.cpp:1947 lemonview.cpp:3855 pricechecker.cpp:53
 msgid "Discount:"
 msgstr "Descuento:"
 
-#: lemonview.cpp:1914
+#: lemonview.cpp:1948
 msgid "Points:"
 msgstr "Puntos:"
 
-#: lemonview.cpp:2000
+#: lemonview.cpp:2024
+#, fuzzy
 msgid ""
-"Lemon has encountered an error when openning database, click details to see "
-"the error details."
+"PortoBelloPos has encountered an error when openning database, click details "
+"to see the error details."
 msgstr ""
 "Lemon ha encontrado un error al buscar en la base de datos. Presione "
 "\"detalles\" para ver mas detalles del error."
 
-#: lemonview.cpp:2000
+#: lemonview.cpp:2024
 msgid "Create New Transaction: Error"
 msgstr "Crear nueva transacción: Error"
 
-#: lemonview.cpp:2052
+#: lemonview.cpp:2076
 msgid ""
 "<html><font color=red><b>Please fill the correct payment amount before "
 "finishing a transaction.</b></font></html>"
@@ -506,7 +512,7 @@ msgstr ""
 "<html><font color=red><b>Por favor llene la cantidad correcta a pagar antes "
 "de finalizar.</b></font></html>"
 
-#: lemonview.cpp:2061
+#: lemonview.cpp:2085
 msgid ""
 "Please be sure to enter an appropiate amount in this field. The number seems "
 "to be a barcode entered by mistake in the amount field."
@@ -514,12 +520,12 @@ msgstr ""
 "Por favor asegurese de poner una cantidad apropiada en este campo. El número "
 "parece ser un código de barras puesto por error en el campo de cantidad."
 
-#: lemonview.cpp:2077
+#: lemonview.cpp:2101
 msgid ""
 "<html><font color=red><b>Please enter the card number.</b></font></html>"
 msgstr "<html><font color=red><b>Llene el número de tarjeta.</b></font></html>"
 
-#: lemonview.cpp:2085
+#: lemonview.cpp:2109
 msgid ""
 "<html><font color=red><b>Please enter the Authorisation number from the bank "
 "voucher.</b></font></html>"
@@ -527,29 +533,29 @@ msgstr ""
 "<html><font color=red><b>Llene el número de autorización del banco.</b></"
 "font></html>"
 
-#: lemonview.cpp:2093
+#: lemonview.cpp:2117
 msgid "Before selling, you must start operations."
 msgstr "Antes de vender, debe iniciar operaciones."
 
-#: lemonview.cpp:2198
+#: lemonview.cpp:2223
 msgid "Warning: Insufficient Credit for this Transaction"
 msgstr ""
 
-#: lemonview.cpp:2199
+#: lemonview.cpp:2224
 msgid ""
 "Click Discard to return to modify the transaction, Apply to override credit "
 "limit"
 msgstr ""
 
-#: lemonview.cpp:2522
+#: lemonview.cpp:2545
 msgid "The Drawer is not initialized, please start operation first."
 msgstr "La gaveta no esta inicializada, por favor inicie operaciones."
 
-#: lemonview.cpp:2593
+#: lemonview.cpp:2615
 msgid "Cash level in drawer is low."
 msgstr "El nivel de efectivo en gaveta es bajo."
 
-#: lemonview.cpp:2613
+#: lemonview.cpp:2635
 msgid ""
 "The ticket was not printed because it is ZERO in the amount to pay. Just to "
 "save trees."
@@ -557,117 +563,117 @@ msgstr ""
 "El ticket no fue impreso porque el total esta en CEROS. Sólo para salvar un "
 "árbol."
 
-#: lemonview.cpp:2622
+#: lemonview.cpp:2644
 msgid "Salesperson: %1"
 msgstr "Vendedor: %1"
 
-#: lemonview.cpp:2623 lemonview.cpp:2838 lemonview.cpp:2935 lemonview.cpp:2972
+#: lemonview.cpp:2645 lemonview.cpp:2860 lemonview.cpp:2957 lemonview.cpp:2994
 msgid "Qty"
 msgstr "Cant."
 
-#: lemonview.cpp:2624
+#: lemonview.cpp:2646
 msgid "Product"
 msgstr "Producto"
 
-#: lemonview.cpp:2625
+#: lemonview.cpp:2647
 msgid "Price"
 msgstr "Precio"
 
-#: lemonview.cpp:2626 lemonview.cpp:4089
+#: lemonview.cpp:2648 lemonview.cpp:4118
 msgid "Discount"
 msgstr "Descuento"
 
-#: lemonview.cpp:2627 lemonview.cpp:4088
+#: lemonview.cpp:2649 lemonview.cpp:4117
 msgid "Total"
 msgstr "Total"
 
-#: lemonview.cpp:2628
+#: lemonview.cpp:2650
 msgid "Your Personal Discount"
 msgstr "Su Descuento Personal"
 
-#: lemonview.cpp:2629
+#: lemonview.cpp:2651
 msgid "Your points this buy: %1"
 msgstr "Puntos de esta compra: %1"
 
-#: lemonview.cpp:2630
+#: lemonview.cpp:2652
 msgid "Your total points: %1"
 msgstr "Puntos totales: %1"
 
-#: lemonview.cpp:2631
+#: lemonview.cpp:2653
 msgid "# %1"
 msgstr "# %1"
 
-#: lemonview.cpp:2632
+#: lemonview.cpp:2654
 msgid "Terminal #%1"
 msgstr "Terminal #%1"
 
-#: lemonview.cpp:2633
+#: lemonview.cpp:2655
 msgid "PRE PAYMENT OF"
 msgstr "  ANTICIPO DE   "
 
-#: lemonview.cpp:2634
+#: lemonview.cpp:2656
 msgid "COMPLETED PAYMENT WITH"
 msgstr "  PAGO COMPLETADO CON "
 
-#: lemonview.cpp:2635
+#: lemonview.cpp:2657
 msgid "To complete your payment"
 msgstr "  Para completar el pago"
 
-#: lemonview.cpp:2636
+#: lemonview.cpp:2658
 msgid "Your pre payment"
 msgstr "  Su anticipo"
 
-#: lemonview.cpp:2637
+#: lemonview.cpp:2659
 msgid "SPECIAL ORDERS"
 msgstr "ORDENES ESPECIALES"
 
-#: lemonview.cpp:2638 lemonview.cpp:4244 lemonview.cpp:4596
+#: lemonview.cpp:2660 lemonview.cpp:4274 lemonview.cpp:4629
 msgid "Notes:"
 msgstr "Notas:"
 
-#: lemonview.cpp:2639
+#: lemonview.cpp:2661
 msgid "Delivery"
 msgstr "  Entrega: "
 
-#: lemonview.cpp:2640
+#: lemonview.cpp:2662
 msgid "Tax"
 msgstr "Imp"
 
-#: lemonview.cpp:2641
+#: lemonview.cpp:2663
 msgid "Subtotal"
 msgstr "Subtotal"
 
-#: lemonview.cpp:2642
+#: lemonview.cpp:2664
 msgid "Tendered"
 msgstr "Recibido"
 
-#: lemonview.cpp:2755 lemonview.cpp:2843 lemonview.cpp:2941
+#: lemonview.cpp:2777 lemonview.cpp:2865 lemonview.cpp:2963
 msgid "%1 article."
 msgid_plural "%1 articles."
 msgstr[0] "%1 artículo."
 msgstr[1] "%1 artículos."
 
-#: lemonview.cpp:2756
+#: lemonview.cpp:2778
 msgid "A total of"
 msgstr "Un total de"
 
-#: lemonview.cpp:2759
+#: lemonview.cpp:2781
 msgid "<br>Paid with %1, your change is <b>%2</b><br>"
 msgstr "<br>Pagado con %1, su cambio es <b>%2</b><br>"
 
-#: lemonview.cpp:2768
+#: lemonview.cpp:2790
 msgid "You saved %1"
 msgstr "Usted Ahorró %1"
 
-#: lemonview.cpp:2775
+#: lemonview.cpp:2797
 msgid "Paid with %1, your change is %2"
 msgstr "Pagado con %1, su cambio %2"
 
-#: lemonview.cpp:2780
+#: lemonview.cpp:2802
 msgid "<br>Card # %1<br>Authorisation # %2"
 msgstr "<br>Tarjeta # %1<br>Autorización # %2"
 
-#: lemonview.cpp:2781
+#: lemonview.cpp:2803
 msgid ""
 "Card Number:%1 \n"
 "Authorisation #:%2"
@@ -675,346 +681,340 @@ msgstr ""
 "Tarjeta # %1\n"
 " Autorización # %2"
 
-#: lemonview.cpp:2821
+#: lemonview.cpp:2843
 #, fuzzy
 msgid ""
 " %3 [ %4 ]| You got %1 points | Your accumulated is :%2 | | Your credit "
 "balance is: %5"
 msgstr " %3 [ %4 ]| Obtuvo %1 puntos | Su acumulado es: %2 | "
 
-#: lemonview.cpp:2823 lemonview.cpp:2940
+#: lemonview.cpp:2845 lemonview.cpp:2962
 msgid " %3 [ %4 ]| You got %1 points | Your accumulated is :%2 | "
 msgstr " %3 [ %4 ]| Obtuvo %1 puntos | Su acumulado es: %2 | "
 
-#: lemonview.cpp:2834 lemonview.cpp:2931
+#: lemonview.cpp:2856 lemonview.cpp:2953
 msgid "Phone: "
 msgstr "Tel:"
 
-#: lemonview.cpp:2846
+#: lemonview.cpp:2868
 msgid "Change"
 msgstr "Cambio:"
 
-#: lemonview.cpp:2848
+#: lemonview.cpp:2870
 msgid "Card Number  : %1"
 msgstr "Número de tarjeta: %1"
 
-#: lemonview.cpp:2849
+#: lemonview.cpp:2871
 msgid "Authorization : %1"
 msgstr "Núm. de Autorización: %1"
 
-#: lemonview.cpp:2868
+#: lemonview.cpp:2890
 msgid " RESERVATION "
 msgstr " APARTADO "
 
-#: lemonview.cpp:2870
+#: lemonview.cpp:2892
 msgid "Purchase Total Amount"
 msgstr "Total de la compra"
 
-#: lemonview.cpp:2872
+#: lemonview.cpp:2894
 msgid "Reservation Total Amount"
 msgstr "Total de la apartado"
 
-#: lemonview.cpp:2884
+#: lemonview.cpp:2906
 msgid ""
 "Print Receipt -- Press ESC to export to PDF to your home/lemon-printing/ "
 "folder"
 msgstr "Imprimir Recibo -- Presione ESC para exportar a PDF."
 
-#: lemonview.cpp:2954
+#: lemonview.cpp:2976
 msgid "Print Receipt"
 msgstr "Imprimir Recibo"
 
-#: lemonview.cpp:2988
+#: lemonview.cpp:3009
 msgid "Print Special Order Instructions "
 msgstr "Imprimir instrucciones de ordenes especiales"
 
-#: lemonview.cpp:3095
+#: lemonview.cpp:3116
+#, fuzzy
 msgid ""
-"Lemon has encountered an error when querying the database, click details to "
-"see the error details."
+"PortoBelloPos has encountered an error when querying the database, click "
+"details to see the error details."
 msgstr ""
 "Lemon ha encontrado un error al buscar en la base de datos. Presione "
 "\"detalles\" para ver mas detalles del error."
 
-#: lemonview.cpp:3095
+#: lemonview.cpp:3116
 msgid "Delete Transaction: Error"
 msgstr "Borrar Transacción: Error"
 
-#: lemonview.cpp:3151
+#: lemonview.cpp:3172
 msgid ""
 "The ticket cannot be cancelled because it was paid with a credit/debit card."
 msgstr "El ticket no puede ser cancelado porque fué pagado con tarjeta."
 
-#: lemonview.cpp:3163
+#: lemonview.cpp:3184
 msgid "Cancelling transaction #%1. Authorized by %2"
 msgstr "Cancelando transaccion #%1, Autorizada por %2"
 
-#: lemonview.cpp:3173
+#: lemonview.cpp:3194
 msgid "The ticket was sucessfully cancelled."
 msgstr "El ticket fue cancelado con éxito."
 
-#: lemonview.cpp:3185
+#: lemonview.cpp:3206
 msgid "Error cancelling ticket: %1"
 msgstr "Error cancelando ticket #%1"
 
-#: lemonview.cpp:3207 reservations.cpp:244
+#: lemonview.cpp:3228 reservations.cpp:244
 msgid "There is not enough cash available in the drawer."
 msgstr "No hay suficiente efectivo disponible en gaveta"
 
-#: lemonview.cpp:3209
+#: lemonview.cpp:3230
 msgid "Ticket to cancel does not exists!"
 msgstr "El ticket a cancelar no existe!"
 
-#: lemonview.cpp:3227
-msgid "Enter the amount of money to deposit in the drawer"
-msgstr "Cantidad de dinero a depositar en la gaveta:"
-
-#: lemonview.cpp:3250
+#: lemonview.cpp:3272
 msgid "Operation Started by %1 at terminal %2"
 msgstr "Operaciones iniciadas por %1 en terminal %2"
 
-#: lemonview.cpp:3372
+#: lemonview.cpp:3394
 msgid "Balance Id:%1"
 msgstr "Corte de caja # %1"
 
-#: lemonview.cpp:3378
+#: lemonview.cpp:3400
 msgid "%1 at Terminal # %2"
 msgstr "%1 en Terminal # %2"
 
-#: lemonview.cpp:3379
+#: lemonview.cpp:3401
 msgid "Initial Amount deposited:"
 msgstr "Cantidad inicial en la gaveta:"
 
-#: lemonview.cpp:3380
+#: lemonview.cpp:3402
 msgid "Deposit"
 msgstr "Depósito"
 
-#: lemonview.cpp:3381
+#: lemonview.cpp:3403
 msgid "In"
 msgstr "Entrada"
 
-#: lemonview.cpp:3382
+#: lemonview.cpp:3404
 msgid "Out"
 msgstr "Salida"
 
-#: lemonview.cpp:3383
+#: lemonview.cpp:3405
 msgid "In Drawer"
 msgstr "En la gaveta"
 
-#: lemonview.cpp:3384
+#: lemonview.cpp:3406
 msgid "Drawer Balance"
 msgstr "Corte de Caja"
 
-#: lemonview.cpp:3385
+#: lemonview.cpp:3407
 msgid "Transactions Details"
 msgstr "Detalles de transacción"
 
-#: lemonview.cpp:3386
+#: lemonview.cpp:3408
 msgid "Transactions"
 msgstr "Transacciones"
 
-#: lemonview.cpp:3387 lemonview.cpp:3642
+#: lemonview.cpp:3409 lemonview.cpp:3664
 msgid "Id"
 msgstr "Num"
 
-#: lemonview.cpp:3388 lemonview.cpp:3422 lemonview.cpp:3646 lemonview.cpp:5607
-#: lemonview.cpp:5668 resume.cpp:155
+#: lemonview.cpp:3410 lemonview.cpp:3444 lemonview.cpp:3668 lemonview.cpp:5637
+#: lemonview.cpp:5698 resume.cpp:155
 msgid "Time"
 msgstr "Hora"
 
-#: lemonview.cpp:3389 lemonview.cpp:3647 lemonview.cpp:5609 lemonview.cpp:5670
+#: lemonview.cpp:3411 lemonview.cpp:3669 lemonview.cpp:5639 lemonview.cpp:5700
 msgid "Amount"
 msgstr "Cantidad"
 
-#: lemonview.cpp:3390
+#: lemonview.cpp:3412
 msgid "Paid"
 msgstr "Pagado"
 
-#: lemonview.cpp:3391 lemonview.cpp:3649
+#: lemonview.cpp:3413 lemonview.cpp:3671
 msgid "Method"
 msgstr "Método"
 
-#: lemonview.cpp:3392
+#: lemonview.cpp:3414
 msgid ""
 "When Completing Reservations, the Amount may be grater than Paid (amount) "
 "because of the reservation payment."
 msgstr ""
 
-#: lemonview.cpp:3411
+#: lemonview.cpp:3433
 msgid "Start: %1"
 msgstr "Inicio: %1"
 
-#: lemonview.cpp:3412
+#: lemonview.cpp:3434
 msgid "End  : %1"
 msgstr "Fin : %1"
 
-#: lemonview.cpp:3419
+#: lemonview.cpp:3441
 msgid "Cash flow Details"
 msgstr "Detalles de flujo de efectivo"
 
-#: lemonview.cpp:3420
+#: lemonview.cpp:3442
 msgid "Type"
 msgstr "Tipo"
 
-#: lemonview.cpp:3421
+#: lemonview.cpp:3443
 msgid "Reason"
 msgstr "Razón:"
 
-#: lemonview.cpp:3423
+#: lemonview.cpp:3445
 msgid "This payment was not paid in cash."
 msgstr "Este pago no fue hecho en efectivo."
 
-#: lemonview.cpp:3571
+#: lemonview.cpp:3593
 msgid "Print Balance"
 msgstr "Imprimir Corte de caja"
 
-#: lemonview.cpp:3624
+#: lemonview.cpp:3646
 msgid "End of Day report printed by %1 at terminal %2 on %3"
 msgstr "Reporte de Fin del día impreso por %1 en terminal %2 el %3"
 
-#: lemonview.cpp:3644
+#: lemonview.cpp:3666
 msgid "at terminal # %1"
 msgstr "en terminal # %1"
 
-#: lemonview.cpp:3648
+#: lemonview.cpp:3670
 msgid "Profit"
 msgstr "Utilidades"
 
-#: lemonview.cpp:3650
+#: lemonview.cpp:3672
 msgid "Total taxes collected for this terminal: "
 msgstr "Total de impuestos recaudados en ésta terminal:"
 
-#: lemonview.cpp:3683
+#: lemonview.cpp:3705
 msgid "Total Sales : %1"
 msgstr "Ventas totales: %1"
 
-#: lemonview.cpp:3684
+#: lemonview.cpp:3706
 msgid "Total Profit: %1"
 msgstr "Utilidades totales: %1"
 
-#: lemonview.cpp:3702 lemonview.cpp:3728
+#: lemonview.cpp:3724 lemonview.cpp:3750
 msgid "Print end of day report"
 msgstr "Imprimir reporte de fin del día"
 
-#: lemonview.cpp:3831
+#: lemonview.cpp:3853
 msgid "Price: "
 msgstr "Precio:"
 
-#: lemonview.cpp:3832
+#: lemonview.cpp:3854
 msgid "Available: "
 msgstr "Disponible:"
 
-#: lemonview.cpp:3834
+#: lemonview.cpp:3856
 msgid "Category:"
 msgstr "Categoría:"
 
-#: lemonview.cpp:3835
+#: lemonview.cpp:3857
 msgid "in stock"
 msgstr "en invetario"
 
-#: lemonview.cpp:3836
+#: lemonview.cpp:3858
 msgid "in your shopping cart, Total Available"
 msgstr "en su carrito de compras, Total Disponible"
 
-#: lemonview.cpp:4041
+#: lemonview.cpp:4066
 msgid "Discount: %1% "
 msgstr "Descuento: %1% "
 
-#: lemonview.cpp:4043
-msgid "%1 points"
-msgstr "%1 puntos"
-
-#: lemonview.cpp:4061
-msgid "Credit Total: %1"
+#: lemonview.cpp:4090
+#, fuzzy
+msgid "Credito Residuo: %1"
 msgstr "Total del credito: %1"
 
-#: lemonview.cpp:4083
+#: lemonview.cpp:4112
 msgid "Tr"
 msgstr "Ticket #"
 
-#: lemonview.cpp:4084 reservations.cpp:170 resume.cpp:158
+#: lemonview.cpp:4113 reservations.cpp:170 resume.cpp:158
 msgid "Client"
 msgstr "Cliente"
 
-#: lemonview.cpp:4085 lemonview.cpp:5605 lemonview.cpp:5666
+#: lemonview.cpp:4114 lemonview.cpp:5635 lemonview.cpp:5696
 #: reservations.cpp:169 resume.cpp:156 soselector.cpp:171 sostatus.cpp:167
 msgid "Date"
 msgstr "Fecha"
 
-#: lemonview.cpp:4086
+#: lemonview.cpp:4115
 msgid "User"
 msgstr "Usuario"
 
-#: lemonview.cpp:4087
+#: lemonview.cpp:4116
 msgid "Items"
 msgstr "Artículos"
 
-#: lemonview.cpp:4140
+#: lemonview.cpp:4169
 msgid "Please select a ticket to print."
 msgstr "Por favor seleccione un ticket a imprimir"
 
-#: lemonview.cpp:4140
+#: lemonview.cpp:4169
 msgid "Cannot print ticket"
 msgstr "No se pudo imprimir ticket"
 
-#: lemonview.cpp:4160
+#: lemonview.cpp:4189
 msgid "Reprint ticket cancelled."
 msgstr "Se cancelo la Reimpresión de tickes"
 
-#: lemonview.cpp:4324
+#: lemonview.cpp:4357
 msgid "Cash not available at drawer!"
 msgstr "Efectivo no disponible en gaveta"
 
-#: lemonview.cpp:4351
+#: lemonview.cpp:4384
 msgid "Cash-OUT by %1 at terminal %2 on %3"
 msgstr "Salida de Efectivo por %1 en terminal %2 el %3"
 
-#: lemonview.cpp:4394
+#: lemonview.cpp:4427
 msgid "Cash-IN [%1] by %2 at terminal %3 on %4"
 msgstr "Entrada de Efectivo por %1 en terminal %2 el %3"
 
-#: lemonview.cpp:4404
+#: lemonview.cpp:4437
 msgid "There are <b> %1 in cash </b> available at the drawer."
 msgstr "Hay <b>%1 disponibles</b> en la gaveta."
 
-#: lemonview.cpp:4425
+#: lemonview.cpp:4458
 msgid "Please finish the current transaction before creating a special order."
 msgstr "Por favor termine la venta actual antes de crear una orden especial."
 
-#: lemonview.cpp:4532
+#: lemonview.cpp:4565
 msgid ""
 "Please finish the current transaction before completing a special order."
 msgstr ""
 "Por favor termine la venta actual antes de completar una orden especial."
 
-#: lemonview.cpp:4549
+#: lemonview.cpp:4582
 msgid "The given ticket number does not contains any special order."
 msgstr "El número de ticket no contiene ninguna orden especial."
 
-#: lemonview.cpp:4556
+#: lemonview.cpp:4589
 msgid "These special orders cannot be completed because:"
 msgstr "Esta orden especial no puede ser completada porque:"
 
-#: lemonview.cpp:4563
+#: lemonview.cpp:4596
 msgid "<b>is Cancelled</b>"
 msgstr "<b>está Cancelada</b>"
 
-#: lemonview.cpp:4565
+#: lemonview.cpp:4598
 msgid "is already <b>Delivered</b>"
 msgstr "ya ha sido <b>Entregada</b>"
 
-#: lemonview.cpp:4566
+#: lemonview.cpp:4599
 msgid "%1 %2."
 msgstr "%1 %2."
 
-#: lemonview.cpp:4577
+#: lemonview.cpp:4610
 msgid ""
 "The special order %1 in ticket %2 is completely paid. Marked as delivered."
 msgstr ""
 "La orden especial %1 en ticket %2 esta pagada por completo. Marcada como "
 "entregada."
 
-#: lemonview.cpp:4664
+#: lemonview.cpp:4697
 msgid ""
 "<b>This terminal is locked.</b> <br><i>Please enter the user's password to "
 "unlock it</i>."
@@ -1022,15 +1022,15 @@ msgstr ""
 "<b>La terminal esta bloqueada.</b> <br><i>Por favor escriba la contraseña "
 "del usuario para desbloquearla.</i>"
 
-#: lemonview.cpp:4835
+#: lemonview.cpp:4869
 msgid "The sale %1 has been sucessfully suspended."
 msgstr "La venta %1 fue suspendida con éxito."
 
-#: lemonview.cpp:4890 specialordereditor.cpp:493
+#: lemonview.cpp:4924 specialordereditor.cpp:493
 msgid "Notes: %1"
 msgstr "Notas: %1"
 
-#: lemonview.cpp:4918
+#: lemonview.cpp:4952
 msgid ""
 "Please finish the current transaction before changing state for a special "
 "order."
@@ -1038,30 +1038,30 @@ msgstr ""
 "Por favor termine la venta actual antes de cambiar el estado de una orden "
 "especial."
 
-#: lemonview.cpp:5012
+#: lemonview.cpp:5043
 msgid "Changing price to product %1, from %2 to %3. Authorized by %4"
 msgstr "Cambiando el precio al producto %1, de %2 a %3. Autorizado por %4"
 
-#: lemonview.cpp:5045
+#: lemonview.cpp:5075
 msgid "Applying occasional discount. Authorized by %1"
 msgstr "Aplicando descuento ocasional. Autorizado por %1"
 
-#: lemonview.cpp:5091
+#: lemonview.cpp:5121
 msgid ""
 "Please Enter the reservation Amount in the Payment Amount and try again."
 msgstr ""
 "Por favor escriba la cantidad con la que se aparta en el campo de cantidad a "
 "pagar."
 
-#: lemonview.cpp:5155
+#: lemonview.cpp:5185
 msgid "Reservation #%1 [tr. %2]"
 msgstr "Apartado #%1 [Tr. %2]"
 
-#: lemonview.cpp:5177
+#: lemonview.cpp:5207
 msgid "Cash-IN [%1] for RESERVATION [%5] by %2 at terminal %3 on %4"
 msgstr "Entrada de Efectivo %1 para APARTADO [%5] por %2 en terminal %3 el %4"
 
-#: lemonview.cpp:5234
+#: lemonview.cpp:5264
 msgid ""
 "Cannot make a reservation, no products on the list. Special Orders are not "
 "considered."
@@ -1069,42 +1069,42 @@ msgstr ""
 "No se puede hacer un apartado, no hay productos que apartar. Las Ordenes "
 "especiales no pueden apartarse."
 
-#: lemonview.cpp:5257
+#: lemonview.cpp:5287
 msgid "The sale %1 has been sucessfully reserved."
 msgstr "La venta %1 fue apartada con éxito."
 
-#: lemonview.cpp:5397
+#: lemonview.cpp:5427
 msgid "Make partial payment"
 msgstr "Hacer un pago parcial"
 
-#: lemonview.cpp:5399
+#: lemonview.cpp:5429
 msgid "Pay"
 msgstr "Pagar"
 
-#: lemonview.cpp:5508
+#: lemonview.cpp:5538
 msgid "Payment for Credit %1"
 msgstr "Pago por Credito %1"
 
-#: lemonview.cpp:5523
+#: lemonview.cpp:5553
 msgid "Cash-IN-CreditPayment [%1] for credit %5 by %2 at terminal %3 on %4"
 msgstr ""
 "Entrada de Efectivo [%1] para Pago del Credito %5, por %2 en terminal %3 el "
 "%4"
 
-#: lemonview.cpp:5572
+#: lemonview.cpp:5602
 msgid "CREDIT REPORT"
 msgstr "REPORTE DE CREDITO"
 
-#: lemonview.cpp:5590
+#: lemonview.cpp:5620
 #, fuzzy
 msgid "Today Credit History"
 msgstr "Historial del Crédito"
 
-#: lemonview.cpp:5611 lemonview.cpp:5672
+#: lemonview.cpp:5641 lemonview.cpp:5702
 msgid "Sale #"
 msgstr "Venta #"
 
-#: lemonview.cpp:5650
+#: lemonview.cpp:5680
 #, fuzzy
 msgid "More Credit History"
 msgstr "Historial del Crédito"
@@ -1310,9 +1310,18 @@ msgstr ""
 "<html><font color=red><b>La fecha de entrega esta en el pasado.</b></font></"
 "html>"
 
-#: specialordereditor.cpp:648
+#: specialordereditor.cpp:645
 msgid "%1 chars of %2 allowed."
 msgstr ""
+
+#~ msgid "Discount: %1%  [%2]"
+#~ msgstr "Descuento: %1% [%2]"
+
+#~ msgid "Enter the amount of money to deposit in the drawer"
+#~ msgstr "Cantidad de dinero a depositar en la gaveta:"
+
+#~ msgid "%1 points"
+#~ msgstr "%1 puntos"
 
 #~ msgid "<b>Welcome</b> <i>%1</i>."
 #~ msgstr "<b>Bienvenido</b> <i>%1</i>."
