@@ -55,7 +55,7 @@ msgstr "Errore #%1, Tipo:%2\n"
 #: ../../dataAccess/azahar.cpp:115
 #: ../../dataAccess/azahar.cpp:1062
 msgid "Error serching product id %1, Rows affected: %2"
-msgstr ""
+msgstr "Errore di reicerca id prodotto %1, righe interessate: %2"
 
 #: ../../dataAccess/azahar.cpp:142
 msgid "Error serching offer id %1, Rows affected: %2"
@@ -63,30 +63,30 @@ msgstr "Errore ricerca id prodotto %1, Righe interessate: %2"
 
 #: ../../dataAccess/azahar.cpp:218
 msgid "Error getting product information for code %1, Rows affected: %2"
-msgstr ""
+msgstr "Errore informaziomni prodotto %1, Righe interessate: %2"
 
 #: ../../dataAccess/azahar.cpp:1302
 msgid "Unable to set an offer/discount for the selected produc because it is NOT DISCOUNTABLE"
-msgstr ""
+msgstr "Sconto non applicabile"
 
 #: ../../dataAccess/azahar.cpp:1333
 msgid "Error deleting offer id %1, Rows affected: %2"
-msgstr ""
+msgstr "Errore: impossibile eliminare id offerta %1, righe interessate: %2"
 
 #: ../../dataAccess/azahar.cpp:2462
 msgid "Money return on cancelling ticket #%1 "
-msgstr ""
+msgstr "Importo storno scontrino #1"
 
 #: ../../dataAccess/azahar.cpp:2469
 msgid "Ticket #%1 was already canceled."
-msgstr ""
+msgstr "Scontrino #%1 già stornato"
 
 #: ../../dataAccess/azahar.cpp:3361
 #: ../../dataAccess/azahar.cpp:3389
 #: ../../dataAccess/azahar.cpp:3415
 #: ../../dataAccess/azahar.cpp:3608
 msgid "Error getting special Order information, id: %1, Rows affected: %2"
-msgstr ""
+msgstr "Errore: imposibile ottenere informazioni relative all'ordine: id %1, righe interessate: %2"
 
 #: inputdialog.cpp:68
 msgid "Product Code:"
@@ -265,10 +265,6 @@ msgstr "Riprendi vendita"
 #: lemon.cpp:315
 msgid "Reserve Items"
 msgstr "Prenota articolo"
-
-#: lemon.cpp:315
-msgid "Reserve Items"
-msgstr "Prenota Oggetti"
 
 #: lemon.cpp:322
 #: reservations.cpp:57
