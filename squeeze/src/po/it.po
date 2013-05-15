@@ -1,0 +1,1072 @@
+# translation of it.po to Italian
+
+msgid ""
+msgstr ""
+"Project-Id-Version: it\n"
+"Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
+"POT-Creation-Date: 2012-07-20 21:01+0200\n"
+"PO-Revision-Date: 2012-07-20 22:37+0100\n"
+"Last-Translator:ISF-Modena <info@isf-modena.org>\n"
+"Language-Team: ITALIAN <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+"X-Poedit-Language: Italian\n"
+"X-Poedit-Country: Italy\n"
+
+
+#: clienteditor.cpp:47 donoreditor.cpp:43
+msgid "Client Editor"
+msgstr "Editor Clienti"
+
+#: clienteditor.cpp:63 donoreditor.cpp:56
+msgid "Enter a 6, 12, or 13 digits Bar Code."
+msgstr "inserisci barcode a 6, 12 o 13 caratteri"
+
+#: clienteditor.cpp:64 donoreditor.cpp:57
+msgid "Enter client full name"
+msgstr "Inserisci il nome completo del Cliente"
+
+#: clienteditor.cpp:65 donoreditor.cpp:58
+msgid "Phone number"
+msgstr "Telefono"
+
+#: main.cpp:30
+msgid "Squeeze your lemon!"
+msgstr ""
+
+#: main.cpp:36
+msgid "squeeze"
+msgstr ""
+
+#: main.cpp:36
+#, fuzzy
+msgid "(C) 2007-2011 Miguel Chavez Gamboa"
+msgstr "(C) 2007-2010 Miguel Chavez Gamboa"
+
+#: main.cpp:37
+msgid "Miguel Chavez Gamboa"
+msgstr "Miguel Chavez Gamboa"
+
+#: main.cpp:41
+msgid "Roberto Aceves"
+msgstr "Roberto Aceves"
+
+#: main.cpp:41
+msgid "Many ideas and general help"
+msgstr "help generale e suggerimenti"
+
+#: main.cpp:42
+msgid "Biel Frontera"
+msgstr "Biel Frontera"
+
+#: main.cpp:42 main.cpp:43
+msgid "Code contributor"
+msgstr "Contributeur de code"
+
+#: main.cpp:43
+msgid "Vitali Kari"
+msgstr ""
+
+#: main.cpp:44
+msgid "Jose Nivar"
+msgstr "Jose Nivar"
+
+#: main.cpp:44
+#, fuzzy
+msgid "Many ideas, bug reports and testing"
+msgstr "suggerimenti "
+
+#: main.cpp:45
+msgid "Benjamin Burt"
+msgstr ""
+
+#: main.cpp:45
+msgid ""
+"Many ideas, Documentation Writer, How-to Videos Creation, and general help "
+"and support"
+msgstr "Suggerimenti e help generale"
+
+#: main.cpp:48
+msgid "Document to open"
+msgstr "Documento da arire"
+
+#: po/extractedrc.cpp:1 extractedrc.cpp:1
+msgctxt "NAME OF TRANSLATORS"
+msgid "Your names"
+msgstr "Ingegneria senza frontiere - Modena"
+
+#: po/extractedrc.cpp:2 extractedrc.cpp:2
+msgctxt "EMAIL OF TRANSLATORS"
+msgid "Your emails"
+msgstr "info@isf-modena.org"
+
+#: producteditor.cpp:59
+msgid "Product Editor"
+msgstr "Editor prodotti"
+
+#: producteditor.cpp:127
+msgid "Purchase Qty:"
+msgstr "Quantit acquisto:"
+
+#: producteditor.cpp:129
+msgid "Stock Qty:"
+msgstr "Quantit magazzino:"
+
+#: producteditor.cpp:356
+#, fuzzy
+msgid "Gross Profit: %1% (%2)"
+msgstr "Utile Lordo: %1 (%2)"
+
+#: producteditor.cpp:380 squeezeview.cpp:2286
+msgid ""
+"Enter the quantity and reason for the change, then press <ENTER> to accept, "
+"<ESC> to cancel"
+msgstr ""
+"inserire una quantit e il motivo della modifica, quindi premere <ENTER> per "
+"confermare, <ESC> per annullare"
+
+#: producteditor.cpp:445
+msgid "Code %1 already exists."
+msgstr "Il codice %1 esiste gi"
+
+#: promoeditor.cpp:40
+msgid "Discounts Editor"
+msgstr "Editor Sconti"
+
+#: purchaseeditor.cpp:45 squeeze.cpp:370
+msgid "Purchase"
+msgstr "Aquisti"
+
+#: purchaseeditor.cpp:316
+msgid "<b>Unlimited Stock Products cannot be purchased.</b>"
+msgstr ""
+"<b>Non  poosibile effettuare un acquisto senza specifcare la quantit.</b>"
+
+#: purchaseeditor.cpp:377 purchaseeditor.cpp:398
+msgid ""
+"<b>Stock cannot go negative.</b> The <i>minimum</i> purchase can be <b>%1</b>"
+msgstr ""
+"<b>la quantit di magazzino non pu essere minore di zero.</b> La quantit "
+"<i>minima</i> di acquisto pu essere <b>%1</b>"
+
+#: purchaseeditor.cpp:459 purchaseeditor.cpp:493
+msgid "Items in this purchase [ %1  items,  %2 ]"
+msgstr "Gli articoli presenti in questo acquisto sono [ %1  articles,  %2 ]"
+
+#: purchaseeditor.cpp:507
+msgid "No Photo"
+msgstr "Foto non disponbile"
+
+#: squeeze.cpp:292
+msgid "Login"
+msgstr "Login"
+
+#: squeeze.cpp:298
+msgid "Users"
+msgstr "User"
+
+#: squeeze.cpp:304 squeezeview.cpp:489
+msgid "Clients"
+msgstr "Client"
+
+#: squeeze.cpp:310 squeezeview.cpp:501
+msgid "Limits"
+msgstr "Limiti"
+
+#: squeeze.cpp:316 squeezeview.cpp:512
+msgid "Donors"
+msgstr "Donatori"
+
+#: squeeze.cpp:322 squeezeview.cpp:435 squeezeview.cpp:699
+msgid "Products"
+msgstr "Prodotti"
+
+#: squeeze.cpp:328
+msgid "Measures"
+msgstr "Unit di misura"
+
+#: squeeze.cpp:334 squeezeview.cpp:480
+msgid "Categories"
+msgstr "Categorie"
+
+#: squeeze.cpp:340 squeezeview.cpp:447
+msgid "Offers"
+msgstr "Offerte"
+
+#: squeeze.cpp:346 squeezeview.cpp:534
+msgid "Balances"
+msgstr "Saldo"
+
+#: squeeze.cpp:352 squeezeview.cpp:557
+msgid "Cash Flow"
+msgstr "Movimenti di cassa"
+
+#: squeeze.cpp:358 squeezeview.cpp:522 squeezeview.cpp:1612
+msgid "Transactions"
+msgstr "Transazioni"
+
+#: squeeze.cpp:364
+msgid "Quick Plots"
+msgstr "Riepilogo veloce"
+
+#: squeeze.cpp:376
+msgid "Check Out"
+msgstr "Verificare"
+
+#: squeeze.cpp:382
+msgid "Stock Correction"
+msgstr "Correzione di stock"
+
+#: squeeze.cpp:388 squeezeview.cpp:566
+msgid "Reports"
+msgstr "Riepilogo"
+
+#: squeeze.cpp:394
+msgid "Print End of day report"
+msgstr "Stampa riepilogo di fine giornata"
+
+#: squeeze.cpp:400
+msgid "Print General end of day report"
+msgstr "Stampa riepilogo generale di fine giornata"
+
+#: squeeze.cpp:406
+msgid "Print End of month report"
+msgstr "Stampa riepilogo generale di fine mese"
+
+#: squeeze.cpp:412
+msgid "Print Low stock products"
+msgstr "Stampa articoli per riordino"
+
+#: squeeze.cpp:418
+msgid "Print Sold out products"
+msgstr "Stampa articoli venduti"
+
+#: squeeze.cpp:424
+msgid "Show Special Orders"
+msgstr "Mostra Ordini Speciali"
+
+#: squeeze.cpp:430 squeezeview.cpp:578
+msgid "Ticket Messages"
+msgstr "Messaggio scontrino"
+
+#: squeeze.cpp:436
+msgid "View Events Log"
+msgstr "Vista log eventi"
+
+#: squeeze.cpp:442
+msgid "View Currencies"
+msgstr "Vista prenotazioni"
+
+#: squeeze.cpp:448
+#, fuzzy
+msgid "View Reservations"
+msgstr "Prenotazioni"
+
+#: squeeze.cpp:493 squeeze.cpp:517
+msgid "Database"
+msgstr ""
+
+#: squeeze.cpp:513
+msgid "General"
+msgstr "Generale"
+
+#: squeeze.cpp:521
+msgid "Printers"
+msgstr "Stampanti"
+
+#: squeezeview.cpp:101
+msgid "Authorisation Required"
+msgstr "Richiesta autorizzazione"
+
+#: squeezeview.cpp:102
+msgid "Enter administrator/supervisor user and password please."
+msgstr "Inserire user e password amministratore."
+
+#: squeezeview.cpp:107
+msgid "Basic Information"
+msgstr "Informazioni DI base"
+
+#: squeezeview.cpp:137
+msgid "End of Day"
+msgstr "Fine giornata"
+
+#: squeezeview.cpp:138
+msgid "General End of Day"
+msgstr "Fine giornata generale"
+
+#: squeezeview.cpp:139
+msgid "End of Month"
+msgstr "Fine mese"
+
+#: squeezeview.cpp:140 squeezeview.cpp:3539
+msgid "Sold Out Products"
+msgstr "Prodotti venduti"
+
+#: squeezeview.cpp:141
+msgid "Low Stock Products"
+msgstr "Prodotti sottoscorta"
+
+#: squeezeview.cpp:142
+#, fuzzy
+msgid "Stock Report"
+msgstr "Riepilogo giacenze"
+
+#: squeezeview.cpp:211
+msgid "Unable to connect to the database"
+msgstr "Impossibile accedere al database"
+
+#: squeezeview.cpp:420
+msgid "Quick Information"
+msgstr "Informazioni rapide"
+
+#: squeezeview.cpp:462
+msgid "Vendors"
+msgstr "Venditori"
+
+#: squeezeview.cpp:471
+msgid "Weight and Measures"
+msgstr "Pesi e misure"
+
+#: squeezeview.cpp:545
+msgid "Special Orders"
+msgstr "Ordini speciali"
+
+#: squeezeview.cpp:586
+msgid "Currencies"
+msgstr "Valute"
+
+#: squeezeview.cpp:594
+#, fuzzy
+msgid "Reservations"
+msgstr "Prenotazioni"
+
+#: squeezeview.cpp:684 squeezeview.cpp:690
+msgid "%1"
+msgstr "%1"
+
+#: squeezeview.cpp:685
+msgid "Month Sales (%1)"
+msgstr "Venduto mensile (%1)"
+
+#: squeezeview.cpp:691
+msgid "Month Profit (%1)"
+msgstr "Utile mensile (%1)"
+
+#: squeezeview.cpp:700 squeezeview.cpp:1085 squeezeview.cpp:3543
+msgid "Sold Units"
+msgstr "Quantit vendute :"
+
+#: squeezeview.cpp:983
+msgid "Trying connection in %1 seconds..."
+msgstr "tentativo di connessione in %1 secondi..."
+
+#: squeezeview.cpp:987
+msgid "Connecting..."
+msgstr "Connessione..."
+
+#: squeezeview.cpp:1022 squeezeview.cpp:1249 squeezeview.cpp:1276
+#: squeezeview.cpp:1304 squeezeview.cpp:1333 squeezeview.cpp:1361
+#: squeezeview.cpp:1570 squeezeview.cpp:1823
+msgid ""
+"Squeeze has encountered an error, click details to see the error details."
+msgstr ""
+"PortobelloMAG ha riscontrato un errore, cliccare su detagli per maggiori "
+"informazioni"
+
+#: squeezeview.cpp:1022 squeezeview.cpp:1249 squeezeview.cpp:1276
+#: squeezeview.cpp:1304 squeezeview.cpp:1333 squeezeview.cpp:1361
+#: squeezeview.cpp:1570 squeezeview.cpp:1823
+msgid "Error"
+msgstr "Errore"
+
+#: squeezeview.cpp:1079 squeezeview.cpp:3380 squeezeview.cpp:3461
+#: squeezeview.cpp:3540
+msgid "Code"
+msgstr "Codice"
+
+#: squeezeview.cpp:1080 squeezeview.cpp:1555 squeezeview.cpp:1716
+msgid "Name"
+msgstr "Nome"
+
+#: squeezeview.cpp:1081
+msgid "Category"
+msgstr "Categoria"
+
+#: squeezeview.cpp:1082 squeezeview.cpp:1719
+msgid "Price"
+msgstr "Prezzo"
+
+#: squeezeview.cpp:1083 squeezeview.cpp:1720
+msgid "Cost"
+msgstr "Costo"
+
+#: squeezeview.cpp:1084 squeezeview.cpp:3542
+msgid "Stock Qty"
+msgstr "Quantit a stock"
+
+#: squeezeview.cpp:1086
+msgid "Last Sold"
+msgstr "Ultima vendita"
+
+#: squeezeview.cpp:1087
+msgid "Last Provider"
+msgstr "Ultimo Fornitore"
+
+#: squeezeview.cpp:1088
+msgid "Alpha Code"
+msgstr "Codice Alfa"
+
+#: squeezeview.cpp:1202 squeezeview.cpp:1413 squeezeview.cpp:1604
+#: squeezeview.cpp:2896 squeezeview.cpp:3031 squeezeview.cpp:3163
+#: squeezeview.cpp:3273 squeezeview.cpp:3635 squeezeview.cpp:3672
+msgid "Id"
+msgstr "Id"
+
+#: squeezeview.cpp:1203
+msgid "Product Affected"
+msgstr "Prodotti interessati"
+
+#: squeezeview.cpp:1204
+msgid "Discount Applied (%)"
+msgstr "Sconto applicato (%)"
+
+#: squeezeview.cpp:1205
+msgid "Valid from"
+msgstr "Valido da"
+
+#: squeezeview.cpp:1206
+msgid "Valid until"
+msgstr "Valido fino a "
+
+#: squeezeview.cpp:1234 squeezeview.cpp:1259 squeezeview.cpp:3381
+#: squeezeview.cpp:3462 squeezeview.cpp:3541
+msgid "Description"
+msgstr "Descrizione"
+
+#: squeezeview.cpp:1414 squeezeview.cpp:1801
+msgid "Client"
+msgstr "Cliente"
+
+#: squeezeview.cpp:1415 squeezeview.cpp:2897 squeezeview.cpp:3649
+msgid "Type"
+msgstr "Tipo"
+
+#: squeezeview.cpp:1416 squeezeview.cpp:2902 squeezeview.cpp:3036
+#: squeezeview.cpp:3168 squeezeview.cpp:3278 squeezeview.cpp:3637
+#: squeezeview.cpp:3672
+msgid "Amount"
+msgstr "Importo"
+
+#: squeezeview.cpp:1417 squeezeview.cpp:1605 squeezeview.cpp:1717
+#: squeezeview.cpp:1802 squeezeview.cpp:2898 squeezeview.cpp:3280
+#: squeezeview.cpp:3810
+msgid "Date"
+msgstr "Data"
+
+#: squeezeview.cpp:1418 squeezeview.cpp:2900 squeezeview.cpp:3035
+#: squeezeview.cpp:3167 squeezeview.cpp:3277 squeezeview.cpp:3636
+#: squeezeview.cpp:3651 squeezeview.cpp:3811
+msgid "Time"
+msgstr "Tempo"
+
+#: squeezeview.cpp:1419
+msgid "Paid with"
+msgstr "Pagato con"
+
+#: squeezeview.cpp:1420
+msgid "Change Given"
+msgstr "Resto"
+
+#: squeezeview.cpp:1421
+msgid "Pay Method"
+msgstr "Metodo di pagamento"
+
+#: squeezeview.cpp:1422
+msgid "State"
+msgstr "Stato"
+
+#: squeezeview.cpp:1423 squeezeview.cpp:1606 squeezeview.cpp:2899
+msgid "Vendor"
+msgstr "Venditore"
+
+#: squeezeview.cpp:1424
+msgid "Card Num"
+msgstr "N carta"
+
+#: squeezeview.cpp:1425
+msgid "Items Count"
+msgstr "Articoli contati"
+
+#: squeezeview.cpp:1426
+msgid "Points"
+msgstr "Punti"
+
+#: squeezeview.cpp:1427
+msgid "Discount %1"
+msgstr "Sconto %1"
+
+#: squeezeview.cpp:1428
+msgid "Discount %"
+msgstr "Sconto %"
+
+#: squeezeview.cpp:1429
+msgid "Card Authorization #"
+msgstr "Autorizzazione carta #"
+
+#: squeezeview.cpp:1430 squeezeview.cpp:3037 squeezeview.cpp:3169
+#: squeezeview.cpp:3279
+msgid "Profit"
+msgstr "Utile"
+
+#: squeezeview.cpp:1431 squeezeview.cpp:1613
+msgid "Terminal #"
+msgstr "Terminale #"
+
+#: squeezeview.cpp:1432
+msgid "Provider"
+msgstr "Fornitore"
+
+#: squeezeview.cpp:1607
+msgid "Initial amount"
+msgstr "Importo iniaiale"
+
+#: squeezeview.cpp:1608 squeezeview.cpp:3631 squeezeview.cpp:3663
+msgid "In"
+msgstr "Entrata"
+
+#: squeezeview.cpp:1609 squeezeview.cpp:3632 squeezeview.cpp:3665
+msgid "Out"
+msgstr "Usctia"
+
+#: squeezeview.cpp:1610
+msgid "Cash in drawer"
+msgstr "Cassetto contante in entrata"
+
+#: squeezeview.cpp:1611
+msgid "Received by Card"
+msgstr "Ricevuto da carta"
+
+#: squeezeview.cpp:1715
+msgid "Order #"
+msgstr "Ordine #"
+
+#: squeezeview.cpp:1718
+msgid "Qty"
+msgstr "Qt"
+
+#: squeezeview.cpp:1721
+msgid "Sold by"
+msgstr "Venduto per"
+
+#: squeezeview.cpp:1722 squeezeview.cpp:1803
+msgid "Status"
+msgstr "Stato"
+
+#: squeezeview.cpp:1723
+msgid "Tr. Id"
+msgstr "Tr. Id"
+
+#: squeezeview.cpp:1724
+msgid "Notes"
+msgstr "Note"
+
+#: squeezeview.cpp:1725
+msgid "Payment"
+msgstr "Pagamento"
+
+#: squeezeview.cpp:1726
+msgid "Payment Complete"
+msgstr "Pagmento totale"
+
+#: squeezeview.cpp:1799
+#, fuzzy
+msgid "Reservation"
+msgstr "Prenotazione"
+
+#: squeezeview.cpp:1800
+#, fuzzy
+msgid "Tr. #"
+msgstr "Tr. #"
+
+#: squeezeview.cpp:1804
+#, fuzzy
+msgid "Prepayment"
+msgstr "Pagamento anticipato"
+
+#: squeezeview.cpp:1805
+#, fuzzy
+msgid "Total"
+msgstr "Totale"
+
+#: squeezeview.cpp:1868
+msgid "Settings changed"
+msgstr "Configurazione modificata"
+
+#: squeezeview.cpp:2255 squeezeview.cpp:2542
+msgid "Purchase #%4 - %1 x %2 (%3)"
+msgstr "Acquisto #%4 - %1 x %2 (%3)"
+
+#: squeezeview.cpp:2263
+msgid "Purchase #%4 - [new] - %1 x %2 (%3)"
+msgstr "Acquisto #%4 - [new] - %1 x %2 (%3)"
+
+#: squeezeview.cpp:2315
+msgid ""
+"The desired product is a group and its stock cannot be modified, try "
+"modifying each of its contents."
+msgstr ""
+"Il prodotto selezioneato  un gruppo e la sua giacenza non pu esere "
+"modificataProvare a modificare le giacenze dei singoli prodotti."
+
+#: squeezeview.cpp:2315
+msgid "Cannot modify stock"
+msgstr "Giacenza non modificabile"
+
+#: squeezeview.cpp:2333
+#, fuzzy
+msgid "Stock Correction: [Product %1] from %2 to %3. Reason:%4"
+msgstr "Correzione Giacenza: [%1] da %2 a %3 Motivazione : %4"
+
+#: squeezeview.cpp:2561
+msgid "New Weight or Measure"
+msgstr "Nuova unit di misura"
+
+#: squeezeview.cpp:2561
+msgid "Enter the new weight or measure to insert:"
+msgstr "Inserire la nuova unit di misura da aggiungere:"
+
+#: squeezeview.cpp:2578
+msgid "New category"
+msgstr "Nuova categoria"
+
+#: squeezeview.cpp:2578
+msgid "Enter the new category to insert:"
+msgstr "Inserire la nuova categoria da aggiungere"
+
+#: squeezeview.cpp:2632
+#, fuzzy
+msgid "Please select a donor to delete, then press the delete button again."
+msgstr ""
+"Selezionare il fornitore da eliminare, quindi premere nuovamente Elimina"
+
+#: squeezeview.cpp:2632 squeezeview.cpp:2652 squeezeview.cpp:2688
+#: squeezeview.cpp:2708 squeezeview.cpp:2719 squeezeview.cpp:2742
+#: squeezeview.cpp:2754 squeezeview.cpp:2787 squeezeview.cpp:2815
+#: squeezeview.cpp:2835 squeezeview.cpp:2847 squeezeview.cpp:2868
+#: squeezeview.cpp:3895 squeezeview.cpp:3914
+msgid "Cannot delete"
+msgstr "Impossibile eliminre"
+
+#: squeezeview.cpp:2638
+#, fuzzy
+msgid "Do you really want to delete the donor named %1?"
+msgstr "Confermare l'eliminazione del donatore selezionato %1?"
+
+#: squeezeview.cpp:2639 squeezeview.cpp:2695 squeezeview.cpp:2728
+#: squeezeview.cpp:2759 squeezeview.cpp:2791 squeezeview.cpp:2824
+#: squeezeview.cpp:2856 squeezeview.cpp:3904
+msgid "Delete"
+msgstr "Elimina"
+
+#: squeezeview.cpp:2652
+#, fuzzy
+msgid "Default donor cannot be deleted."
+msgstr "Il donatore principale non pu essere eliminato"
+
+#: squeezeview.cpp:2688
+msgid "Please select a client to delete, then press the delete button again."
+msgstr ""
+"Selezionare Il cliente da eliminare, quindi premere nuovamente \"Elimina\""
+
+#: squeezeview.cpp:2694
+msgid "Do you really want to delete the client named %1?"
+msgstr "Confermare l'eliminazione del cliente selezionato %1?"
+
+#: squeezeview.cpp:2708
+msgid "Default client cannot be deleted."
+msgstr "Il cliente principale non pu essere eliminato"
+
+#: squeezeview.cpp:2719
+msgid "Please select a user to delete, then press the delete button again."
+msgstr ""
+"Selezionare l'utente da eliminare, quindi premere nuovamente \"Elimina\""
+
+#: squeezeview.cpp:2727
+msgid "Do you really want to delete the user named %1?"
+msgstr "Confermare l'eliminazione del cliente selezionato %1?"
+
+#: squeezeview.cpp:2742
+msgid "Admin user cannot be deleted."
+msgstr "Impossibile eliminare l'utente amministratore."
+
+#: squeezeview.cpp:2754
+msgid "Please select an offer to delete, then press the delete button again."
+msgstr ""
+"Selezionare l'offera da eliminare, quindi premere nuovamente \"Elimina\""
+
+#: squeezeview.cpp:2758
+msgid "Do you really want to delete the selected discount?"
+msgstr "Confermare l'eliminazione dello sconto selezionato?"
+
+#: squeezeview.cpp:2787
+msgid "Please select a product to delete, then press the delete button."
+msgstr ""
+"Selezionare l'offera da eliminare, quindi premere nuovamente \"Elimina\""
+
+#: squeezeview.cpp:2790
+msgid "Do you really want to delete the selected product?"
+msgstr "Confermare l'eliminazione del prodotto selezionato?"
+
+#: squeezeview.cpp:2815 squeezeview.cpp:3895
+msgid "Please select a row to delete, then press the delete button again."
+msgstr ""
+"Selezionare le righe da eliminare, quindi premere nuovamente \"Elimina\""
+
+#: squeezeview.cpp:2823
+msgid "Do you really want to delete the measure '%1'?"
+msgstr "Confermare l'eliminazione dell'unit di misura selezionata '%1'?"
+
+#: squeezeview.cpp:2835
+msgid "Default measure cannot be deleted."
+msgstr "L'unit di misura principale non pu essere eliminata"
+
+#: squeezeview.cpp:2847
+msgid "Please select a category to delete, then press the delete button again."
+msgstr ""
+"Selezionare la categoria da eliminare, quindi premere nuovamente \"Elimina\""
+
+#: squeezeview.cpp:2855
+msgid "Do you really want to delete the category '%1'?"
+msgstr "Confermare l'eliminazione della categoria selezionata '%1'?"
+
+#: squeezeview.cpp:2868
+msgid "Default category cannot be deleted."
+msgstr "La categoria principale non pu essere eliminata"
+
+#: squeezeview.cpp:2901 squeezeview.cpp:3650
+msgid "Reason"
+msgstr "Motivazione"
+
+#: squeezeview.cpp:2903
+msgid "Terminal Num."
+msgstr "Terminale N"
+
+#: squeezeview.cpp:2946
+msgid "Save As"
+msgstr "Salva con nome"
+
+#: squeezeview.cpp:2946
+msgid "CSV files (*.csv)"
+msgstr "File CSV (*.csv)"
+
+#: squeezeview.cpp:2960
+msgid "Exporting data..."
+msgstr "Esportazine dati"
+
+#: squeezeview.cpp:2960
+msgid "Abort"
+msgstr "Annullare"
+
+#: squeezeview.cpp:3030 squeezeview.cpp:3162
+msgid "End of day report"
+msgstr "Report di fine giornata"
+
+#: squeezeview.cpp:3033 squeezeview.cpp:3275
+msgid "All Terminals"
+msgstr "Tutti i terminali"
+
+#: squeezeview.cpp:3038 squeezeview.cpp:3170 squeezeview.cpp:3639
+msgid "Method"
+msgstr "Metodo"
+
+#: squeezeview.cpp:3039
+msgid "Total taxes collected today: "
+msgstr "Saldo giornaliero tasse: "
+
+#: squeezeview.cpp:3071 squeezeview.cpp:3203 squeezeview.cpp:3312
+#, fuzzy
+msgid "Total Sales : %1"
+msgstr "Totale vendite: %1"
+
+#: squeezeview.cpp:3072 squeezeview.cpp:3204 squeezeview.cpp:3313
+msgid "Total Profit: %1"
+msgstr "Utile totale: %1"
+
+#: squeezeview.cpp:3089 squeezeview.cpp:3115 squeezeview.cpp:3221
+#: squeezeview.cpp:3247
+msgid "Print end of day report"
+msgstr "Stampa il riepilogo di fien giornata"
+
+#: squeezeview.cpp:3129
+msgid ""
+"Enter the Terminal number for the end of day, then press <ENTER> to accept, "
+"<ESC> to cancel"
+msgstr ""
+"Inserire il n del terminale di cui stampare il riepilogo di fine gionrata, "
+"quindi premere <ENTER> per confermare, <ESC> per annullare"
+
+#: squeezeview.cpp:3151
+msgid "No transactions to print!"
+msgstr "Non sono presenti transazioni da stampare"
+
+#: squeezeview.cpp:3152
+msgid "No transactions for  terminal #%1 for today."
+msgstr "Non sono presenti transazioni odierne per il terminale #%1"
+
+#: squeezeview.cpp:3165
+msgid "terminal # %1 "
+msgstr "terminale # %1"
+
+#: squeezeview.cpp:3171
+msgid "Total taxes collected for this terminal: "
+msgstr "Saldo tasse per questo terminale: "
+
+#: squeezeview.cpp:3272
+msgid "End of Month report"
+msgstr "Riepilogo di fine mese"
+
+#: squeezeview.cpp:3281
+msgid "Total taxes collected for the month: "
+msgstr "Saldo mensile tasse"
+
+#: squeezeview.cpp:3330 squeezeview.cpp:3356
+msgid "Print end of Month report"
+msgstr "Stampa riepilogo fine mese"
+
+#: squeezeview.cpp:3378
+msgid "Low Stock Products (< %1)"
+msgstr "Prodotto gicenza inferiore (< %1)"
+
+#: squeezeview.cpp:3382 squeezeview.cpp:3463
+msgid "Stock Qty."
+msgstr "Giacenza"
+
+#: squeezeview.cpp:3383 squeezeview.cpp:3464
+msgid "Sold"
+msgstr "Venduto"
+
+#: squeezeview.cpp:3384 squeezeview.cpp:3465 squeezeview.cpp:3544
+msgid "Units"
+msgstr "Unit"
+
+#: squeezeview.cpp:3411 squeezeview.cpp:3437 squeezeview.cpp:3492
+#: squeezeview.cpp:3518
+msgid "Print Low Stock Report"
+msgstr "Stmapa sottoscorta"
+
+#: squeezeview.cpp:3459
+msgid "Product Stock (excluding groups)"
+msgstr "Gicenza prodotto (esclusi i gruppi)"
+
+#: squeezeview.cpp:3572 squeezeview.cpp:3598
+msgid "Print Sold Out Products"
+msgstr "Stampa prodotti giacenza 0"
+
+#: squeezeview.cpp:3616
+msgid "Please select a balance to print, then press the print button again."
+msgstr "Selezionare il bilancio da stampare, quindi premere Stampa"
+
+#: squeezeview.cpp:3616
+msgid "Cannot print"
+msgstr "Stampa non dispobile"
+
+#: squeezeview.cpp:3625
+msgid "Balance Id:%1"
+msgstr "Saldo ID : %1"
+
+#: squeezeview.cpp:3629 squeezeview.cpp:3656
+msgid "%1 at Terminal # %2"
+msgstr "%1 al terminale # %2"
+
+#: squeezeview.cpp:3630
+msgid "Deposit"
+msgstr "Deposito"
+
+#: squeezeview.cpp:3633 squeezeview.cpp:3668
+msgid "In Drawer"
+msgstr "Cassa entrate"
+
+#: squeezeview.cpp:3634 squeezeview.cpp:3670
+msgid "Transactions Details"
+msgstr "Dettagli transazione"
+
+#: squeezeview.cpp:3638 squeezeview.cpp:3672
+msgid "Paid"
+msgstr "Pagato"
+
+#: squeezeview.cpp:3640
+msgid "Start: %1"
+msgstr "Inizio: %1"
+
+#: squeezeview.cpp:3641
+msgid "End  : %1"
+msgstr "Fine : %1"
+
+#: squeezeview.cpp:3648
+msgid "Cash flow Details"
+msgstr "Dettagli flusso di cassa"
+
+#: squeezeview.cpp:3660
+msgid "Initial Amount deposited:"
+msgstr "Importo iniziale depositato"
+
+#: squeezeview.cpp:3748
+msgid "Print Balance"
+msgstr "Stampa saldo"
+
+#: squeezeview.cpp:3790
+msgid "Events Log"
+msgstr "Log eventi"
+
+#: squeezeview.cpp:3809
+msgid "User"
+msgstr "Utenti"
+
+#: squeezeview.cpp:3812
+msgid "Event"
+msgstr "Evento"
+
+#: squeezeview.cpp:3842
+msgid "Message"
+msgstr "Messaggio"
+
+#: squeezeview.cpp:3843
+msgid "Month"
+msgstr "Mese"
+
+#: squeezeview.cpp:3860
+msgid "Enter the new ticket message."
+msgstr "Inserire nuovo messagio scontrino"
+
+#: squeezeview.cpp:3876
+#, fuzzy
+msgid "Enter the new currency"
+msgstr "Inserire nuova valuta"
+
+#: squeezeview.cpp:3903
+#, fuzzy
+msgid "Do you really want to delete the currency '%1'?"
+msgstr "Confermare l'eliminazione della valuta '%1'?"
+
+#: squeezeview.cpp:3914
+#, fuzzy
+msgid "Default currencies cannot be deleted."
+msgstr "Impossibile eliminare la valuta corrente"
+
+#: usereditor.cpp:41
+msgid "User Editor"
+msgstr "Editor Utenti"
+
+#: ../../src/productdelegate.cpp:124
+msgid " Out of stock "
+msgstr "Giacenza mancante"
+
+#: ../../src/productdelegate.cpp:154
+msgid " Raw Product "
+msgstr "Riga prodotto"
+
+#: ../../src/productdelegate.cpp:167
+msgid " Group "
+msgstr "Gruppo"
+
+#: ../../src/loginwindow.cpp:64
+msgid "&Quit"
+msgstr "&Usicta"
+
+#: ../../src/loginwindow.cpp:65
+msgid "&Ok"
+msgstr "&Ok"
+
+#: ../../src/loginwindow.cpp:171
+msgid "Username:"
+msgstr "Nome utente:"
+
+#: ../../src/loginwindow.cpp:172
+msgid "Password:"
+msgstr "Password:"
+
+#: ../../src/loginwindow.cpp:307
+msgid "Invalid username or password"
+msgstr "Nopme utente o password errate"
+
+#: ../../src/inputdialog.cpp:68
+msgid "Product Code:"
+msgstr "Codice prodotto:"
+
+#: ../../src/inputdialog.cpp:80
+msgid "Month or Season:"
+msgstr "Mese o stagione"
+
+#: ../../src/inputdialog.cpp:81
+msgid "New Stock Qty:"
+msgstr "Nuova giacenza:"
+
+#: ../../src/inputdialog.cpp:82
+msgid "New currency factor:"
+msgstr "Nuovo Cambio valuta"
+
+#: ../../src/inputdialog.cpp:83
+msgid "Amount:"
+msgstr "Importo:"
+
+#: ../../src/inputdialog.cpp:85
+msgid "New Message:"
+msgstr "Nuovo messaggio"
+
+#: ../../src/inputdialog.cpp:86
+#, fuzzy
+msgid "New Currency Name:"
+msgstr "Nuovo nome valuta"
+
+#: ../../src/inputdialog.cpp:87
+msgid "Reason:"
+msgstr "Motivazione:"
+
+#: ../../src/inputdialog.cpp:89
+msgid "Ticket #:"
+msgstr "Scontrino #"
+
+#: ../../src/inputdialog.cpp:102
+msgid "valid amount between %1 and %2"
+msgstr "Importo valido tra %1 e %2"
+
+#: ../../src/inputdialog.cpp:109
+msgid "Enter the product code here..."
+msgstr "Inserire qui il codice prodotto..."
+
+#: ../../src/inputdialog.cpp:110
+msgid "Enter the new stock quantity here..."
+msgstr "Inserire qui la nuova giacenza..."
+
+#: ../../src/inputdialog.cpp:117
+msgid "Terminal Number:"
+msgstr "Numero terminale:"
+
+#: ../../src/inputdialog.cpp:118
+msgid "Enter the terminal number here..."
+msgstr "Inserire qui il numero terminale..."
+
+#: ../../src/inputdialog.cpp:125
+msgid "Enter the number of the month or season here..."
+msgstr "Inserire qui il mese o la stagione..."
+
+#: ../../src/inputdialog.cpp:130
+#, fuzzy
+msgid "Enter the new currency name..."
+msgstr "Inserie il nuovo nome valuta..."
+
+#: ../../src/inputdialog.cpp:131
+#, fuzzy
+msgid "Enter the new currency factor..."
+msgstr "Inserire nuovo cambio valuta..."
+
+#: ../../src/inputdialog.cpp:172
+msgid "Ok"
+msgstr "Ok"
+
+#: ../../src/inputdialog.cpp:175
+msgid "Cancel"
+msgstr "Annullare"
