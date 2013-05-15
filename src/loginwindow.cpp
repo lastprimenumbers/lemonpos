@@ -152,8 +152,8 @@ LoginWindow::LoginWindow(QWidget *parent,
       QTimer::singleShot(3000, this, SLOT(showAdminPhoto()));
       resize(348,215); //Size of the login background...
       path = KStandardDirs::locate("appdata", "styles/");
-      pixm = QPixmap(path + Settings::styleName() + "/passwordBackground_wide.png");
-      //qDebug()<<"password image path:"<<path + Settings::styleName();
+      pixm = QPixmap(path + Settings::styleName() + "/Schermata.png");
+      qDebug()<<"password image path:"<<path + Settings::styleName();
       setMask( pixm.mask() );
       //FIXME:Why at widescreen 1280x800, the dialogs moves to 0,0 ? -- only with compiz
       break;
@@ -207,7 +207,8 @@ void LoginWindow::paintEvent(QPaintEvent* event){
   int indxe = styleSheet.indexOf(")", indxs);
   /*indxe = indxe-1;*/ indxs = indxs+1;
   bgName = styleSheet.mid(indxs,indxe-indxs);
-  //qDebug()<<" index start:"<<indxs<<" index end:"<<indxe<<" string:"<<bgName<< " OMG: How many times this is updated! (painted)...";
+  bgName="Schermata.png";
+  qDebug()<<" index start:"<<indxs<<" index end:"<<indxe<<" string:"<<bgName<< " OMG: How many times this is updated! (painted)...";
   
 
   switch (currentMode)
@@ -218,7 +219,7 @@ void LoginWindow::paintEvent(QPaintEvent* event){
       bg = QPixmap(path + Settings::styleName() + "/" + bgName);
       break;
     case LoginWindow::PasswordOnly:
-      bg = QPixmap(path + Settings::styleName() + "/passwordBackground_wide.png");
+      bg = QPixmap(path + Settings::styleName() + "/Schermata.png");
       break;
     default:
       break;

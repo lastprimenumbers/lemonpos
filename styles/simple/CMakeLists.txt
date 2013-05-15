@@ -10,4 +10,5 @@ install( FILES
          priceCheckerBack.png
          dialog.png
          simple.qss
+         Schermata.png
         DESTINATION  ${DATA_INSTALL_DIR}/lemon/styles/simple/ )

@@ -22,4 +22,5 @@ install( FILES
         tira.png
         dialog.png
         elegant.qss
+        Schermata.png
         DESTINATION  ${DATA_INSTALL_DIR}/lemon/styles/elegant/ )
