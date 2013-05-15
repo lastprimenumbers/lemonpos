@@ -129,7 +129,7 @@
     </entry>
     <entry name="styleName" type="String">
       <label>Get Stylesheet Name</label>
-      <default>1</default>
+      <default>portobello</default>
     </entry>
   </group>
   <group name="security">
