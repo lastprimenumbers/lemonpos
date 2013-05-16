@@ -21,6 +21,9 @@ public:
     ~limiteditor();
     QSqlDatabase db;
     void setDb(QSqlDatabase pippo);
+
+
+private slots:
     void addLimit();
     
 private:

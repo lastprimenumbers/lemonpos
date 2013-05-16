@@ -1957,13 +1957,13 @@ void Azahar::getClientLimits(ClientInfo &info)
 
 bool Azahar::insertLimit(Limit &lim)
 {
+    qDebug()<<"inserting limit:"<<lim.clientId<<lim.clientTag<<lim.productCat<<lim.productCode<<lim.limit<<lim.priority;
+    if (!db.isOpen()) db.open();
+    if (!db.isOpen()) {
+        return false;
+    }
     return true;
-//    if (!db.isOpen()) db.open();
-//    if (!db.isOpen()) {
-//        return false;
-//    }
 //    QSqlQuery query(db);
-//    qDebug()<<"ADDING LIMIT";
 //    query.prepare("INSERT INTO limits () VALUES (:idclient, :tag);");
 //    query.bindValue(":idclient",info.id);
 //    query.bindValue(":tag",info.tags.at(i));

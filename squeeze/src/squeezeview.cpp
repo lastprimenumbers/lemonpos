@@ -1340,10 +1340,9 @@ void squeezeView::setupLimitsModel()
   qDebug()<<"Setting up Limits Model";
   if (db.isOpen()) {
     limitsModel->setTable("limits");
-    //PROBLEMA: E se non sono definite?
-    limitsModel->setRelation(2, QSqlRelation("tags", "tag", "tag"));
+//    limitsModel->setRelation(3, QSqlRelation("tags", "tag", "tag"));
     limitsModel->setRelation(3, QSqlRelation("products", "code", "name"));
-    limitsModel->setRelation(4, QSqlRelation("categories", "catid", "text"));
+//    limitsModel->setRelation(5, QSqlRelation("categories", "catid", "text"));
 
     ui_mainview.limitsView->setModel(limitsModel);
     ui_mainview.limitsView->setColumnHidden(0,true);
