@@ -314,8 +314,8 @@ msgid "Continue"
 msgstr "Continua"
 
 #: lemonview.cpp:158
-msgid "Welcome to Lemon"
-msgstr "Benvenuto su Portobello"
+msgid "Welcome to PortobelloPos"
+msgstr "Benvenuto su PortobelloPos"
 
 #: lemonview.cpp:159
 msgid "Enter username and password to start using the system."
@@ -1072,7 +1072,7 @@ msgstr "Ulteriore Storia Credito"
 
 #: loginwindow.cpp:64
 msgid "&Quit"
-msgstr "&Abbandonare"
+msgstr "&Esci"
 
 #: loginwindow.cpp:65
 msgid "&Ok"

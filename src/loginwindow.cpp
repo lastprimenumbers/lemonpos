@@ -128,7 +128,7 @@ LoginWindow::LoginWindow(QWidget *parent,
   labelPrompt->setObjectName("labelPrompt");
   labelError->setObjectName("labelError");
 
-  QRect geom = geometry();
+//  QRect geom = geometry();
   //qDebug()<<"Geometry:"<<geom;
   QString str("admin");
   QString path; QPixmap pixm;
@@ -136,25 +136,26 @@ LoginWindow::LoginWindow(QWidget *parent,
   switch (mode)
   {
     case LoginWindow::FullScreen:
-      setWindowState(Qt::WindowFullScreen);
+//    setWindowState(Qt::WindowFullScreen);
       setObjectName("loginDialog");
-      mainImage->setPixmap(DesktopIcon("lemon-user", 128));
+//    mainImage->setPixmap(DesktopIcon("lemon-user", 128));
       imageError->setPixmap(DesktopIcon("dialog-cancel", 48));
-      setGeometry(QApplication::desktop()->screenGeometry(this));
+//    setGeometry(QApplication::desktop()->screenGeometry(this));
+      resize(520,394);
       break;
     case LoginWindow::PasswordOnly:
       setObjectName("passwordDialog");
       //labelUsername->hide();
       //editUsername->hide();
       editPassword->setMaximumSize(QSize(120, 28));
-      mainImage->setPixmap(DesktopIcon("lemon-user", 128));
+//      mainImage->setPixmap(DesktopIcon("lemon-user", 128));
       imageError->setPixmap(DesktopIcon("dialog-cancel", 22));
       QTimer::singleShot(3000, this, SLOT(showAdminPhoto()));
-      resize(348,215); //Size of the login background...
+      resize(200,100); //Size of the login background...
       path = KStandardDirs::locate("appdata", "styles/");
-      pixm = QPixmap(path + Settings::styleName() + "/Schermata.png");
+      pixm = QPixmap(path + Settings::styleName() + "/login2Portobello.png");
       qDebug()<<"password image path:"<<path + Settings::styleName();
-      setMask( pixm.mask() );
+//      setMask( pixm.mask() );
       //FIXME:Why at widescreen 1280x800, the dialogs moves to 0,0 ? -- only with compiz
       break;
     default:
@@ -207,7 +208,7 @@ void LoginWindow::paintEvent(QPaintEvent* event){
   int indxe = styleSheet.indexOf(")", indxs);
   /*indxe = indxe-1;*/ indxs = indxs+1;
   bgName = styleSheet.mid(indxs,indxe-indxs);
-  bgName="Schermata.png";
+  bgName="loginPortobello.png";
   qDebug()<<" index start:"<<indxs<<" index end:"<<indxe<<" string:"<<bgName<< " OMG: How many times this is updated! (painted)...";
   
 
@@ -219,7 +220,7 @@ void LoginWindow::paintEvent(QPaintEvent* event){
       bg = QPixmap(path + Settings::styleName() + "/" + bgName);
       break;
     case LoginWindow::PasswordOnly:
-      bg = QPixmap(path + Settings::styleName() + "/Schermata.png");
+      bg = QPixmap(path + Settings::styleName() + "/login2Portobello.png");
       break;
     default:
       break;
@@ -350,7 +351,7 @@ void LoginWindow::updateUserPhoto(const QString &text)
   }
   else {
     //Repaint image if it is the same??? how to know it is the same?
-    mainImage->setPixmap(DesktopIcon("lemon-user", 128));
+//    mainImage->setPixmap(DesktopIcon("lemon-user", 128));
   }
   mainImage->setAlignment(Qt::AlignCenter);
 }

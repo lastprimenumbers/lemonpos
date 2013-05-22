@@ -23,4 +23,6 @@ install( FILES
         dialog.png
         elegant.qss
         Schermata.png
+	loginPortobello.png
+        login2Portobello.png
         DESTINATION  ${DATA_INSTALL_DIR}/lemon/styles/portobello/ )
