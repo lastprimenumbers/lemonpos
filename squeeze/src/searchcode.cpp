@@ -75,6 +75,7 @@ void SearchCode::setCustomLayout(int direction) {
 
 
 void SearchCode::setDb(QSqlDatabase parentDb, QString targetTable){
+    // supported targetTables: clients, products, donors
     db=parentDb;
     table=targetTable;
     BasicInfo info;
@@ -92,7 +93,6 @@ void SearchCode::setDb(QSqlDatabase parentDb, QString targetTable){
     }
     delete myDb;
 }
-
 // External function to set the initial name
 bool SearchCode::setName(QString name) {
     int idx = ui->comboName->findText(name,Qt::MatchCaseSensitive);
@@ -162,8 +162,40 @@ bool SearchCode::validate(){
         return true;
     }
     return false;
-
 }
 
+bool SearchCode::getInfo(BasicInfo &info){
+    int id;
+    id=getId();
+    info=entries[id];
+    return true;
+}
+
+bool SearchCode::getInfo(ClientInfo &info){
+    Azahar *myDb = new Azahar;
+    myDb->setDatabase(db);
+    info = myDb->getClientInfo(getCode());
+    delete myDb;
+    if (info.id==0) return false;
+    return true;
+}
+
+bool SearchCode::getInfo(DonorInfo &info){
+    Azahar *myDb = new Azahar;
+    myDb->setDatabase(db);
+    info = myDb->getDonorInfo(getCode());
+    delete myDb;
+    if (info.id==0) return false;
+    return true;
+}
+
+bool SearchCode::getInfo(ProductInfo &info){
+    Azahar *myDb = new Azahar;
+    myDb->setDatabase(db);
+    info = myDb->getProductInfo(getCode());
+    delete myDb;
+    if (info.code=="0") return false;
+    return true;
+}
 
 #include "searchcode.moc"

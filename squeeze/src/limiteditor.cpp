@@ -9,6 +9,7 @@ limiteditor::limiteditor(QWidget *parent) :
     ui(new Ui::limit_editor)
 {
     ui->setupUi(this);
+    connect( this   , SIGNAL( accepted() ), this, SLOT( addLimit() ) );
 }
 
 void limiteditor::setDb(QSqlDatabase parentDb)
@@ -37,10 +38,8 @@ void limiteditor::setDb(QSqlDatabase parentDb)
 void limiteditor::addLimit()
 
 {
-    Limit lim;
-    Azahar *myDb = new Azahar;
-    myDb->setDatabase(db);
     // An empty limit
+    Limit lim;
     lim.clientId=0;
     lim.clientTag=QString("*");
     lim.productCat=-1;
@@ -48,6 +47,9 @@ void limiteditor::addLimit()
     lim.parent=-1;
     lim.limit=-1;
     lim.current=0;
+    lim.priority=0;
+    Azahar *myDb = new Azahar;
+    myDb->setDatabase(db);    
 
 // CLIENT SELECTION
     // All clients
@@ -57,7 +59,7 @@ void limiteditor::addLimit()
     // A single, specific client
     }else if (ui->radioSingleClient->isChecked()) {
         ClientInfo info;
-        info = myDb->getClientInfo(ui->codeClient->getCode());
+        ui->codeClient->getInfo(info);
         lim.clientId = info.id;
     // All clients having a tag
     }else if (ui->radioTagClient->isChecked()) {
@@ -67,7 +69,7 @@ void limiteditor::addLimit()
             return;
             }
     // For the moment keep just the first tag. Should be generalized.
-        lim.clientTag = tags.at (0);
+        lim.clientTag = tags.at(0);
     }
 
 // PRODUCT SELECTION
@@ -83,7 +85,10 @@ void limiteditor::addLimit()
 
     // The limit threshold
     lim.limit = ui->inputLimit->value();
+    lim.priority = ui->inputPriority->value();
+    // Must check feasibility?
     myDb->insertLimit(lim);
+    delete myDb;
 }
 
 limiteditor::~limiteditor()

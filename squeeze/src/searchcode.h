@@ -53,7 +53,11 @@ public:
     qulonglong getId();
     void setDb(QSqlDatabase db, QString targetTable);
 
-
+    // Overloaded function calls for filling specific info structs
+    bool getInfo(ClientInfo &info);
+    bool getInfo(ProductInfo &info);
+    bool getInfo(BasicInfo &info);
+    bool getInfo(DonorInfo &info);
 
 private:
     SearchCodeUI *ui;
