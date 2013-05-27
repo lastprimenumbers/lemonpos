@@ -225,10 +225,6 @@ public:
    /**
      * Slot used to increment qty on doubleclick on an item
     */
-    void deleteSelectedItem2();
-   /**
-     * Slot used to increment qty on doubleclick on an item
-    */
     void itemDoubleClicked(QTableWidgetItem* item);
    /**
      * Slot used to add clicked item to shopping list...
