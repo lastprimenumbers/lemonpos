@@ -699,6 +699,7 @@ void lemonView::switchColor()
   else{
     ui_mainview.labelItem->setStyleSheet("background:none");
     ui_mainview.deleteItem->setStyleSheet("background:none");}
+  ui_mainview.editItemCode->setFocus();
 }
 
 
@@ -1472,6 +1473,13 @@ if ( doNotAddMoreItems ) { //only for reservations
   if (productsHash.contains( info.code )) 
       info = productsHash.value( info.code );
 
+  //   TODO: finire rimozione prodotti con pistola
+    if (ui_mainview.deleteItem->isChecked()) {
+        ui_mainview.tableWidget->setCurrentCell(info.row,1);
+        qDebug()<<"pippo"<<info.row;
+        deleteSelectedItem();
+        return;
+  }
   QString msg;
 
   //verify item units and qty..
@@ -1640,12 +1648,6 @@ void lemonView::updateItem(ProductInfo prod)
 
 int lemonView::doInsertItem(QString itemCode, QString itemDesc, double itemQty, double itemPrice, double itemDiscount, QString itemUnits)
 {
-//    TODO: finire rimozione prodotti con pistola
-//    if (ui_mainview.deleteItem->isChecked()) {
-//        ProductInfo pi;
-//        pi=productsHash.value(itemCode);
-//        ui_mainview.tableWidget->setCurrentCell(pi.row,0);
-//    }
 
   int rowCount = ui_mainview.tableWidget->rowCount();
   ui_mainview.tableWidget->insertRow(rowCount);
