@@ -699,6 +699,7 @@ void lemonView::switchColor()
   else{
     ui_mainview.labelItem->setStyleSheet("background:none");
     ui_mainview.deleteItem->setStyleSheet("background:none");}
+  ui_mainview.editItemCode->setFocus();
 }
 
 
@@ -1472,6 +1473,13 @@ if ( doNotAddMoreItems ) { //only for reservations
   if (productsHash.contains( info.code )) 
       info = productsHash.value( info.code );
 
+  //   TODO: finire rimozione prodotti con pistola
+    if (ui_mainview.deleteItem->isChecked()) {
+        ui_mainview.tableWidget->setCurrentCell(info.row,1);
+        qDebug()<<"pippo"<<info.row;
+        deleteSelectedItem();
+        return;
+  }
   QString msg;
 
   //verify item units and qty..
@@ -1640,12 +1648,6 @@ void lemonView::updateItem(ProductInfo prod)
 
 int lemonView::doInsertItem(QString itemCode, QString itemDesc, double itemQty, double itemPrice, double itemDiscount, QString itemUnits)
 {
-//    TODO: finire rimozione prodotti con pistola
-//    if (ui_mainview.deleteItem->isChecked()) {
-//        ProductInfo pi;
-//        pi=productsHash.value(itemCode);
-//        ui_mainview.tableWidget->setCurrentCell(pi.row,0);
-//    }
 
   int rowCount = ui_mainview.tableWidget->rowCount();
   ui_mainview.tableWidget->insertRow(rowCount);
@@ -1823,6 +1825,146 @@ void lemonView::deleteSelectedItem()
   if (ui_mainview.tableWidget->rowCount() == 0) ui_mainview.comboClients->setEnabled(true);
   refreshTotalLabel();
 }
+
+void lemonView::deleteSelectedItem2()
+
+//    TODO: finire rimozione prodotti con pistola
+//    if (ui_mainview.deleteItem->isChecked()) {
+//        ProductInfo pi;
+//        pi=productsHash.value(itemCode);
+//        ui_mainview.tableWidget->setCurrentCell(pi.row,0);
+//    }
+{
+  if (startingReservation || finishingReservation) {
+      KNotification *notify = new KNotification("information", this);
+      notify->setText(i18n("Cannot delete items from a reservation."));
+      QPixmap pixmap = DesktopIcon("dialog-information",32);
+      notify->setPixmap(pixmap);
+      notify->sendEvent();
+      return;
+  }
+
+
+  bool continueIt=false;
+  bool reinsert = false;
+  double qty=0;
+
+  if (ui_mainview.deleteItem->isChecked()) {
+      if ( !ui_mainview.editItemCode->text().isEmpty()){
+
+          QList<QTableWidgetItem *> item = ui_mainview.tableWidget->findItems(ui_mainview.editItemCode->text(), Qt::MatchExactly);
+          int row;
+          row = ui_mainview.tableWidget->currentRow();
+          continueIt=true; //if no low security
+
+    if (continueIt) {
+      int row = ui_mainview.tableWidget->currentRow();
+      QTableWidgetItem *item = ui_mainview.tableWidget->item(row, colCode);
+      QString codeStr = item->data(Qt::DisplayRole).toString();
+
+      if ( codeStr.toULongLong() == 0 ) {
+        //its not a product, its a s.o.
+        codeStr.remove(0,3); //remove the "so." string
+        qulonglong id = codeStr.toULongLong();
+        if (specialOrders.contains(id)) {
+          SpecialOrderInfo info = specialOrders.take(id);
+          //check if is completing the order
+          if (info.status == stReady) { //yes, its completing the order, but wants to cancel the action.
+            //remove from listview
+            ui_mainview.tableWidget->removeRow(row);
+            ui_mainview.editItemCode->setFocus();
+            if (ui_mainview.tableWidget->rowCount() == 0) ui_mainview.comboClients->setEnabled(true);
+            refreshTotalLabel();
+            qDebug()<<" Removing a SO when completing the Order";
+            return;
+          }
+          if ( info.qty == 1 ) {
+            Azahar *myDb = new Azahar;
+            myDb->setDatabase(db);
+            myDb->deleteSpecialOrder(id);
+            //remove from listview
+            ui_mainview.tableWidget->removeRow(row);
+            QString authBy = dlgPassword->username();
+            if (authBy.isEmpty()) authBy = myDb->getUserName(1); //default admin.
+            log(loggedUserId, QDate::currentDate(), QTime::currentTime(), i18n("Removing an Special Item from shopping list. Authorized by %1",authBy));
+            if (ui_mainview.tableWidget->rowCount() == 0) ui_mainview.comboClients->setEnabled(true);
+            ui_mainview.editItemCode->setFocus();
+            refreshTotalLabel();
+            delete myDb;
+            return;
+          }
+          //more than one
+          double iqty = info.qty-1;
+          info.qty = iqty;
+          double newdiscount = info.disc * info.payment * iqty;
+
+          item = ui_mainview.tableWidget->item(row, colQty);
+          item->setData(Qt::EditRole, QVariant(iqty));
+          item = ui_mainview.tableWidget->item(row, colDue);
+          item->setData(Qt::EditRole, QVariant((iqty*info.payment)-newdiscount));
+          item = ui_mainview.tableWidget->item(row, colDisc);
+          item->setData(Qt::EditRole, QVariant(newdiscount));
+
+          //reinsert to the hash
+          specialOrders.insert(info.orderid,info);
+        }
+        if (ui_mainview.tableWidget->rowCount() == 0) ui_mainview.comboClients->setEnabled(true);
+        ui_mainview.editItemCode->setFocus();
+        refreshTotalLabel();
+        return; //to exit the method, we dont need to continue.
+      }
+
+      QString code = item->data(Qt::DisplayRole).toString();
+      ProductInfo info = productsHash.take(code); //insert it later...
+      qty = info.qtyOnList; //this must be the same as obtaining from the table... this arrived on Dec 18 2007
+      //if the itemQty is more than 1, decrement it, if its 1, delete it
+      item = ui_mainview.tableWidget->item(row, colUnits);//get item Units in strings...
+      QString iUnitString = item->data(Qt::DisplayRole).toString();
+      item = ui_mainview.tableWidget->item(row, colQty); //get Qty
+      if ((item->data(Qt::DisplayRole).canConvert(QVariant::Double))) {
+        qty = item->data(Qt::DisplayRole).toDouble();
+       //NOTE:
+       //  Here, we are going to delete only items that are bigger than 1. and remove them one by one..
+       //  or are we goint to decrement items only sold by pieces?
+        if (qty>1 && info.units==uPiece) {
+          qty--;
+          item->setData(Qt::EditRole, QVariant(qty));
+          double price    = info.price;
+          double discountperitem = info.disc;
+          double newdiscount = discountperitem*qty;
+          item = ui_mainview.tableWidget->item(row, colDue);
+          item->setData(Qt::EditRole, QVariant((qty*price)-newdiscount));
+          item = ui_mainview.tableWidget->item(row, colDisc);
+          item->setData(Qt::EditRole, QVariant(newdiscount));
+          info.qtyOnList = qty;
+          reinsert = true;
+        }//if qty>1
+        else { //Remove from the productsHash and tableWidget...
+          //get item code
+          //int removed = productsHash.remove(code);
+          productsHash.remove(code);
+          ui_mainview.tableWidget->removeRow(row);
+          reinsert = false;
+        }//qty = 1...
+      }//if canConvert
+      if (reinsert) productsHash.insert(code, info); //we remove it with .take...
+      Azahar *myDb = new Azahar;
+      myDb->setDatabase(db);
+      QString authBy = dlgPassword->username();
+      if (authBy.isEmpty()) authBy = myDb->getUserName(1); //default admin.
+      log(loggedUserId, QDate::currentDate(), QTime::currentTime(), i18n("Removing an article from shopping list. Authorized by %1", authBy));
+      delete myDb;
+
+       qDebug()<<"** REMOVING A PRODUCT [updating balance/transaction]";
+       updateBalance(false);
+       updateTransaction();
+
+    }//continueIt
+  }//there is something to delete..
+
+  if (ui_mainview.tableWidget->rowCount() == 0) ui_mainview.comboClients->setEnabled(true);
+  refreshTotalLabel();
+}}
 
 void lemonView::itemDoubleClicked(QTableWidgetItem* item)
 {
