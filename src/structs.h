@@ -340,6 +340,12 @@ struct PrintTicketInfo {
   QString    subtotal;
   QString    resTotalAmountStr;
   QString    hdrReservation;
+  QString    thExpiry;
+  QString    thExpiryStr;
+  QString    thBalance;
+  QString    thBalanceStr;
+  QString    thMonthly;
+  QString    thMonthlyStr;
 };
 
 //TODO: add grouped products and special orders
