@@ -1616,16 +1616,16 @@ bool Azahar::_bindDonor(DonorInfo &info, QSqlQuery &query)
     query.bindValue(":id", info.id);
     query.bindValue(":photo", info.photo);
     query.bindValue(":name", info.name);
-    query.bindValue(":email", info.email);
+    query.bindValue(":email", info.emailDonor);
     query.bindValue(":code", info.code);
     query.bindValue(":address", info.address);
     query.bindValue(":phone", info.phone);
     query.bindValue(":since", info.since);
-    query.bindValue(":refname", info.refname);
-    query.bindValue(":refsurname", info.refsurname);
-    query.bindValue(":refemail", info.refemail);
-    query.bindValue(":refphone", info.refphone);
-    query.bindValue(":notes", info.notes);
+    query.bindValue(":refname", info.nameRefDonor);
+    query.bindValue(":refsurname", info.surnameRefDonor);
+    query.bindValue(":refemail", info.emailRefDonor);
+    query.bindValue(":refphone", info.phoneRefDonor);
+    query.bindValue(":notes", info.notesRefDonor);
     if (!query.exec()) setError(query.lastError().text()); else result = true;
     return result;
 }
@@ -1716,25 +1716,31 @@ bool Azahar::getDonorInfoFromQuery(QSqlQuery &qC, DonorInfo &info){
       int fieldId     = qC.record().indexOf("id");
       int fieldCode   = qC.record().indexOf("code");
       int fieldName   = qC.record().indexOf("name");
-      int fieldEmail  = qC.record().indexOf("email");
+      int fieldEmailDonor  = qC.record().indexOf("email");
       int fieldPhoto  = qC.record().indexOf("photo");
       int fieldSince  = qC.record().indexOf("since");
       int fieldPhone  = qC.record().indexOf("phone");
       int fieldAdd    = qC.record().indexOf("address");
+      int fieldNameRefDonor   = qC.record().indexOf("refname");
+      int fieldSurnameDonor   = qC.record().indexOf("refsurname");
+      int fieldPhoneDonor   = qC.record().indexOf("refphone");
+      int fieldEmailRefDonor   = qC.record().indexOf("refemail");
+      int fieldNotes   = qC.record().indexOf("notes");
+
       //Should be only one
       info.id         = qC.value(fieldId).toUInt();
       info.code       = qC.value(fieldCode).toString();
       info.name       = qC.value(fieldName).toString();
-      info.email       = qC.value(fieldEmail).toString();
+      info.emailDonor    = qC.value(qC.record().indexOf("email")).toString();
       info.photo      = qC.value(fieldPhoto).toByteArray();
       info.since      = qC.value(fieldSince).toDate();
       info.phone      = qC.value(fieldPhone).toString();
       info.address    = qC.value(fieldAdd).toString();
-      info.refname    = qC.value(qC.record().indexOf("refname")).toString();
-      info.refname    = qC.value(qC.record().indexOf("refsurname")).toString();
-      info.refname    = qC.value(qC.record().indexOf("refemail")).toString();
-      info.refname    = qC.value(qC.record().indexOf("refphone")).toString();
-      info.notes    =   qC.value(qC.record().indexOf("notes")).toString();
+      info.nameRefDonor    = qC.value(qC.record().indexOf("refname")).toString();
+      info.surnameRefDonor    = qC.value(qC.record().indexOf("refsurname")).toString();
+      info.emailRefDonor    = qC.value(qC.record().indexOf("refemail")).toString();
+      info.phoneRefDonor    = qC.value(qC.record().indexOf("refphone")).toString();
+      info.notesRefDonor    =   qC.value(qC.record().indexOf("notes")).toString();
       return true;
     }
     return false;

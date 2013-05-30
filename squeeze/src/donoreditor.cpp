@@ -56,6 +56,12 @@ DonorEditor::DonorEditor( QSqlDatabase parentDb, QWidget *parent )
     ui->editClientCode->setEmptyMessage(i18n("Enter a 6, 12, or 13 digits Bar Code."));
     ui->editClientName->setEmptyMessage(i18n("Enter client full name"));
     ui->editClientPhone->setEmptyMessage(i18n("Phone number"));
+    ui->nameRefDonor->setEmptyMessage("");
+    ui->surnameRefDonor->setEmptyMessage("");
+    ui->emailDonor->setEmptyMessage("");
+    ui->emailRefDonor->setEmptyMessage("");
+    ui->phoneRefDonor->setEmptyMessage("");
+    ui->notesRefDonor->setEmptyMessage("");
 
     //since date picker
     ui->sinceDatePicker->setDate(QDate::currentDate());
@@ -109,6 +115,13 @@ void DonorEditor::setClientInfo(DonorInfo info)
     setAddress(info.address);
     setPhone(info.phone);
     setSinceDate(info.since);
+    setEmail(info.emailDonor);
+    setNameRef(info.nameRefDonor);
+    setSurnameRef(info.surnameRefDonor);
+    setEmailRef(info.emailRefDonor);
+    setPhoneRef(info.phoneRefDonor);
+    setNotes(info.notesRefDonor);
+
     QPixmap photo;
     photo.loadFromData(info.photo);
     setPhoto(photo);
@@ -133,6 +146,13 @@ DonorInfo DonorEditor::getClientInfo()
     info.since    = getSinceDate();
     QPixmap photo=getPhoto();
     info.photo = Misc::pixmap2ByteArray(new QPixmap(photo));
+    info.emailDonor = getEmail();
+    info.nameRefDonor = getNameRef();
+    info.surnameRefDonor = getSurnameRef();
+    info.emailRefDonor = getEmailRef();
+    info.phoneRefDonor = getPhoneRef();
+    info.notesRefDonor = getNotes();
+
     return info;
 }
 
@@ -141,7 +161,7 @@ void DonorEditor::commitClientInfo()
     DonorInfo cInfo = getClientInfo();
     qDebug()<<"commitClientInfo: "<<cInfo.id<<cInfo.code;
     if (!db.isOpen()) db.open();
-    Azahar *myDb = new Azahar;
+    Azahar *myDb = new Azahar;//
     myDb->setDatabase(db);
     bool result=myDb->updateDonor(cInfo);
     db.commit();
