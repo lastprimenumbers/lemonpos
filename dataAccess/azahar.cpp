@@ -2637,7 +2637,7 @@ qulonglong Azahar::insertTransaction(TransactionInfo info)
   //else {
     // insert a new one.
     QSqlQuery query2(db);
-    query2.prepare("INSERT INTO transactions (clientid, type, amount, date,  time, paidwith, changegiven, paymethod, state, userid, cardnumber, itemcount, itemslist, cardauthnumber, utility, terminalnum, providerid, specialOrders, balanceId, totalTax, donor) VALUES (:clientid, :type, :amount, :date, :time, :paidwith, :changegiven, :paymethod, :state, :userid, :cardnumber, :itemcount, :itemslist, :cardauthnumber, :utility, :terminalnum, :providerid, :specialOrders, :balance, :tax, :donor)"); //removed groups 29DIC09
+    query2.prepare("INSERT INTO transactions (clientid, type, amount, date,  time, paidwith, changegiven, paymethod, state, userid, cardnumber, itemcount, itemslist, cardauthnumber, utility, terminalnum, providerid, specialOrders, balanceId, totalTax, donor, note) VALUES (:clientid, :type, :amount, :date, :time, :paidwith, :changegiven, :paymethod, :state, :userid, :cardnumber, :itemcount, :itemslist, :cardauthnumber, :utility, :terminalnum, :providerid, :specialOrders, :balance, :tax, :donor, :note)"); //removed groups 29DIC09
 
     /** Remember to improve queries readability:
      * query2.prepare("INSERT INTO transactions ( \
@@ -2645,13 +2645,13 @@ qulonglong Azahar::insertTransaction(TransactionInfo info)
     paidwith,  paymethod, changegiven, state,    \
     cardnumber, itemcount, itemslist, points, \
     discmoney, disc, discmoney, cardauthnumber, profit,  \
-    terminalnum, providerid, specialOrders, balanceId, totalTax, donor) \
+    terminalnum, providerid, specialOrders, balanceId, totalTax, donor, note) \
     VALUES ( \
     :clientid, :userid, :type, :amount, :date, :time, \
     :paidwith, :paymethod, :changegiven, :state,  \
     :cardnumber, :itemcount, :itemslist, :points, \
     :discmoney, :disc, :discm, :cardauthnumber, :utility, \
-    :terminalnum, :providerid, :specialOrders, :balanceId, :totalTax, :donor)");
+    :terminalnum, :providerid, :specialOrders, :balanceId, :totalTax, :donor, :note)");
     **/
     
     query2.bindValue(":type", info.type);
@@ -2675,6 +2675,7 @@ qulonglong Azahar::insertTransaction(TransactionInfo info)
     query2.bindValue(":specialOrders", info.specialOrders);
     query2.bindValue(":balance", info.balanceId);
     query2.bindValue(":donor", info.donor);
+    query2.bindValue(":note", info.note);
     if (!query2.exec() ) {
       int errNum = query2.lastError().number();
       QSqlError::ErrorType errType = query2.lastError().type();

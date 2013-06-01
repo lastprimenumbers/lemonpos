@@ -23,7 +23,7 @@
    <item row="0" column="0">
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>2</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="basePage">
       <property name="enabled">
@@ -490,6 +490,12 @@
    <header>kdatewidget.h</header>
   </customwidget>
   <customwidget>
+   <class>SearchCode</class>
+   <extends>QWidget</extends>
+   <header>searchcode.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
    <class>clienttag</class>
    <extends>QWidget</extends>
    <header location="global">clienttag.h</header>
@@ -499,12 +505,6 @@
    <class>MibitLineEdit</class>
    <extends>QLineEdit</extends>
    <header>../../mibitWidgets/mibitlineedit.h</header>
-  </customwidget>
-  <customwidget>
-   <class>SearchCode</class>
-   <extends>QWidget</extends>
-   <header location="global">searchcode.h</header>
-   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>

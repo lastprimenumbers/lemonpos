@@ -138,7 +138,7 @@ msgstr "Editor Sconti"
 
 #: purchaseeditor.cpp:45 squeeze.cpp:370
 msgid "Purchase"
-msgstr "Aquisti"
+msgstr "Acquisti"
 
 #: purchaseeditor.cpp:316
 msgid "<b>Unlimited Stock Products cannot be purchased.</b>"
