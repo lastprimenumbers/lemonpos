@@ -21,7 +21,7 @@
 #ifndef MYENUMS_H
 #define MYENUMS_H
 
-enum TransactionType  {tSell=1, tBuy=2, tChange=3, tReturn=4, tPayment=5, tOutOther=6};
+enum TransactionType  {tSell=1, tBuy=2, tChange=3, tReturn=4, tPayment=5, tOutOther=6, tDonation=7};
 enum PaymentType      {pUnknown=99, pCash=1, pCard=2, pOwnCredit=3 };
 enum cashFlowType     {ctCashOut=1, ctCashOutMoneyReturnOnCancel=2, ctCashOutMoneyReturnOnProductReturn=3, ctCashIn=4, ctCashInReservation=5, ctCashOutReservation=6, ctCashInCreditPayment=7, ctCashInDebit=8};
 enum TransactionState {tNotCompleted=1, tCompleted=2, tCancelled=3, tPOPending=4, tPOCompleted=5, tPOIncomplete=6, tReserved=7, tCompletedOwnCreditPending=8, tCompletedOwnCreditPaid=9};

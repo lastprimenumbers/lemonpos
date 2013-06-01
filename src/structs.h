@@ -176,6 +176,7 @@ struct TransactionInfo
   qulonglong balanceId; //to store balance where it was sold. For SESSIONS.
   double     totalTax; //in money.
   QString    donor;
+  QString   note;
 };
 
 struct BalanceInfo

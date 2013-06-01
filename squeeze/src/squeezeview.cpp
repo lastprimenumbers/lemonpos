@@ -2200,13 +2200,18 @@ void squeezeView::doPurchase()
     purchaseEditorDlg->setDb(db);
     if (purchaseEditorDlg->exec()) {
       //Now add a transaction for buy
-      QDate date = QDate::currentDate();
-      QTime time = QTime::currentTime();
+//      QDate date = QDate::currentDate();
+//      QTime time = QTime::currentTime();
+        qDebug()<<"DATE:"<<purchaseEditorDlg->getDate().toString()<<purchaseEditorDlg->getTime().toString();
       TransactionInfo tInfo;
-      tInfo.type    = tBuy;
+      if (purchaseEditorDlg->getPurchased()) {
+          tInfo.type    = tBuy;
+      } else {
+          tInfo.type    = tDonation;
+      }
       tInfo.amount  = purchaseEditorDlg->getTotalBuy();
-      tInfo.date    = date;
-      tInfo.time    = time;
+      tInfo.date    = purchaseEditorDlg->getDate();
+      tInfo.time    = purchaseEditorDlg->getTime();
       tInfo.paywith = 0.0;
       tInfo.changegiven = 0.0;
       tInfo.paymethod   = pCash;
@@ -2224,6 +2229,7 @@ void squeezeView::doPurchase()
       tInfo.balanceId = 0;
       tInfo.totalTax  = purchaseEditorDlg->getTotalTaxes();
       tInfo.donor       = purchaseEditorDlg->getDonor();
+      tInfo.note= purchaseEditorDlg->getNote();
       qulonglong trnum = myDb->insertTransaction(tInfo); //to get the transaction number to insert in the log.
       if ( trnum <= 0 ) {
           qDebug()<<"ERROR: Could not create a Purchase Transaction ::doPurchase()";

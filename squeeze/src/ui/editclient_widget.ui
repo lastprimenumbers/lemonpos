@@ -419,6 +419,12 @@
    <header>kdatewidget.h</header>
   </customwidget>
   <customwidget>
+   <class>SearchCode</class>
+   <extends>QWidget</extends>
+   <header>searchcode.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
    <class>clienttag</class>
    <extends>QWidget</extends>
    <header location="global">clienttag.h</header>
@@ -428,12 +434,6 @@
    <class>MibitLineEdit</class>
    <extends>QLineEdit</extends>
    <header>../../mibitWidgets/mibitlineedit.h</header>
-  </customwidget>
-  <customwidget>
-   <class>SearchCode</class>
-   <extends>QWidget</extends>
-   <header location="global">searchcode.h</header>
-   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>
