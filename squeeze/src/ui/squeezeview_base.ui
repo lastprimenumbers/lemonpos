@@ -99,7 +99,7 @@
       </sizepolicy>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>8</number>
      </property>
      <widget class="QWidget" name="pageWelcome">
       <layout class="QGridLayout" name="gridLayout">
@@ -1352,6 +1352,13 @@ p, li { white-space: pre-wrap; }
          <widget class="QPushButton" name="btnCreateLimit">
           <property name="text">
            <string>Aggiungi</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btnModifyLimit">
+          <property name="text">
+           <string>Modifica</string>
           </property>
          </widget>
         </item>

@@ -15,13 +15,14 @@ class limit_editor;
 class limiteditor : public QDialog
 {
     Q_OBJECT
+    Limit lim;
     
 public:
     explicit limiteditor(QWidget *parent = 0);
     ~limiteditor();
     QSqlDatabase db;
     void setDb(QSqlDatabase pippo);
-
+    void setLimit(Limit nlim);
 
 private slots:
     void addLimit();

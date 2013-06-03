@@ -1966,15 +1966,27 @@ bool Azahar::insertLimit(Limit &lim)
     qDebug()<<"inserting limit:"<<lim.clientId<<lim.clientTag<<lim.productCat<<lim.productCode<<lim.limit<<lim.priority;
     if (!db.isOpen()) db.open();
     if (!db.isOpen()) {
+
         return false;
     }
-    return true;
 //    QSqlQuery query(db);
 //    query.prepare("INSERT INTO limits () VALUES (:idclient, :tag);");
 //    query.bindValue(":idclient",info.id);
 //    query.bindValue(":tag",info.tags.at(i));
+    return true;
+
 }
 
+bool Azahar::modifyLimit(Limit &lim)
+{
+    // Should recursively modify all limits having same parent as lim
+    qDebug()<<"inserting limit:"<<lim.clientId<<lim.clientTag<<lim.productCat<<lim.productCode<<lim.limit<<lim.priority;
+    if (!db.isOpen()) db.open();
+    if (!db.isOpen()) {
+        return false;
+    }
+    return true;
+}
 
 QStringList Azahar::getClientTags(qulonglong clientId)
 {
