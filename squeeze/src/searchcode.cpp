@@ -134,6 +134,20 @@ void SearchCode::updatedName(int idx) {
 }
 
 
+bool SearchCode::setId(qulonglong clientId) {
+    BasicInfo info;
+    QHashIterator<int, BasicInfo> i(entries);
+    while (i.hasNext()) {
+        i.next();
+        info = i.value();
+        if ( info.id==clientId ) {
+            setCode(info.code);
+            return true;
+        }
+    }
+    return false;
+}
+
 qulonglong SearchCode::getId() {
     BasicInfo info;
     QString code;

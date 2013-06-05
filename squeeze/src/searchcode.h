@@ -50,6 +50,7 @@ public:
     void setCustomLayout(int direction);
     QString getCode() { return ui->editCode->text(); };
     QString getName() { return ui->comboName->currentText(); };
+    bool setId(qulonglong clientId);
     qulonglong getId();
     void setDb(QSqlDatabase db, QString targetTable);
 
@@ -58,6 +59,7 @@ public:
     bool getInfo(ProductInfo &info);
     bool getInfo(BasicInfo &info);
     bool getInfo(DonorInfo &info);
+
 
 private:
     SearchCodeUI *ui;
