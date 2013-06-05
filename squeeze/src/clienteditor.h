@@ -59,6 +59,11 @@ class ClientEditor : public KDialog
     void setSinceDate(QDate date) { ui->sinceDatePicker->setDate(date); }
     void setExpiryDate(QDate date) { ui->expiryDatePicker->setDate(date); }
     void setBirthDate(QDate date) {ui->birthDatePicker->setDate(date); }
+    void setBeginsuspDate(QDate date) {ui->beginsuspPicker->setDate(date); }
+    void setEndsuspDate(QDate date) {ui->endsuspPicker->setDate(date); }
+    void setMsgsusp(QString msgsusp){ui->editClientMsgsusp->setText(msgsusp);}
+    void setNotes(QString notes){ui->editClientNotes->setText(notes);}
+
 //    void setTags(QStringList tags);
 
     QString getCode(){ return ui->editClientCode->text();};
@@ -74,6 +79,10 @@ class ClientEditor : public KDialog
     QDate   getSinceDate() { return ui->sinceDatePicker->date(); }
     QDate   getExpiryDate() { return ui->expiryDatePicker->date(); }
     QDate   getBirthDate() { return ui->birthDatePicker->date(); }
+    QDate   getBeginsuspDate() { return ui->beginsuspPicker->date(); }
+    QDate   getEndsuspDate() { return ui->endsuspPicker->date(); }
+    QString getMsgsusp(){ return ui->editClientMsgsusp->toPlainText();};
+    QString getNotes(){ return ui->editClientNotes->toPlainText();};
     //    QStringList getTags();
 
     void setClientInfo(ClientInfo info);

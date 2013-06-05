@@ -27,7 +27,7 @@ Azahar::Azahar(QWidget * parent): QObject(parent)
 {
   errorStr = "";
   m_mainClient = "undefined";
-  clientFields= QString("name, surname, address, phone, email, nation, monthly, photo, since, expiry, code, beginsusp, endsusp, msgsusp, notes, birthDate, parent").split(", ");
+  clientFields= QString("name, surname, address, phone, email, nation, monthly, photo, since, expiry, birthDate, code, beginsusp, endsusp, msgsusp, notes, parent").split(", ");
   donorFields=QString("name, email, address, phone, photo, since, code, refname, refsurname, refemail, refphone, notes").split(", ");
 }
 
@@ -1888,6 +1888,11 @@ bool Azahar::getClientInfoFromQuery(QSqlQuery &qC, ClientInfo &info){
       int fieldAdd    = qC.record().indexOf("address");
       int fieldParent = qC.record().indexOf("parent");
       int fieldMonthly = qC.record().indexOf("monthly");
+      int fieldBeginsusp = qC.record().indexOf("beginsusp");
+      int fieldEndsusp = qC.record().indexOf("endsusp");
+      int fieldMsgsusp = qC.record().indexOf("msgsusp");
+      int fieldNotes = qC.record().indexOf("notes");
+
       //Should be only one
       info.id         = qC.value(fieldId).toUInt();
       info.code       = qC.value(fieldCode).toString();      

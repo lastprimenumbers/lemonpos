@@ -293,6 +293,10 @@ void ClientEditor::setClientInfo(ClientInfo info)
     setMonthly(info.monthly);
     setSinceDate(info.since);
     setExpiryDate(info.expiry);
+    setBeginsuspDate(info.beginsusp);
+    setEndsuspDate(info.endsusp);
+    setMsgsusp(info.msgsusp);
+    setNotes(info.notes);
     QPixmap photo;
     photo.loadFromData(info.photo);
     setPhoto(photo);
@@ -322,19 +326,16 @@ ClientInfo ClientEditor::getClientInfo()
     info.monthly   = getMonthly();
     info.since    = getSinceDate();
     info.expiry    = getExpiryDate();
-    info.birthDate = getExpiryDate(); //getBirthDate();
+    info.beginsusp = getBeginsuspDate();
+    info.endsusp = getEndsuspDate();
+    info.msgsusp = getMsgsusp();
+    info.notes   = getNotes();
+
     QPixmap photo=getPhoto();
     info.photo = Misc::pixmap2ByteArray(new QPixmap(photo));
     info.parentClient=getParentClient();
     info.tags=ui->clientTagEditor->getTags();
     //TODO: complete!
-    info.beginsusp=getExpiryDate();
-    info.endsusp=getExpiryDate();
-    info.surname=QString("");
-    info.notes=QString("");
-    info.msgsusp=QString("");
-    info.email=QString("");
-    info.nation=QString("");
     return info;
 }
 
