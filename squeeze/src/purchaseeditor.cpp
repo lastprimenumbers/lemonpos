@@ -87,8 +87,11 @@ PurchaseEditor::PurchaseEditor( QWidget *parent )
     totalBuy = 0.0;
     itemCount = 0.0;
     totalTaxes = 0.0;
+    ui->editDateTime->setDateTime(QDateTime::currentDateTime());
     QTimer::singleShot(500, this, SLOT(setupTable()));
 }
+
+
 
 PurchaseEditor::~PurchaseEditor()
 {
@@ -294,6 +297,7 @@ void PurchaseEditor::setupTable() {
 
 void PurchaseEditor::addItemToList()
 {
+    qDebug()<<"DATE:"<<getDate().toString()<<ui->editDateTime->dateTime().date().toString();
   ProductInfo pInfo;
   Azahar *myDb = new Azahar;
   myDb->setDatabase(db);

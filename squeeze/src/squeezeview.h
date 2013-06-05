@@ -188,9 +188,12 @@ signals:
    void createCategory();
    void createClient();
    void createDonor();
+
    void createLimit();
+   void modifyLimit();
    void deleteLimit();
    void searchLimit();
+
    void createRandomMsg();
    void createCurrency();
    void deleteSelectedCurrency();

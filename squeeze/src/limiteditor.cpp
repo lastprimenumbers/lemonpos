@@ -9,6 +9,17 @@ limiteditor::limiteditor(QWidget *parent) :
     ui(new Ui::limit_editor)
 {
     ui->setupUi(this);
+
+    // An empty limit
+    lim.clientId=0;
+    lim.clientTag=QString("*");
+    lim.productCat=-1;
+    lim.productCode=QString("*");
+    lim.parent=-1;
+    lim.limit=-1;
+    lim.current=0;
+    lim.priority=0;
+
     connect( this   , SIGNAL( accepted() ), this, SLOT( addLimit() ) );
 }
 
@@ -32,22 +43,45 @@ void limiteditor::setDb(QSqlDatabase parentDb)
     }
     ui->codeProduct->setDb(parentDb,"products");
     ui->codeClient->setDb(parentDb,"clients");
-
 }
+
+void limiteditor::setLimit(Limit nlim)
+{
+    lim=nlim;
+
+    // Setup client selection
+    if (lim.clientId==0) {
+        if (lim.clientTag=="*") {
+            ui->radioAllClients->setChecked(true);
+        } else {
+           ui->radioTagClient->setChecked(true);
+           ui->clientTagWidget->setTags(QStringList(lim.clientTag));
+        }
+    } else {
+        ui->radioSingleClient->setChecked(true);
+        ui->codeClient->setId(lim.clientId);
+    }
+
+
+    // Setup product selection
+    if (lim.productCode!="*") {
+        ui->radioProductCode->setChecked(true);
+        ui->codeProduct->setCode(lim.productCode);
+    } else {
+        ui->radioProductCat->setChecked(true);
+        int i=ui->comboProductCat->findData(QVariant(lim.productCat));
+        ui->comboProductCat->setCurrentIndex(i);
+    }
+
+    ui->inputLimit->setValue(lim.limit);
+    ui->inputPriority->setValue(lim.priority);
+}
+
 
 void limiteditor::addLimit()
 
 {
-    // An empty limit
-    Limit lim;
-    lim.clientId=0;
-    lim.clientTag=QString("*");
-    lim.productCat=-1;
-    lim.productCode=QString("*");
-    lim.parent=-1;
-    lim.limit=-1;
-    lim.current=0;
-    lim.priority=0;
+
     Azahar *myDb = new Azahar;
     myDb->setDatabase(db);    
 
@@ -86,8 +120,15 @@ void limiteditor::addLimit()
     // The limit threshold
     lim.limit = ui->inputLimit->value();
     lim.priority = ui->inputPriority->value();
+
     // Must check feasibility?
-    myDb->insertLimit(lim);
+    if (lim.parent>-1){
+        // If parent is defined, we are modifying an existing limit
+        myDb->modifyLimit(lim);
+    } else {
+        // If parent was -1, we are inserting a new limit
+        myDb->insertLimit(lim);
+    }
     delete myDb;
 }
 

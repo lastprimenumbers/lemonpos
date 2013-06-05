@@ -1356,6 +1356,13 @@ p, li { white-space: pre-wrap; }
          </widget>
         </item>
         <item>
+         <widget class="QPushButton" name="btnModifyLimit">
+          <property name="text">
+           <string>Modifica</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="QPushButton" name="btnDeleteLimit">
           <property name="text">
            <string>Elimina</string>

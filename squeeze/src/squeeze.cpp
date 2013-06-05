@@ -21,7 +21,6 @@
 #include "squeeze.h"
 #include "squeezeview.h"
 #include "settings.h"
-
 #include <qapplication.h>
 #include <qpainter.h>
 #include <QDragEnterEvent>
@@ -506,7 +505,6 @@ void squeeze::optionsPreferences()
         return;
     }
     KConfigDialog *dialog = new KConfigDialog(this, "settings", Settings::self());
-
     //general
     QWidget *generalSettingsDlg = new QWidget;
     ui_prefs_base.setupUi(generalSettingsDlg);

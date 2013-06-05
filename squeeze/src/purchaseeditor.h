@@ -22,6 +22,7 @@
 #define PURCHASEEDITOR_H
 
 #include <KDialog>
+#include <KDateTime>
 #include <QDate>
 #include <QtGui>
 #include <QPixmap>
@@ -52,6 +53,10 @@ class PurchaseEditor : public KDialog
     QString getDonor()     { return ui->editDonor->getCode(); };
     QString    getCodeStr()  { return ui->editCode->text(); };
     QString getDescription() { return ui->editDesc->text(); };
+    QString getNote() { return ui->editNote->toPlainText(); };
+    QDate   getDate() { return ui->editDateTime->dateTime().date(); };
+    QTime   getTime() { return ui->editDateTime->dateTime().time(); };
+    bool   getPurchased() { return ui->chPurchased->isChecked(); };
     double  getPurchaseQty();
     int     getCategoryId();
     int     getMeasureId();

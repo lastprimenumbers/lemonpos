@@ -48,13 +48,25 @@ class DonorEditor : public KDialog
     void setPhoto(QPixmap photo) { ui->labelClientPhoto->setPixmap(photo); pix = photo; };
     void setId(long int id) { clientId = id; };
     void setSinceDate(QDate date) { ui->sinceDatePicker->setDate(date); }
+    void setEmail(QString email) { ui->emailDonor->setText(email); };
+    void setNameRef(QString nameRefDonor) { ui->nameRefDonor->setText(nameRefDonor); };
+    void setSurnameRef(QString surnameRefDonor) { ui->surnameRefDonor->setText(surnameRefDonor); };
+    void setEmailRef(QString emailRefDonor) { ui->emailRefDonor->setText(emailRefDonor); };
+    void setPhoneRef(QString phoneRefDonor) { ui->phoneRefDonor->setText(phoneRefDonor); };
+    void setNotes(QString notesRefDonor) { ui->notesRefDonor->setText(notesRefDonor); };
 
     QString getCode(){ return ui->editClientCode->text();};
     QString getName(){ return ui->editClientName->text();};
     QString getAddress(){ return ui->editClientAddress->toPlainText();};
     QString getPhone(){ return ui->editClientPhone->text();};
     QPixmap getPhoto(){ return pix;};
-    QDate   getSinceDate() { return ui->sinceDatePicker->date(); }
+    QDate   getSinceDate() { return ui->sinceDatePicker->date();};
+    QString getEmail(){ return ui->emailDonor->text();};
+    QString getNameRef(){ return ui->nameRefDonor->text();};
+    QString getSurnameRef(){ return ui->surnameRefDonor->text();};
+    QString getEmailRef(){ return ui->emailRefDonor->text();};
+    QString getPhoneRef(){ return ui->phoneRefDonor->text();};
+    QString getNotes(){ return ui->notesRefDonor->text();};
 
     void setClientInfo(DonorInfo info);
     void setClientInfo(QString code);

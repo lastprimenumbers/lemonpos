@@ -130,14 +130,14 @@ struct DonorInfo
   QString      surname; //dummy
   QString      address;
   QString      phone;
-  QString      email;
-  QString      refname;
-  QString      refsurname;
-  QString      refemail;
-  QString      refphone;
+  QString      emailDonor;
+  QString      nameRefDonor;
+  QString      surnameRefDonor;
+  QString      emailRefDonor;
+  QString      phoneRefDonor;
   QByteArray   photo;
   QDate        since;
-  QString      notes;
+  QString      notesRefDonor;
 };
 
 struct OfferInfo
@@ -176,6 +176,7 @@ struct TransactionInfo
   qulonglong balanceId; //to store balance where it was sold. For SESSIONS.
   double     totalTax; //in money.
   QString    donor;
+  QString   note;
 };
 
 struct BalanceInfo

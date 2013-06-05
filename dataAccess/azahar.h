@@ -160,6 +160,7 @@ class Azahar : public QObject
     void getClientLimits(ClientInfo &info);
     Limit getLimitFromQuery(QSqlQuery &query);
     bool insertLimit(Limit &lim);
+    bool modifyLimit(Limit &lim);
 
     //TRANSACTIONS
     TransactionInfo getTransactionInfo(qulonglong id);

@@ -295,12 +295,15 @@ void squeezeView::setupSignalConnections()
 
   connect(ui_mainview.btnDeleteLimit, SIGNAL(clicked()), SLOT(deleteLimit()));
   connect(ui_mainview.btnCreateLimit, SIGNAL(clicked()), SLOT(createLimit()));
+  connect(ui_mainview.btnModifyLimit, SIGNAL(clicked()), SLOT(modifyLimit()));
   connect(ui_mainview.btnSearchLimit, SIGNAL(clicked()), SLOT(searchLimit()));
 
   connect(ui_mainview.btnAddRandomMsg, SIGNAL(clicked()), SLOT(createRandomMsg()));
 
   connect(timerCheckDb, SIGNAL(timeout()), this, SLOT(checkDBStatus()));
   connect(timerUpdateGraphs, SIGNAL(timeout()), this, SLOT(updateGraphs()));
+
+
   connect(ui_mainview.offersDateEditor, SIGNAL(changed(const QDate &)), this, SLOT(setOffersFilter()));
 
   connect(this, SIGNAL(signalAdminLoggedOn()),  SLOT( enableUI()));
@@ -1340,16 +1343,25 @@ void squeezeView::setupLimitsModel()
   qDebug()<<"Setting up Limits Model";
   if (db.isOpen()) {
     limitsModel->setTable("limits");
-//    limitsModel->setRelation(3, QSqlRelation("tags", "tag", "tag"));
-    limitsModel->setRelation(3, QSqlRelation("products", "code", "name"));
-//    limitsModel->setRelation(5, QSqlRelation("categories", "catid", "text"));
 
+    limitsModel->setRelation(1, QSqlRelation("clients", "id", "surname"));
+    limitsModel->setRelation(2, QSqlRelation("tags", "tag", "tag"));
+    limitsModel->setRelation(3, QSqlRelation("products", "code", "name"));
+    limitsModel->setRelation(4, QSqlRelation("categories", "catid", "text"));
+    limitsModel->setHeaderData(1, Qt::Horizontal, "Cliente");
+    limitsModel->setHeaderData(2, Qt::Horizontal, "Etichetta");
+    limitsModel->setHeaderData(3, Qt::Horizontal, "Prodotto");
+    limitsModel->setHeaderData(4, Qt::Horizontal, "Categoria");
     ui_mainview.limitsView->setModel(limitsModel);
     ui_mainview.limitsView->setColumnHidden(0,true);
     ui_mainview.limitsView->setItemDelegate(new QSqlRelationalDelegate(ui_mainview.limitsView));
     QString f;
     f=QString("clientId=0");
     limitsModel->setFilter(f);
+    ui_mainview.limitsView->hideColumn(0);
+    ui_mainview.limitsView->hideColumn(1);
+    ui_mainview.limitsView->hideColumn(6);
+    ui_mainview.limitsView->hideColumn(8);
     limitsModel->select();
 
   }
@@ -2200,13 +2212,18 @@ void squeezeView::doPurchase()
     purchaseEditorDlg->setDb(db);
     if (purchaseEditorDlg->exec()) {
       //Now add a transaction for buy
-      QDate date = QDate::currentDate();
-      QTime time = QTime::currentTime();
+//      QDate date = QDate::currentDate();
+//      QTime time = QTime::currentTime();
+        qDebug()<<"DATE:"<<purchaseEditorDlg->getDate().toString()<<purchaseEditorDlg->getTime().toString();
       TransactionInfo tInfo;
-      tInfo.type    = tBuy;
+      if (purchaseEditorDlg->getPurchased()) {
+          tInfo.type    = tBuy;
+      } else {
+          tInfo.type    = tDonation;
+      }
       tInfo.amount  = purchaseEditorDlg->getTotalBuy();
-      tInfo.date    = date;
-      tInfo.time    = time;
+      tInfo.date    = purchaseEditorDlg->getDate();
+      tInfo.time    = purchaseEditorDlg->getTime();
       tInfo.paywith = 0.0;
       tInfo.changegiven = 0.0;
       tInfo.paymethod   = pCash;
@@ -2224,6 +2241,7 @@ void squeezeView::doPurchase()
       tInfo.balanceId = 0;
       tInfo.totalTax  = purchaseEditorDlg->getTotalTaxes();
       tInfo.donor       = purchaseEditorDlg->getDonor();
+      tInfo.note= purchaseEditorDlg->getNote();
       qulonglong trnum = myDb->insertTransaction(tInfo); //to get the transaction number to insert in the log.
       if ( trnum <= 0 ) {
           qDebug()<<"ERROR: Could not create a Purchase Transaction ::doPurchase()";
@@ -2482,6 +2500,13 @@ void squeezeView::createProduct()
 void squeezeView::createLimit() {
     limiteditor *limed = new limiteditor;
     limed->setDb(db);
+    limed->show();
+}
+
+void squeezeView::modifyLimit() {
+    limiteditor *limed = new limiteditor;
+    limed->setDb(db);
+//    limed->setLimit();
     limed->show();
 }
 
