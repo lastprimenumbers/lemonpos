@@ -118,13 +118,9 @@ squeezeView::squeezeView(QWidget *parent)
   categoriesHash.clear();
   setupSignalConnections();
   QTimer::singleShot(1100, this, SLOT(setupDb()));
-  QTimer::singleShot(2000, timerCheckDb, SLOT(start()));
-  QTimer::singleShot(20000, timerUpdateGraphs, SLOT(start()));
-  QTimer::singleShot(2010, this, SLOT(showWelcomeGraphs()));
-  QTimer::singleShot(2000, this, SLOT(login()));
+
   rmTimer = new QTimer(this);
   connect(rmTimer, SIGNAL(timeout()), SLOT(reSelectModels()) );
-  rmTimer->start(1000*60*2);
 
   ui_mainview.stackedWidget->setCurrentIndex(pWelcome);
   ui_mainview.errLabel->hide();
@@ -867,6 +863,12 @@ void squeezeView::setupDb()
   dlgPassword->setDb(db);
   if (db.isOpen()) {
     emit signalConnected();
+    rmTimer->start(1000*60*2);
+    QTimer::singleShot(2000, timerCheckDb, SLOT(start()));
+    QTimer::singleShot(20000, timerUpdateGraphs, SLOT(start()));
+    QTimer::singleShot(2010, this, SLOT(showWelcomeGraphs()));
+    QTimer::singleShot(2000, this, SLOT(login()));
+
     enableUI(); //enable until logged in...
     productsModel   = new QSqlRelationalTableModel();
     offersModel     = new QSqlRelationalTableModel();
@@ -904,6 +906,8 @@ void squeezeView::setupDb()
   } else {
     emit signalDisconnected();
     disableUI();
+    emit signalShowDbConfig();
+
   }
 }
 
@@ -2688,7 +2692,7 @@ void squeezeView::createClient()
 
   if (db.isOpen()) {
     ClientEditor *clientEditorDlg = new ClientEditor(db,this);
-//    ClientInfo info;
+    ClientInfo info;
     QPixmap photo;
 
     if (clientEditorDlg->exec() ) {

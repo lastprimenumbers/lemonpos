@@ -27,7 +27,7 @@ Azahar::Azahar(QWidget * parent): QObject(parent)
 {
   errorStr = "";
   m_mainClient = "undefined";
-  clientFields= QString("name, surname, address, phone, email, nation, monthly, photo, since, expiry, code, beginsusp, endsusp, msgsusp, notes, parent").split(", ");
+  clientFields= QString("name, surname, address, phone, email, nation, monthly, photo, since, expiry, birthDate, code, beginsusp, endsusp, msgsusp, notes, parent").split(", ");
   donorFields=QString("name, email, address, phone, photo, since, code, refname, refsurname, refemail, refphone, notes").split(", ");
 }
 
@@ -1773,11 +1773,13 @@ bool Azahar::_bindClient(ClientInfo &info, QSqlQuery &query)
     query.bindValue(":parent", info.parentClient);
     query.bindValue(":phone", info.phone);
     query.bindValue(":since", info.since);
+    query.bindValue(":birthDate", info.since);
     query.bindValue(":expiry", info.expiry);
     query.bindValue(":beginsusp", info.beginsusp);
     query.bindValue(":endsusp", info.endsusp);
     query.bindValue(":msgsusp", info.msgsusp);
     query.bindValue(":notes", info.notes);
+    qDebug()<<"Insert client lastQuery: "<<query.boundValues();
     if (!query.exec()) setError(query.lastError().text()); else result = true;
     return result;
 }
@@ -1875,21 +1877,34 @@ bool Azahar::getClientInfoFromQuery(QSqlQuery &qC, ClientInfo &info){
       int fieldId     = qC.record().indexOf("id");
       int fieldCode   = qC.record().indexOf("code");
       int fieldName   = qC.record().indexOf("name");
+      int fieldSurname   = qC.record().indexOf("surname");
+      int fieldNation   = qC.record().indexOf("nation");
+      int fieldEmail   = qC.record().indexOf("email");
       int fieldPhoto  = qC.record().indexOf("photo");
       int fieldSince  = qC.record().indexOf("since");
       int fieldExpiry = qC.record().indexOf("expiry");
+      int fieldBirthDate   = qC.record().indexOf("birthDate");
       int fieldPhone  = qC.record().indexOf("phone");
       int fieldAdd    = qC.record().indexOf("address");
       int fieldParent = qC.record().indexOf("parent");
       int fieldMonthly = qC.record().indexOf("monthly");
+      int fieldBeginsusp = qC.record().indexOf("beginsusp");
+      int fieldEndsusp = qC.record().indexOf("endsusp");
+      int fieldMsgsusp = qC.record().indexOf("msgsusp");
+      int fieldNotes = qC.record().indexOf("notes");
+
       //Should be only one
       info.id         = qC.value(fieldId).toUInt();
-      info.code       = qC.value(fieldCode).toString();
+      info.code       = qC.value(fieldCode).toString();      
       info.name       = qC.value(fieldName).toString();
+      info.surname       = qC.value(qC.record().indexOf("surname")).toString();
+      info.email       = qC.value(fieldEmail).toString();
+      info.nation       = qC.value(fieldNation).toString();
       info.parentClient = qC.value(fieldParent).toString();
       info.photo      = qC.value(fieldPhoto).toByteArray();
       info.since      = qC.value(fieldSince).toDate();
       info.expiry     = qC.value(fieldExpiry).toDate();
+      info.birthDate      = qC.value(qC.record().indexOf("birthDate")).toDate();
       info.phone      = qC.value(fieldPhone).toString();
       info.address    = qC.value(fieldAdd).toString();
       info.monthly   = qC.value(fieldMonthly).toDouble();
