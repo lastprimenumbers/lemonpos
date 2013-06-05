@@ -62,6 +62,9 @@ ClientEditor::ClientEditor( QSqlDatabase parentDb, QWidget *parent )
 
     ui->editClientCode->setEmptyMessage(i18n("Enter a 6, 12, or 13 digits Bar Code."));
     ui->editClientName->setEmptyMessage(i18n("Enter client full name"));
+    ui->editClientSurname->setEmptyMessage("");
+    ui->editClientEmail->setEmptyMessage("");
+    ui->editClientNation->setEmptyMessage("");
     ui->editClientPhone->setEmptyMessage(i18n("Phone number"));
 
     ui->editParentClient->setCustomLayout(0);
@@ -280,6 +283,10 @@ void ClientEditor::setClientInfo(ClientInfo info)
     setCode(info.code);
     setId(info.id);
     setName(info.name);
+    setSurname(info.surname);
+    setEmail(info.email);
+    setNation(info.nation);
+    setBirthDate(info.birthDate);
     setParentClient(info.parentClient);
     setAddress(info.address);
     setPhone(info.phone);
@@ -307,11 +314,15 @@ ClientInfo ClientEditor::getClientInfo()
     info.id       = clientId;
     info.code     = getCode();
     info.name     = getName();
+    info.surname  = getSurname();
+    info.email    = getEmail();
+    info.nation   = getNation();
     info.address  = getAddress();
     info.phone    = getPhone();
     info.monthly   = getMonthly();
     info.since    = getSinceDate();
     info.expiry    = getExpiryDate();
+    info.birthDate = getExpiryDate(); //getBirthDate();
     QPixmap photo=getPhoto();
     info.photo = Misc::pixmap2ByteArray(new QPixmap(photo));
     info.parentClient=getParentClient();

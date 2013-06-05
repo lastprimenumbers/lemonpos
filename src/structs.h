@@ -114,6 +114,7 @@ struct ClientInfo
   QByteArray   photo;
   QDate        since;
   QDate        expiry;
+  QDate        birthDate;
   QDate        beginsusp;
   QDate        endsusp;
   QString      msgsusp;

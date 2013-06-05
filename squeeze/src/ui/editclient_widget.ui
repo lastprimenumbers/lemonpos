@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>482</width>
+    <width>480</width>
     <height>524</height>
    </rect>
   </property>
@@ -43,7 +43,10 @@
          </property>
         </widget>
        </item>
-       <item row="0" column="3" rowspan="6" colspan="2">
+       <item row="1" column="0" colspan="2">
+        <widget class="MibitLineEdit" name="editClientCode"/>
+       </item>
+       <item row="1" column="3" rowspan="5" colspan="2">
         <widget class="QLabel" name="labelClientPhoto">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
@@ -71,9 +74,6 @@
          </property>
         </widget>
        </item>
-       <item row="1" column="0" colspan="3">
-        <widget class="MibitLineEdit" name="editClientCode"/>
-       </item>
        <item row="2" column="0">
         <widget class="QLabel" name="label_4">
          <property name="text">
@@ -84,7 +84,7 @@
          </property>
         </widget>
        </item>
-       <item row="3" column="0" colspan="3">
+       <item row="3" column="0" colspan="2">
         <widget class="MibitLineEdit" name="editClientName"/>
        </item>
        <item row="4" column="0">
@@ -97,7 +97,7 @@
          </property>
         </widget>
        </item>
-       <item row="5" column="0" colspan="3">
+       <item row="5" column="0" colspan="2">
         <widget class="MibitLineEdit" name="editClientSurname"/>
        </item>
        <item row="6" column="0">
@@ -107,6 +107,20 @@
          </property>
          <property name="buddy">
           <cstring>editClientAddress</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="3" rowspan="2">
+        <widget class="QPushButton" name="btnChangeClientPhoto">
+         <property name="text">
+          <string>Change &amp;Photo</string>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="4" rowspan="2">
+        <widget class="QPushButton" name="btnOpenCamera">
+         <property name="text">
+          <string>Cam</string>
          </property>
         </widget>
        </item>
@@ -123,20 +137,6 @@
          </property>
          <property name="acceptRichText">
           <bool>false</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="7" column="3">
-        <widget class="QPushButton" name="btnChangeClientPhoto">
-         <property name="text">
-          <string>Change &amp;Photo</string>
-         </property>
-        </widget>
-       </item>
-       <item row="7" column="4">
-        <widget class="QPushButton" name="btnOpenCamera">
-         <property name="text">
-          <string>Cam</string>
          </property>
         </widget>
        </item>
@@ -176,10 +176,24 @@
          </property>
         </widget>
        </item>
-       <item row="9" column="2" colspan="3">
-        <widget class="MibitLineEdit" name="editClientEmail"/>
-       </item>
        <item row="10" column="0">
+        <widget class="QLabel" name="e">
+         <property name="text">
+          <string>Data di nascita: </string>
+         </property>
+        </widget>
+       </item>
+       <item row="10" column="1" colspan="3">
+        <widget class="KDateWidget" name="birthDatePicker"/>
+       </item>
+       <item row="11" column="0">
+        <widget class="QLabel" name="label_3">
+         <property name="text">
+          <string>Since:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="11" column="3">
         <widget class="QLabel" name="label_12">
          <property name="text">
           <string>Nation:</string>
@@ -189,27 +203,30 @@
          </property>
         </widget>
        </item>
-       <item row="10" column="1" colspan="3">
+       <item row="12" column="0" colspan="3">
+        <widget class="KDateWidget" name="sinceDatePicker"/>
+       </item>
+       <item row="12" column="3" colspan="2">
         <widget class="MibitLineEdit" name="editClientNation"/>
        </item>
-       <item row="11" column="0">
-        <widget class="QLabel" name="label_3">
+       <item row="13" column="0">
+        <widget class="QLabel" name="label_6">
          <property name="text">
-          <string>Since:</string>
+          <string>Expiry:</string>
          </property>
         </widget>
        </item>
-       <item row="11" column="3" colspan="2">
+       <item row="13" column="3">
         <widget class="QLabel" name="label_5">
          <property name="text">
           <string>Monthly Points:</string>
          </property>
         </widget>
        </item>
-       <item row="12" column="0" colspan="3">
-        <widget class="KDateWidget" name="sinceDatePicker"/>
+       <item row="14" column="0" colspan="3">
+        <widget class="KDateWidget" name="expiryDatePicker"/>
        </item>
-       <item row="12" column="3" colspan="2">
+       <item row="14" column="3">
         <widget class="MibitLineEdit" name="editMonthlyPoints">
          <property name="maximumSize">
           <size>
@@ -219,22 +236,15 @@
          </property>
         </widget>
        </item>
-       <item row="13" column="0">
-        <widget class="QLabel" name="label_6">
-         <property name="text">
-          <string>Expiry:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="14" column="0" colspan="3">
-        <widget class="KDateWidget" name="expiryDatePicker"/>
-       </item>
        <item row="15" column="0" colspan="5">
         <widget class="Line" name="line">
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
         </widget>
+       </item>
+       <item row="9" column="2" colspan="3">
+        <widget class="MibitLineEdit" name="editClientEmail"/>
        </item>
       </layout>
      </widget>
