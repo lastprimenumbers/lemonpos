@@ -29,6 +29,7 @@ Azahar::Azahar(QWidget * parent): QObject(parent)
   m_mainClient = "undefined";
   clientFields= QString("name, surname, address, phone, email, nation, monthly, photo, since, expiry, code, beginsusp, endsusp, msgsusp, notes, parent").split(", ");
   donorFields=QString("name, email, address, phone, photo, since, code, refname, refsurname, refemail, refphone, notes").split(", ");
+  limitFields=QString("clientCode, clientTag, productCode, productCat, limit, current, priority, parent").split(", ");
 }
 
 Azahar::~Azahar()
@@ -906,38 +907,6 @@ QList<ProductInfo> Azahar::getAllProducts()
     return products;
 }
 
-qulonglong Azahar::getLastProviderId(QString code)
-{
-  qulonglong result = 0;
-  QSqlQuery query(db);
-  query.prepare("SELECT lastproviderid FROM products WHERE code=:code");
-  query.bindValue(":code", code);
-  if (query.exec()) {
-    while (query.next()) {
-      int fieldProv  = query.record().indexOf("lastproviderid");
-      result         = query.value(fieldProv).toULongLong();
-    }
-  }
-  else {
-    setError(query.lastError().text());
-    qDebug()<<lastError();
-  }
-  return result;
-}
-
-bool Azahar::updateProductLastProviderId(QString code, qulonglong provId)
-{
-  bool result = false;
-  if (!db.isOpen()) db.open();
-  QSqlQuery query(db);
-  query.prepare("UPDATE products SET lastproviderid=:provid WHERE code=:id");
-  query.bindValue(":id", code);
-  query.bindValue(":provid", provId);
-  if (!query.exec()) setError(query.lastError().text()); else result=true;
-  qDebug()<<"Rows Affected:"<<query.numRowsAffected();
-  return result;
-}
-
 QList<ProductInfo> Azahar::getGroupProductsList(QString id, bool notConsiderDiscounts)
 {
   //qDebug()<<"getGroupProductsList...";
@@ -961,52 +930,6 @@ QList<ProductInfo> Azahar::getGroupProductsList(QString id, bool notConsiderDisc
   return pList;
 }
 
-//NOTE: This method just get the average tax, it does not make any other calculation.
-//      When all the products in the group has a same tax rate, the average tax is the same and
-//      tax in money for the group is fine (not unbalanced), but when is not the same and the difference is much
-//      then the average tax would have an impact, For example:
-//      A group with TWO products :
-//         product 1: Price: 10, tax:15%
-//         product 2: Price  100, tax 1%
-//     The average tax is 8%, its equally for the two products but the second one has a lower tax.
-//     The tax charged to the group with the average tax is $8.8
-//     The tax charged to the group with each product tax is $2.15
-//     So the tax is not fine in this case. This means this method is not accurate for all cases.
-// DEPRECATED
-/*
-double Azahar::getGroupAverageTax(qulonglong id)
-{
-  qDebug()<<"Getting averate tax for id:"<<id;
-  double result = 0;
-  double sum = 0;
-  QList<ProductInfo> pList = getGroupProductsList(id);
-  foreach( ProductInfo info, pList) {
-    sum += info.tax + info.extratax;
-    ///sum += getTotalTaxPercent(info.taxElements);  FOR when taxmodels are implemented
-  }
-  
-  result = sum/pList.count();
-  qDebug()<<"Group average tax: "<<result <<" sum:"<<sum<<" count:"<<pList.count();
-  
-  return result;
-}
-*/
-
-/*DEPRECATED double Azahar::getGroupTotalTax(qulonglong id)
-{
-  qDebug()<<"Getting total tax for id:"<<id;
-  double result = 0;
-  double sum = 0;
-  QList<ProductInfo> pList = getGroupProductsList(id);
-  foreach( ProductInfo info, pList) {
-    sum += info.tax + info.extratax;
-  }
-  
-  result = sum;
-  qDebug()<<" TOTAL tax:"<<sum;
-  
-  return result;
-}*/
 
 //This method replaces the two above deprecated methods.
 ///NOTE: Aug 17 2011: this tax does not take into account the ocassional discounts or price changes. It may be false.
@@ -1803,10 +1726,10 @@ QString Azahar::getInsertString(QStringList list)
     for (int i = 0; i<list.count(); ++i) {
         QString e=list.at(i);
         if (i==0) {
-            msg=msg+e;
+            msg=msg+"`"+e+"`";
             val=val+":"+e;
         } else {
-            msg=msg+", "+e;
+            msg=msg+", "+"`"+e+"`";
             val=val+", :"+e;
         }
     }
@@ -1922,7 +1845,7 @@ qulonglong Azahar::checkParent(ClientInfo &info)
 
 Limit Azahar::getLimitFromQuery(QSqlQuery &query)
 {
-    int fieldClientId     = query.record().indexOf("clientId");
+    int fieldClientCode     = query.record().indexOf("clientCode");
     int fieldClientTag     = query.record().indexOf("clientTag");
     int fieldProductCode    = query.record().indexOf("productCode");
     int fieldProductCat     = query.record().indexOf("productCat");
@@ -1930,7 +1853,7 @@ Limit Azahar::getLimitFromQuery(QSqlQuery &query)
     int fieldLimit     = query.record().indexOf("limit");
     int fieldCurrent     = query.record().indexOf("current");
     Limit result;
-    result.clientId=query.value(fieldClientId).toInt();
+    result.clientCode=query.value(fieldClientCode).toInt();
     result.clientTag=query.value(fieldClientTag).toString();
     result.productCode=query.value(fieldProductCode).toString();
     result.productCat=query.value(fieldProductCat).toInt();
@@ -1952,7 +1875,7 @@ void Azahar::getClientLimits(ClientInfo &info)
         query.exec(q);
         while (query.next()) {
             lim=getLimitFromQuery(query);
-            if (lim.clientId==0) {
+            if (lim.clientCode==QString("")) {
                  if (!info.tags.contains(lim.clientTag)) { continue; }
             }
             limits.append(lim);
@@ -1961,32 +1884,67 @@ void Azahar::getClientLimits(ClientInfo &info)
     info.limits=limits;
 }
 
+bool Azahar::_bindLimit(Limit &info, QSqlQuery &query)
+{
+    bool result=false;
+//    query.bindValue(":id", 0);
+    query.bindValue(":clientCode", info.clientCode);
+    query.bindValue(":clientTag", info.clientTag);
+    query.bindValue(":productCode", info.productCode);
+    query.bindValue(":productCat", info.productCat);
+    query.bindValue(":limit", info.limit);
+    query.bindValue(":current", info.current);
+    query.bindValue(":priority", info.priority);
+    query.bindValue(":parent", info.parent);
+    if (!query.exec()) setError(query.lastError().text()); else result = true;
+    return result;
+}
+
 bool Azahar::insertLimit(Limit &lim)
 {
-    qDebug()<<"inserting limit:"<<lim.clientId<<lim.clientTag<<lim.productCat<<lim.productCode<<lim.limit<<lim.priority;
+    qDebug()<<"inserting limit:"<<lim.clientCode<<lim.clientTag<<lim.productCode<<lim.productCat<<lim.limit<<lim.priority;
     if (!db.isOpen()) db.open();
     if (!db.isOpen()) {
-
         return false;
     }
-//    QSqlQuery query(db);
-//    query.prepare("INSERT INTO limits () VALUES (:idclient, :tag);");
-//    query.bindValue(":idclient",info.id);
-//    query.bindValue(":tag",info.tags.at(i));
-    return true;
-
+    QSqlQuery query(db);
+    QString q="INSERT INTO limits ";
+    q=q+getInsertString(limitFields)+";";
+    qDebug()<<"Insert Client query: "<<q;
+    query.prepare(q);
+    bool r=_bindLimit(lim, query);
+    qDebug()<<"insertLimit: "<<r<<query.lastError()<<query.boundValues();
+    return r;
 }
 
 bool Azahar::modifyLimit(Limit &lim)
 {
     // Should recursively modify all limits having same parent as lim
-    qDebug()<<"inserting limit:"<<lim.clientId<<lim.clientTag<<lim.productCat<<lim.productCode<<lim.limit<<lim.priority;
+    qDebug()<<"inserting limit:"<<lim.clientCode<<lim.clientTag<<lim.productCat<<lim.productCode<<lim.limit<<lim.priority;
     if (!db.isOpen()) db.open();
     if (!db.isOpen()) {
         return false;
     }
     return true;
 }
+
+QList<Limit> Azahar::getClientLimits(ClientInfo &cInfo, ProductInfo &pInfo) {
+    // Retrieve the list of limits regarding clientCode
+    // Search applicable specific limits
+    query=QSqlQuery("select * from limits where ((clientCode=\":clientCode\" or (clientTag in (\":clientTags\"))) and (productCode=\":productCode\" or (productCode=\"*\" and productCat=\":productCat\")));");
+    query.bindValue(":clientCode",cInfo.code);
+    query.bindValue(":clientTag",cInfo.tags.join("\", \""));
+    query.bindValue(":productCode",pInfo.code);
+    query.bindValue(":productCat",pInfo.category);
+    // ciclare sui risultati ed inserire in lista
+}
+
+QList<Limit> Azahar::getInvolvedLimits(QString parentClientCode, QString productCode, int productCat) {
+    // Starting from a parent client code, generate the full set of applicable limits for productCode and productCat
+
+    // restituire anche il limite effettivo per l'acquisto: definire una nuova structs?
+}
+
 
 QStringList Azahar::getClientTags(qulonglong clientId)
 {

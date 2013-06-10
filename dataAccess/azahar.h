@@ -51,6 +51,7 @@ class Azahar : public QObject
     QString m_mainClient;
     QStringList clientFields;
     QStringList donorFields;
+    QStringList limitFields;
   public:
     Azahar(QWidget * parent = 0);
     ~ Azahar();
@@ -82,8 +83,6 @@ class Azahar : public QObject
     QList<ProductInfo>  getLowStockProducts(double min);
     QList<ProductInfo>  getAllProducts();
     double       getProductStockQty(QString code);
-    qulonglong   getLastProviderId(QString code);
-    bool         updateProductLastProviderId(QString code, qulonglong provId);
     QList<ProductInfo> getGroupProductsList(QString id, bool notConsiderDiscounts = false);
     /* DEPRECATED double       getGroupAverageTax(qulonglong id);
        DEPRECATED double       getGroupTotalTax(qulonglong id); */
@@ -294,6 +293,8 @@ private:
     DonorInfo   _getDonorInfo(qulonglong clientId);
     DonorInfo   _getDonorInfo(QString clientCode);
     bool   getDonorInfoFromQuery(QSqlQuery &qC, DonorInfo &info);
+
+    bool    _bindLimit(Limit &info, QSqlQuery &query);
 
 };
 

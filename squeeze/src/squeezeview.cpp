@@ -90,11 +90,13 @@ squeezeView::squeezeView(QWidget *parent)
   qDebug()<<"===STARTING SQUEEZE AT "<<QDateTime::currentDateTime().toString()<<" ===";
   adminIsLogged = false;
   ui_mainview.setupUi(this);
+  qDebug()<<"setupUi OK";
   setAutoFillBackground(true);
 
   // The db = QSqlDatabase called multiple times is causing a crash on certain installations (Not on kubuntu 8.10).
   QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
   db = QSqlDatabase::addDatabase("QMYSQL");
+  qDebug()<<"DB init OK";
 
   ///Login dialog
   dlgPassword = new LoginWindow(this,
@@ -118,13 +120,18 @@ squeezeView::squeezeView(QWidget *parent)
   categoriesHash.clear();
   setupSignalConnections();
   QTimer::singleShot(1100, this, SLOT(setupDb()));
+
+  rmTimer = new QTimer(this);
+  connect(rmTimer, SIGNAL(timeout()), SLOT(reSelectModels()) );
+
   QTimer::singleShot(2000, timerCheckDb, SLOT(start()));
   QTimer::singleShot(20000, timerUpdateGraphs, SLOT(start()));
   QTimer::singleShot(2010, this, SLOT(showWelcomeGraphs()));
   QTimer::singleShot(2000, this, SLOT(login()));
-  rmTimer = new QTimer(this);
-  connect(rmTimer, SIGNAL(timeout()), SLOT(reSelectModels()) );
   rmTimer->start(1000*60*2);
+  QTimer::singleShot(500,this, SLOT(createFloatingPanels()) );
+  QTimer::singleShot(1000,this, SLOT(checkDefaultView()) );
+
 
   ui_mainview.stackedWidget->setCurrentIndex(pWelcome);
   ui_mainview.errLabel->hide();
@@ -149,12 +156,10 @@ squeezeView::squeezeView(QWidget *parent)
   ui_mainview.btnSO->setIcon(DesktopIcon("lemon-box", 32));
 
 
-  QTimer::singleShot(500,this, SLOT(createFloatingPanels()) );
-  QTimer::singleShot(1000,this, SLOT(checkDefaultView()) );
-
   logoBottomFile = KStandardDirs::locate("appdata", "styles/");
   logoBottomFile = logoBottomFile+"tip.svg";
   notifierPanel = new MibitNotifier(this,logoBottomFile, DesktopIcon("dialog-warning", 32));
+  qDebug()<<"exiting from init function";
 
 }
 
@@ -291,7 +296,6 @@ void squeezeView::setupSignalConnections()
   connect(ui_mainview.btnDeleteCategory, SIGNAL(clicked()), SLOT(deleteSelectedCategory()) );
   connect(ui_mainview.btnDeleteClient, SIGNAL(clicked()), SLOT(deleteSelectedClient()));
    connect(ui_mainview.btnDeleteDonor, SIGNAL(clicked()), SLOT(deleteSelectedDonor()));
-  //connect(ui_mainview.btnConfigure, SIGNAL(clicked()),  SLOT( showPrefs()));
 
   connect(ui_mainview.btnDeleteLimit, SIGNAL(clicked()), SLOT(deleteLimit()));
   connect(ui_mainview.btnCreateLimit, SIGNAL(clicked()), SLOT(createLimit()));
@@ -858,14 +862,24 @@ void squeezeView::updateGraphs()
 /*  ----------------- Database ----------------- */
 void squeezeView::setupDb()
 {
+  qDebug()<<"SetupDB";
   if (db.isOpen()) db.close();
+  qDebug()<<"SetupDB: closed";
   db.setHostName(Settings::editDBServer());
   db.setDatabaseName(Settings::editDBName());
   db.setUserName(Settings::editDBUsername());
   db.setPassword(Settings::editDBPassword());
+//  db.setHostName("localhost");
+//  db.setDatabaseName("lemondb");
+//  db.setUserName("lemonclient");
+//  db.setPassword("xarwit0721");
+
+  qDebug()<<"SetupDB: opening";
   db.open();
+  qDebug()<<"SetupDB: opened";
   dlgPassword->setDb(db);
   if (db.isOpen()) {
+      qDebug()<<"it is open!";
     emit signalConnected();
     enableUI(); //enable until logged in...
     productsModel   = new QSqlRelationalTableModel();
@@ -901,7 +915,9 @@ void squeezeView::setupDb()
     setupLogsModel();
     setupCurrenciesModel();
     setupReservationsModel();
+
   } else {
+      qDebug()<<"it was not open...";
     emit signalDisconnected();
     disableUI();
   }
@@ -1344,19 +1360,18 @@ void squeezeView::setupLimitsModel()
   if (db.isOpen()) {
     limitsModel->setTable("limits");
 
-    limitsModel->setRelation(1, QSqlRelation("clients", "id", "surname"));
+//    limitsModel->setRelation(1, QSqlRelation("clients", "code", "surname"));
     limitsModel->setRelation(2, QSqlRelation("tags", "tag", "tag"));
     limitsModel->setRelation(3, QSqlRelation("products", "code", "name"));
     limitsModel->setRelation(4, QSqlRelation("categories", "catid", "text"));
-    limitsModel->setHeaderData(1, Qt::Horizontal, "Cliente");
+//    limitsModel->setHeaderData(1, Qt::Horizontal, "Cliente");
     limitsModel->setHeaderData(2, Qt::Horizontal, "Etichetta");
     limitsModel->setHeaderData(3, Qt::Horizontal, "Prodotto");
     limitsModel->setHeaderData(4, Qt::Horizontal, "Categoria");
     ui_mainview.limitsView->setModel(limitsModel);
-    ui_mainview.limitsView->setColumnHidden(0,true);
     ui_mainview.limitsView->setItemDelegate(new QSqlRelationalDelegate(ui_mainview.limitsView));
     QString f;
-    f=QString("clientId=0");
+    f=QString("clientCode=\"*\"");
     limitsModel->setFilter(f);
     ui_mainview.limitsView->hideColumn(0);
     ui_mainview.limitsView->hideColumn(1);
@@ -1895,8 +1910,8 @@ void squeezeView::settingsChangedOnInitConfig()
   db.setDatabaseName(Settings::editDBName());
   db.setUserName(Settings::editDBUsername());
   db.setPassword(Settings::editDBPassword());
-  
-  connectToDb();
+  setupDb();
+//  connectToDb();
   login();
 }
 

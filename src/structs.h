@@ -89,7 +89,7 @@ struct UserInfo
 
 struct Limit
 {
-    int clientId;
+    QString clientCode;
     QString clientTag;
     QString productCode;
     int productCat;
