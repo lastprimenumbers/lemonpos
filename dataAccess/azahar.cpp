@@ -1842,9 +1842,43 @@ qulonglong Azahar::checkParent(ClientInfo &info)
     return info.id;
 }
 
+Family Azahar::getFamily(ClientInfo &info)
+{
+    // Retrieve the list of ClientInfo pertaining to the family of info. The parent client is the first of the list.
+    Family family;
+    QList<ClientInfo> result;
+    if (!db.isOpen()) {db.open();}
+    if (!db.isOpen()) return family;
+    ClientInfo parentInfo;
+    QString parentCode;
+    if (info.parentClient.count()==0) {
+        parentInfo=info;
+        parentCode=info.code;
+        result.append(info);
+    } else {
+        parentInfo=_getClientInfo(info.parentClient);
+        parentCode=info.parentClient;
+        result.append(parentInfo);
+        result.append(info);
+    }
+    QSqlQuery query(db);
+    query.exec(QString("select * from clients where parent='%1';").arg(parentCode));
+    // Cycle over results, to build the limits hash
+    ClientInfo ci;
+    while (getClientInfoFromQuery(query,ci)) {
+        qDebug()<<"GET Family"<<info.code<<ci.code<<result.count();
+        if (ci.code==info.code or ci.code==parentCode) {continue;}
+        ci.photo="";
+        result.append(ci);
+    }
+    family.members=result;
+    return family;
+}
+
 
 Limit Azahar::getLimitFromQuery(QSqlQuery &query)
 {
+    int fieldId     = query.record().indexOf("id");
     int fieldClientCode     = query.record().indexOf("clientCode");
     int fieldClientTag     = query.record().indexOf("clientTag");
     int fieldProductCode    = query.record().indexOf("productCode");
@@ -1852,37 +1886,21 @@ Limit Azahar::getLimitFromQuery(QSqlQuery &query)
     int fieldPriority     = query.record().indexOf("priority");
     int fieldLimit     = query.record().indexOf("limit");
     int fieldCurrent     = query.record().indexOf("current");
+    int fieldParent     = query.record().indexOf("parent");
     Limit result;
-    result.clientCode=query.value(fieldClientCode).toInt();
+    result.id=query.value(fieldId).toInt();
+    result.clientCode=query.value(fieldClientCode).toString();
     result.clientTag=query.value(fieldClientTag).toString();
     result.productCode=query.value(fieldProductCode).toString();
     result.productCat=query.value(fieldProductCat).toInt();
     result.priority=query.value(fieldPriority).toInt();
     result.limit=query.value(fieldLimit).toFloat();
     result.current=query.value(fieldCurrent).toFloat();
+    result.id=query.value(fieldParent).toInt();
     return result;
 }
 
-void Azahar::getClientLimits(ClientInfo &info)
-{
-    QList<Limit> limits;
-    if (!db.isOpen()) db.open();
-    if (db.isOpen()) {
-        QSqlQuery query(db);
-        Limit lim;
-        // Specific client limits
-        QString q=QString("select * from limits where (clientId=%1 or clientId=0) and (clientTag in (###));").arg(info.id);
-        query.exec(q);
-        while (query.next()) {
-            lim=getLimitFromQuery(query);
-            if (lim.clientCode==QString("")) {
-                 if (!info.tags.contains(lim.clientTag)) { continue; }
-            }
-            limits.append(lim);
-        }
-        }
-    info.limits=limits;
-}
+
 
 bool Azahar::_bindLimit(Limit &info, QSqlQuery &query)
 {
@@ -1928,49 +1946,102 @@ bool Azahar::modifyLimit(Limit &lim)
     return true;
 }
 
-QList<Limit> Azahar::getClientLimits(ClientInfo &cInfo, ProductInfo &pInfo) {
-    // Retrieve the list of limits regarding clientCode
-    // Search applicable specific limits
-    query=QSqlQuery("select * from limits where ((clientCode=\":clientCode\" or (clientTag in (\":clientTags\"))) and (productCode=\":productCode\" or (productCode=\"*\" and productCat=\":productCat\")));");
-    query.bindValue(":clientCode",cInfo.code);
-    query.bindValue(":clientTag",cInfo.tags.join("\", \""));
-    query.bindValue(":productCode",pInfo.code);
-    query.bindValue(":productCat",pInfo.category);
-    // ciclare sui risultati ed inserire in lista
-}
-
-QList<Limit> Azahar::getInvolvedLimits(QString parentClientCode, QString productCode, int productCat) {
-    // Starting from a parent client code, generate the full set of applicable limits for productCode and productCat
-
-    // restituire anche il limite effettivo per l'acquisto: definire una nuova structs?
-}
-
-
-QStringList Azahar::getClientTags(qulonglong clientId)
+QList<int> Azahar::getClientLimits(ClientInfo &cInfo, ProductInfo &pInfo,QHash<int,Limit> &currentLimits)
 {
-    return QStringList() ;
-//    QStringList tags;
-//    if (clientId == 0) {
-//        return tags;
-//    }
-//    if (!db.isOpen()) db.open();
-//    if (db.isOpen()) {
-//        QSqlQuery qC(db);
-//        if (qC.exec(QString("select * from tags where idclient=%1;").arg(clientId))) {
-//            int fieldTag     = qC.record().indexOf("tag");
-//            while (qC.next()) {
-//                tags.append(qC.value(fieldTag).toString());
-//            }
-//        }
-//    }
-//    return tags;
+    // Retrieve the list of limits regarding client cInfo for product pInfo
+    // Search applicable specific limits
+    // Returns a list of applicable limits ids and updates the currentLimits hash
+    QList<int> result;
+    if (!db.isOpen()) db.open();
+    if (!db.isOpen()) return result;
+    QSqlQuery query(db);
+
+    // TODO: creare limiti specifici se inesistenti, quindi cercare solo per i limiti specifici!
+
+    QString q=QString("select * from limits where ((clientCode=':clientCode' or (clientTag in (':clientTags'))) and (productCode=':productCode' or (productCode='*' and productCat=':productCat')));");
+    query.prepare(q);
+    query.bindValue(":clientCode", cInfo.code);
+    query.bindValue(":clientTag", cInfo.tags.join("\", \""));
+    query.bindValue(":productCode", pInfo.code);
+    query.bindValue(":productCat", pInfo.category);
+    query.exec();
+    // Cycle over results, to build the limits hash
+    while (query.next()) {
+        Limit lim=getLimitFromQuery(query);
+        int key=lim.id;
+        if (lim.clientCode=="*") {
+            // Transform into a limit specification (just set clientCode, parentClient, and unset id)
+            lim.clientCode=cInfo.code;
+            lim.parent=lim.id;
+            lim.id=-1;
+            // notice: key must remain equal to lim.id!
+        }
+        // If the limit is already present in current hash, skip
+        if (currentLimits.contains(key)) {continue;}
+        currentLimits[key]=lim;
+    }
+
+    return result;
+
+}
+
+void Azahar::incrementLimits(ClientInfo &cInfo, ProductInfo &pInfo, QHash<int,Limit> &currentLimits) {
+    // Increment by one product unit the current limit consumption for that product.
+    QList<int> applicable=getClientLimits(cInfo,pInfo,currentLimits);
+    float add=pInfo.price/applicable.count();
+    for (int i=0; i<applicable.count(); ++i) {
+        int aid=applicable.at(i);
+        currentLimits[aid].current+=add;
+    }
+
+}
+
+void Azahar::decrementLimits(ClientInfo &cInfo, ProductInfo &pInfo, QHash<int,Limit> &currentLimits) {
+    // Decrement by one product unit the current limit consumption for that product.
+    return;
+}
+
+void Azahar::commitLimits( QHash<int,Limit> &currentLimits) {
+    // Save to database current limit values
+    QList<int> keys=currentLimits.keys();
+    for (int i; i<keys.count(); ++i) {
+        Limit lim=currentLimits[keys.at(i)];
+        if (lim.id<=0) {
+            // new limit specification found
+            insertLimit(lim);
+        } else {
+            // modify current limit
+            modifyLimit(lim);
+        }
+    }
+}
+
+
+
+QStringList Azahar::getClientTags(QString clientCode)
+{
+    QStringList tags;
+    if (clientCode.count() == 0) {
+        return tags;
+    }
+    if (!db.isOpen()) db.open();
+    if (db.isOpen()) {
+        QSqlQuery qC(db);
+        if (qC.exec(QString("select * from tags where clientCode='%1';").arg(clientCode))) {
+            int fieldTag     = qC.record().indexOf("tag");
+            while (qC.next()) {
+                tags.append(qC.value(fieldTag).toString());
+            }
+        }
+    }
+    return tags;
 }
 
 void Azahar::setClientTags(ClientInfo info)
 {
     qDebug()<<"setClientTags"<<info.tags;
     // Recupero vecchi tag
-    QStringList old = getClientTags(info.id);
+    QStringList old = getClientTags(info.code);
     if (!db.isOpen()) db.open();
     if (db.isOpen()) {
         QSqlQuery query(db);
@@ -1978,8 +2049,8 @@ void Azahar::setClientTags(ClientInfo info)
         for (int i = 0; i<info.tags.count(); ++i) {
             if (old.contains(info.tags.at(i))) { continue ;}
             qDebug()<<"ADDING"<<info.tags.at(i);
-            query.prepare("INSERT INTO tags (idclient, tag) VALUES (:idclient, :tag);");
-            query.bindValue(":idclient",info.id);
+            query.prepare("INSERT INTO tags (clientCode, tag) VALUES (:idclient, :tag);");
+            query.bindValue(":idclient",info.code);
             query.bindValue(":tag",info.tags.at(i));
             if (!query.exec()){
                 qDebug()<<"ERROR ADDING"<<info.tags.at(i)<<query.lastError();
@@ -1990,8 +2061,8 @@ void Azahar::setClientTags(ClientInfo info)
         for (int i = 0; i<old.count(); ++i) {
             if (info.tags.contains(old.at(i))) { continue ; }
             qDebug()<<"REMOVING"<<old.at(i);
-            query.prepare("DELETE FROM tags WHERE idclient=:idclient and tag=:tag");
-            query.bindValue(":idclient",info.id);
+            query.prepare("DELETE FROM tags WHERE clientCode=:idclient and tag=:tag");
+            query.bindValue(":idclient",info.code);
             query.bindValue(":tag",old.at(i));
             query.exec();
         }
@@ -2046,8 +2117,7 @@ ClientInfo Azahar::_getClientInfo(qulonglong clientId)
       QSqlQuery qC(db);
       if (qC.exec(QString("select * from clients where id=%1;").arg(clientId))) {
         getClientInfoFromQuery(qC,info);
-        info.tags=getClientTags(clientId);
-        getClientLimits(info);
+        info.tags=getClientTags(info.code);
       }
       else {
         qDebug()<<"ERROR: "<<qC.lastError();
@@ -2075,8 +2145,7 @@ ClientInfo Azahar::_getClientInfo(QString clientCode)
         QSqlQuery qC(db);
         if (qC.exec(QString("select * from clients WHERE code='%1';").arg(clientCode))) {
             getClientInfoFromQuery(qC,info);
-            info.tags=getClientTags(info.id);
-            getClientLimits(info);
+            info.tags=getClientTags(clientCode);
         }
         else {
             qDebug()<<"ERROR: "<<qC.lastError();

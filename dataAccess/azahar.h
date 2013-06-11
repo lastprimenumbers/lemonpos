@@ -149,17 +149,22 @@ class Azahar : public QObject
     QString      getMainClient();
     unsigned int getClientId(QString uname);
     bool         deleteClient(qulonglong id);
+    Family getFamily(ClientInfo &info);
+    void getFamilyLimits(Family &family, ProductInfo &pInfo);
 
     // TAGS
-    QStringList getClientTags(qulonglong clientId);
+    QStringList getClientTags(QString clientCode);
     QStringList getAvailableTags();
     void setClientTags(ClientInfo info);
 
     // LIMITS
-    void getClientLimits(ClientInfo &info);
     Limit getLimitFromQuery(QSqlQuery &query);
     bool insertLimit(Limit &lim);
     bool modifyLimit(Limit &lim);
+    QList<int> getClientLimits(ClientInfo &cInfo, ProductInfo &pInfo, QHash<int,Limit> &currentLimits);
+    void incrementLimits(ClientInfo &cInfo, ProductInfo &pInfo, QHash<int,Limit> &currentLimits);
+    void decrementLimits(ClientInfo &cInfo, ProductInfo &pInfo, QHash<int,Limit> &currentLimits);
+    void commitLimits(QHash<int,Limit> &currentLimits);
 
     //TRANSACTIONS
     TransactionInfo getTransactionInfo(qulonglong id);
