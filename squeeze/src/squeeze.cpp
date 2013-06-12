@@ -153,6 +153,7 @@ void squeeze::setConnection(bool yes)
   } else {
     led->off();
     disableUI();
+    showDBConfigDialog();
   }
 }
 

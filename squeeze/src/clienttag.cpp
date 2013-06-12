@@ -68,7 +68,7 @@ void clienttag::removeTag()
 }
 void clienttag::createTag()
 {
-    QString item = QInputDialog::getText(this,"Create a new tag","Enter the new tag:");
+    QString item = QInputDialog::getText(this,"Crea una nuova etichetta per il cliente","Nuova etichetta:");
     if (item.count()==0){
         return;
     }

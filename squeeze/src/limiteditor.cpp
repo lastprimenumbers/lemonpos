@@ -11,12 +11,12 @@ limiteditor::limiteditor(QWidget *parent) :
     ui->setupUi(this);
 
     // An empty limit
-    lim.clientId=0;
+    lim.clientCode=QString("");
     lim.clientTag=QString("*");
-    lim.productCat=-1;
+    lim.productCat=0;
     lim.productCode=QString("*");
-    lim.parent=-1;
-    lim.limit=-1;
+    lim.parent=0;
+    lim.limit=0;
     lim.current=0;
     lim.priority=0;
 
@@ -50,7 +50,7 @@ void limiteditor::setLimit(Limit nlim)
     lim=nlim;
 
     // Setup client selection
-    if (lim.clientId==0) {
+    if (lim.clientCode==0) {
         if (lim.clientTag=="*") {
             ui->radioAllClients->setChecked(true);
         } else {
@@ -59,7 +59,7 @@ void limiteditor::setLimit(Limit nlim)
         }
     } else {
         ui->radioSingleClient->setChecked(true);
-        ui->codeClient->setId(lim.clientId);
+        ui->codeClient->setCode(lim.clientCode);
     }
 
 
@@ -88,13 +88,13 @@ void limiteditor::addLimit()
 // CLIENT SELECTION
     // All clients
     if (ui->radioAllClients->isChecked()) {
-        lim.clientId = 0;
+        lim.clientCode= "*";
         lim.clientTag = QString("*");
     // A single, specific client
     }else if (ui->radioSingleClient->isChecked()) {
         ClientInfo info;
         ui->codeClient->getInfo(info);
-        lim.clientId = info.id;
+        lim.clientCode = info.code;
     // All clients having a tag
     }else if (ui->radioTagClient->isChecked()) {
         QStringList tags;
@@ -122,7 +122,7 @@ void limiteditor::addLimit()
     lim.priority = ui->inputPriority->value();
 
     // Must check feasibility?
-    if (lim.parent>-1){
+    if (lim.parent>0){
         // If parent is defined, we are modifying an existing limit
         myDb->modifyLimit(lim);
     } else {

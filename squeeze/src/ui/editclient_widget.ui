@@ -23,7 +23,7 @@
    <item row="0" column="0">
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="basePage">
       <property name="enabled">
@@ -351,7 +351,7 @@
         </rect>
        </property>
        <property name="text">
-        <string>Paying Client:</string>
+        <string>Capofamiglia:</string>
        </property>
       </widget>
       <widget class="QLabel" name="label_8">
@@ -364,7 +364,7 @@
         </rect>
        </property>
        <property name="text">
-        <string>This Client Pays Also For:</string>
+        <string>Composizione Familiare</string>
        </property>
       </widget>
       <widget class="QPushButton" name="viewClientButton">
@@ -377,7 +377,7 @@
         </rect>
        </property>
        <property name="text">
-        <string>View</string>
+        <string>Apri</string>
        </property>
       </widget>
       <widget class="QLabel" name="parentClientPhoto">
@@ -424,7 +424,7 @@
         </rect>
        </property>
        <property name="text">
-        <string>Paying Client Name</string>
+        <string>Nome del capofamiglia</string>
        </property>
        <property name="wordWrap">
         <bool>true</bool>

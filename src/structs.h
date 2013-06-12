@@ -89,7 +89,8 @@ struct UserInfo
 
 struct Limit
 {
-    int clientId;
+    qulonglong id;
+    QString clientCode;
     QString clientTag;
     QString productCode;
     int productCat;
@@ -120,7 +121,15 @@ struct ClientInfo
   QString      msgsusp;
   QString      notes;
   QStringList   tags;
-  QList<Limit>         limits;
+  // Effective limits for the current transaction
+  QHash<int, Limit>         limits;
+};
+
+
+struct Family
+{
+    QList<ClientInfo> members;
+    double effectiveLimit;
 };
 
 struct DonorInfo

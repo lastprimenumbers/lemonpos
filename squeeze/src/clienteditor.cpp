@@ -166,16 +166,13 @@ void ClientEditor::setParentClient(QString code)
     else {
         qDebug()<<"Empty parent client"<<code;
     }
+    updateChildren();
 }
 
 // Controlla che il codice parent inserito esista. Se esiste, colora la label di verde
 // Carica il nome e la foto, imposta hasParent=true
 bool ClientEditor::validateParent(QString code)
 {
-    if (hasChild) {
-        updateChildren();
-        return false;
-    }
     QPixmap photo;
     QPalette pal=this->palette();
     QColor col;
@@ -211,34 +208,42 @@ bool ClientEditor::validateParent(QString code)
 }
 void ClientEditor::updateChildren()
 {
-    QStringList codes;
-    QStringList names;
-    QTableWidgetItem codeItem;
-    QTableWidgetItem nameItem;
-    QString code;
-    QString name;
+    ClientInfo info=getClientInfo();
+    info.parentClient=getParentClient();
+    qDebug()<<"updateChildren"<<info.code<<info.parentClient;
+    Family family;
+    // Retrieve from db
     Azahar *myDb=new Azahar;
     myDb->setDatabase(db);
-    myDb->getChildrenClientsList(ui->editClientCode->text(), codes, names);
+    family=myDb->getFamily(info);
     delete myDb;
-    ui->childrenTable->setRowCount(codes.count());
-    hasChild=false;
-    if (codes.count()==0) {
+    // Populate family table
+    ui->childrenTable->setRowCount(family.members.count());
+    hasChild=true;
+    hasParent=false;
+    if (family.members.count()==1) {
         ui->editParentClient->setEnabled(true);
-        return;
+        hasChild=false;
+        hasParent=false;
+    } else if (family.members.at(0).code==info.code) {
+        hasChild=true;
+        ui->editParentClient->setName("");
+        ui->parentClientLabel->setText(tr("Disabled"));
+        ui->editParentClient->setEnabled(false);
+    } else {
+        hasParent=true;
     }
-
-    for (int i=0 ; i<codes.count(); ++i ) {
-        QTableWidgetItem *codeItem = new QTableWidgetItem(codes.at(i));
-        QTableWidgetItem *nameItem = new QTableWidgetItem(names.at(i));
+    for (int i=0 ; i<family.members.count(); ++i ) {
+        ClientInfo fc=family.members.at(i);
+        QTableWidgetItem *codeItem = new QTableWidgetItem(fc.code);
+        QTableWidgetItem *nameItem = new QTableWidgetItem(fc.name+" "+fc.surname);
+        if (fc.code==info.parentClient || (info.parentClient.count()==0 && i==0)) {
+            codeItem->setBackgroundColor(QColor("red"));
+            nameItem->setBackgroundColor(QColor("red"));
+        }
         ui->childrenTable->setItem(i,0,codeItem);
         ui->childrenTable->setItem(i,1,nameItem);
     }
-    hasChild=true;
-    hasParent=false;
-    ui->editParentClient->setName("");
-    ui->parentClientLabel->setText(tr("Disabled"));
-    ui->editParentClient->setEnabled(false);
 }
 
 void ClientEditor::viewParentClient()
@@ -300,6 +305,7 @@ void ClientEditor::setClientInfo(ClientInfo info)
     QPixmap photo;
     photo.loadFromData(info.photo);
     setPhoto(photo);
+    qDebug()<<"clientEditor setting tags"<<info.code<<info.tags;
     ui->clientTagEditor->setTags(info.tags);
     loadLimits(info);
 }
