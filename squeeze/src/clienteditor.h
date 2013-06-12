@@ -46,8 +46,11 @@ class ClientEditor : public KDialog
     ClientInfo parentClientInfo;
     void setCode(QString code) { ui->editClientCode->setText(code); };
     void setName(QString name) { ui->editClientName->setText(name); };
+    void setSurname(QString surname) { ui->editClientSurname->setText(surname); } ;
     void setAddress(QString address) { ui->editClientAddress->setText(address); } ;
     void setPhone(QString phone) { ui->editClientPhone->setText(phone); };
+    void setEmail(QString email) { ui->editClientEmail->setText(email); };
+    void setNation(QString nation) {ui->editClientNation->setText(nation); };
 //    void setParentClient(QString code) { ui->editParentClient->setText(code); };
     void setParentClient(QString);
     void setMonthly(double p) { ui->editMonthlyPoints->setText(QString::number(p)); };
@@ -55,10 +58,19 @@ class ClientEditor : public KDialog
     void setId(long int id) { clientId = id; };
     void setSinceDate(QDate date) { ui->sinceDatePicker->setDate(date); }
     void setExpiryDate(QDate date) { ui->expiryDatePicker->setDate(date); }
+    void setBirthDate(QDate date) {ui->birthDatePicker->setDate(date); }
+    void setBeginsuspDate(QDate date) {ui->beginsuspPicker->setDate(date); }
+    void setEndsuspDate(QDate date) {ui->endsuspPicker->setDate(date); }
+    void setMsgsusp(QString msgsusp){ui->editClientMsgsusp->setText(msgsusp);}
+    void setNotes(QString notes){ui->editClientNotes->setText(notes);}
+
 //    void setTags(QStringList tags);
 
     QString getCode(){ return ui->editClientCode->text();};
     QString getName(){ return ui->editClientName->text();};
+    QString getSurname(){ return ui->editClientSurname->text();};
+    QString getEmail(){ return ui->editClientEmail->text();};
+    QString getNation(){ return ui->editClientNation->text();};
     QString getParentClient(){ return ui->editParentClient->getCode();};
     QString getAddress(){ return ui->editClientAddress->toPlainText();};
     QString getPhone(){ return ui->editClientPhone->text();};
@@ -66,7 +78,12 @@ class ClientEditor : public KDialog
     QPixmap getPhoto(){ return pix;};
     QDate   getSinceDate() { return ui->sinceDatePicker->date(); }
     QDate   getExpiryDate() { return ui->expiryDatePicker->date(); }
-//    QStringList getTags();
+    QDate   getBirthDate() { return ui->birthDatePicker->date(); }
+    QDate   getBeginsuspDate() { return ui->beginsuspPicker->date(); }
+    QDate   getEndsuspDate() { return ui->endsuspPicker->date(); }
+    QString getMsgsusp(){ return ui->editClientMsgsusp->toPlainText();};
+    QString getNotes(){ return ui->editClientNotes->toPlainText();};
+    //    QStringList getTags();
 
     void setClientInfo(ClientInfo info);
     void setClientInfo(QString code);
