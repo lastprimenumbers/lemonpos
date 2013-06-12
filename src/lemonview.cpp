@@ -1272,33 +1272,34 @@ bool lemonView::incrementTableItemQty(QString code, double q)
         double     qq = ea.section('/',1,1).toDouble();
         ProductInfo pi = myDb->getProductInfo(QString::number(c));
         QString unitStr;
-        bool yes = false;
+//        bool yes = false;
+         bool yes = true;
         double onList = getTotalQtyOnList(pi); // item itself and contained in any gruped product.
         // q     : item qty to add.
         // qq    : item qty on current grouped element to add
         // qq*q  : total items to add for this product.
         // onList: items of the same product already on the shopping list.
-        if (pi.stockqty >= ((qq*q)+onList) ) yes = true;
-        available = (available && yes );
-        if (!yes) {
-          itemsNotAvailable << i18n("%1 has %2 %3 but requested %4 + %5",pi.desc,pi.stockqty,unitStr,qq*q,onList);
-        }
+//        if (pi.stockqty >= ((qq*q)+onList) ) yes = true;
+//        available = (available && yes );
+//        if (!yes) {
+//          itemsNotAvailable << i18n("%1 has %2 %3 but requested %4 + %5",pi.desc,pi.stockqty,unitStr,qq*q,onList);
+//        }
         qDebug()<<pi.desc<<" qtyonstock:"<<pi.stockqty<<" needed qty (onlist and new):"<<QString::number((qq*q)+onList);
       }
       delete myDb;
     } else {
       double onList = getTotalQtyOnList(info); // item itself and contained in any gruped product.
-      if (stockqty >= q+onList) available = true; else available = false;
+//      if (stockqty >= q+onList) available = true; else available = false;
       qDebug()<<info.desc<<" qtyonstock:"<<info.stockqty<<" needed qty (onlist and new):"<<QString::number(q+onList);
     }
       
     if (available) qty+=q; else {
       QString msg;
       double onList = getTotalQtyOnList(info); // item itself and contained in any gruped product.
-      if (!itemsNotAvailable.isEmpty())
-        msg = i18n("<html><font color=red><b>The group/pack is not available because:<br>%1</b></font></html>", itemsNotAvailable.join("<br>"));
-      else
-        msg = i18n("<html><font color=red><b>There are only %1 articles of your choice at stock.<br> You requested %2</b></font></html>", info.stockqty,q+onList);
+//      if (!itemsNotAvailable.isEmpty())
+//        msg = i18n("<html><font color=red><b>The group/pack is not available because:<br>%1</b></font></html>", itemsNotAvailable.join("<br>"));
+//      else
+//        msg = i18n("<html><font color=red><b>There are only %1 articles of your choice at stock.<br> You requested %2</b></font></html>", info.stockqty,q+onList);
       
       if (ui_mainview.mainPanel->currentIndex() == pageMain) {
          tipCode->showTip(msg, 6000);
@@ -1473,7 +1474,6 @@ if ( doNotAddMoreItems ) { //only for reservations
   if (productsHash.contains( info.code )) 
       info = productsHash.value( info.code );
 
-  //   TODO: finire rimozione prodotti con pistola
     if (ui_mainview.deleteItem->isChecked()) {
         ui_mainview.tableWidget->setCurrentCell(info.row,1);
         qDebug()<<"pippo"<<info.row;
@@ -1498,7 +1498,6 @@ if ( doNotAddMoreItems ) { //only for reservations
   
   if (!incrementTableItemQty( info.code /*codeX*/, qty) ) {
     info.qtyOnList = qty;
-
     
     int insertedAtRow = -1;
     bool productFound = false;
@@ -1525,17 +1524,19 @@ if ( doNotAddMoreItems ) { //only for reservations
             QString unitStr;
             if (pi.units == 1 ) unitStr=" "; else unitStr = pi.unitStr;
             iname += '\n' + QString::number(q) + " "+ unitStr +" "+ pi.desc;
-            bool yes = false;
+//            bool yes = false;
+            bool yes = true;
+            available=true;
             double onList = getTotalQtyOnList(pi); // item itself and contained in any gruped product.
             // q     : item qty to add.
             // qq    : item qty on current grouped element to add
             // q*qty : total items to add for this product.
             // onList: items of the same product already on the shopping list.
-            if (pi.stockqty >= ((q*qty)+onList) ) yes = true;
-            available = (available && yes );
-            if (!yes) {
-              itemsNotAvailable << i18n("%1 has %2 %3 but requested %4 + %5",pi.desc,pi.stockqty,unitStr,qty*q,onList);
-            }
+//            if (pi.stockqty >= ((q*qty)+onList) ) yes = true;
+//            available = (available && yes );
+//            if (!yes) {
+//              itemsNotAvailable << i18n("%1 has %2 %3 but requested %4 + %5",pi.desc,pi.stockqty,unitStr,qty*q,onList);
+//            }
             qDebug()<<pi.desc<<" qtyonstock:"<<pi.stockqty<<" needed qty:"<<QString::number(qty*q);
           }
           //CHECK AVAILABILITY
@@ -1549,14 +1550,14 @@ if ( doNotAddMoreItems ) { //only for reservations
         }
       } else { //It is not a grouped product
         double onList = getTotalQtyOnList(info); // item itself and contained in any gruped product.
-        if (info.stockqty >=  qty+onList || availabilityDoesNotMatters) {
-          if (availabilityDoesNotMatters) qDebug() << __FUNCTION__ <<" Availability DOES NOT MATTERS! ";
+//        if (info.stockqty >=  qty+onList || availabilityDoesNotMatters) {
+//          if (availabilityDoesNotMatters) qDebug() << __FUNCTION__ <<" Availability DOES NOT MATTERS! ";
           insertedAtRow = doInsertItem(info.code /*codeX*/, iname, qty, info.price, descuento, info.unitStr);
-        }
-        else
-          msg = i18n("<html><font color=red><b>There are only %1 articles of your choice at stock.<br> You requested %2</b></font></html>", info.stockqty,qty+onList);
+//        }
+//        else
+//          msg = i18n("<html><font color=red><b>There are only %1 articles of your choice at stock.<br> You requested %2</b></font></html>", info.stockqty,qty+onList);
       }
-    } else qDebug()<<"\n\n***Este ELSE no importa!!! ya se tomaron acciones al respecto***\nTHIS SHOULD NOT BE PRINTED!!!\n\n";
+    }
       
     if (!msg.isEmpty()) {
         if (ui_mainview.mainPanel->currentIndex() == pageMain) {
