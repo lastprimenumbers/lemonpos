@@ -24,7 +24,7 @@
 #include <KDialog>
 #include <QtGui>
 #include "../../dataAccess/azahar.h"
-#include "../../squeeze/src/ui_editclient_widget.h"
+#include "ui_editclient_widget.h"
 #include <QtSql>
 
 class ClientEditorUI : public QFrame, public Ui::clientEditor

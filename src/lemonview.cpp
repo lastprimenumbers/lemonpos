@@ -37,7 +37,7 @@
 #include "../../mibitWidgets/mibitpassworddlg.h"
 #include "../../mibitWidgets/mibitfloatpanel.h"
 #include "../../mibitWidgets/mibitnotifier.h"
-#include "../../squeeze/src/clienteditor.h"
+//#include "../../squeeze/src/clienteditor.h"
 
 //StarMicronics printers
 // #include "printers/sp500.h"
