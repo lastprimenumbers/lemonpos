@@ -129,7 +129,11 @@ struct ClientInfo
 struct Family
 {
     QList<ClientInfo> members;
+    QHash<QString, Limit> limits;
+    ProductInfo lastProduct;
+    QStringList applicable;
     double effectiveLimit;
+
 };
 
 struct DonorInfo

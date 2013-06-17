@@ -98,6 +98,8 @@ public:
     QSqlTableModel *productsModel;
     QHash<QString, int> categoriesHash;
     ClientInfo clientInfo;
+    Family  family;
+    void updateFamily(ClientInfo info);
     QHash<int, ClientInfo> clientsHash;
     qulonglong buyPoints;
     double discMoney;

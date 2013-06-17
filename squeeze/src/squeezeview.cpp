@@ -1359,19 +1359,20 @@ void squeezeView::setupLimitsModel()
   qDebug()<<"Setting up Limits Model";
   if (db.isOpen()) {
     limitsModel->setTable("limits");
-
 //    limitsModel->setRelation(1, QSqlRelation("clients", "code", "surname"));
-    limitsModel->setRelation(2, QSqlRelation("tags", "tag", "tag"));
+//    limitsModel->setRelation(2, QSqlRelation("tags", "tag", "tag"));
     limitsModel->setRelation(3, QSqlRelation("products", "code", "name"));
     limitsModel->setRelation(4, QSqlRelation("categories", "catid", "text"));
 //    limitsModel->setHeaderData(1, Qt::Horizontal, "Cliente");
     limitsModel->setHeaderData(2, Qt::Horizontal, "Etichetta");
     limitsModel->setHeaderData(3, Qt::Horizontal, "Prodotto");
     limitsModel->setHeaderData(4, Qt::Horizontal, "Categoria");
+    limitsModel->setHeaderData(5, Qt::Horizontal, "Limite");
+    limitsModel->setHeaderData(6, Qt::Horizontal, "Priorità");
     ui_mainview.limitsView->setModel(limitsModel);
     ui_mainview.limitsView->setItemDelegate(new QSqlRelationalDelegate(ui_mainview.limitsView));
     QString f;
-    f=QString("clientCode=\"*\"");
+    f=QString("clientCode='*'");
     limitsModel->setFilter(f);
     ui_mainview.limitsView->hideColumn(0);
     ui_mainview.limitsView->hideColumn(1);
@@ -2516,6 +2517,8 @@ void squeezeView::createLimit() {
     limiteditor *limed = new limiteditor;
     limed->setDb(db);
     limed->show();
+    //FIXME: controlla modelReset!
+    connect(limed,SIGNAL(accepted()),SLOT(limitsModel->modelReset()));
 }
 
 void squeezeView::modifyLimit() {

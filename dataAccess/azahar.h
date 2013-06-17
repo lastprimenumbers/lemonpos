@@ -150,7 +150,8 @@ class Azahar : public QObject
     unsigned int getClientId(QString uname);
     bool         deleteClient(qulonglong id);
     Family getFamily(ClientInfo &info);
-    void getFamilyLimits(Family &family, ProductInfo &pInfo);
+    bool getFamilyLimits(Family &family, ProductInfo &pInfo, double qty=1);
+
 
     // TAGS
     QStringList getClientTags(QString clientCode);
@@ -161,9 +162,8 @@ class Azahar : public QObject
     Limit getLimitFromQuery(QSqlQuery &query);
     bool insertLimit(Limit &lim);
     bool modifyLimit(Limit &lim);
-    QList<int> getClientLimits(ClientInfo &cInfo, ProductInfo &pInfo, QHash<int,Limit> &currentLimits);
-    void incrementLimits(ClientInfo &cInfo, ProductInfo &pInfo, QHash<int,Limit> &currentLimits);
-    void decrementLimits(ClientInfo &cInfo, ProductInfo &pInfo, QHash<int,Limit> &currentLimits);
+    QStringList getClientLimits(ClientInfo &cInfo, ProductInfo &pInfo, QHash<QString, Limit> currentLimits);
+    bool changeFamilyLimits(Family &family, ProductInfo &pInfo, double sign=1);
     void commitLimits(QHash<int,Limit> &currentLimits);
 
     //TRANSACTIONS

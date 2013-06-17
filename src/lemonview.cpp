@@ -1233,9 +1233,29 @@ void lemonView::loadClient()
   } else {
     clientInfo=info;
     qDebug()<<"loadClient"<<info.name<<info.monthly;
+    updateFamily(info);
     updateClientInfo();
-  }
 
+
+  }
+}
+
+void lemonView::updateFamily(ClientInfo info) {
+    // Get a new family only if the current clientInfo is not contained in current family
+    bool getfam=true;
+    for (int i; i<family.members.count(); ++i) {
+      if (family.members.at(i).code==info.code) {
+          getfam=false;
+          break;
+      }
+    }
+    // if not contained, get new family
+    qDebug()<<"getting a new family?"<<getfam;
+    if (getfam) {
+        Azahar *myDb = new Azahar;
+        myDb->setDatabase(db);
+        family=myDb->getFamily(info);
+    }
 }
 
 void lemonView::doEmitSignalQueryDb()
@@ -1345,26 +1365,26 @@ void lemonView::insertItem(QString code)
       return;
   }
   
-  if ( !specialOrders.isEmpty() ) {
-    KNotification *notify = new KNotification("information", this);
-    notify->setText(i18n("Only Special Orders can be added. Please finish the current special order before adding any other product."));
-    QPixmap pixmap = DesktopIcon("dialog-information",32);
-    notify->setPixmap(pixmap);
-    notify->sendEvent();
-    ui_mainview.editItemCode->clear();
-    return;
-  }
+//  if ( !specialOrders.isEmpty() ) {
+//    KNotification *notify = new KNotification("information", this);
+//    notify->setText(i18n("Only Special Orders can be added. Please finish the current special order before adding any other product."));
+//    QPixmap pixmap = DesktopIcon("dialog-information",32);
+//    notify->setPixmap(pixmap);
+//    notify->sendEvent();
+//    ui_mainview.editItemCode->clear();
+//    return;
+//  }
 
-qDebug()<< __FUNCTION__ <<" doNotAddMoreItems = "<<doNotAddMoreItems;
-if ( doNotAddMoreItems ) { //only for reservations
-    KNotification *notify = new KNotification("information", this);
-    notify->setText(i18n("Cannot Add more items to the Reservation."));
-    QPixmap pixmap = DesktopIcon("dialog-information",32);
-    notify->setPixmap(pixmap);
-    notify->sendEvent();
-    ui_mainview.editItemCode->clear();
-    return;
-}
+//qDebug()<< __FUNCTION__ <<" doNotAddMoreItems = "<<doNotAddMoreItems;
+//if ( doNotAddMoreItems ) { //only for reservations
+//    KNotification *notify = new KNotification("information", this);
+//    notify->setText(i18n("Cannot Add more items to the Reservation."));
+//    QPixmap pixmap = DesktopIcon("dialog-information",32);
+//    notify->setPixmap(pixmap);
+//    notify->sendEvent();
+//    ui_mainview.editItemCode->clear();
+//    return;
+//}
   
   double qty  = 1;
   bool qtyWritten = false;
@@ -1495,6 +1515,15 @@ if ( doNotAddMoreItems ) { //only for reservations
   }
 
   if ( qty <= 0) {return;}
+
+  // Check for limits
+  updateFamily(clientInfo);
+  if (myDb->getFamilyLimits(family,info,qty)==false) {
+      msg=i18n("Limite di acquisto oltrepassato. La disponibilità residua è solamente di %1.", family.effectiveLimit);
+      tipCode->showTip(msg, 6000);
+      return;
+  }
+
   
   if (!incrementTableItemQty( info.code /*codeX*/, qty) ) {
     info.qtyOnList = qty;
@@ -4084,7 +4113,10 @@ void lemonView::updateClientInfo()
   myDb->setDatabase(db); //NOTE:maybe its better to add creditInfo to clientInfo, and from azahar::getClientInfo() get the creditInfoForClient. Need more code review at azahar.
 
   QPixmap pix;
-  clientInfo = myDb->getClientInfo(clientInfo.code);
+
+
+  clientInfo= myDb->getClientInfo(clientInfo.code);
+
   pix.loadFromData(clientInfo.photo);
   ui_mainview.lblClientPhoto->setPixmap(pix);
 
