@@ -1488,7 +1488,7 @@ void lemonView::insertItem(QString code)
 
   info = myDb->getProductInfo(codeX); //includes discount and validdiscount
   qDebug()<<" CodeX = "<<codeX<<" Numeric Code:"<<info.code<<" Alphacode:"<<info.alphaCode<<" Required Qty:"<<qty;
-  delete myDb;
+
 
   //the next 'if' checks if the hash contains the product and got values from there.. To include purchaseQty, that we need!
   if (productsHash.contains( info.code )) 
@@ -1521,13 +1521,13 @@ void lemonView::insertItem(QString code)
   if (myDb->getFamilyLimits(family,info,qty)==false) {
       msg=i18n("Limite di acquisto oltrepassato. La disponibilità residua è solamente di %1.", family.effectiveLimit);
       tipCode->showTip(msg, 6000);
+      delete myDb;
       return;
   }
 
-  
+  delete myDb;
   if (!incrementTableItemQty( info.code /*codeX*/, qty) ) {
     info.qtyOnList = qty;
-    
     int insertedAtRow = -1;
     bool productFound = false;
     if ( info.code > 0 ) productFound = true;
@@ -1561,16 +1561,11 @@ void lemonView::insertItem(QString code)
             // qq    : item qty on current grouped element to add
             // q*qty : total items to add for this product.
             // onList: items of the same product already on the shopping list.
-//            if (pi.stockqty >= ((q*qty)+onList) ) yes = true;
-//            available = (available && yes );
-//            if (!yes) {
-//              itemsNotAvailable << i18n("%1 has %2 %3 but requested %4 + %5",pi.desc,pi.stockqty,unitStr,qty*q,onList);
-//            }
             qDebug()<<pi.desc<<" qtyonstock:"<<pi.stockqty<<" needed qty:"<<QString::number(qty*q);
           }
           //CHECK AVAILABILITY
           if (available || availabilityDoesNotMatters ) {
-            if (availabilityDoesNotMatters) qDebug() << __FUNCTION__ <<" Availability DOES NOT MATTERS! ";
+            if (availabilityDoesNotMatters) qDebug() << __FUNCTION__ <<" Availability DOES NOT MATTER! ";
             insertedAtRow = doInsertItem( info.code /*codeX*/, iname, qty, info.price, descuento, info.unitStr);
           }
           else
@@ -1579,12 +1574,7 @@ void lemonView::insertItem(QString code)
         }
       } else { //It is not a grouped product
         double onList = getTotalQtyOnList(info); // item itself and contained in any gruped product.
-//        if (info.stockqty >=  qty+onList || availabilityDoesNotMatters) {
-//          if (availabilityDoesNotMatters) qDebug() << __FUNCTION__ <<" Availability DOES NOT MATTERS! ";
           insertedAtRow = doInsertItem(info.code /*codeX*/, iname, qty, info.price, descuento, info.unitStr);
-//        }
-//        else
-//          msg = i18n("<html><font color=red><b>There are only %1 articles of your choice at stock.<br> You requested %2</b></font></html>", info.stockqty,qty+onList);
       }
     }
       
@@ -1607,6 +1597,15 @@ void lemonView::insertItem(QString code)
       refreshTotalLabel();
     }
   }//if !increment...
+
+  // Increment limit counter
+  if (qty>0){
+  Azahar *myDb = new Azahar;
+  myDb->setDatabase(db);
+  myDb->changeFamilyLimits(family,info,qty);
+  delete myDb;
+  }
+
   //Saving session.
   qDebug()<<"** INSERTING A PRODUCT [updating balance/transaction]";
   updateBalance(false);
@@ -1719,6 +1718,7 @@ int lemonView::doInsertItem(QString itemCode, QString itemDesc, double itemQty, 
   ui_mainview.editItemCode->setText("");
   ui_mainview.editItemCode->setCursorPosition(0);
   ui_mainview.mainPanel->setCurrentIndex(pageMain);
+
 
   return rowCount;
 }

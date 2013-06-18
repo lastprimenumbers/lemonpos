@@ -162,9 +162,9 @@ class Azahar : public QObject
     Limit getLimitFromQuery(QSqlQuery &query);
     bool insertLimit(Limit &lim);
     bool modifyLimit(Limit &lim);
-    QStringList getClientLimits(ClientInfo &cInfo, ProductInfo &pInfo, QHash<QString, Limit> currentLimits);
+    QStringList getClientLimits(ClientInfo &cInfo, ProductInfo &pInfo, QHash<QString, Limit> &currentLimits);
     bool changeFamilyLimits(Family &family, ProductInfo &pInfo, double sign=1);
-    void commitLimits(QHash<int,Limit> &currentLimits);
+    void commitLimits(QHash<QString, Limit> &currentLimits);
 
     //TRANSACTIONS
     TransactionInfo getTransactionInfo(qulonglong id);
