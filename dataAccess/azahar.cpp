@@ -1936,6 +1936,13 @@ bool Azahar::_bindLimit(Limit &info, QSqlQuery &query)
     return result;
 }
 
+Limit Azahar::getLimit(qulonglong limitId) {
+    QSqlQuery query(db);
+    query.prepare("select * from limits where id=:id");
+    query.bindValue(':id',limitId);
+    return getLimitFromQuery(query);
+}
+
 bool Azahar::insertLimit(Limit &lim)
 {
     qDebug()<<"inserting limit:"<<lim.clientCode<<lim.clientTag<<lim.productCode<<lim.productCat<<lim.limit<<lim.priority;
@@ -1969,7 +1976,24 @@ bool Azahar::modifyLimit(Limit &lim)
     bool r=_bindLimit(lim,query);
     qDebug()<<"modifyLimit: "<<r<<query.lastError()<<query.boundValues()<<query.lastQuery();
 \
-    // TODO: If it's absolute, should recursively modify all limits having same parent as lim
+    // If it's general, should recursively modify all limits having same parent as lim
+    if (lim.parent<=0) {
+        q="select * from limits where parent=:parent";
+        query.prepare(q);
+        query.exec(q);
+        while (query.next()) {
+            // Get child limit
+            Limit child=getLimitFromQuery(query);
+            // Copy updatable fields from parent to child
+            child.clientTag=lim.clientTag;
+            child.limit=lim.limit;
+            child.priority=lim.priority;
+            child.productCat=lim.productCat;
+            child.productCode=lim.productCode;
+            // Recursively modify the child limit
+            modifyLimit(child);
+        }
+    }
     return true;
 }
 

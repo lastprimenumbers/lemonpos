@@ -45,8 +45,7 @@ void limiteditor::setDb(QSqlDatabase parentDb)
     ui->codeClient->setDb(parentDb,"clients");
 }
 
-void limiteditor::setLimit(Limit nlim)
-{
+void limiteditor::setLimit(Limit nlim) {
     lim=nlim;
 
     // Setup client selection
@@ -75,6 +74,13 @@ void limiteditor::setLimit(Limit nlim)
 
     ui->inputLimit->setValue(lim.limit);
     ui->inputPriority->setValue(lim.priority);
+}
+
+void limiteditor::setLimit(qulonglong limitId) {
+    Azahar *myDb = new Azahar;
+    myDb->setDatabase(db);
+    Limit lim=myDb->getLimit(limitId);
+    setLimit(lim);
 }
 
 

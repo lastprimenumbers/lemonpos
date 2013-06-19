@@ -152,6 +152,7 @@ class Azahar : public QObject
     Family getFamily(ClientInfo &info);
     bool getFamilyLimits(Family &family, ProductInfo &pInfo, double qty=1);
     bool changeFamilyLimits(Family &family, ProductInfo &pInfo, double sign=1);
+    Limit getLimit(qulonglong limitId);
 
 
     // TAGS

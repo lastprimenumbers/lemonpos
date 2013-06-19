@@ -1368,16 +1368,16 @@ void squeezeView::setupLimitsModel()
     limitsModel->setHeaderData(3, Qt::Horizontal, "Prodotto");
     limitsModel->setHeaderData(4, Qt::Horizontal, "Categoria");
     limitsModel->setHeaderData(5, Qt::Horizontal, "Limite");
-    limitsModel->setHeaderData(6, Qt::Horizontal, "Priorità");
+//    limitsModel->setHeaderData(6, Qt::Horizontal, "Priorità");
     ui_mainview.limitsView->setModel(limitsModel);
     ui_mainview.limitsView->setItemDelegate(new QSqlRelationalDelegate(ui_mainview.limitsView));
     QString f;
     f=QString("clientCode='*'");
     limitsModel->setFilter(f);
-    ui_mainview.limitsView->hideColumn(0);
-    ui_mainview.limitsView->hideColumn(1);
-    ui_mainview.limitsView->hideColumn(6);
-    ui_mainview.limitsView->hideColumn(8);
+    ui_mainview.limitsView->hideColumn(0); //id
+    ui_mainview.limitsView->hideColumn(1); //clientcode
+    ui_mainview.limitsView->hideColumn(6); //priorità
+    ui_mainview.limitsView->hideColumn(8); //parent
     limitsModel->select();
 
   }
@@ -2526,6 +2526,36 @@ void squeezeView::modifyLimit() {
     limed->setDb(db);
 //    limed->setLimit();
     limed->show();
+
+//    if (db.isOpen()) {
+//      QModelIndex index = ui_mainview.limitsView->currentIndex();
+//      if (limitsModel->tableName().isEmpty()) setupLimitsModel();
+//      if (index == limitsModel->index(-1,-1) ) {
+//        KMessageBox::information(this, i18n("Please select a limit to modify, then press the modify button again."), i18n("Cannot modify"));
+//      }
+//      else  {
+//        QString uname = limitsModel->record(index.row()).value("name").toString();
+//        qulonglong limitId = limitsModel->record(index.row()).value("id").toULongLong();
+//        if (clientId > 1) {
+//          int answer = KMessageBox::questionYesNo(this, i18n("Do you really want to delete the client named %1?",uname),
+//                                                i18n("Delete"));
+//          if (answer == KMessageBox::Yes) {
+//            Azahar *myDb = new Azahar;
+//            myDb->setDatabase(db);
+//            if (!clientsModel->removeRow(index.row(), index)) {
+//              // weird:  since some time, removeRow does not work... it worked fine on versions < 0.9 ..
+//              bool d = myDb->deleteClient(clientId); qDebug()<<"Deleteing client ("<<clientId<<") manually...";
+//              if (d) qDebug()<<"Deletion succed...";
+//            }
+//            clientsModel->submitAll();
+//            clientsModel->select();
+//            delete myDb;
+//          }
+//      } else KMessageBox::information(this, i18n("Default client cannot be deleted."), i18n("Cannot delete"));
+//     }
+//   }
+
+
 }
 
 void squeezeView::deleteLimit() {
