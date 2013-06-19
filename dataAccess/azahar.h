@@ -151,6 +151,7 @@ class Azahar : public QObject
     bool         deleteClient(qulonglong id);
     Family getFamily(ClientInfo &info);
     bool getFamilyLimits(Family &family, ProductInfo &pInfo, double qty=1);
+    bool changeFamilyLimits(Family &family, ProductInfo &pInfo, double sign=1);
 
 
     // TAGS
@@ -163,7 +164,6 @@ class Azahar : public QObject
     bool insertLimit(Limit &lim);
     bool modifyLimit(Limit &lim);
     QStringList getClientLimits(ClientInfo &cInfo, ProductInfo &pInfo, QHash<QString, Limit> &currentLimits);
-    bool changeFamilyLimits(Family &family, ProductInfo &pInfo, double sign=1);
     void commitLimits(QHash<QString, Limit> &currentLimits);
 
     //TRANSACTIONS
@@ -302,5 +302,7 @@ private:
     bool    _bindLimit(Limit &info, QSqlQuery &query);
 
 };
+
+
 
 #endif

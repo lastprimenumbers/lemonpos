@@ -1600,10 +1600,10 @@ void lemonView::insertItem(QString code)
 
   // Increment limit counter
   if (qty>0){
-  Azahar *myDb = new Azahar;
-  myDb->setDatabase(db);
-  myDb->changeFamilyLimits(family,info,qty);
-  delete myDb;
+    Azahar *myDb = new Azahar;
+    myDb->setDatabase(db);
+    myDb->changeFamilyLimits(family,info,qty);
+    delete myDb;
   }
 
   //Saving session.
@@ -2279,6 +2279,8 @@ void lemonView::finishCurrentTransaction()
         myDb->insertCreditHistory(history);
     }
 
+    // COMMIT LIMITS
+    myDb->commitLimits(family.limits);
 
     if (finishingReservation) {
         //set reservation status to rCompleted.

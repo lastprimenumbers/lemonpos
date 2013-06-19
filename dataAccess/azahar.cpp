@@ -1713,12 +1713,12 @@ QString Azahar::getUpdateString(QStringList list)
     for (int i = 0; i<list.count(); ++i) {
         QString e=list.at(i);
         if (i==0) {
-            msg=e+"=:"+e;
+            msg="`"+e+"`=:"+e;
         } else {
-            msg+=", "+e+"=:"+e;
+            msg+=", `"+e+"`=:"+e;
         }
     }
-    return msg;
+    return msg+" ";
 }
 
 QString Azahar::getInsertString(QStringList list)
@@ -1737,6 +1737,7 @@ QString Azahar::getInsertString(QStringList list)
     }
     return "("+msg+") VALUES("+val+")";
 }
+
 
 bool Azahar::insertClient(ClientInfo info)
 {
@@ -1905,7 +1906,7 @@ Limit Azahar::getLimitFromQuery(QSqlQuery &query)
     int fieldCurrent     = query.record().indexOf("current");
     int fieldParent     = query.record().indexOf("parent");
     Limit result;
-    result.id=query.value(fieldId).toInt();
+    result.id=query.value(fieldId).toLongLong();
     result.clientCode=query.value(fieldClientCode).toString();
     result.clientTag=query.value(fieldClientTag).toString();
     result.productCode=query.value(fieldProductCode).toString();
@@ -1913,16 +1914,16 @@ Limit Azahar::getLimitFromQuery(QSqlQuery &query)
     result.priority=query.value(fieldPriority).toInt();
     result.limit=query.value(fieldLimit).toFloat();
     result.current=query.value(fieldCurrent).toFloat();
-    result.id=query.value(fieldParent).toInt();
+    result.parent=query.value(fieldParent).toLongLong();
     return result;
 }
-
-
 
 bool Azahar::_bindLimit(Limit &info, QSqlQuery &query)
 {
     bool result=false;
-//    query.bindValue(":id", 0);
+    if (query.lastQuery().contains(":id")) {
+        query.bindValue(":id", info.id);
+    }
     query.bindValue(":clientCode", info.clientCode);
     query.bindValue(":clientTag", info.clientTag);
     query.bindValue(":productCode", info.productCode);
@@ -1954,12 +1955,21 @@ bool Azahar::insertLimit(Limit &lim)
 
 bool Azahar::modifyLimit(Limit &lim)
 {
-    // Should recursively modify all limits having same parent as lim
-    qDebug()<<"modify limit:"<<lim.clientCode<<lim.clientTag<<lim.productCat<<lim.productCode<<lim.limit<<lim.priority;
+
+    qDebug()<<"modify limit:"<<lim.id<<lim.clientCode<<lim.clientTag<<lim.productCat<<lim.productCode<<lim.limit<<lim.parent;
     if (!db.isOpen()) db.open();
     if (!db.isOpen()) {
         return false;
     }
+    QString q="UPDATE limits set ";
+    q+=getUpdateString(limitFields);
+    q+=" where id=:id;";
+    QSqlQuery query(db);
+    query.prepare(q);
+    bool r=_bindLimit(lim,query);
+    qDebug()<<"modifyLimit: "<<r<<query.lastError()<<query.boundValues()<<query.lastQuery();
+\
+    // TODO: If it's absolute, should recursively modify all limits having same parent as lim
     return true;
 }
 
@@ -1986,10 +1996,10 @@ QStringList Azahar::getClientLimits(ClientInfo &cInfo, ProductInfo &pInfo, QHash
     qDebug()<<"getClientLimits:"<<query.lastError()<<query.boundValues()<<query.lastQuery();
     // Cycle over results to build the limits hash
     while (query.next()) {
-        qDebug()<<"Found query:"<<query.size();
         Limit lim=getLimitFromQuery(query);
         // key must contain both lim.id and clientCode, in case of same limit applying to more clients
         QString key=cInfo.code+"::"+QString::number(lim.id);
+        qDebug()<<"Found key"<<key<<lim.id<<lim.parent;
         result.append(key);
         // If the limit is already present in current hash, skip
         if (currentLimits.contains(key)) {continue;}
@@ -2004,8 +2014,31 @@ QStringList Azahar::getClientLimits(ClientInfo &cInfo, ProductInfo &pInfo, QHash
         // add to hash
         currentLimits[key]=lim;
     }
-    qDebug()<<"getClientLimits ending with"<<currentLimits.count()<<currentLimits.keys()<<result;
-    return result;
+    // Remove duplicate limits
+    // Duplicates arise if a general limit is created before its specific limits are found
+    QStringList rresult; // result filtered from duplicates
+    QString genkey;
+    for (int i; i<result.count(); ++i) {
+        QString key=result.at(i);
+        Limit lim=currentLimits[key];
+
+        rresult.append(key);
+        // Generic limit, do not check
+        if (lim.parent<=0) { continue; }
+        // Generated limit, keep
+        if (lim.id<0) {continue;}
+        // Build a possible generic key, deriving from the parent of lim
+        genkey=cInfo.code+"::"+QString::number(lim.parent);
+        // If that generic key exists
+        if (currentLimits.contains(genkey)) {
+            qDebug()<<"Removing duplicate key:"<<genkey<<key;
+            // remove it from currentLimits and from rresult
+            currentLimits.remove(genkey);
+            rresult.removeAll(genkey);
+        }
+    }
+    qDebug()<<"getClientLimits ending with"<<currentLimits.count()<<currentLimits.keys()<<rresult;
+    return rresult;
 }
 
 bool Azahar::getFamilyLimits(Family &family, ProductInfo &pInfo, double qty) {
@@ -2020,6 +2053,7 @@ bool Azahar::getFamilyLimits(Family &family, ProductInfo &pInfo, double qty) {
         qDebug()<<"Retrieved member"<<ci.code<<ci.name;
         applicable+=getClientLimits(ci, pInfo, family.limits);
     }
+
     family.lastProduct=pInfo;
     family.applicable=applicable;
     family.effectiveLimit=0;
@@ -2028,8 +2062,13 @@ bool Azahar::getFamilyLimits(Family &family, ProductInfo &pInfo, double qty) {
         return true;
     }
     for (int i=0; i<applicable.count(); ++i) {
-        Limit lim=family.limits[applicable.at(i)];
+        QString key=applicable.at(i);
+        if (!family.limits.contains(key)) {
+            qDebug()<<"Applicable limit NOT FOUND:"<<key;
+        }
+        Limit lim=family.limits.value(key);
         result+=lim.limit-lim.current;
+        qDebug()<<"Applicable limit"<<key<<lim.limit<<lim.current<<result;
     }
     family.effectiveLimit=result;
     qDebug()<<"New effective limit"<<family.effectiveLimit;
@@ -2049,17 +2088,19 @@ bool Azahar::changeFamilyLimits(Family &family, ProductInfo &pInfo, double qty) 
     }
     double mod=qty*pInfo.price/family.applicable.count();
     for (int i=0; i<family.applicable.count(); ++i) {
-        family.limits[family.applicable.at(i)].current+=mod;
+        QString key=family.applicable.at(i);
+        Limit lim=family.limits.value(key);
+        lim.current+=mod;
+        family.limits[key]=lim;
     }
     return true;
-
 }
 
 void Azahar::commitLimits( QHash<QString,Limit> &currentLimits) {
     // Save to database current limit values
     QList<QString> keys=currentLimits.keys();
     for (int i; i<keys.count(); ++i) {
-        Limit lim=currentLimits[keys.at(i)];
+        Limit lim=currentLimits.value(keys.at(i));
         if (lim.id<0) {
             // new limit specification found
             insertLimit(lim);

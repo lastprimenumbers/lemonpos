@@ -89,7 +89,7 @@ struct UserInfo
 
 struct Limit
 {
-    qulonglong id;
+    qlonglong id;
     QString clientCode;
     QString clientTag;
     QString productCode;
@@ -97,7 +97,7 @@ struct Limit
     double limit;
     double current;
     int priority;
-    int parent;
+    qlonglong parent;
 };
 
 struct ClientInfo
