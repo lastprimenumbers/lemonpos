@@ -161,11 +161,13 @@ class Azahar : public QObject
     void setClientTags(ClientInfo info);
 
     // LIMITS
-    Limit getLimitFromQuery(QSqlQuery &query);
+    bool getLimitFromQuery(QSqlQuery &query, Limit &result);
     bool insertLimit(Limit &lim);
     bool modifyLimit(Limit &lim);
     QStringList getClientLimits(ClientInfo &cInfo, ProductInfo &pInfo, QHash<QString, Limit> &currentLimits);
     void commitLimits(QHash<QString, Limit> &currentLimits);
+    bool deleteLimit(qlonglong &limitId);
+    bool deleteLimit(Limit &lim);
 
     //TRANSACTIONS
     TransactionInfo getTransactionInfo(qulonglong id);

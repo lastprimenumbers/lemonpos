@@ -190,6 +190,7 @@ signals:
    void createDonor();
 
    void createLimit();
+   void limitsModelSelect();
    void modifyLimit();
    void deleteLimit();
    void searchLimit();

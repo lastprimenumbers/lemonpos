@@ -1894,7 +1894,7 @@ Family Azahar::getFamily(ClientInfo &info)
 }
 
 
-Limit Azahar::getLimitFromQuery(QSqlQuery &query)
+bool Azahar::getLimitFromQuery(QSqlQuery &query, Limit &result)
 {
     int fieldId     = query.record().indexOf("id");
     int fieldClientCode     = query.record().indexOf("clientCode");
@@ -1905,17 +1905,16 @@ Limit Azahar::getLimitFromQuery(QSqlQuery &query)
     int fieldLimit     = query.record().indexOf("limit");
     int fieldCurrent     = query.record().indexOf("current");
     int fieldParent     = query.record().indexOf("parent");
-    Limit result;
     result.id=query.value(fieldId).toLongLong();
     result.clientCode=query.value(fieldClientCode).toString();
     result.clientTag=query.value(fieldClientTag).toString();
     result.productCode=query.value(fieldProductCode).toString();
     result.productCat=query.value(fieldProductCat).toInt();
     result.priority=query.value(fieldPriority).toInt();
-    result.limit=query.value(fieldLimit).toFloat();
-    result.current=query.value(fieldCurrent).toFloat();
+    result.limit=query.value(fieldLimit).toDouble();
+    result.current=query.value(fieldCurrent).toDouble();
     result.parent=query.value(fieldParent).toLongLong();
-    return result;
+    return true;
 }
 
 bool Azahar::_bindLimit(Limit &info, QSqlQuery &query)
@@ -1937,10 +1936,37 @@ bool Azahar::_bindLimit(Limit &info, QSqlQuery &query)
 }
 
 Limit Azahar::getLimit(qulonglong limitId) {
+    Limit lim;
+    if (!db.isOpen()) db.open();
+    if (!db.isOpen()) {
+        return lim;
+    }
     QSqlQuery query(db);
-    query.prepare("select * from limits where id=:id");
-    query.bindValue(':id',limitId);
-    return getLimitFromQuery(query);
+    query.prepare("select * from limits where id=:id;");
+    query.bindValue(":id",limitId);
+    query.exec();
+    query.next();
+    getLimitFromQuery(query,lim);
+    qDebug()<<"Getting limit"<<limitId<<lim.limit<<query.lastQuery()<<query.lastError()<<query.boundValues();
+    return lim;
+}
+
+bool Azahar::deleteLimit(qlonglong &limitId)
+{
+    if (!db.isOpen()) db.open();
+    if (!db.isOpen()) {
+        return false;
+    }
+    QSqlQuery query(db);
+    query.prepare("delete from limits where id=:id;");
+    query.bindValue(":id",limitId);
+    query.exec();
+    return true;
+}
+
+bool Azahar::deleteLimit(Limit &lim) {
+     qDebug()<<"deleting limit:"<<lim.clientCode<<lim.clientTag<<lim.productCode<<lim.productCat<<lim.limit<<lim.priority;
+    return deleteLimit(lim.id);
 }
 
 bool Azahar::insertLimit(Limit &lim)
@@ -1959,6 +1985,7 @@ bool Azahar::insertLimit(Limit &lim)
     qDebug()<<"insertLimit: "<<r<<query.lastError()<<query.boundValues();
     return r;
 }
+
 
 bool Azahar::modifyLimit(Limit &lim)
 {
@@ -1983,7 +2010,8 @@ bool Azahar::modifyLimit(Limit &lim)
         query.exec(q);
         while (query.next()) {
             // Get child limit
-            Limit child=getLimitFromQuery(query);
+            Limit child;
+            getLimitFromQuery(query,child);
             // Copy updatable fields from parent to child
             child.clientTag=lim.clientTag;
             child.limit=lim.limit;
@@ -2020,7 +2048,8 @@ QStringList Azahar::getClientLimits(ClientInfo &cInfo, ProductInfo &pInfo, QHash
     qDebug()<<"getClientLimits:"<<query.lastError()<<query.boundValues()<<query.lastQuery();
     // Cycle over results to build the limits hash
     while (query.next()) {
-        Limit lim=getLimitFromQuery(query);
+        Limit lim;
+        getLimitFromQuery(query,lim);
         // key must contain both lim.id and clientCode, in case of same limit applying to more clients
         QString key=cInfo.code+"::"+QString::number(lim.id);
         qDebug()<<"Found key"<<key<<lim.id<<lim.parent;

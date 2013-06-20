@@ -2518,48 +2518,51 @@ void squeezeView::createLimit() {
     limed->setDb(db);
     limed->show();
     //FIXME: controlla modelReset!
-    connect(limed,SIGNAL(accepted()),SLOT(limitsModel->modelReset()));
+    connect(limed,SIGNAL(accepted()),SLOT(limitsModelSelect()));
+}
+
+void squeezeView::limitsModelSelect() {
+    limitsModel->select();
 }
 
 void squeezeView::modifyLimit() {
-    limiteditor *limed = new limiteditor;
-    limed->setDb(db);
-//    limed->setLimit();
-    limed->show();
+          QModelIndex index = ui_mainview.limitsView->currentIndex();
+          if (limitsModel->tableName().isEmpty()) setupLimitsModel();
+          if (index == limitsModel->index(-1,-1) ) {
+            KMessageBox::information(this, i18n("Please select a limit to modify, then press the modify button again."), i18n("Cannot modify"));
+          }
+          else  {
+            qulonglong limitId = limitsModel->record(index.row()).value("id").toULongLong();
+            limiteditor *limed = new limiteditor;
+            limed->setDb(db);
+            limed->setLimit(limitId);
+            limed->show();
 
-//    if (db.isOpen()) {
-//      QModelIndex index = ui_mainview.limitsView->currentIndex();
-//      if (limitsModel->tableName().isEmpty()) setupLimitsModel();
-//      if (index == limitsModel->index(-1,-1) ) {
-//        KMessageBox::information(this, i18n("Please select a limit to modify, then press the modify button again."), i18n("Cannot modify"));
-//      }
-//      else  {
-//        QString uname = limitsModel->record(index.row()).value("name").toString();
-//        qulonglong limitId = limitsModel->record(index.row()).value("id").toULongLong();
-//        if (clientId > 1) {
-//          int answer = KMessageBox::questionYesNo(this, i18n("Do you really want to delete the client named %1?",uname),
-//                                                i18n("Delete"));
-//          if (answer == KMessageBox::Yes) {
-//            Azahar *myDb = new Azahar;
-//            myDb->setDatabase(db);
-//            if (!clientsModel->removeRow(index.row(), index)) {
-//              // weird:  since some time, removeRow does not work... it worked fine on versions < 0.9 ..
-//              bool d = myDb->deleteClient(clientId); qDebug()<<"Deleteing client ("<<clientId<<") manually...";
-//              if (d) qDebug()<<"Deletion succed...";
-//            }
-//            clientsModel->submitAll();
-//            clientsModel->select();
-//            delete myDb;
-//          }
-//      } else KMessageBox::information(this, i18n("Default client cannot be deleted."), i18n("Cannot delete"));
-//     }
-//   }
-
-
+      }
 }
 
 void squeezeView::deleteLimit() {
-
+    if (db.isOpen()) {
+          QModelIndex index = ui_mainview.limitsView->currentIndex();
+          if (limitsModel->tableName().isEmpty()) setupLimitsModel();
+          if (index == limitsModel->index(-1,-1) ) {
+            KMessageBox::information(this, i18n("Please select a limit to delete, then press the delete button again."), i18n("Cannot delete"));
+          }
+          else  {
+            qlonglong limitId = limitsModel->record(index.row()).value("id").toLongLong();
+            if (limitId > 0) {
+          int answer = KMessageBox::questionYesNo(this, i18n("Do you really want to delete the limit?"),
+                                                i18n("Delete"));
+          if (answer == KMessageBox::Yes) {
+            Azahar *myDb = new Azahar;
+            myDb->setDatabase(db);
+            myDb->deleteLimit(limitId);
+            limitsModel->select();
+            delete myDb;
+          }
+      } else KMessageBox::information(this, i18n("Default limit cannot be deleted."), i18n("Cannot delete"));
+     }
+   }
 }
 
 void squeezeView::searchLimit() {

@@ -22,7 +22,7 @@ public:
     ~limiteditor();
     QSqlDatabase db;
     void setDb(QSqlDatabase pippo);
-    void setLimit(Limit nlim);
+    void setLimit(Limit &nlim);
     void setLimit(qulonglong limitId);
 
 private slots:
