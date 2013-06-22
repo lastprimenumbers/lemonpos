@@ -2923,17 +2923,25 @@ void squeezeView::deleteSelectedCategory()
     }
     else  {
       QString catText = categoriesModel->record(index.row()).value("text").toString();
+      qulonglong newCatId=0;
       Azahar *myDb = new Azahar;
       myDb->setDatabase(db);
+      QStringList catlist=myDb->getCategoriesList();
       qulonglong catId = myDb->getCategoryId(catText);
       if (catId >0) {
         int answer = KMessageBox::questionYesNo(this, i18n("Do you really want to delete the category '%1'?", catText),
                                                 i18n("Delete"));
-        if (answer == KMessageBox::Yes) {
+        bool ok=false;
+        QString newCatName=QInputDialog::getItem(this,i18n("Re-assign products to another category"),
+                              "Select a new category:",  catlist, 0, false, &ok);
+        if (answer == KMessageBox::Yes && ok) {
+          // Ask for a category reassignement
+
+          newCatId=myDb->getCategoryId(newCatName);
           qulonglong  iD = categoriesModel->record(index.row()).value("catid").toULongLong();
           if (!categoriesModel->removeRow(index.row(), index)) {
             // weird:  since some time, removeRow does not work... it worked fine on versions < 0.9 ..
-            bool d = myDb->deleteCategory(iD); qDebug()<<"Deleteing Category ("<<iD<<") manually...";
+            bool d = myDb->deleteCategory(iD,newCatId); qDebug()<<"Deleteing Category ("<<iD<<") manually...";
             if (d) qDebug()<<"Deletion succed...";
           }
           categoriesModel->submitAll();

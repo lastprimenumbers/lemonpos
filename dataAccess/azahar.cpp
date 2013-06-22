@@ -1060,12 +1060,13 @@ QHash<QString, int> Azahar::getCategoriesHash()
 
 QStringList Azahar::getCategoriesList()
 {
+    // Alphabetical order!
   QStringList result;
   result.clear();
   if (!db.isOpen()) db.open();
   if (db.isOpen()) {
     QSqlQuery myQuery(db);
-    if (myQuery.exec("select text from categories;")) {
+    if (myQuery.exec("select text from categories order by text;")) {
       while (myQuery.next()) {
         int fieldText = myQuery.record().indexOf("text");
         QString text = myQuery.value(fieldText).toString();
@@ -1117,11 +1118,15 @@ QString Azahar::getCategoryStr(qulonglong id)
   return result;
 }
 
-bool Azahar::deleteCategory(qulonglong id)
+bool Azahar::deleteCategory(qulonglong id, qulonglong newId=0)
 {
   bool result = false;
-  if (!db.isOpen()) db.open();
+  if (!db.isOpen()) db.open();  
   QSqlQuery query(db);
+  // Reassign all products in that category to newId
+  query=QString("update products set category=%1 where category=%2").arg(newId).arg(id);
+  query.exec();
+  qDebug()<<"Reassign products:"<<query.lastError().text()<<query.lastQuery();
   query = QString("DELETE FROM categories WHERE catid=%1").arg(id);
   if (!query.exec()) setError(query.lastError().text()); else result=true;
   return result;
