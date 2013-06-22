@@ -1882,6 +1882,7 @@ Family Azahar::getFamily(ClientInfo &info)
     QList<ClientInfo> result;
     if (!db.isOpen()) {db.open();}
     if (!db.isOpen()) return family;
+    info.tags=getClientTags(info.code);
     ClientInfo parentInfo;
     QString parentCode;
     if (info.parentClient.count()==0) {
@@ -1904,8 +1905,10 @@ Family Azahar::getFamily(ClientInfo &info)
         qDebug()<<"GET Family"<<info.code<<ci.code<<result.count();
         if (ci.code==info.code or ci.code==parentCode) {continue;}
         ci.photo="";
+        ci.tags=getClientTags(ci.code);
         result.append(ci);
     }
+
     family.members=result;
     return family;
 }
@@ -2051,14 +2054,22 @@ QStringList Azahar::getClientLimits(ClientInfo &cInfo, ProductInfo &pInfo, QHash
     if (!db.isOpen()) { db.open();}
     if (!db.isOpen()) {return QStringList();}
     QSqlQuery query(db);
-
+    QString ctags="";
+    for (int i; i<cInfo.tags.count(); ++i) {
+        ctags+="'"+cInfo.tags.at(i)+"', ";
+    }
+    ctags+="'*'";
     // TODO: creare limiti specifici se inesistenti, quindi cercare solo per i limiti specifici!
-    qDebug()<<"Querying getClientLimits"<<cInfo.code<<currentLimits.count();
-    qDebug()<<cInfo.tags.join("\", \"");
-    QString q=QString("select * from limits where ( (clientCode in (:clientCode,'*') or (clientTag in (:clientTag))) and (productCode=:productCode or (productCode='*' and productCat=:productCat)) );");
+    qDebug()<<"Querying getClientLimits"<<cInfo.code<<currentLimits.count()<<ctags;
+    QString q=QString("select * from limits where (                         \
+                      (clientCode=':clientCode' or                          \
+                            (clientCode='*' and clientTag in (:clientTag))) \
+                      and                                                   \
+                      (productCode=':productCode' or                        \
+                        (productCode='*' and productCat=:productCat)) );");
     query.prepare(q);
     query.bindValue(":clientCode", cInfo.code);
-    query.bindValue(":clientTag", cInfo.tags.join("', '"));
+    query.bindValue(":clientTag", ctags);
     query.bindValue(":productCode", pInfo.code);
     query.bindValue(":productCat", pInfo.category);
     query.exec();

@@ -3852,12 +3852,19 @@ void lemonView::setupModel()
 
     //Categories popuplist
     populateCategoriesHash();
-    QHashIterator<QString, int> item(categoriesHash);
-    while (item.hasNext()) {
-      item.next();
-      ui_mainview.comboFilterByCategory->addItem(item.key());
-      //qDebug()<<"iterando por el hash en el item:"<<item.key()<<"/"<<item.value();
-    }
+    Azahar * myDb = new Azahar;
+    myDb->setDatabase(db);
+     QStringList catList=myDb->getCategoriesList();
+//    QHashIterator<QString, int> item(categoriesHash);
+//    while (item.hasNext()) {
+//      item.next();
+//      ui_mainview.comboFilterByCategory->addItem(item.key());
+//      //qDebug()<<"iterando por el hash en el item:"<<item.key()<<"/"<<item.value();
+//    }
+     for (int i; i<catList.count(); ++i) {
+         ui_mainview.comboFilterByCategory->addItem(catList.at(i));
+     }
+    delete myDb;
 
     ui_mainview.comboFilterByCategory->setCurrentIndex(0);
     connect(ui_mainview.comboFilterByCategory,SIGNAL(currentIndexChanged(int)), this, SLOT( setFilter()) );
