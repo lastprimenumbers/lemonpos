@@ -102,6 +102,7 @@ class Azahar : public QObject
     QString     getCategoryStr(qulonglong id);
     bool        insertCategory(QString text);
     bool        deleteCategory(qulonglong id, qulonglong newId);
+    bool        renameCategory(qulonglong id, QString newText);
 
     //MEASURES
     QStringList getMeasuresList();

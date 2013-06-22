@@ -289,6 +289,7 @@ void squeezeView::setupSignalConnections()
   connect(ui_mainview.btnAddProduct, SIGNAL(clicked()), SLOT(createProduct()) );
   connect(ui_mainview.btnAddMeasure, SIGNAL(clicked()), SLOT(createMeasure()) );
   connect(ui_mainview.btnAddCategory, SIGNAL(clicked()), SLOT(createCategory()) );
+  connect(ui_mainview.btnRenameCategory, SIGNAL(clicked()), SLOT(renameSelectedCategory()) );
   connect(ui_mainview.btnAddClient, SIGNAL(clicked()), SLOT(createClient()));
   connect(ui_mainview.btnAddDonor, SIGNAL(clicked()), SLOT(createDonor()));
   connect(ui_mainview.btnDeleteProduct, SIGNAL(clicked()), SLOT(deleteSelectedProduct()) );
@@ -2953,6 +2954,33 @@ void squeezeView::deleteSelectedCategory()
     }
   }
 }
+
+void squeezeView::renameSelectedCategory()
+{
+  if (!db.isOpen()) return;
+
+    QModelIndex index = ui_mainview.tableCategories->currentIndex();
+    if (categoriesModel->tableName().isEmpty()) setupCategoriesModel();
+    if (index == offersModel->index(-1,-1) ) {
+      KMessageBox::information(this, i18n("Please select a category to rename, then press the rename button again."), i18n("Cannot rename"));
+      return;
+    }
+    QString catText = categoriesModel->record(index.row()).value("text").toString();
+    bool ok=false;
+    catText = QInputDialog::getText(this, i18n("Rename category"), i18n("Enter the new category name:"),
+                                        QLineEdit::Normal, catText, &ok );
+    if (ok) {
+        Azahar *myDb = new Azahar;
+        myDb->setDatabase(db);
+        qulonglong  catId = categoriesModel->record(index.row()).value("catid").toULongLong();
+        bool b=myDb->renameCategory(catId,catText);
+        categoriesModel->select();
+        updateCategoriesCombo();
+        delete myDb;
+    }
+
+}
+
 
 
 //CASH OUTS

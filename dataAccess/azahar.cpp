@@ -1118,10 +1118,22 @@ QString Azahar::getCategoryStr(qulonglong id)
   return result;
 }
 
+bool Azahar::renameCategory(qulonglong id, QString newText)
+{
+  bool result = false;
+  if (!db.isOpen()) db.open();
+  QSqlQuery query(db);
+  // Reassign all products in that category to newId
+  query=QString("update categories set text='%1' where catid=%2").arg(newText).arg(id);
+  if (!query.exec()) setError(query.lastError().text()); else result=true;
+  qDebug()<<"Rename category"<<query.lastQuery()<<query.lastError();
+  return result;
+}
+
 bool Azahar::deleteCategory(qulonglong id, qulonglong newId=0)
 {
   bool result = false;
-  if (!db.isOpen()) db.open();  
+  if (!db.isOpen()) db.open();
   QSqlQuery query(db);
   // Reassign all products in that category to newId
   query=QString("update products set category=%1 where category=%2").arg(newId).arg(id);

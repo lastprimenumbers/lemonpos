@@ -205,6 +205,7 @@ signals:
    void deleteSelectedCategory();
    void deleteSelectedClient();
    void deleteSelectedDonor();
+   void renameSelectedCategory();
    void populateCategoriesHash();
    void setProductsFilter();
    void setTransactionsFilter();
