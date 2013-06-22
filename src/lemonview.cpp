@@ -730,6 +730,7 @@ void lemonView::getCurrencies()
     }
 
     ui_mainview.editConvQty->setFocus();
+    ui_mainview.comboCurrency->setCurrentIndex(0);
 
     delete myDb;
 }
@@ -739,7 +740,7 @@ void lemonView::comboCurrencyOnChange()
     Azahar *myDb = new Azahar();
     myDb->setDatabase(db);
 
-    CurrencyInfo info = myDb->getCurrency( ui_mainview.comboCurrency->currentText() );
+    CurrencyInfo info = myDb->getCurrency( currency() );
     ui_mainview.editConvFactor->setText( QString::number( info.factor ) );
     
     doCurrencyConversion();
@@ -1117,7 +1118,7 @@ void lemonView::refreshTotalLabel()
     
     if (reservationPayment > 0) qDebug()<<" RESERVATION PAYMENT:"<<reservationPayment;
 
-    qDebug()<<"SUBTOTAL: "<<subTotalSum<<" TOTAL: "<<totalSum<<"Fromatted SUBTOTAL:"<<KGlobal::locale()->formatMoney(subTotalSum)<<" Formatted TOTAL:"<<KGlobal::locale()->formatMoney(totalSum);
+    qDebug()<<"SUBTOTAL: "<<subTotalSum<<" TOTAL: "<<totalSum<<"Fromatted SUBTOTAL:"<<KGlobal::locale()->formatMoney(subTotalSum,currency())<<" Formatted TOTAL:"<<KGlobal::locale()->formatMoney(totalSum,currency());
 
     if ( roundToUSStandard ) {
         //first round taxes
@@ -1144,12 +1145,13 @@ void lemonView::refreshTotalLabel()
     }
     
     ///refresh labels.
-    ui_mainview.labelTotal->setText(QString("%1").arg(KGlobal::locale()->formatMoney(totalSum)));
-    ui_mainview.labelChange->setText(QString("%1") .arg(KGlobal::locale()->formatMoney(change)));
+    QString fmt=KGlobal::locale()->formatMoney(totalSum,currency());
+    ui_mainview.labelTotal->setText(QString("%1").arg(fmt));
+    ui_mainview.labelChange->setText(QString("%1") .arg(KGlobal::locale()->formatMoney(change,currency())));
     //update client discount
     QString dStr;
     if (oDiscountMoney >0 ){
-        dStr = i18n("Discount: %1", KGlobal::locale()->formatMoney(oDiscountMoney));
+        dStr = i18n("Discount: %1", KGlobal::locale()->formatMoney(oDiscountMoney,currency()));
     }
     ui_mainview.lblClientDiscount->setText(dStr);
 
@@ -1445,9 +1447,9 @@ void lemonView::insertItem(QString code)
             //get client Remaining credit (-) to inform the client.
             CreditInfo credit = myDb->getCreditInfoForClient(cI.id);
             if (credit.total <= 0) //if it is negative then inform.
-                msg = i18n("<b>Welcome</b> <i>%1</i>. You have remaining <b>debit</b> of %2 to use.",clientInfo.name, KGlobal::locale()->formatMoney(-credit.total));
+                msg = i18n("<b>Welcome</b> <i>%1</i>. You have remaining <b>debit</b> of %2 to use.",clientInfo.name, KGlobal::locale()->formatMoney(-credit.total,currency()));
             else
-                msg = i18n("<b>Welcome</b> <i>%1</i>. You have remaining <b>credit</b> of %2 used.",clientInfo.name, KGlobal::locale()->formatMoney(-credit.total));
+                msg = i18n("<b>Welcome</b> <i>%1</i>. You have remaining <b>credit</b> of %2 used.",clientInfo.name, KGlobal::locale()->formatMoney(-credit.total,currency()));
             updateClientInfo();
             refreshTotalLabel();
             notifierPanel->setSize(350,150);
@@ -1991,14 +1993,14 @@ void lemonView::displayItemInfo(QTableWidgetItem* item)
 
     ui_mainview.labelDetailPhoto->setPixmap(pix);
     str = QString("%1 (%2 %)")
-        .arg(KGlobal::locale()->formatMoney(tax2m)).arg(info.extratax);
+        .arg(KGlobal::locale()->formatMoney(tax2m,currency())).arg(info.extratax);
     ui_mainview.labelDetailUnits->setText(QString("<html>%1 <b>%2</b></html>")
         .arg(tUnits).arg(uLabel));
     ui_mainview.labelDetailDesc->setText(QString("<html><b>%1</b></html>").arg(desc));
     ui_mainview.labelDetailPrice->setText(QString("<html>%1 <b>%2</b></html>")
-        .arg(tPrice).arg(KGlobal::locale()->formatMoney(price)));
+        .arg(tPrice).arg(KGlobal::locale()->formatMoney(price,currency())));
     ui_mainview.labelDetailDiscount->setText(QString("<html>%1 <b>%2 (%3 %)</b></html>")
-        .arg(tDisc).arg(KGlobal::locale()->formatMoney(info.disc)).arg(discP));
+        .arg(tDisc).arg(KGlobal::locale()->formatMoney(info.disc,currency())).arg(discP));
     if (info.points>0) {
       ui_mainview.labelDetailPoints->setText(QString("<html>%1 <b>%2</b></html>")
         .arg(tPoints).arg(info.points));
@@ -2591,9 +2593,9 @@ void lemonView::finishCurrentTransaction()
     QString realSubtotal;
     if (Settings::addTax())
       //realSubtotal = KGlobal::locale()->formatMoney(subTotalSum-discMoney+soDiscounts+pDiscounts, QString(), 2);
-      realSubtotal = KGlobal::locale()->formatMoney(subTotalSum+discMoney+soDiscounts+pDiscounts, QString(), 2);
+        realSubtotal = KGlobal::locale()->formatMoney(subTotalSum+discMoney+soDiscounts+pDiscounts, currency(), 2);
     else
-      realSubtotal = KGlobal::locale()->formatMoney(subTotalSum-totalTax+discMoney+soDiscounts+pDiscounts, QString(), 2); //FIXME: es +discMoney o -discMoney??
+      realSubtotal = KGlobal::locale()->formatMoney(subTotalSum-totalTax+discMoney+soDiscounts+pDiscounts, currency(), 2); //FIXME: es +discMoney o -discMoney??
     qDebug()<<"\n >>>>>>>>> Real SUBTOTAL = "<<realSubtotal<<"  subTotalSum = "<<subTotalSum<<" ADDTAXES:"<<Settings::addTax()<<"  Disc:"<<discMoney;
     qDebug()<<"\n********** Total Taxes:"<<totalTax<<" total Discount:"<<discMoney<< " SO Discount:"<<soDiscounts<<" Prod Discounts:"<<pDiscounts;
 
@@ -2811,17 +2813,17 @@ void lemonView::printTicket(TicketInfo ticket)
   QString harticles = i18np("%1 article.", "%1 articles.", ticket.itemcount);
   QString htotal    = i18n("A total of");
   ticketHtml.append(QString("</table><br><br><b>%1</b> %2 <b>%3</b>")
-      .arg(harticles).arg(htotal).arg(KGlobal::locale()->formatMoney(ticket.total, QString(), 2)));
+      .arg(harticles).arg(htotal).arg(KGlobal::locale()->formatMoney(ticket.total, currency(), 2)));
   ticketHtml.append(i18n("<br>Paid with %1, your change is <b>%2</b><br>",
-                          KGlobal::locale()->formatMoney(ticket.paidwith, QString(), 2),
-                          KGlobal::locale()->formatMoney(ticket.change, QString(), 2)));
+                          KGlobal::locale()->formatMoney(ticket.paidwith, currency(), 2),
+                          KGlobal::locale()->formatMoney(ticket.change, currency(), 2)));
   ticketHtml.append(Settings::editTicketMessage());
   //Text Ticket
   itemsForPrint.append("  ");
-  line = QString("%1  %2 %3").arg(harticles).arg(htotal).arg(KGlobal::locale()->formatMoney(ticket.total, QString(), 2));
+  line = QString("%1  %2 %3").arg(harticles).arg(htotal).arg(KGlobal::locale()->formatMoney(ticket.total, currency(), 2));
   itemsForPrint.append(line);
   if (tDisc > 0) {
-    line = i18n("You saved %1", KGlobal::locale()->formatMoney(tDisc, QString(), 2));
+    line = i18n("You saved %1", KGlobal::locale()->formatMoney(tDisc, currency(), 2));
     itemsForPrint.append(line);
   }
   if (ticket.clientDiscMoney>0) itemsForPrint.append(hClientDisc+": "+QString::number(ticket.clientDiscMoney));
@@ -2829,7 +2831,7 @@ void lemonView::printTicket(TicketInfo ticket)
   if (ticket.clientPoints>0 && ticket.clientid>1) itemsForPrint.append(hClientPoints);
   itemsForPrint.append(" ");
   line = i18n("Paid with %1, your change is %2",
-              KGlobal::locale()->formatMoney(ticket.paidwith, QString(), 2), KGlobal::locale()->formatMoney(ticket.change, QString(), 2));
+              KGlobal::locale()->formatMoney(ticket.paidwith, currency(), 2), KGlobal::locale()->formatMoney(ticket.change, currency(), 2));
   itemsForPrint.append(line);
   itemsForPrint.append(" ");
   if (ticket.paidWithCard) {
@@ -2874,7 +2876,7 @@ void lemonView::printTicket(TicketInfo ticket)
       CreditInfo crInfo  = myDb->getCreditInfoForClient(ticket.clientid, false); //gets the credit info for the client, wihtout creating a new creditInfo if not exists.
       if (crInfo.id > 0) {
           //the client has credit info.
-          ptInfo.thPoints   = i18n(" %3 [ %4 ]| You got %1 points | Your accumulated is :%2 | | Your credit balance is: %5", ticket.buyPoints, ticket.clientPoints, clientName, ticket.clientid, KGlobal::locale()->formatMoney(crInfo.total, QString(), 2));
+          ptInfo.thPoints   = i18n(" %3 [ %4 ]| You got %1 points | Your accumulated is :%2 | | Your credit balance is: %5", ticket.buyPoints, ticket.clientPoints, clientName, ticket.clientid, KGlobal::locale()->formatMoney(crInfo.total, currency(), 2));
       } else {
           ptInfo.thPoints   = i18n(" %3 [ %4 ]| You got %1 points | Your accumulated is :%2 | ", ticket.buyPoints, ticket.clientPoints, clientName, ticket.clientid);
       }
@@ -2895,12 +2897,12 @@ void lemonView::printTicket(TicketInfo ticket)
       ptInfo.thPrice    = hPrice;
       ptInfo.thDiscount = hDisc;
       ptInfo.thTotal    = hTotal;
-      ptInfo.thTotals   = KGlobal::locale()->formatMoney(ptInfo.ticketInfo.total, QString(), 2);
+      ptInfo.thTotals   = KGlobal::locale()->formatMoney(ptInfo.ticketInfo.total, currency(), 2);
       ptInfo.thArticles = i18np("%1 article.", "%1 articles.", ptInfo.ticketInfo.itemcount);
-      ptInfo.thPaid     = KGlobal::locale()->formatMoney(ptInfo.ticketInfo.paidwith, QString(), 2);
-      ptInfo.thChange   = KGlobal::locale()->formatMoney(ptInfo.ticketInfo.change, QString(), 2);
+      ptInfo.thPaid     = KGlobal::locale()->formatMoney(ptInfo.ticketInfo.paidwith, currency(), 2);
+      ptInfo.thChange   = KGlobal::locale()->formatMoney(ptInfo.ticketInfo.change, currency(), 2);
       ptInfo.thChangeStr= i18n("Change");
-      ptInfo.tDisc      = KGlobal::locale()->formatMoney(-tDisc, QString(), 2);
+      ptInfo.tDisc      = KGlobal::locale()->formatMoney(-tDisc, currency(), 2);
       ptInfo.thCard     = i18n("Card Number  : %1", ticket.cardnum);
       ptInfo.thCardAuth = i18n("Authorization : %1", ticket.cardAuthNum);
       ptInfo.totDisc    = tDisc;
@@ -2916,7 +2918,7 @@ void lemonView::printTicket(TicketInfo ticket)
       ptInfo.clientDiscMoney = ticket.clientDiscMoney;
       ptInfo.clientDiscountStr = hClientDisc;
       ptInfo.randomMsg = myDb->getRandomMessage(rmExcluded, rmSeason);
-      ptInfo.taxes = KGlobal::locale()->formatMoney(ticket.totalTax, QString(), 2);
+      ptInfo.taxes = KGlobal::locale()->formatMoney(ticket.totalTax, currency(), 2);
       ptInfo.thTax = hTax;
       ptInfo.thSubtotal = hSubtotal;
       ptInfo.thTendered = hTendered;
@@ -2992,11 +2994,11 @@ void lemonView::printTicket(TicketInfo ticket)
       ptInfo.thPrice    = hPrice;
       ptInfo.thDiscount = hDisc;
       ptInfo.thTotal    = hTotal;
-      ptInfo.thTotals   = KGlobal::locale()->formatMoney(ptInfo.ticketInfo.total, QString(), 2);
+      ptInfo.thTotals   = KGlobal::locale()->formatMoney(ptInfo.ticketInfo.total, currency(), 2);
       ptInfo.thPoints   = i18n(" %3 [ %4 ]| You got %1 points | Your accumulated is :%2 | ", ticket.buyPoints, ticket.clientPoints, clientName, ticket.clientid);
       ptInfo.thArticles = i18np("%1 article.", "%1 articles.", ptInfo.ticketInfo.itemcount);
-      ptInfo.thPaid     = ""; //i18n("Paid with %1, your change is %2", KGlobal::locale()->formatMoney(ptInfo.ticketInfo.paidwith, QString(), 2),KGlobal::locale()->formatMoney(ptInfo.ticketInfo.change, QString(), 2) );
-      ptInfo.tDisc      = KGlobal::locale()->formatMoney(-tDisc, QString(), 2);
+      ptInfo.thPaid     = ""; //i18n("Paid with %1, your change is %2", KGlobal::locale()->formatMoney(ptInfo.ticketInfo.paidwith, currency(), 2),KGlobal::locale()->formatMoney(ptInfo.ticketInfo.change, currency(), 2) );
+      ptInfo.tDisc      = KGlobal::locale()->formatMoney(-tDisc, currency(), 2);
       ptInfo.subtotal   = ticket.subTotal;
       ptInfo.totDisc    = tDisc;
       ptInfo.logoOnTop = Settings::chLogoOnTop();
@@ -3028,8 +3030,8 @@ void lemonView::printTicket(TicketInfo ticket)
       ptInfo.thQty      = i18n("Qty");
       ptInfo.thPrice    = hPrice;
       ptInfo.thTotal    = hTotal;
-      ptInfo.thTotals   = KGlobal::locale()->formatMoney(ptInfo.ticketInfo.total, QString(), 2);
-      QString signM = KGlobal::locale()->formatMoney(tDisc, QString(), 2);
+      ptInfo.thTotals   = KGlobal::locale()->formatMoney(ptInfo.ticketInfo.total, currency(), 2);
+      QString signM = KGlobal::locale()->formatMoney(tDisc, currency(), 2);
       signM.truncate(2); //this gets the $ only...
       ptInfo.paymentStrPrePayment = hPrePayment + signM;
       ptInfo.paymentStrComplete = hCompletePayment + signM;
@@ -3467,10 +3469,10 @@ void lemonView::corteDeCaja()
     pbInfo.startDate   = i18n("Start: %1",KGlobal::locale()->formatDateTime(drawer->getStartDateTime(), KLocale::LongDate));
     pbInfo.endDate     = i18n("End  : %1",KGlobal::locale()->formatDateTime(QDateTime::currentDateTime(), KLocale::LongDate));
     //Qty's
-    pbInfo.initAmount = KGlobal::locale()->formatMoney(drawer->getInitialAmount(), QString(), 2);
-    pbInfo.inAmount   = KGlobal::locale()->formatMoney(drawer->getInAmount(), QString(), 2);
-    pbInfo.outAmount  = KGlobal::locale()->formatMoney(drawer->getOutAmount(), QString(), 2);
-    pbInfo.cashAvailable=KGlobal::locale()->formatMoney(drawer->getAvailableInCash(), QString(), 2);
+    pbInfo.initAmount = KGlobal::locale()->formatMoney(drawer->getInitialAmount(), currency(), 2);
+    pbInfo.inAmount   = KGlobal::locale()->formatMoney(drawer->getInAmount(), currency(), 2);
+    pbInfo.outAmount  = KGlobal::locale()->formatMoney(drawer->getOutAmount(), currency(), 2);
+    pbInfo.cashAvailable=KGlobal::locale()->formatMoney(drawer->getAvailableInCash(), currency(), 2);
     pbInfo.logoOnTop = Settings::chLogoOnTop();
     pbInfo.thTitleCFDetails = i18n("Cash flow Details");
     pbInfo.thCFType    = i18n("Type");
@@ -3490,10 +3492,10 @@ void lemonView::corteDeCaja()
         .arg(strInH)
         .arg(strOutH)
         .arg(strInDrawerH)
-        .arg(KGlobal::locale()->formatMoney(drawer->getInitialAmount(), QString(), 2))
-        .arg(KGlobal::locale()->formatMoney(drawer->getInAmount(), QString(), 2))
-        .arg(KGlobal::locale()->formatMoney(drawer->getOutAmount(), QString(), 2))
-        .arg(KGlobal::locale()->formatMoney(drawer->getAvailableInCash(), QString(), 2))
+        .arg(KGlobal::locale()->formatMoney(drawer->getInitialAmount(), currency(), 2))
+        .arg(KGlobal::locale()->formatMoney(drawer->getInAmount(), currency(), 2))
+        .arg(KGlobal::locale()->formatMoney(drawer->getOutAmount(), currency(), 2))
+        .arg(KGlobal::locale()->formatMoney(drawer->getAvailableInCash(), currency(), 2))
         .arg(strTitlePre);
     linesHTML.append(line);
     line = QString("<table border=1 cellpadding=5><tr><th colspan=5>%1</th></tr><tr><th>%2</th><th>%3</th><th>%4</th><th>%5</th><th>%6</th></tr>")
@@ -3510,15 +3512,15 @@ void lemonView::corteDeCaja()
     line = QString(KGlobal::locale()->formatDateTime(QDateTime::currentDateTime(), KLocale::LongDate));
     lines.append(line);
     lines.append("----------------------------------------");
-    line = QString("%1 %2").arg(strInitAmount).arg(KGlobal::locale()->formatMoney(drawer->getInitialAmount(), QString(), 2));
+    line = QString("%1 %2").arg(strInitAmount).arg(KGlobal::locale()->formatMoney(drawer->getInitialAmount(), currency(), 2));
     lines.append(line);
     line = QString("%1 :%2, %3 :%4")
         .arg(strInH)
-        .arg(KGlobal::locale()->formatMoney(drawer->getInAmount(), QString(), 2))
+        .arg(KGlobal::locale()->formatMoney(drawer->getInAmount(), currency(), 2))
         .arg(strOutH)
-        .arg(KGlobal::locale()->formatMoney(drawer->getOutAmount(), QString(), 2));
+        .arg(KGlobal::locale()->formatMoney(drawer->getOutAmount(), currency(), 2));
     lines.append(line);
-    line = QString(" %1 %2").arg(KGlobal::locale()->formatMoney(drawer->getAvailableInCash(), QString(), 2)).arg(strInDrawerH);
+    line = QString(" %1 %2").arg(KGlobal::locale()->formatMoney(drawer->getAvailableInCash(), currency(), 2)).arg(strInDrawerH);
     lines.append(line);
     //Now, add a transactions report per user and for today.
     //At this point, drawer must be initialized and valid.
@@ -3559,8 +3561,8 @@ void lemonView::corteDeCaja()
       QString tmp = QString("%1|%2|%3|%4")
         .arg(dId)
         .arg(dHour+":"+dMinute)
-        .arg(KGlobal::locale()->formatMoney(info.amount, QString(), 2))
-        .arg(KGlobal::locale()->formatMoney(info.paywith, QString(), 2));
+        .arg(KGlobal::locale()->formatMoney(info.amount, currency(), 2))
+        .arg(KGlobal::locale()->formatMoney(info.paywith, currency(), 2));
 
       while (dId.length()<10) dId = dId.insert(dId.length(), ' ');
       while (dAmount.length()<14) dAmount = dAmount.insert(dAmount.length(), ' ');
@@ -3599,7 +3601,7 @@ void lemonView::corteDeCaja()
     cfList.clear();
     QList<CashFlowInfo> cashflowInfoList = myDb->getCashFlowInfoList( drawer->getCashflowIds() );
     foreach(CashFlowInfo cfInfo, cashflowInfoList) {
-        QString amountF = KGlobal::locale()->formatMoney(cfInfo.amount);
+        QString amountF = KGlobal::locale()->formatMoney(cfInfo.amount,currency());
         //QDateTime dateTime; dateTime.setDate(cfInfo.date); dateTime.setTime(cfInfo.time);
         QString dateF   = KGlobal::locale()->formatTime(cfInfo.time);
         QString typeSign; /*cfInfo.typeStr*/
@@ -3705,8 +3707,8 @@ void lemonView::endOfDay() {
     pdInfo.thPayMethod = i18n("Method");
     pdInfo.thTotalTaxes= i18n("Total taxes collected for this terminal: ");
     pdInfo.logoOnTop = Settings::chLogoOnTop();
-    pdInfo.thTotalSales  = KGlobal::locale()->formatMoney(amountProfit.amount, QString(), 2);
-    pdInfo.thTotalProfit = KGlobal::locale()->formatMoney(amountProfit.profit, QString(), 2);
+    pdInfo.thTotalSales  = KGlobal::locale()->formatMoney(amountProfit.amount, currency(), 2);
+    pdInfo.thTotalProfit = KGlobal::locale()->formatMoney(amountProfit.profit, currency(), 2);
 
     QStringList lines;
     lines.append(pdInfo.thTitle);
@@ -3910,7 +3912,7 @@ void lemonView::listViewOnMouseMove(const QModelIndex & index)
   }
 
   QString line1 = QString("<p><b><i>%1</i></b><br>").arg(desc);
-  QString line2 = QString("<b>%1</b>%2<br>").arg(tprice).arg(KGlobal::locale()->formatMoney(price));
+  QString line2 = QString("<b>%1</b>%2<br>").arg(tprice).arg(KGlobal::locale()->formatMoney(price,currency()));
   QString line3;
   if (onList) line3 = QString("<b>%1</b> %2 %5 %6, %3 %7: %4<br></p>").arg(tstock).arg(stockqty).arg(pInfo.qtyOnList).arg(stockqty - pInfo.qtyOnList).arg(pInfo.unitStr).arg(tmoreAv).arg(tmoreAv2);
   else line3 = QString("<b>%1</b> %2 %3 %4<br></p>").arg(tstock).arg(stockqty).arg(pInfo.unitStr).arg(tmoreAv);
@@ -4035,6 +4037,7 @@ void lemonView::connectToDb()
     Azahar *myDb = new Azahar;
     myDb->setDatabase(db);
     if (myDb->getConfigFirstRun())  syncSettingsOnDb();
+    getCurrencies();
     delete myDb;
   }
 }
@@ -4097,7 +4100,7 @@ void lemonView::updateClientInfo()
 {
   QString dStr;
   if (oDiscountMoney >0 ){
-      dStr = i18n("Discount: %1% ", KGlobal::locale()->formatMoney(oDiscountMoney));
+      dStr = i18n("Discount: %1% ", KGlobal::locale()->formatMoney(oDiscountMoney,currency()));
   }
   QString pStr = "";
 
@@ -4124,7 +4127,7 @@ void lemonView::updateClientInfo()
 
   CreditInfo credit = myDb->getCreditInfoForClient(clientInfo.id, false);//do not create new credit if not found.
   if (credit.id > 0 and credit.total != 0 )
-      ui_mainview.lblCreditInfo->setText(i18n("Credito Residuo: %1", KGlobal::locale()->formatMoney(clientInfo.monthly-credit.total)));
+      ui_mainview.lblCreditInfo->setText(i18n("Credito Residuo: %1", KGlobal::locale()->formatMoney(clientInfo.monthly-credit.total,currency())));
   else
       ui_mainview.lblCreditInfo->setText("");
   delete myDb;
@@ -4355,7 +4358,7 @@ void lemonView::printTicketFromTransaction(qulonglong transactionNumber)
     subtotal  = subtotal;
   else
     subtotal  = subtotal - ticket.totalTax;
-  QString realSubtotal = KGlobal::locale()->formatMoney(subtotal, QString(), 2);
+  QString realSubtotal = KGlobal::locale()->formatMoney(subtotal, currency(), 2);
 
   qDebug()<<"\n*** Ticket tax:"<<trInfo.totalTax<<" itemsDiscount:"<<itemsDiscount<<"client Discount:"<<trInfo.discmoney<<" ticket total:"<<ticket.total<<" SUBTOTAL:"<<subtotal<<" AddTax:"<<Settings::addTax()<<" \n";
   ticket.subTotal = realSubtotal;
@@ -4471,7 +4474,7 @@ void lemonView::cashAvailable()
 {
   double available = drawer->getAvailableInCash();
   KNotification *notify = new KNotification("information", this);
-  notify->setText(i18n("There are <b> %1 in cash </b> available at the drawer.", KGlobal::locale()->formatMoney(available)));
+  notify->setText(i18n("There are <b> %1 in cash </b> available at the drawer.", KGlobal::locale()->formatMoney(available,currency())));
   QPixmap pixmap = DesktopIcon("dialog-information",32);
   notify->setPixmap(pixmap);
   notify->sendEvent();
@@ -5258,9 +5261,9 @@ void lemonView::reserveItems()
 
         QString realSubtotal;
         if (Settings::addTax())
-            realSubtotal = KGlobal::locale()->formatMoney(subTotalSum-discMoney+pDiscounts, QString(), 2);
+            realSubtotal = KGlobal::locale()->formatMoney(subTotalSum-discMoney+pDiscounts, currency(), 2);
         else
-            realSubtotal = KGlobal::locale()->formatMoney(subTotalSum-totalTax+discMoney+pDiscounts, QString(), 2); //FIXME: es +discMoney o -discMoney??
+            realSubtotal = KGlobal::locale()->formatMoney(subTotalSum-totalTax+discMoney+pDiscounts, currency(), 2); //FIXME: es +discMoney o -discMoney??
             qDebug()<<"\n********** Total Taxes:"<<totalTax<<" total Discount:"<<discMoney<<" Prod Discounts:"<<pDiscounts;
         
         ticket.number = currentTransaction;
@@ -5466,7 +5469,7 @@ void lemonView::tenderedChanged()
         ui_mainview.btnPayCredit->setText(i18n("Pay"));
     }
 
-    ui_mainview.lblCreditChange->setText(KGlobal::locale()->formatMoney(change));
+    ui_mainview.lblCreditChange->setText(KGlobal::locale()->formatMoney(change,currency()));
 }
 
 void lemonView::doCreditPayment()
@@ -5647,7 +5650,7 @@ void lemonView::calculateTotalForClient()
         //cursor.setPosition(topFrame->lastPosition());
         //totals.
         cursor.setBlockFormat(blockCenter);
-        cursor.insertText(KGlobal::locale()->formatMoney(crInfo.total), boldFormat);
+        cursor.insertText(KGlobal::locale()->formatMoney(crInfo.total,currency()), boldFormat);
         cursor.insertBlock();
         qDebug()<<__FUNCTION__<<"Credit for "<<crInfo.clientId<<" -- $"<<crInfo.total;
 
@@ -5686,7 +5689,7 @@ void lemonView::calculateTotalForClient()
                 cursor = itemsTable->cellAt(row, 1).firstCursorPosition();
                 cursor.insertText(KGlobal::locale()->formatTime(credit.time), textFormat);
                 cursor = itemsTable->cellAt(row, 2).firstCursorPosition();
-                cursor.insertText(KGlobal::locale()->formatMoney(credit.amount), boldFormat);
+                cursor.insertText(KGlobal::locale()->formatMoney(credit.amount,currency()), boldFormat);
                 cursor = itemsTable->cellAt(row, 3).firstCursorPosition();
                 cursor.insertText(QString::number(credit.saleId), textFormat);
                 
@@ -5703,7 +5706,7 @@ void lemonView::calculateTotalForClient()
                         cursor = itemsTable->cellAt(row, 1).firstCursorPosition();
                         cursor.insertText("x"+QString::number(item.qty), italicsFormat);
                         cursor = itemsTable->cellAt(row, 2).firstCursorPosition();
-                        cursor.insertText(KGlobal::locale()->formatMoney(item.total), italicsFormat);
+                        cursor.insertText(KGlobal::locale()->formatMoney(item.total,currency()), italicsFormat);
                     }
                 }
             }
@@ -5747,7 +5750,7 @@ void lemonView::calculateTotalForClient()
                 cursor = itemsTable->cellAt(row, 1).firstCursorPosition();
                 cursor.insertText(KGlobal::locale()->formatTime(credit.time), textFormat);
                 cursor = itemsTable->cellAt(row, 2).firstCursorPosition();
-                cursor.insertText(KGlobal::locale()->formatMoney(credit.amount), boldFormat);
+                cursor.insertText(KGlobal::locale()->formatMoney(credit.amount,currency()), boldFormat);
                 cursor = itemsTable->cellAt(row, 3).firstCursorPosition();
                 cursor.insertText(QString::number(credit.saleId), textFormat);
                 
@@ -5764,7 +5767,7 @@ void lemonView::calculateTotalForClient()
                         cursor = itemsTable->cellAt(row, 1).firstCursorPosition();
                         cursor.insertText("x"+QString::number(item.qty), italicsFormat);
                         cursor = itemsTable->cellAt(row, 2).firstCursorPosition();
-                        cursor.insertText(KGlobal::locale()->formatMoney(item.total), italicsFormat);
+                        cursor.insertText(KGlobal::locale()->formatMoney(item.total,currency()), italicsFormat);
                     }
                 }
             }

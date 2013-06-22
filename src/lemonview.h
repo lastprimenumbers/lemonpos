@@ -137,6 +137,7 @@ public:
     void setupModel();
 
     RoundingInfo roundUsStandard(const double &number);
+    QString currency(){ return ui_mainview.comboCurrency->currentText(); };
 
   signals:
     /**

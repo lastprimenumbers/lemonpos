@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1005</width>
-    <height>620</height>
+    <height>672</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -64,9 +64,9 @@
            <property name="geometry">
             <rect>
              <x>0</x>
-             <y>10</y>
-             <width>271</width>
-             <height>231</height>
+             <y>20</y>
+             <width>281</width>
+             <height>271</height>
             </rect>
            </property>
            <property name="sizePolicy">
@@ -131,7 +131,7 @@
             <item>
              <widget class="QWidget" name="widget_3" native="true">
               <property name="sizePolicy">
-               <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+               <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
                 <horstretch>0</horstretch>
                 <verstretch>0</verstretch>
                </sizepolicy>
@@ -140,7 +140,7 @@
                <item>
                 <widget class="QWidget" name="widget_4" native="true">
                  <property name="sizePolicy">
-                  <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                  <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
                    <horstretch>0</horstretch>
                    <verstretch>0</verstretch>
                   </sizepolicy>
@@ -154,6 +154,11 @@
                       <verstretch>0</verstretch>
                      </sizepolicy>
                     </property>
+                    <property name="font">
+                     <font>
+                      <pointsize>8</pointsize>
+                     </font>
+                    </property>
                     <property name="text">
                      <string>lblClientDiscount</string>
                     </property>
@@ -166,6 +171,11 @@
                       <horstretch>0</horstretch>
                       <verstretch>0</verstretch>
                      </sizepolicy>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <pointsize>8</pointsize>
+                     </font>
                     </property>
                     <property name="text">
                      <string>labellClientDiscounted</string>
@@ -182,6 +192,11 @@
                       <horstretch>0</horstretch>
                       <verstretch>0</verstretch>
                      </sizepolicy>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <pointsize>8</pointsize>
+                     </font>
                     </property>
                     <property name="text">
                      <string>lblCreditInfo</string>
@@ -231,7 +246,7 @@
            <property name="geometry">
             <rect>
              <x>0</x>
-             <y>240</y>
+             <y>290</y>
              <width>281</width>
              <height>211</height>
             </rect>
@@ -515,7 +530,7 @@
            <property name="geometry">
             <rect>
              <x>0</x>
-             <y>460</y>
+             <y>520</y>
              <width>281</width>
              <height>122</height>
             </rect>

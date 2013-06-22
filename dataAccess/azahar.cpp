@@ -4569,24 +4569,25 @@ QList<CurrencyInfo> Azahar::getCurrencyList()
 {
     QList<CurrencyInfo> result;
     if (!db.isOpen()) db.open();
-    if (db.isOpen()) {
-        QSqlQuery myQuery(db);
-        if (myQuery.exec(QString("select * from currencies;"))) {
-            while (myQuery.next()) {
-                CurrencyInfo info;
-                int fieldName   = myQuery.record().indexOf("name");
-                int fieldFactor = myQuery.record().indexOf("factor");
-                int fieldId     = myQuery.record().indexOf("id");
-                info.name   = myQuery.value(fieldName).toString();
-                info.factor = myQuery.value(fieldFactor).toDouble();
-                info.id     = myQuery.value(fieldId).toULongLong();
-                result.append(info);
-            }
-        }
-        else {
-            qDebug()<<"ERROR: "<<myQuery.lastError();
+    if (!db.isOpen()) {return result;}
+
+    QSqlQuery myQuery(db);
+    if (myQuery.exec(QString("select * from currencies;"))) {
+        while (myQuery.next()) {
+            CurrencyInfo info;
+            int fieldName   = myQuery.record().indexOf("name");
+            int fieldFactor = myQuery.record().indexOf("factor");
+            int fieldId     = myQuery.record().indexOf("id");
+            info.name   = myQuery.value(fieldName).toString();
+            info.factor = myQuery.value(fieldFactor).toDouble();
+            info.id     = myQuery.value(fieldId).toULongLong();
+            result.append(info);
         }
     }
+    else {
+        qDebug()<<"ERROR: "<<myQuery.lastError();
+    }
+
     return result;
 }
 
