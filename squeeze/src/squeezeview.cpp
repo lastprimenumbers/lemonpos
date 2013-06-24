@@ -1311,6 +1311,9 @@ void squeezeView::setupDonorsModel()
     ui_mainview.donorsView->setSelectionMode(QAbstractItemView::SingleSelection);
 
     UsersDelegate *delegate = new UsersDelegate(ui_mainview.donorsView);
+    QList<int> ncols;
+    ncols.append(2);
+    delegate->setCol(ncols);
     ui_mainview.donorsView->setItemDelegate(delegate);
 
     donorsModel->select();
