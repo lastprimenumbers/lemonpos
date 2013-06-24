@@ -364,8 +364,8 @@ void lemonView::loadIcons()
 {
   ui_mainview.labelImageSearch->setPixmap(DesktopIcon("edit-find", 64));
   QString logoBottomFile = KStandardDirs::locate("appdata", "images/logo_bottom.png");
-  ui_mainview.labelBanner->setPixmap(QPixmap(logoBottomFile));
-  ui_mainview.labelBanner->setAlignment(Qt::AlignCenter);
+//  ui_mainview.labelBanner->setPixmap(QPixmap(logoBottomFile));
+//  ui_mainview.labelBanner->setAlignment(Qt::AlignCenter);
 }
 
 void lemonView::setUpTable()
@@ -1153,7 +1153,7 @@ void lemonView::refreshTotalLabel()
     if (oDiscountMoney >0 ){
         dStr = i18n("Discount: %1", KGlobal::locale()->formatMoney(oDiscountMoney,currency()));
     }
-    ui_mainview.lblClientDiscount->setText(dStr);
+//    ui_mainview.lblClientDiscount->setText(dStr);
 
     if ( ui_mainview.checkOwnCredit->isChecked() || ui_mainview.checkCard->isChecked() ) {
         //Set the amount to pay.
@@ -4113,8 +4113,8 @@ void lemonView::updateClientInfo()
 
   //QString frmDisc = i18n("[%1]", KGlobal::locale()->formatMoney(discMoney));
   //dStr = dStr + "\n"+KGlobal::locale()->formatMoney(discMoney);
-  ui_mainview.lblClientDiscount->setText(dStr);
-  ui_mainview.labelClientDiscounted->setText(pStr);
+//  ui_mainview.lblClientDiscount->setText(dStr);
+//  ui_mainview.labelClientDiscounted->setText(pStr);
 
   int comboIdx = ui_mainview.comboClients->findData(clientInfo.id);
   ui_mainview.comboClients->setCurrentIndex(comboIdx);

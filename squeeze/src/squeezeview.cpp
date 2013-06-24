@@ -1340,6 +1340,10 @@ void squeezeView::setupClientsModel()
     ui_mainview.clientsView->setSelectionMode(QAbstractItemView::SingleSelection);
 
     UsersDelegate *delegate = new UsersDelegate(ui_mainview.clientsView);
+    QList<int> cols;
+    cols.append(3);
+    cols.append(2);
+    delegate->setCol(cols);
     ui_mainview.clientsView->setItemDelegate(delegate);
 
     clientsModel->select();
@@ -2172,36 +2176,11 @@ void squeezeView::clientsViewOnSelected(const QModelIndex & index)
     int row = index.row();
 
     QModelIndex indx = model->index(row, clientsModel->fieldIndex("id"));
-//    info.id = model->data(indx, Qt::DisplayRole).toInt();
-//    indx = model->index(row, clientsModel->fieldIndex("name"));
-//    info.name = model->data(indx, Qt::DisplayRole).toString();
-//    indx = model->index(row, clientsModel->fieldIndex("parent"));
-//    info.parentClient = model->data(indx, Qt::DisplayRole).toString();
     indx = model->index(row, clientsModel->fieldIndex("code"));
     info.code = model->data(indx, Qt::DisplayRole).toString();
-//    indx = model->index(row, clientsModel->fieldIndex("address"));
-//    info.address = model->data(indx, Qt::DisplayRole).toString();
-//    indx = model->index(row, clientsModel->fieldIndex("phone"));
-//    info.phone = model->data(indx, Qt::DisplayRole).toString();
-//    indx = model->index(row, clientsModel->fieldIndex("phone_movil"));
-//    info.cell = model->data(indx, Qt::DisplayRole).toString();
-//    indx = model->index(row, clientsModel->fieldIndex("points"));
-//    info.points = model->data(indx, Qt::DisplayRole).toULongLong();
-//    indx = model->index(row, clientsModel->fieldIndex("discount"));
-//    info.discount = model->data(indx, Qt::DisplayRole).toDouble();
-//    indx = model->index(row, clientsModel->fieldIndex("monthly"));
-//    info.monthly = model->data(indx, Qt::DisplayRole).toDouble();
-//    indx = model->index(row, clientsModel->fieldIndex("photo"));
-//    info.photo = model->data(indx, Qt::DisplayRole).toByteArray();
-//    indx = model->index(row, clientsModel->fieldIndex("since"));
-//    info.since = model->data(indx, Qt::DisplayRole).toDate();
-//    indx = model->index(row, clientsModel->fieldIndex("expiry"));
-//    info.expiry = model->data(indx, Qt::DisplayRole).toDate();
-
     //Launch Edit dialog
     ClientEditor *clientEditorDlg = new ClientEditor(db, this);
     clientEditorDlg->setClientInfo(info.code);
-
     if (clientEditorDlg->exec() ) {
       clientEditorDlg->commitClientInfo();
       clientsModel->select();

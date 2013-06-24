@@ -25,15 +25,19 @@
 class QMouseEvent;
 class QPainEvent;
 
+
 #include <QItemDelegate>
 
 class UsersDelegate : public QItemDelegate
 {
   Q_OBJECT
+  QList<int> cols;
 
   public:
-    UsersDelegate(QWidget *parent = 0) : QItemDelegate(parent) {}
+    void setCol(QList<int> &i);
+    UsersDelegate(QWidget *parent);
     QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const;
+
 
   protected:
     void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
