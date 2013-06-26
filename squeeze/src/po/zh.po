@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: zh\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "atid=1011570&group_id=209899&func=browse\n"
-"POT-Creation-Date: 2013-05-08 21:34+0200\n"
+"POT-Creation-Date: 2013-05-15 22:31+0200\n"
 "PO-Revision-Date: 2007-12-26 18:31+0100\n"
 "Last-Translator: Scott Wu\n"
 "Language-Team: Zh<zh@li.org>\n"
@@ -45,7 +45,7 @@ msgid "squeeze"
 msgstr "压缩"
 
 #: main.cpp:36
-#, fuzzy
+#removed f-u-z-z-y
 msgid "(C) 2007-2011 Miguel Chavez Gamboa"
 msgstr "(C) 2007 Miguel Chávez Gamboa"
 
@@ -110,18 +110,18 @@ msgid "Product Editor"
 msgstr "产品编辑"
 
 #: producteditor.cpp:127
-#, fuzzy
+#removed f-u-z-z-y
 msgid "Purchase Qty:"
 msgstr "购买数量"
 
 # removed f-u-z-z-y
 #: producteditor.cpp:129
-#, fuzzy
+#removed f-u-z-z-y
 msgid "Stock Qty:"
 msgstr "储存数量 :"
 
 #: producteditor.cpp:356
-#, fuzzy
+#removed f-u-z-z-y
 msgid "Gross Profit: %1% (%2)"
 msgstr "月利润"
 
@@ -153,7 +153,7 @@ msgid ""
 msgstr ""
 
 #: purchaseeditor.cpp:459 purchaseeditor.cpp:493
-#, fuzzy
+#removed f-u-z-z-y
 msgid "Items in this purchase [ %1  items,  %2 ]"
 msgstr "把产品添加到购买"
 
@@ -186,7 +186,7 @@ msgid "Products"
 msgstr "产品"
 
 #: squeeze.cpp:328
-#, fuzzy
+#removed f-u-z-z-y
 msgid "Measures"
 msgstr "添加尺寸"
 
@@ -213,7 +213,7 @@ msgid "Transactions"
 msgstr "交易 "
 
 #: squeeze.cpp:364
-#, fuzzy
+#removed f-u-z-z-y
 msgid "Quick Plots"
 msgstr "预览"
 
@@ -242,7 +242,7 @@ msgid "Print End of month report"
 msgstr ""
 
 #: squeeze.cpp:412
-#, fuzzy
+#removed f-u-z-z-y
 msgid "Print Low stock products"
 msgstr "浏览产品"
 
@@ -280,7 +280,7 @@ msgstr "一般"
 
 # removed f-u-z-z-y
 #: squeeze.cpp:521
-#, fuzzy
+#removed f-u-z-z-y
 msgid "Printers"
 msgstr "打印:"
 
@@ -289,7 +289,7 @@ msgid "Authorisation Required"
 msgstr "需要授权"
 
 #: squeezeview.cpp:102
-#, fuzzy
+#removed f-u-z-z-y
 msgid "Enter administrator/supervisor user and password please."
 msgstr "管理员密码"
 
@@ -311,18 +311,18 @@ msgstr ""
 
 # removed f-u-z-z-y
 #: squeezeview.cpp:140 squeezeview.cpp:3539
-#, fuzzy
+#removed f-u-z-z-y
 msgid "Sold Out Products"
 msgstr "装箱产品"
 
 #: squeezeview.cpp:141
-#, fuzzy
+#removed f-u-z-z-y
 msgid "Low Stock Products"
 msgstr "产品"
 
 # removed f-u-z-z-y
 #: squeezeview.cpp:142
-#, fuzzy
+#removed f-u-z-z-y
 msgid "Stock Report"
 msgstr "库存数量 :"
 
@@ -343,7 +343,7 @@ msgid "Weight and Measures"
 msgstr "重量和尺寸 "
 
 #: squeezeview.cpp:545
-#, fuzzy
+#removed f-u-z-z-y
 msgid "Special Orders"
 msgstr "特别税收 "
 
@@ -352,7 +352,7 @@ msgid "Currencies"
 msgstr ""
 
 #: squeezeview.cpp:594
-#, fuzzy
+#removed f-u-z-z-y
 msgid "Reservations"
 msgstr "描述"
 
@@ -361,12 +361,12 @@ msgid "%1"
 msgstr "%1"
 
 #: squeezeview.cpp:685
-#, fuzzy
+#removed f-u-z-z-y
 msgid "Month Sales (%1)"
 msgstr "月销量"
 
 #: squeezeview.cpp:691
-#, fuzzy
+#removed f-u-z-z-y
 msgid "Month Profit (%1)"
 msgstr "月利润"
 
@@ -433,7 +433,7 @@ msgstr "最后卖出 :"
 
 # removed f-u-z-z-y
 #: squeezeview.cpp:1087
-#, fuzzy
+#removed f-u-z-z-y
 msgid "Last Provider"
 msgstr "最后卖出 :"
 
@@ -533,7 +533,7 @@ msgstr "点 :"
 
 # removed f-u-z-z-y
 #: squeezeview.cpp:1427
-#, fuzzy
+#removed f-u-z-z-y
 msgid "Discount %1"
 msgstr "折扣 :"
 
@@ -558,7 +558,7 @@ msgstr "最终的"
 
 # removed f-u-z-z-y
 #: squeezeview.cpp:1432
-#, fuzzy
+#removed f-u-z-z-y
 msgid "Provider"
 msgstr "最后卖出 :"
 
@@ -592,13 +592,13 @@ msgid "Qty"
 msgstr ""
 
 #: squeezeview.cpp:1721
-#, fuzzy
+#removed f-u-z-z-y
 msgid "Sold by"
 msgstr "售货 &p员 :"
 
 # removed f-u-z-z-y
 #: squeezeview.cpp:1722 squeezeview.cpp:1803
-#, fuzzy
+#removed f-u-z-z-y
 msgid "Status"
 msgstr "付款状态"
 
@@ -619,7 +619,7 @@ msgid "Payment Complete"
 msgstr ""
 
 #: squeezeview.cpp:1799
-#, fuzzy
+#removed f-u-z-z-y
 msgid "Reservation"
 msgstr "描述"
 
@@ -632,7 +632,7 @@ msgid "Prepayment"
 msgstr ""
 
 #: squeezeview.cpp:1805
-#, fuzzy
+#removed f-u-z-z-y
 msgid "Total"
 msgstr "总数量"
 
@@ -655,7 +655,7 @@ msgid ""
 msgstr ""
 
 #: squeezeview.cpp:2315
-#, fuzzy
+#removed f-u-z-z-y
 msgid "Cannot modify stock"
 msgstr "无库存"
 
@@ -682,7 +682,7 @@ msgid "Enter the new category to insert:"
 msgstr "输入新添加的种类"
 
 #: squeezeview.cpp:2632
-#, fuzzy
+#removed f-u-z-z-y
 msgid "Please select a donor to delete, then press the delete button again."
 msgstr "请选择一行删除, 然后按\"删除\"键."
 
@@ -695,7 +695,7 @@ msgid "Cannot delete"
 msgstr "不能删除 "
 
 #: squeezeview.cpp:2638
-#, fuzzy
+#removed f-u-z-z-y
 msgid "Do you really want to delete the donor named %1?"
 msgstr "你真的想删除顾客  %1?"
 
@@ -706,7 +706,7 @@ msgid "Delete"
 msgstr "删除"
 
 #: squeezeview.cpp:2652
-#, fuzzy
+#removed f-u-z-z-y
 msgid "Default donor cannot be deleted."
 msgstr "默认种类不能被删除"
 
@@ -786,7 +786,7 @@ msgstr "终端号"
 
 # removed f-u-z-z-y
 #: squeezeview.cpp:2946
-#, fuzzy
+#removed f-u-z-z-y
 msgid "Save As"
 msgstr "销售员"
 
@@ -807,12 +807,12 @@ msgid "End of day report"
 msgstr ""
 
 #: squeezeview.cpp:3033 squeezeview.cpp:3275
-#, fuzzy
+#removed f-u-z-z-y
 msgid "All Terminals"
 msgstr "最终的"
 
 #: squeezeview.cpp:3038 squeezeview.cpp:3170 squeezeview.cpp:3639
-#, fuzzy
+#removed f-u-z-z-y
 msgid "Method"
 msgstr "付款方式"
 
@@ -821,12 +821,12 @@ msgid "Total taxes collected today: "
 msgstr ""
 
 #: squeezeview.cpp:3071 squeezeview.cpp:3203 squeezeview.cpp:3312
-#, fuzzy
+#removed f-u-z-z-y
 msgid "Total Sales : %1"
 msgstr "月销量"
 
 #: squeezeview.cpp:3072 squeezeview.cpp:3204 squeezeview.cpp:3313
-#, fuzzy
+#removed f-u-z-z-y
 msgid "Total Profit: %1"
 msgstr "月利润"
 
@@ -842,7 +842,7 @@ msgid ""
 msgstr ""
 
 #: squeezeview.cpp:3151
-#, fuzzy
+#removed f-u-z-z-y
 msgid "No transactions to print!"
 msgstr "显示现金交易"
 
@@ -851,7 +851,7 @@ msgid "No transactions for  terminal #%1 for today."
 msgstr ""
 
 #: squeezeview.cpp:3165
-#, fuzzy
+#removed f-u-z-z-y
 msgid "terminal # %1 "
 msgstr "最终的"
 
@@ -877,18 +877,18 @@ msgstr ""
 
 # removed f-u-z-z-y
 #: squeezeview.cpp:3382 squeezeview.cpp:3463
-#, fuzzy
+#removed f-u-z-z-y
 msgid "Stock Qty."
 msgstr "库存数量 :"
 
 #: squeezeview.cpp:3383 squeezeview.cpp:3464
-#, fuzzy
+#removed f-u-z-z-y
 msgid "Sold"
 msgstr "售货 &p员 :"
 
 # removed f-u-z-z-y
 #: squeezeview.cpp:3384 squeezeview.cpp:3465 squeezeview.cpp:3544
-#, fuzzy
+#removed f-u-z-z-y
 msgid "Units"
 msgstr "售出量 :"
 
@@ -906,23 +906,23 @@ msgid "Print Sold Out Products"
 msgstr ""
 
 #: squeezeview.cpp:3616
-#, fuzzy
+#removed f-u-z-z-y
 msgid "Please select a balance to print, then press the print button again."
 msgstr "请选择一个顾客删除, 然后按\"删除\"键"
 
 #: squeezeview.cpp:3616
-#, fuzzy
+#removed f-u-z-z-y
 msgid "Cannot print"
 msgstr "不能删除 "
 
 # removed f-u-z-z-y
 #: squeezeview.cpp:3625
-#, fuzzy
+#removed f-u-z-z-y
 msgid "Balance Id:%1"
 msgstr "余额"
 
 #: squeezeview.cpp:3629 squeezeview.cpp:3656
-#, fuzzy
+#removed f-u-z-z-y
 msgid "%1 at Terminal # %2"
 msgstr "最终的"
 
@@ -931,18 +931,18 @@ msgid "Deposit"
 msgstr ""
 
 #: squeezeview.cpp:3633 squeezeview.cpp:3668
-#, fuzzy
+#removed f-u-z-z-y
 msgid "In Drawer"
 msgstr "银柜里的钱"
 
 # removed f-u-z-z-y
 #: squeezeview.cpp:3634 squeezeview.cpp:3670
-#, fuzzy
+#removed f-u-z-z-y
 msgid "Transactions Details"
 msgstr "交易 "
 
 #: squeezeview.cpp:3638 squeezeview.cpp:3672
-#, fuzzy
+#removed f-u-z-z-y
 msgid "Paid"
 msgstr "付款"
 
@@ -960,13 +960,13 @@ msgstr ""
 
 # removed f-u-z-z-y
 #: squeezeview.cpp:3660
-#, fuzzy
+#removed f-u-z-z-y
 msgid "Initial Amount deposited:"
 msgstr "数量初始化:"
 
 # removed f-u-z-z-y
 #: squeezeview.cpp:3748
-#, fuzzy
+#removed f-u-z-z-y
 msgid "Print Balance"
 msgstr "余额"
 
@@ -975,7 +975,7 @@ msgid "Events Log"
 msgstr ""
 
 #: squeezeview.cpp:3809
-#, fuzzy
+#removed f-u-z-z-y
 msgid "User"
 msgstr "用户"
 
@@ -992,23 +992,23 @@ msgid "Month"
 msgstr ""
 
 #: squeezeview.cpp:3860
-#, fuzzy
+#removed f-u-z-z-y
 msgid "Enter the new ticket message."
 msgstr "输入新添加的种类"
 
 #: squeezeview.cpp:3876
-#, fuzzy
+#removed f-u-z-z-y
 msgid "Enter the new currency"
 msgstr "输入新添加的种类"
 
 # removed f-u-z-z-y
 #: squeezeview.cpp:3903
-#, fuzzy
+#removed f-u-z-z-y
 msgid "Do you really want to delete the currency '%1'?"
 msgstr "你真的想删除尺寸 %1?"
 
 #: squeezeview.cpp:3914
-#, fuzzy
+#removed f-u-z-z-y
 msgid "Default currencies cannot be deleted."
 msgstr "默认客户不能被删除"
 
@@ -1021,7 +1021,7 @@ msgid " Out of stock "
 msgstr "无库存"
 
 #: ../../src/productdelegate.cpp:154
-#, fuzzy
+#removed f-u-z-z-y
 msgid " Raw Product "
 msgstr "产品"
 
@@ -1052,7 +1052,7 @@ msgid "Invalid username or password"
 msgstr "无效用户名或密码"
 
 #: ../../src/inputdialog.cpp:68
-#, fuzzy
+#removed f-u-z-z-y
 msgid "Product Code:"
 msgstr "产品"
 
@@ -1062,7 +1062,7 @@ msgstr ""
 
 # removed f-u-z-z-y
 #: ../../src/inputdialog.cpp:81
-#, fuzzy
+#removed f-u-z-z-y
 msgid "New Stock Qty:"
 msgstr "储存数量 :"
 
@@ -1071,22 +1071,22 @@ msgid "New currency factor:"
 msgstr ""
 
 #: ../../src/inputdialog.cpp:83
-#, fuzzy
+#removed f-u-z-z-y
 msgid "Amount:"
 msgstr "数额"
 
 #: ../../src/inputdialog.cpp:85
-#, fuzzy
+#removed f-u-z-z-y
 msgid "New Message:"
 msgstr "添加尺寸"
 
 #: ../../src/inputdialog.cpp:86
-#, fuzzy
+#removed f-u-z-z-y
 msgid "New Currency Name:"
 msgstr "按客户"
 
 #: ../../src/inputdialog.cpp:87
-#, fuzzy
+#removed f-u-z-z-y
 msgid "Reason:"
 msgstr "原因"
 
@@ -1103,12 +1103,12 @@ msgid "Enter the product code here..."
 msgstr ""
 
 #: ../../src/inputdialog.cpp:110
-#, fuzzy
+#removed f-u-z-z-y
 msgid "Enter the new stock quantity here..."
 msgstr "输入新添加的种类"
 
 #: ../../src/inputdialog.cpp:117
-#, fuzzy
+#removed f-u-z-z-y
 msgid "Terminal Number:"
 msgstr "按最终产品号"
 
@@ -1121,17 +1121,17 @@ msgid "Enter the number of the month or season here..."
 msgstr ""
 
 #: ../../src/inputdialog.cpp:130
-#, fuzzy
+#removed f-u-z-z-y
 msgid "Enter the new currency name..."
 msgstr "输入新添加的种类"
 
 #: ../../src/inputdialog.cpp:131
-#, fuzzy
+#removed f-u-z-z-y
 msgid "Enter the new currency factor..."
 msgstr "输入新添加的种类"
 
 #: ../../src/inputdialog.cpp:172
-#, fuzzy
+#removed f-u-z-z-y
 msgid "Ok"
 msgstr "确认"
 
@@ -1139,30 +1139,30 @@ msgstr "确认"
 msgid "Cancel"
 msgstr ""
 
-#, fuzzy
+#removed f-u-z-z-y
 #~ msgid "Cell phone number"
 #~ msgstr "移动电话 :"
 
 # removed f-u-z-z-y
-#, fuzzy
+#removed f-u-z-z-y
 #~ msgid "Personal discount"
 #~ msgstr "按以前的折扣 "
 
-#, fuzzy
+#removed f-u-z-z-y
 #~ msgid "General ToolBar"
 #~ msgstr "一般"
 
 # removed f-u-z-z-y
-#, fuzzy
+#removed f-u-z-z-y
 #~ msgid "Stock Movement"
 #~ msgstr "库存数量 :"
 
 # removed f-u-z-z-y
-#, fuzzy
+#removed f-u-z-z-y
 #~ msgid "&Data"
 #~ msgstr "数据库"
 
-#, fuzzy
+#removed f-u-z-z-y
 #~ msgid "&Reports"
 #~ msgstr "报告"
 
@@ -1226,7 +1226,7 @@ msgstr ""
 #~ msgid "&Full Name:"
 #~ msgstr "&N全称 :"
 
-#, fuzzy
+#removed f-u-z-z-y
 #~ msgid "User Role"
 #~ msgstr "用户编辑"
 
@@ -1274,7 +1274,7 @@ msgstr ""
 #~ msgid "C&ost:"
 #~ msgstr "C&成本 :"
 
-#, fuzzy
+#removed f-u-z-z-y
 #~ msgid "It's A Raw Product"
 #~ msgstr "增加产品"
 
@@ -1315,43 +1315,43 @@ msgstr ""
 #~ msgid "Can be calculated with de + button"
 #~ msgstr "按按钮 +开始计算."
 
-#, fuzzy
+#removed f-u-z-z-y
 #~ msgid "Group Price:"
 #~ msgstr "新产品价格"
 
 #~ msgid "TextLabel"
 #~ msgstr "文本标签"
 
-#, fuzzy
+#removed f-u-z-z-y
 #~ msgid "Filter:"
 #~ msgstr "筛选"
 
-#, fuzzy
+#removed f-u-z-z-y
 #~ msgid "You can filter the products by description,"
 #~ msgstr "按产品描述 "
 
 # removed f-u-z-z-y
-#, fuzzy
+#removed f-u-z-z-y
 #~ msgid "Non Discount item"
 #~ msgstr "折扣 :"
 
-#, fuzzy
+#removed f-u-z-z-y
 #~ msgid "&Phone"
 #~ msgstr "电话 :"
 
-#, fuzzy
+#removed f-u-z-z-y
 #~ msgid "&Cell Phone:"
 #~ msgstr "移动电话 :"
 
-#, fuzzy
+#removed f-u-z-z-y
 #~ msgid "Products "
 #~ msgstr "产品"
 
-#, fuzzy
+#removed f-u-z-z-y
 #~ msgid "Add selected"
 #~ msgstr "添加顾客"
 
-#, fuzzy
+#removed f-u-z-z-y
 #~ msgid "Product Information"
 #~ msgstr "快捷信息"
 
@@ -1362,7 +1362,7 @@ msgstr ""
 #~ msgid "&Points:"
 #~ msgstr "点 :"
 
-#, fuzzy
+#removed f-u-z-z-y
 #~ msgid "&Taxes 1).-"
 #~ msgstr "&TVA附加增值税(%) :"
 
@@ -1370,27 +1370,27 @@ msgstr ""
 #~ msgid "Boxed products"
 #~ msgstr "装箱产品"
 
-#, fuzzy
+#removed f-u-z-z-y
 #~ msgid "&Items/box:"
 #~ msgstr "每箱产品数量"
 
-#, fuzzy
+#removed f-u-z-z-y
 #~ msgid "Items per box"
 #~ msgstr "每箱产品数量"
 
-#, fuzzy
+#removed f-u-z-z-y
 #~ msgid "P&rice/box :"
 #~ msgstr "每箱价格"
 
-#, fuzzy
+#removed f-u-z-z-y
 #~ msgid "Price per box"
 #~ msgstr "每箱价格"
 
-#, fuzzy
+#removed f-u-z-z-y
 #~ msgid "add this product"
 #~ msgstr "添加该产品"
 
-#, fuzzy
+#removed f-u-z-z-y
 #~ msgid "Items in this purchase"
 #~ msgstr "把产品添加到购买"
 
@@ -1423,7 +1423,7 @@ msgstr ""
 #~ msgid "Delete Product"
 #~ msgstr "删除产品"
 
-#, fuzzy
+#removed f-u-z-z-y
 #~ msgid "Export"
 #~ msgstr "报告"
 
@@ -1451,7 +1451,7 @@ msgstr ""
 #~ msgid "Add Client"
 #~ msgstr "添加顾客"
 
-#, fuzzy
+#removed f-u-z-z-y
 #~ msgid "Add New Message"
 #~ msgstr "添加尺寸"
 
@@ -1485,7 +1485,7 @@ msgstr ""
 #~ msgstr "按最终产品号"
 
 # removed f-u-z-z-y
-#, fuzzy
+#removed f-u-z-z-y
 #~ msgid "Only Sales"
 #~ msgstr "销售员"
 
@@ -1493,7 +1493,7 @@ msgstr ""
 #~ msgid "show finished transactions"
 #~ msgstr "显示完成的交易 "
 
-#, fuzzy
+#removed f-u-z-z-y
 #~ msgid "Only Purchases"
 #~ msgstr "购买"
 
@@ -1517,15 +1517,15 @@ msgstr ""
 #~ msgstr "付款金额大于"
 
 # removed f-u-z-z-y
-#, fuzzy
+#removed f-u-z-z-y
 #~ msgid "Printed"
 #~ msgstr "打印:"
 
-#, fuzzy
+#removed f-u-z-z-y
 #~ msgid "Add Currency"
 #~ msgstr "添加顾客"
 
-#, fuzzy
+#removed f-u-z-z-y
 #~ msgid "Delete Currency"
 #~ msgstr "删除产品"
 
@@ -1566,17 +1566,17 @@ msgstr ""
 #~ msgstr "显示热销产品"
 
 # removed f-u-z-z-y
-#, fuzzy
+#removed f-u-z-z-y
 #~ msgid "By Date:"
 #~ msgstr "按日期"
 
 # removed f-u-z-z-y
-#, fuzzy
+#removed f-u-z-z-y
 #~ msgid "Product Name"
 #~ msgstr "浏览度量单位 "
 
 # removed f-u-z-z-y
-#, fuzzy
+#removed f-u-z-z-y
 #~ msgid "Last Price"
 #~ msgstr "最后卖出 :"
 
@@ -1637,7 +1637,7 @@ msgstr ""
 #~ msgid "Browse Balances"
 #~ msgstr "浏览结余"
 
-#, fuzzy
+#removed f-u-z-z-y
 #~ msgid "Browse Cash Flow"
 #~ msgstr "浏览种类 "
 

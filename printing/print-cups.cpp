@@ -591,9 +591,9 @@ bool PrintCUPS::printSmallTicket(const PrintTicketInfo &ptInfo, QPrinter &printe
     if (idiscount > 0) {
         discc = ", "+idiscount+" "+textDisc;
     }
-    text = "@ "+iprice+ ", "+itax+ " "+ textTax + discc;
-    painter.drawText(Margin*5, Margin + yPos, text);
-    yPos = yPos + fm.lineSpacing();
+//    text = "@ "+iprice+ ", "+itax+ " "+ textTax + discc;
+//    painter.drawText(Margin*5, Margin + yPos, text);
+//    yPos = yPos + fm.lineSpacing();
     
     ///check if there is a Special Order or group, to print contents
     if ( !tLine.geForPrint.isEmpty() ) {
@@ -805,12 +805,12 @@ bool PrintCUPS::printSmallTicket(const PrintTicketInfo &ptInfo, QPrinter &printe
             yPos = yPos + fm.lineSpacing();
         }
         //taxes
-        textWidth = fm.size(Qt::TextExpandTabs | Qt::TextDontClip, ptInfo.thTax);
-        painter.drawText(printer.width()-(printer.width()/3)-textWidth.width(), Margin+yPos, ptInfo.thTax);
-        textWidth = fm.size(Qt::TextExpandTabs | Qt::TextDontClip, ptInfo.taxes);
-        painter.drawText((printer.width() - textWidth.width() - Margin), Margin+yPos, ptInfo.taxes);
-        yPos = yPos + fm.lineSpacing();
-        //draw a total line
+   //   textWidth = fm.size(Qt::TextExpandTabs | Qt::TextDontClip, ptInfo.thTax);
+   //     painter.drawText(printer.width()-(printer.width()/3)-textWidth.width(), Margin+yPos, ptInfo.thTax);
+//        textWidth = fm.size(Qt::TextExpandTabs | Qt::TextDontClip, ptInfo.taxes);
+//        painter.drawText((printer.width() - textWidth.width() - Margin), Margin+yPos, ptInfo.taxes);
+//        yPos = yPos + fm.lineSpacing();
+       //draw a total line
         painter.setPen(QPen(Qt::darkGray, 1, Qt::SolidLine, Qt::FlatCap, Qt::RoundJoin));
         painter.drawLine((printer.width() - (printer.width()/3)) , Margin + yPos - 8, printer.width()-Margin, Margin + yPos - 8);
         yPos = yPos + fm.lineSpacing();
@@ -838,12 +838,12 @@ bool PrintCUPS::printSmallTicket(const PrintTicketInfo &ptInfo, QPrinter &printe
 //    textWidth = fm.size(Qt::TextExpandTabs | Qt::TextDontClip, ptInfo.thPaid);
 //    painter.drawText((printer.width() - textWidth.width() - Margin), Margin+yPos, ptInfo.thPaid);
 //    yPos = yPos + fm.lineSpacing();
-//    //CHANGE
-//    textWidth = fm.size(Qt::TextExpandTabs | Qt::TextDontClip, ptInfo.thChangeStr);
-//    painter.drawText(printer.width()-(printer.width()/3)-textWidth.width(), Margin+yPos, ptInfo.thChangeStr);
-//    textWidth = fm.size(Qt::TextExpandTabs | Qt::TextDontClip, ptInfo.thChange);
-//    painter.drawText((printer.width() - textWidth.width() - Margin), Margin+yPos, ptInfo.thChange);
-//    yPos = yPos + fm.lineSpacing();
+    //CHANGE
+  //  textWidth = fm.size(Qt::TextExpandTabs | Qt::TextDontClip, ptInfo.thChangeStr);
+    //   painter.drawText(printer.width()-(printer.width()/3)-textWidth.width(), Margin+yPos, ptInfo.thChangeStr);
+     //  textWidth = fm.size(Qt::TextExpandTabs | Qt::TextDontClip, ptInfo.thChange);
+     //  painter.drawText((printer.width() - textWidth.width() - Margin), Margin+yPos, ptInfo.thChange);
+     //  yPos = yPos + fm.lineSpacing();
     //TODO: Verify THIS!!!
 //    if (ptInfo.ticketInfo.paidWithCard) {
 //      painter.setFont(tmpFont);
@@ -869,6 +869,29 @@ bool PrintCUPS::printSmallTicket(const PrintTicketInfo &ptInfo, QPrinter &printe
 //       printer.newPage();             // no more room on this page
 //       yPos = 0;                       // back to top of page
 //     }
+//Balance
+    textWidth = fm.size(Qt::TextExpandTabs | Qt::TextDontClip, ptInfo.thBalanceStr);
+    painter.drawText(printer.width()-(printer.width()/3)-textWidth.width(), Margin+yPos, ptInfo.thBalanceStr);
+    textWidth = fm.size(Qt::TextExpandTabs | Qt::TextDontClip, ptInfo.thBalance);
+    painter.drawText((printer.width() - textWidth.width() - Margin), Margin+yPos,ptInfo.thBalance);
+    yPos = yPos + fm.lineSpacing();
+//Monthly
+    textWidth = fm.size(Qt::TextExpandTabs | Qt::TextDontClip, ptInfo.thMonthlyStr);
+    painter.drawText(printer.width()-(printer.width()/3)-textWidth.width(), Margin+yPos, ptInfo.thMonthlyStr);
+    textWidth = fm.size(Qt::TextExpandTabs | Qt::TextDontClip,ptInfo.thMonthly);
+    painter.drawText((printer.width() - textWidth.width() - Margin), Margin+yPos,ptInfo.thMonthly);
+    yPos = yPos + 2*fm.lineSpacing();
+
+ //Balance
+    textWidth = fm.size(Qt::TextExpandTabs | Qt::TextDontClip, ptInfo.thExpiryStr);
+    painter.drawText(printer.width()-(printer.width()/3)-textWidth.width(), Margin+yPos, ptInfo.thExpiryStr);
+    yPos = yPos +  fm.lineSpacing();
+    textWidth = fm.size(Qt::TextExpandTabs | Qt::TextDontClip,ptInfo.thExpiry);
+    painter.drawText((printer.width() - textWidth.width() - Margin), Margin+yPos, ptInfo.thExpiry);
+    yPos = yPos +  fm.lineSpacing();
+
+
+
     //Random Message
     double maxL = ((printer.width())-Margin*2);
     QStringList strList;

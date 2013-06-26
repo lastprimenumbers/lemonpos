@@ -2698,6 +2698,7 @@ void lemonView::printTicket(TicketInfo ticket)
   QString hTax = i18n("Tax");
   QString hSubtotal = i18n("Subtotal");
   QString hTendered = i18n("Tendered");
+
   //HTML Ticket
   QStringList ticketHtml;
   double tDisc = 0.0;
@@ -2902,12 +2903,18 @@ void lemonView::printTicket(TicketInfo ticket)
       ptInfo.thPaid     = KGlobal::locale()->formatMoney(ptInfo.ticketInfo.paidwith, currency(), 2);
       ptInfo.thChange   = KGlobal::locale()->formatMoney(ptInfo.ticketInfo.change, currency(), 2);
       ptInfo.thChangeStr= i18n("Change");
-      ptInfo.tDisc      = KGlobal::locale()->formatMoney(-tDisc, currency(), 2);
-      ptInfo.thCard     = i18n("Card Number  : %1", ticket.cardnum);
-      ptInfo.thCardAuth = i18n("Authorization : %1", ticket.cardAuthNum);
-      ptInfo.totDisc    = tDisc;
-      ptInfo.subtotal   = ticket.subTotal;
-      ptInfo.logoOnTop = Settings::chLogoOnTop();
+      ptInfo.thBalance   = KGlobal::locale()->formatMoney(ptInfo.ticketInfo.balance, QString(), 2);
+      ptInfo.thBalanceStr= i18n("Credito Residuo");
+      ptInfo.thMonthly   = KGlobal::locale()->formatMoney(ptInfo.ticketInfo.monthly, QString(), 2);
+      ptInfo.thMonthlyStr= i18n("Ricarica Mensile");
+      ptInfo.thExpiry    = KGlobal::locale()->formatDate(ptInfo.ticketInfo.expiry, KLocale::LongDate);
+      ptInfo.thExpiryStr = i18n("Scadenza Tessera");
+      ptInfo.tDisc       = KGlobal::locale()->formatMoney(-tDisc, QString(), 2);
+      ptInfo.thCard      = i18n("Card Number  : %1", ticket.cardnum);
+      ptInfo.thCardAuth  = i18n("Authorization : %1", ticket.cardAuthNum);
+      ptInfo.totDisc     = tDisc;
+      ptInfo.subtotal    = ticket.subTotal;
+      ptInfo.logoOnTop  = Settings::chLogoOnTop();
       //QString signM = KGlobal::locale()->formatMoney(tDisc, QString(), 2);
       //signM.truncate(2); //NOTE: this is only getting the sign "$"...
       ptInfo.paymentStrPrePayment = hPrePayment;
@@ -2924,6 +2931,7 @@ void lemonView::printTicket(TicketInfo ticket)
       ptInfo.thTendered = hTendered;
       //for reservations
       ptInfo.hdrReservation = i18n(" RESERVATION ");
+
       if (!ptInfo.ticketInfo.reservationStarted)
         ptInfo.resTotalAmountStr  = i18n("Purchase Total Amount");
       else
@@ -5787,5 +5795,6 @@ void lemonView::calculateTotalForClient()
 
 
 #include "lemonview.moc"
+
 
 
