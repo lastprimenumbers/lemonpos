@@ -359,6 +359,8 @@ void squeezeView::setupSignalConnections()
 
   connect(ui_mainview.comboProductsFilterByCategory,SIGNAL(currentIndexChanged(int)), this, SLOT( setProductsFilter()) );
   connect(ui_mainview.editProductsFilterByDesc,SIGNAL(textEdited(const QString &)), this, SLOT( setProductsFilter()) );
+  connect(ui_mainview.editProductsFilterByCode,SIGNAL(textEdited(const QString &)), this, SLOT( setProductsFilter()) );
+  connect(ui_mainview.rbProductsFilterByCode, SIGNAL(toggled(bool)), this, SLOT( setProductsFilter()) );
   connect(ui_mainview.rbProductsFilterByDesc, SIGNAL(toggled(bool)), this, SLOT( setProductsFilter()) );
   connect(ui_mainview.rbProductsFilterByCategory, SIGNAL(toggled(bool)), this, SLOT( setProductsFilter()) );
   connect(ui_mainview.rbProductsFilterByAvailable, SIGNAL(toggled(bool)), this, SLOT( setProductsFilter()) );
@@ -1145,6 +1147,7 @@ void squeezeView::setProductsFilter()
 //   If filter by description is selected and the text is empty, and later is re-filtered
 //   then NO pictures are shown; even if is refiltered again.
 QRegExp regexp = QRegExp(ui_mainview.editProductsFilterByDesc->text());
+QRegExp regexp2 = QRegExp(ui_mainview.editProductsFilterByCode->text());
 if (!ui_mainview.groupFilterProducts->isChecked()) productsModel->setFilter("");
 else {
   if (ui_mainview.rbProductsFilterByDesc->isChecked()) {
@@ -1154,6 +1157,14 @@ else {
     else  productsModel->setFilter(QString("products.name REGEXP '%1'").arg(ui_mainview.editProductsFilterByDesc->text()));
     productsModel->setSort(productStockIndex, Qt::DescendingOrder);
   }
+  else if (ui_mainview.rbProductsFilterByCode->isChecked()) {
+      // Filter by CODE.
+        if (!regexp2.isValid())  ui_mainview.editProductsFilterByCode->setText("");
+        if (ui_mainview.editProductsFilterByCode->text()=="*" || ui_mainview.editProductsFilterByCode->text()=="") productsModel->setFilter("");
+        else  productsModel->setFilter(QString("products.code REGEXP '%1'").arg(ui_mainview.editProductsFilterByCode->text()));
+        productsModel->setSort(productStockIndex, Qt::DescendingOrder);
+        qDebug()<< "filterCode" << productsModel->filter();
+      }
   else if (ui_mainview.rbProductsFilterByCategory->isChecked()) {
   //2nd if: Filter by CATEGORY
     //Find catId for the text on the combobox.

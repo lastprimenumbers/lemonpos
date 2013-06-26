@@ -700,6 +700,7 @@ void lemonView::switchColor()
     ui_mainview.labelItem->setStyleSheet("background:none");
     ui_mainview.deleteItem->setStyleSheet("background:none");}
   ui_mainview.editItemCode->setFocus();
+
 }
 
 
@@ -1478,6 +1479,7 @@ if ( doNotAddMoreItems ) { //only for reservations
         ui_mainview.tableWidget->setCurrentCell(info.row,1);
         qDebug()<<"pippo"<<info.row;
         deleteSelectedItem();
+        ui_mainview.editItemCode->clear();
         return;
   }
   QString msg;
