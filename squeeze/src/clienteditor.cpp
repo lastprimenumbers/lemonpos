@@ -335,6 +335,7 @@ ClientInfo ClientEditor::getClientInfo()
     info.beginsusp = getBeginsuspDate();
     info.endsusp = getEndsuspDate();
     info.msgsusp = getMsgsusp();
+    info.birthDate = getBirthDate();
     info.notes   = getNotes();
 
     QPixmap photo=getPhoto();

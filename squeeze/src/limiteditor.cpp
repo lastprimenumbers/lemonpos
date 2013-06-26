@@ -11,7 +11,7 @@ limiteditor::limiteditor(QWidget *parent) :
     ui->setupUi(this);
 
     // An empty limit
-    lim.clientCode=QString("");
+    lim.clientCode=QString("*");
     lim.clientTag=QString("*");
     lim.productCat=0;
     lim.productCode=QString("*");
@@ -45,15 +45,16 @@ void limiteditor::setDb(QSqlDatabase parentDb)
     ui->codeClient->setDb(parentDb,"clients");
 }
 
-void limiteditor::setLimit(Limit nlim)
-{
+void limiteditor::setLimit(Limit &nlim) {
     lim=nlim;
 
     // Setup client selection
-    if (lim.clientCode==0) {
+    if (lim.clientCode=="*") {
         if (lim.clientTag=="*") {
             ui->radioAllClients->setChecked(true);
+            ui->radioTagClient->setChecked(false);
         } else {
+            ui->radioAllClients->setChecked(false);
            ui->radioTagClient->setChecked(true);
            ui->clientTagWidget->setTags(QStringList(lim.clientTag));
         }
@@ -75,6 +76,14 @@ void limiteditor::setLimit(Limit nlim)
 
     ui->inputLimit->setValue(lim.limit);
     ui->inputPriority->setValue(lim.priority);
+}
+
+void limiteditor::setLimit(qulonglong limitId) {
+    Azahar *myDb = new Azahar;
+    myDb->setDatabase(db);
+    Limit lim=myDb->getLimit(limitId);
+    setLimit(lim);
+    delete myDb;
 }
 
 

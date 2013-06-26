@@ -23,11 +23,23 @@
 #include <QtSql>
 #include <QMouseEvent>
 #include <QPaintEvent>
+#include <QByteArray>
 #include <klocale.h>
 #include <kstandarddirs.h>
 #include <kiconloader.h>
 
 #include "usersdelegate.h"
+
+UsersDelegate::UsersDelegate(QWidget *parent = 0) : QItemDelegate(parent) {
+    QList<int> ncols;
+    ncols.append(1);
+    cols=ncols;
+}
+
+void UsersDelegate::setCol(QList<int> &i) {
+    cols.clear();
+    cols.append(i);
+}
 
 void UsersDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option,
                          const QModelIndex &index) const
@@ -50,8 +62,12 @@ void UsersDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option,
     //get item data
     const QAbstractItemModel *model = index.model();
     int row = index.row();
-    QModelIndex nameIndex = model->index(row, 1);
-    QString name = model->data(nameIndex, Qt::DisplayRole).toString();
+    QStringList nameList;
+    for (int i; i<cols.count(); ++i) {
+        QModelIndex nameIndex = model->index(row, cols.at(i));
+        nameList.append(model->data(nameIndex, Qt::DisplayRole).toString());
+    }
+    QString name=nameList.join(", ");
     QByteArray pixData = model->data(index, Qt::DisplayRole).toByteArray();
 
     //preparing photo to paint it...
@@ -83,7 +99,7 @@ void UsersDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option,
 
 
     //Painting name
-    QFont font = QFont("Trebuchet MS", 10);
+    QFont font = QFont("Trebuchet MS", 8);
     font.setBold(true);
     //getting name size in pixels...
     QFontMetrics fm(font);

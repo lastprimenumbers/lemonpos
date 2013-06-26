@@ -162,9 +162,9 @@ InputDialog::InputDialog(QWidget *parent, bool integer, DialogType type, QString
     lineEdit->setValidator(validator);
   }
   //NOTE: We remove the xX from the regexp for use as the separator between qtys and code. Only * can be used now, for Alphacode support
-  QRegExp regexpC("[1-9]+[0-9]*[//.]{0,1}[0-9]{0,2}[*]{0,1}[0-9]{0,13}");
-  QRegExpValidator * validatorEAN13 = new QRegExpValidator(regexpC, this);
-  productCodeEdit->setValidator(validatorEAN13);
+//  QRegExp regexpC("[1-9]+[0-9]*[//.]{0,1}[0-9]{0,2}[*]{0,1}[0-9]{0,13}");
+//  QRegExpValidator * validatorEAN13 = new QRegExpValidator(regexpC, this);
+//  productCodeEdit->setValidator(validatorEAN13);
 
   
   buttonsLayout = new QHBoxLayout();

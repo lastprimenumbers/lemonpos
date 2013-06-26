@@ -289,6 +289,7 @@ void squeezeView::setupSignalConnections()
   connect(ui_mainview.btnAddProduct, SIGNAL(clicked()), SLOT(createProduct()) );
   connect(ui_mainview.btnAddMeasure, SIGNAL(clicked()), SLOT(createMeasure()) );
   connect(ui_mainview.btnAddCategory, SIGNAL(clicked()), SLOT(createCategory()) );
+  connect(ui_mainview.btnRenameCategory, SIGNAL(clicked()), SLOT(renameSelectedCategory()) );
   connect(ui_mainview.btnAddClient, SIGNAL(clicked()), SLOT(createClient()));
   connect(ui_mainview.btnAddDonor, SIGNAL(clicked()), SLOT(createDonor()));
   connect(ui_mainview.btnDeleteProduct, SIGNAL(clicked()), SLOT(deleteSelectedProduct()) );
@@ -1321,6 +1322,9 @@ void squeezeView::setupDonorsModel()
     ui_mainview.donorsView->setSelectionMode(QAbstractItemView::SingleSelection);
 
     UsersDelegate *delegate = new UsersDelegate(ui_mainview.donorsView);
+    QList<int> ncols;
+    ncols.append(2);
+    delegate->setCol(ncols);
     ui_mainview.donorsView->setItemDelegate(delegate);
 
     donorsModel->select();
@@ -1350,6 +1354,10 @@ void squeezeView::setupClientsModel()
     ui_mainview.clientsView->setSelectionMode(QAbstractItemView::SingleSelection);
 
     UsersDelegate *delegate = new UsersDelegate(ui_mainview.clientsView);
+    QList<int> cols;
+    cols.append(3);
+    cols.append(2);
+    delegate->setCol(cols);
     ui_mainview.clientsView->setItemDelegate(delegate);
 
     clientsModel->select();
@@ -1370,24 +1378,25 @@ void squeezeView::setupLimitsModel()
   qDebug()<<"Setting up Limits Model";
   if (db.isOpen()) {
     limitsModel->setTable("limits");
-
 //    limitsModel->setRelation(1, QSqlRelation("clients", "code", "surname"));
-    limitsModel->setRelation(2, QSqlRelation("tags", "tag", "tag"));
+//    limitsModel->setRelation(2, QSqlRelation("tags", "tag", "tag"));
     limitsModel->setRelation(3, QSqlRelation("products", "code", "name"));
     limitsModel->setRelation(4, QSqlRelation("categories", "catid", "text"));
 //    limitsModel->setHeaderData(1, Qt::Horizontal, "Cliente");
     limitsModel->setHeaderData(2, Qt::Horizontal, "Etichetta");
     limitsModel->setHeaderData(3, Qt::Horizontal, "Prodotto");
     limitsModel->setHeaderData(4, Qt::Horizontal, "Categoria");
+    limitsModel->setHeaderData(5, Qt::Horizontal, "Limite");
+//    limitsModel->setHeaderData(6, Qt::Horizontal, "Priorità");
     ui_mainview.limitsView->setModel(limitsModel);
     ui_mainview.limitsView->setItemDelegate(new QSqlRelationalDelegate(ui_mainview.limitsView));
     QString f;
-    f=QString("clientCode=\"*\"");
+    f=QString("clientCode='*'");
     limitsModel->setFilter(f);
-    ui_mainview.limitsView->hideColumn(0);
-    ui_mainview.limitsView->hideColumn(1);
-    ui_mainview.limitsView->hideColumn(6);
-    ui_mainview.limitsView->hideColumn(8);
+    ui_mainview.limitsView->hideColumn(0); //id
+    ui_mainview.limitsView->hideColumn(1); //clientcode
+    ui_mainview.limitsView->hideColumn(6); //priorità
+    ui_mainview.limitsView->hideColumn(8); //parent
     limitsModel->select();
 
   }
@@ -2181,36 +2190,11 @@ void squeezeView::clientsViewOnSelected(const QModelIndex & index)
     int row = index.row();
 
     QModelIndex indx = model->index(row, clientsModel->fieldIndex("id"));
-//    info.id = model->data(indx, Qt::DisplayRole).toInt();
-//    indx = model->index(row, clientsModel->fieldIndex("name"));
-//    info.name = model->data(indx, Qt::DisplayRole).toString();
-//    indx = model->index(row, clientsModel->fieldIndex("parent"));
-//    info.parentClient = model->data(indx, Qt::DisplayRole).toString();
     indx = model->index(row, clientsModel->fieldIndex("code"));
     info.code = model->data(indx, Qt::DisplayRole).toString();
-//    indx = model->index(row, clientsModel->fieldIndex("address"));
-//    info.address = model->data(indx, Qt::DisplayRole).toString();
-//    indx = model->index(row, clientsModel->fieldIndex("phone"));
-//    info.phone = model->data(indx, Qt::DisplayRole).toString();
-//    indx = model->index(row, clientsModel->fieldIndex("phone_movil"));
-//    info.cell = model->data(indx, Qt::DisplayRole).toString();
-//    indx = model->index(row, clientsModel->fieldIndex("points"));
-//    info.points = model->data(indx, Qt::DisplayRole).toULongLong();
-//    indx = model->index(row, clientsModel->fieldIndex("discount"));
-//    info.discount = model->data(indx, Qt::DisplayRole).toDouble();
-//    indx = model->index(row, clientsModel->fieldIndex("monthly"));
-//    info.monthly = model->data(indx, Qt::DisplayRole).toDouble();
-//    indx = model->index(row, clientsModel->fieldIndex("photo"));
-//    info.photo = model->data(indx, Qt::DisplayRole).toByteArray();
-//    indx = model->index(row, clientsModel->fieldIndex("since"));
-//    info.since = model->data(indx, Qt::DisplayRole).toDate();
-//    indx = model->index(row, clientsModel->fieldIndex("expiry"));
-//    info.expiry = model->data(indx, Qt::DisplayRole).toDate();
-
     //Launch Edit dialog
     ClientEditor *clientEditorDlg = new ClientEditor(db, this);
     clientEditorDlg->setClientInfo(info.code);
-
     if (clientEditorDlg->exec() ) {
       clientEditorDlg->commitClientInfo();
       clientsModel->select();
@@ -2527,17 +2511,52 @@ void squeezeView::createLimit() {
     limiteditor *limed = new limiteditor;
     limed->setDb(db);
     limed->show();
+    //FIXME: controlla modelReset!
+    connect(limed,SIGNAL(accepted()),SLOT(limitsModelSelect()));
+}
+
+void squeezeView::limitsModelSelect() {
+    limitsModel->select();
 }
 
 void squeezeView::modifyLimit() {
-    limiteditor *limed = new limiteditor;
-    limed->setDb(db);
-//    limed->setLimit();
-    limed->show();
+          QModelIndex index = ui_mainview.limitsView->currentIndex();
+          if (limitsModel->tableName().isEmpty()) setupLimitsModel();
+          if (index == limitsModel->index(-1,-1) ) {
+            KMessageBox::information(this, i18n("Please select a limit to modify, then press the modify button again."), i18n("Cannot modify"));
+          }
+          else  {
+            qulonglong limitId = limitsModel->record(index.row()).value("id").toULongLong();
+            limiteditor *limed = new limiteditor;
+            limed->setDb(db);
+            limed->setLimit(limitId);
+            limed->show();
+
+      }
 }
 
 void squeezeView::deleteLimit() {
-
+    if (db.isOpen()) {
+          QModelIndex index = ui_mainview.limitsView->currentIndex();
+          if (limitsModel->tableName().isEmpty()) setupLimitsModel();
+          if (index == limitsModel->index(-1,-1) ) {
+            KMessageBox::information(this, i18n("Please select a limit to delete, then press the delete button again."), i18n("Cannot delete"));
+          }
+          else  {
+            qlonglong limitId = limitsModel->record(index.row()).value("id").toLongLong();
+            if (limitId > 0) {
+          int answer = KMessageBox::questionYesNo(this, i18n("Do you really want to delete the limit?"),
+                                                i18n("Delete"));
+          if (answer == KMessageBox::Yes) {
+            Azahar *myDb = new Azahar;
+            myDb->setDatabase(db);
+            myDb->deleteLimit(limitId);
+            limitsModel->select();
+            delete myDb;
+          }
+      } else KMessageBox::information(this, i18n("Default limit cannot be deleted."), i18n("Cannot delete"));
+     }
+   }
 }
 
 void squeezeView::searchLimit() {
@@ -2898,17 +2917,25 @@ void squeezeView::deleteSelectedCategory()
     }
     else  {
       QString catText = categoriesModel->record(index.row()).value("text").toString();
+      qulonglong newCatId=0;
       Azahar *myDb = new Azahar;
       myDb->setDatabase(db);
+      QStringList catlist=myDb->getCategoriesList();
       qulonglong catId = myDb->getCategoryId(catText);
       if (catId >0) {
         int answer = KMessageBox::questionYesNo(this, i18n("Do you really want to delete the category '%1'?", catText),
                                                 i18n("Delete"));
-        if (answer == KMessageBox::Yes) {
+        bool ok=false;
+        QString newCatName=QInputDialog::getItem(this,i18n("Re-assign products to another category"),
+                              "Select a new category:",  catlist, 0, false, &ok);
+        if (answer == KMessageBox::Yes && ok) {
+          // Ask for a category reassignement
+
+          newCatId=myDb->getCategoryId(newCatName);
           qulonglong  iD = categoriesModel->record(index.row()).value("catid").toULongLong();
           if (!categoriesModel->removeRow(index.row(), index)) {
             // weird:  since some time, removeRow does not work... it worked fine on versions < 0.9 ..
-            bool d = myDb->deleteCategory(iD); qDebug()<<"Deleteing Category ("<<iD<<") manually...";
+            bool d = myDb->deleteCategory(iD,newCatId); qDebug()<<"Deleteing Category ("<<iD<<") manually...";
             if (d) qDebug()<<"Deletion succed...";
           }
           categoriesModel->submitAll();
@@ -2920,6 +2947,33 @@ void squeezeView::deleteSelectedCategory()
     }
   }
 }
+
+void squeezeView::renameSelectedCategory()
+{
+  if (!db.isOpen()) return;
+
+    QModelIndex index = ui_mainview.tableCategories->currentIndex();
+    if (categoriesModel->tableName().isEmpty()) setupCategoriesModel();
+    if (index == offersModel->index(-1,-1) ) {
+      KMessageBox::information(this, i18n("Please select a category to rename, then press the rename button again."), i18n("Cannot rename"));
+      return;
+    }
+    QString catText = categoriesModel->record(index.row()).value("text").toString();
+    bool ok=false;
+    catText = QInputDialog::getText(this, i18n("Rename category"), i18n("Enter the new category name:"),
+                                        QLineEdit::Normal, catText, &ok );
+    if (ok) {
+        Azahar *myDb = new Azahar;
+        myDb->setDatabase(db);
+        qulonglong  catId = categoriesModel->record(index.row()).value("catid").toULongLong();
+        bool b=myDb->renameCategory(catId,catText);
+        categoriesModel->select();
+        updateCategoriesCombo();
+        delete myDb;
+    }
+
+}
+
 
 
 //CASH OUTS
