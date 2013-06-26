@@ -99,7 +99,7 @@
       </sizepolicy>
      </property>
      <property name="currentIndex">
-      <number>7</number>
+      <number>6</number>
      </property>
      <widget class="QWidget" name="pageWelcome">
       <layout class="QGridLayout" name="gridLayout">
@@ -1248,6 +1248,13 @@ p, li { white-space: pre-wrap; }
           <widget class="QPushButton" name="btnAddCategory">
            <property name="text">
             <string>Add Category</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnRenameCategory">
+           <property name="text">
+            <string>Rinomina</string>
            </property>
           </widget>
          </item>

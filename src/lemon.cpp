@@ -790,7 +790,7 @@ bool lemon::queryClose()
   //Close only by admin user. or ask for password??
   if (Settings::allowAnyUserToQuit())
   {
-    bool reallyQuit=false;
+    bool reallyQuit=true;
     if (m_view->getLoggedUser() == "admin") reallyQuit=true;  else reallyQuit = m_view->validAdminUser();
     //cancel current transaction
     if (m_view->isTransactionInProgress()){  m_view->cancelByExit(); }
@@ -808,7 +808,7 @@ bool lemon::queryClose()
     //When saving balance on quit, do we need to print the balance???
     m_view->corteDeCaja();
     return true;
-  } else return false;
+  } else return true;
 }
 
 void lemon::salir()

@@ -101,7 +101,8 @@ class Azahar : public QObject
     qulonglong  getCategoryId(QString texto);
     QString     getCategoryStr(qulonglong id);
     bool        insertCategory(QString text);
-    bool        deleteCategory(qulonglong id);
+    bool        deleteCategory(qulonglong id, qulonglong newId);
+    bool        renameCategory(qulonglong id, QString newText);
 
     //MEASURES
     QStringList getMeasuresList();
@@ -150,7 +151,10 @@ class Azahar : public QObject
     unsigned int getClientId(QString uname);
     bool         deleteClient(qulonglong id);
     Family getFamily(ClientInfo &info);
-    void getFamilyLimits(Family &family, ProductInfo &pInfo);
+    bool getFamilyLimits(Family &family, ProductInfo &pInfo, double qty=1);
+    bool changeFamilyLimits(Family &family, ProductInfo &pInfo, double sign=1);
+    Limit getLimit(qulonglong limitId);
+
 
     // TAGS
     QStringList getClientTags(QString clientCode);
@@ -158,13 +162,13 @@ class Azahar : public QObject
     void setClientTags(ClientInfo info);
 
     // LIMITS
-    Limit getLimitFromQuery(QSqlQuery &query);
+    bool getLimitFromQuery(QSqlQuery &query, Limit &result);
     bool insertLimit(Limit &lim);
     bool modifyLimit(Limit &lim);
-    QList<int> getClientLimits(ClientInfo &cInfo, ProductInfo &pInfo, QHash<int,Limit> &currentLimits);
-    void incrementLimits(ClientInfo &cInfo, ProductInfo &pInfo, QHash<int,Limit> &currentLimits);
-    void decrementLimits(ClientInfo &cInfo, ProductInfo &pInfo, QHash<int,Limit> &currentLimits);
-    void commitLimits(QHash<int,Limit> &currentLimits);
+    QStringList getClientLimits(ClientInfo &cInfo, ProductInfo &pInfo, QHash<QString, Limit> &currentLimits);
+    void commitLimits(QHash<QString, Limit> &currentLimits);
+    bool deleteLimit(qlonglong &limitId);
+    bool deleteLimit(Limit &lim);
 
     //TRANSACTIONS
     TransactionInfo getTransactionInfo(qulonglong id);
@@ -302,5 +306,7 @@ private:
     bool    _bindLimit(Limit &info, QSqlQuery &query);
 
 };
+
+
 
 #endif

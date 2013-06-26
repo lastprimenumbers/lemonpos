@@ -190,6 +190,7 @@ signals:
    void createDonor();
 
    void createLimit();
+   void limitsModelSelect();
    void modifyLimit();
    void deleteLimit();
    void searchLimit();
@@ -204,6 +205,7 @@ signals:
    void deleteSelectedCategory();
    void deleteSelectedClient();
    void deleteSelectedDonor();
+   void renameSelectedCategory();
    void populateCategoriesHash();
    void setProductsFilter();
    void setTransactionsFilter();

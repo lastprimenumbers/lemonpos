@@ -62,7 +62,7 @@ class PurchaseEditor : public KDialog
     int     getMeasureId();
     QString getCategoryStr(int c);
     QString getMeasureStr(int c);
-    double  getCost()        { return 0.0; };
+    double  getCost()        { return ui->editCost->text().toDouble(); };
     double  getTax1()        { return 0.0; };
     double  getTax2()        { return 0.0; };
     double  getPrice()       { return ui->editFinalPrice->text().toDouble(); };
