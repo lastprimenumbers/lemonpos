@@ -2905,13 +2905,13 @@ void lemonView::printTicket(TicketInfo ticket)
       ptInfo.thPaid     = KGlobal::locale()->formatMoney(ptInfo.ticketInfo.paidwith, currency(), 2);
       ptInfo.thChange   = KGlobal::locale()->formatMoney(ptInfo.ticketInfo.change, currency(), 2);
       ptInfo.thChangeStr= i18n("Change");
-      ptInfo.thBalance   = KGlobal::locale()->formatMoney(ptInfo.ticketInfo.balance, QString(), 2);
+      ptInfo.thBalance   = KGlobal::locale()->formatMoney(ptInfo.ticketInfo.balance, currency(), 2);
       ptInfo.thBalanceStr= i18n("Credito Residuo");
-      ptInfo.thMonthly   = KGlobal::locale()->formatMoney(ptInfo.ticketInfo.monthly, QString(), 2);
+      ptInfo.thMonthly   = KGlobal::locale()->formatMoney(ptInfo.ticketInfo.monthly, currency(), 2);
       ptInfo.thMonthlyStr= i18n("Ricarica Mensile");
       ptInfo.thExpiry    = KGlobal::locale()->formatDate(ptInfo.ticketInfo.expiry, KLocale::LongDate);
       ptInfo.thExpiryStr = i18n("Scadenza Tessera");
-      ptInfo.tDisc       = KGlobal::locale()->formatMoney(-tDisc, QString(), 2);
+      ptInfo.tDisc       = KGlobal::locale()->formatMoney(-tDisc, currency(), 2);
       ptInfo.thCard      = i18n("Card Number  : %1", ticket.cardnum);
       ptInfo.thCardAuth  = i18n("Authorization : %1", ticket.cardAuthNum);
       ptInfo.totDisc     = tDisc;

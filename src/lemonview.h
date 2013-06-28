@@ -138,6 +138,7 @@ public:
 
     RoundingInfo roundUsStandard(const double &number);
     QString currency(){ return ui_mainview.comboCurrency->currentText(); };
+//    QString currency(){ return QString("P"); };
 
   signals:
     /**
