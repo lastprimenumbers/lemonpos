@@ -62,6 +62,7 @@ public:
     bool adminIsLogged;
     LoginWindow *dlgPassword;
     QHash<QString, int> categoriesHash;
+    QStringList categoriesList;
     QSqlRelationalTableModel *productsModel;
     QSqlRelationalTableModel *offersModel;
     QSqlRelationalTableModel *cashflowModel;

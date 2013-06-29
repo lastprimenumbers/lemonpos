@@ -1139,6 +1139,7 @@ void squeezeView::populateCategoriesHash()
   myDb->setDatabase(db);
   categoriesHash.clear();
   categoriesHash = myDb->getCategoriesHash();
+  categoriesList = myDb->getCategoriesList();
   delete myDb;
 }
 
@@ -2662,10 +2663,8 @@ void squeezeView::updateCategoriesCombo()
 {
   populateCategoriesHash();
   ui_mainview.comboProductsFilterByCategory->clear();
-  QHashIterator<QString, int> item(categoriesHash);
-  while (item.hasNext()) {
-    item.next();
-    ui_mainview.comboProductsFilterByCategory->addItem(item.key());
+  for (int i; i<categoriesList.count(); ++i) {
+      ui_mainview.comboProductsFilterByCategory->addItem(categoriesList.at(i));
   }
 }
 //

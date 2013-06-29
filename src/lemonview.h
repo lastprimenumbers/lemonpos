@@ -97,6 +97,7 @@ public:
     QHash<QString, ProductInfo> productsHash;
     QSqlTableModel *productsModel;
     QHash<QString, int> categoriesHash;
+    QStringList categoriesList;
     ClientInfo clientInfo;
     Family  family;
     void updateFamily(ClientInfo info);

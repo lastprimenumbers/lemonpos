@@ -1756,57 +1756,57 @@ void lemonView::deleteSelectedItem()
       QTableWidgetItem *item = ui_mainview.tableWidget->item(row, colCode);
       QString codeStr = item->data(Qt::DisplayRole).toString();
 
-      if ( codeStr.toULongLong() == 0 ) {
-        //its not a product, its a s.o.
-        codeStr.remove(0,3); //remove the "so." string
-        qulonglong id = codeStr.toULongLong();
-        if (specialOrders.contains(id)) {
-          SpecialOrderInfo info = specialOrders.take(id);
-          //check if is completing the order
-          if (info.status == stReady) { //yes, its completing the order, but wants to cancel the action.
-            //remove from listview
-            ui_mainview.tableWidget->removeRow(row);
-            ui_mainview.editItemCode->setFocus();
-            if (ui_mainview.tableWidget->rowCount() == 0) ui_mainview.comboClients->setEnabled(true);
-            refreshTotalLabel();
-            qDebug()<<" Removing a SO when completing the Order";
-            return;
-          }
-          if ( info.qty == 1 ) {
-            Azahar *myDb = new Azahar;
-            myDb->setDatabase(db);
-            myDb->deleteSpecialOrder(id);
-            //remove from listview
-            ui_mainview.tableWidget->removeRow(row);
-            QString authBy = dlgPassword->username();
-            if (authBy.isEmpty()) authBy = myDb->getUserName(1); //default admin.
-            log(loggedUserId, QDate::currentDate(), QTime::currentTime(), i18n("Removing an Special Item from shopping list. Authorized by %1",authBy));
-            if (ui_mainview.tableWidget->rowCount() == 0) ui_mainview.comboClients->setEnabled(true);
-            ui_mainview.editItemCode->setFocus();
-            refreshTotalLabel();
-            delete myDb;
-            return;
-          }
-          //more than one
-          double iqty = info.qty-1;
-          info.qty = iqty;
-          double newdiscount = info.disc * info.payment * iqty;
+//      if ( codeStr.toULongLong() == 0 ) {
+//        //its not a product, its a s.o.
+//        codeStr.remove(0,3); //remove the "so." string
+//        qulonglong id = codeStr.toULongLong();
+//        if (specialOrders.contains(id)) {
+//          SpecialOrderInfo info = specialOrders.take(id);
+//          //check if is completing the order
+//          if (info.status == stReady) { //yes, its completing the order, but wants to cancel the action.
+//            //remove from listview
+//            ui_mainview.tableWidget->removeRow(row);
+//            ui_mainview.editItemCode->setFocus();
+//            if (ui_mainview.tableWidget->rowCount() == 0) ui_mainview.comboClients->setEnabled(true);
+//            refreshTotalLabel();
+//            qDebug()<<" Removing a SO when completing the Order";
+//            return;
+//          }
+//          if ( info.qty == 1 ) {
+//            Azahar *myDb = new Azahar;
+//            myDb->setDatabase(db);
+//            myDb->deleteSpecialOrder(id);
+//            //remove from listview
+//            ui_mainview.tableWidget->removeRow(row);
+//            QString authBy = dlgPassword->username();
+//            if (authBy.isEmpty()) authBy = myDb->getUserName(1); //default admin.
+//            log(loggedUserId, QDate::currentDate(), QTime::currentTime(), i18n("Removing an Special Item from shopping list. Authorized by %1",authBy));
+//            if (ui_mainview.tableWidget->rowCount() == 0) ui_mainview.comboClients->setEnabled(true);
+//            ui_mainview.editItemCode->setFocus();
+//            refreshTotalLabel();
+//            delete myDb;
+//            return;
+//          }
+//          //more than one
+//          double iqty = info.qty-1;
+//          info.qty = iqty;
+//          double newdiscount = info.disc * info.payment * iqty;
           
-          item = ui_mainview.tableWidget->item(row, colQty);
-          item->setData(Qt::EditRole, QVariant(iqty));
-          item = ui_mainview.tableWidget->item(row, colDue);
-          item->setData(Qt::EditRole, QVariant((iqty*info.payment)-newdiscount));
-          item = ui_mainview.tableWidget->item(row, colDisc);
-          item->setData(Qt::EditRole, QVariant(newdiscount));
+//          item = ui_mainview.tableWidget->item(row, colQty);
+//          item->setData(Qt::EditRole, QVariant(iqty));
+//          item = ui_mainview.tableWidget->item(row, colDue);
+//          item->setData(Qt::EditRole, QVariant((iqty*info.payment)-newdiscount));
+//          item = ui_mainview.tableWidget->item(row, colDisc);
+//          item->setData(Qt::EditRole, QVariant(newdiscount));
           
-          //reinsert to the hash
-          specialOrders.insert(info.orderid,info);
-        }
-        if (ui_mainview.tableWidget->rowCount() == 0) ui_mainview.comboClients->setEnabled(true);
-        ui_mainview.editItemCode->setFocus();
-        refreshTotalLabel();
-        return; //to exit the method, we dont need to continue.
-      }
+//          //reinsert to the hash
+//          specialOrders.insert(info.orderid,info);
+//        }
+//        if (ui_mainview.tableWidget->rowCount() == 0) ui_mainview.comboClients->setEnabled(true);
+//        ui_mainview.editItemCode->setFocus();
+//        refreshTotalLabel();
+//        return; //to exit the method, we dont need to continue.
+//      }
       
       QString code = item->data(Qt::DisplayRole).toString();
       ProductInfo info = productsHash.take(code); //insert it later...
@@ -3862,19 +3862,9 @@ void lemonView::setupModel()
 
     //Categories popuplist
     populateCategoriesHash();
-    Azahar * myDb = new Azahar;
-    myDb->setDatabase(db);
-     QStringList catList=myDb->getCategoriesList();
-//    QHashIterator<QString, int> item(categoriesHash);
-//    while (item.hasNext()) {
-//      item.next();
-//      ui_mainview.comboFilterByCategory->addItem(item.key());
-//      //qDebug()<<"iterando por el hash en el item:"<<item.key()<<"/"<<item.value();
-//    }
-     for (int i; i<catList.count(); ++i) {
-         ui_mainview.comboFilterByCategory->addItem(catList.at(i));
+     for (int i; i<categoriesList.count(); ++i) {
+         ui_mainview.comboFilterByCategory->addItem(categoriesList.at(i));
      }
-    delete myDb;
 
     ui_mainview.comboFilterByCategory->setCurrentIndex(0);
     connect(ui_mainview.comboFilterByCategory,SIGNAL(currentIndexChanged(int)), this, SLOT( setFilter()) );
@@ -3893,6 +3883,7 @@ void lemonView::populateCategoriesHash()
   Azahar * myDb = new Azahar;
   myDb->setDatabase(db);
   categoriesHash = myDb->getCategoriesHash();
+  categoriesList=myDb->getCategoriesList();
   delete myDb;
 }
 
@@ -4003,8 +3994,6 @@ void lemonView::setFilter()
       productsModel->setFilter(QString("products.isARawProduct=false and products.category=%1").arg(catId));
     } else { //by most sold products in current month --biel
       productsModel->setFilter("products.isARawProduct=false and (products.datelastsold > ADDDATE(sysdate( ), INTERVAL -31 DAY )) ORDER BY products.datelastsold DESC"); //limit or not the result to 5?
-      
-      //products.code IN (SELECT * FROM (SELECT product_id FROM (SELECT product_id, sum( units ) AS sold_items FROM transactions t, transactionitems ti WHERE  t.id = ti.transaction_id AND t.date > ADDDATE( sysdate( ) , INTERVAL -31 DAY ) GROUP BY ti.product_id) month_sold_items ORDER BY sold_items DESC LIMIT 5) popular_products)
     }
   }
   productsModel->select();

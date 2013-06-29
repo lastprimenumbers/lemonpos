@@ -36,10 +36,12 @@ void limiteditor::setDb(QSqlDatabase parentDb)
     myDb->setDatabase(db);
     QHash<QString, int> hash;
     hash = myDb->getCategoriesHash();
+    QStringList catList=myDb->getCategoriesList();
     QHashIterator<QString, int> i(hash);
-    while (i.hasNext()) {
-      i.next();
-      ui->comboProductCat->addItem(i.key(), i.value());
+    QString cat;
+    for (int j; j<catList.count(); ++j) {
+      cat=catList.at(j);
+      ui->comboProductCat->addItem(cat, hash.value(cat));
     }
     ui->codeProduct->setDb(parentDb,"products");
     ui->codeClient->setDb(parentDb,"clients");
