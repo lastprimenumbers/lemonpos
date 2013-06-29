@@ -2627,6 +2627,9 @@ void lemonView::finishCurrentTransaction()
     ticket.soTotal =  soGTotal;
     ticket.deliveryDT = soDeliveryDT;
     ticket.terminal = QString::number(tInfo.terminalnum);
+    ticket.monthly=clientInfo.monthly;
+    ticket.expiry=clientInfo.expiry;
+    ticket.balance=clientInfo.monthly-totalSum;
     qDebug()<<" \n soGTotal:"<<soGTotal<<" deliveryDT:"<<soDeliveryDT<<"\n";
 
     if (printDTticket)
