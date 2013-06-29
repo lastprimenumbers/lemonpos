@@ -1602,6 +1602,9 @@ void lemonView::insertItem(QString code)
     }
   }//if !increment...
 
+  // move the focus on the last row
+  ui_mainview.tableWidget->setCurrentCell(info.row,1);
+
   // Increment limit counter
   if (qty>0){
     Azahar *myDb = new Azahar;
