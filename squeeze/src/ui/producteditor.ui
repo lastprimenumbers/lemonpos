@@ -270,7 +270,7 @@
       <string>Make a stock correction</string>
      </property>
      <property name="text">
-      <string/>
+      <string>Mod</string>
      </property>
     </widget>
    </item>

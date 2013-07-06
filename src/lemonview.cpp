@@ -2263,7 +2263,7 @@ void lemonView::finishCurrentTransaction()
                                i18n("Click Discard to return to modify the transaction, Apply to override credit limit"),
                                QMessageBox::Apply|QMessageBox::Abort,
                                QMessageBox::Abort);
-          if ( override  == QMessageBox::Apply ) { canfinish = true; }
+//          if ( override  == QMessageBox::Apply ) { canfinish = true; }
       }
   }
 
