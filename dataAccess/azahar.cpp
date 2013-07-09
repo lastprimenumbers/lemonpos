@@ -3355,10 +3355,8 @@ double Azahar::getClientCredit(ClientInfo clientInfo, double totalSum)
 {
     CreditInfo credit = getCreditInfoForClient(clientInfo.id);
     double paid=clientInfo.monthly-credit.total;
-   // qDebug()<<"PAID (credit.total):"<<paid;
-           //<<"TOTSUM:"<<totalSum;
     double change = paid - totalSum;
-    if (paid <= 0) change = 0.0;
+//    if (paid <= 0) change = 0.0;
     return change;
 }
 
