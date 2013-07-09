@@ -148,7 +148,7 @@
                    <property name="minimumSize">
                     <size>
                      <width>0</width>
-                     <height>50</height>
+                     <height>20</height>
                     </size>
                    </property>
                    <property name="maximumSize">
@@ -183,8 +183,8 @@
                    </property>
                    <property name="minimumSize">
                     <size>
-                     <width>100</width>
-                     <height>100</height>
+                     <width>200</width>
+                     <height>200</height>
                     </size>
                    </property>
                    <property name="maximumSize">
@@ -1124,6 +1124,9 @@
                 <widget class="QRadioButton" name="rbFilterByCode">
                  <property name="text">
                   <string>filtra per codice</string>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
                  </property>
                 </widget>
                </item>

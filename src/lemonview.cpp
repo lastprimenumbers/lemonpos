@@ -3720,8 +3720,10 @@ void lemonView::setupModel()
     connect(ui_mainview.editFilterByDesc,SIGNAL(returnPressed()), this, SLOT( setFilter()) );
     connect(ui_mainview.rbFilterByDesc, SIGNAL(toggled(bool)), this, SLOT( setFilter()) );
     connect(ui_mainview.rbFilterByCategory, SIGNAL(toggled(bool)), this, SLOT( setFilter()) );
+    connect(ui_mainview.editFilterByCode,SIGNAL(returnPressed()), this, SLOT( setFilter()) );
+    connect(ui_mainview.rbFilterByCode, SIGNAL(toggled(bool)), this, SLOT( setFilter()) );
 
-    ui_mainview.rbFilterByCategory->setChecked(true);
+    ui_mainview.rbFilterByCode->setChecked(true);
     setFilter();
   }
  }
@@ -3831,8 +3833,7 @@ void lemonView::setFilter()
       else
         productsModel->setFilter(QString("products.isARawProduct=false and products.name REGEXP '%1'").arg(ui_mainview.editFilterByDesc->text()));
   }
-  else {
-    if (ui_mainview.rbFilterByCategory->isChecked()) { //by category
+  else if (ui_mainview.rbFilterByCategory->isChecked()) { //by category
       //Find catId for the text on the combobox.
       int catId=-1;
       QString catText = ui_mainview.comboFilterByCategory->currentText();
@@ -3840,9 +3841,12 @@ void lemonView::setFilter()
         catId = categoriesHash.value(catText);
       }
       productsModel->setFilter(QString("products.isARawProduct=false and products.category=%1").arg(catId));
-    } else { //by most sold products in current month --biel
+  }
+  else if (ui_mainview.rbFilterByCode->isChecked()) { //by code
+      productsModel->setFilter(QString("products.isARawProduct=false and products.code REGEXP '%1'").arg(ui_mainview.editFilterByCode->text()));
+  }
+  else { //by most sold products in current month --biel
       productsModel->setFilter("products.isARawProduct=false and (products.datelastsold > ADDDATE(sysdate( ), INTERVAL -31 DAY )) ORDER BY products.datelastsold DESC"); //limit or not the result to 5?
-    }
   }
   productsModel->select();
 }

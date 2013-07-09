@@ -67,9 +67,9 @@ PriceChecker::PriceChecker( QWidget *parent )
   //      causing many database queries to be executed.
   connect( ui->editCode, SIGNAL(returnPressed()),this, SLOT(checkIt()) );
   
-  QRegExp regexpC("[0-9]{1,13}");
-  QRegExpValidator * validator = new QRegExpValidator(regexpC, this);
-  ui->editCode->setValidator(validator);
+//  QRegExp regexpC("[0-9]{1,13}");
+//  QRegExpValidator * validator = new QRegExpValidator(regexpC, this);
+//  ui->editCode->setValidator(validator);
 
   ui->editCode->setFocus();
 
