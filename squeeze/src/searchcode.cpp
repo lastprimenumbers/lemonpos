@@ -44,6 +44,7 @@ SearchCode::SearchCode( QWidget *parent )
     //ui.comboName
     connect( ui->editCode, SIGNAL(editingFinished()), SLOT(updatedCode()));
     connect( ui->comboName, SIGNAL(currentIndexChanged(int)), SLOT(updatedName(int)));
+    (ui->comboName) ->setEditable(true);
 }
 
 SearchCode::~SearchCode()

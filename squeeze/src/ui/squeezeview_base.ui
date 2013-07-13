@@ -99,7 +99,7 @@
       </sizepolicy>
      </property>
      <property name="currentIndex">
-      <number>6</number>
+      <number>7</number>
      </property>
      <widget class="QWidget" name="pageWelcome">
       <layout class="QGridLayout" name="gridLayout">
@@ -1277,11 +1277,11 @@ p, li { white-space: pre-wrap; }
       </layout>
      </widget>
      <widget class="QWidget" name="pageClients">
-      <layout class="QVBoxLayout">
-       <item>
-        <widget class="QListView" name="clientsView"/>
+      <layout class="QGridLayout" name="gridLayout_3">
+       <item row="0" column="0">
+        <widget class="QTableView" name="clientsTableView"/>
        </item>
-       <item>
+       <item row="1" column="0">
         <layout class="QHBoxLayout">
          <item>
           <spacer>
@@ -1318,6 +1318,9 @@ p, li { white-space: pre-wrap; }
           </widget>
          </item>
         </layout>
+       </item>
+       <item row="2" column="0">
+        <widget class="QListView" name="clientsView"/>
        </item>
       </layout>
      </widget>

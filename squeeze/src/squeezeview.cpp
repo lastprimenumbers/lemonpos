@@ -893,6 +893,7 @@ void squeezeView::setupDb()
     donorsModel    = new QSqlTableModel();
     clientsModel    = new QSqlTableModel();
     limitsModel     = new QSqlRelationalTableModel();
+    clientsTableModel = new QSqlRelationalTableModel();
     transactionsModel = new QSqlRelationalTableModel();
     balancesModel   = new QSqlTableModel();
     cashflowModel   = new QSqlRelationalTableModel();
@@ -1345,24 +1346,62 @@ void squeezeView::setupDonorsModel()
 void squeezeView::setupClientsModel()
 {
   if (db.isOpen()) {
-    clientsModel->setTable("clients");
-    ui_mainview.clientsView->setViewMode(QListView::IconMode);
-    ui_mainview.clientsView->setGridSize(QSize(170,170));
-    ui_mainview.clientsView->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    ui_mainview.clientsView->setResizeMode(QListView::Adjust);
-    ui_mainview.clientsView->setModel(clientsModel);
-    ui_mainview.clientsView->setModelColumn(clientsModel->fieldIndex("photo"));
-    ui_mainview.clientsView->setSelectionMode(QAbstractItemView::SingleSelection);
+      clientsTableModel->setTable("clients");
 
-    UsersDelegate *delegate = new UsersDelegate(ui_mainview.clientsView);
-    QList<int> cols;
-    cols.append(3);
-    cols.append(2);
-    delegate->setCol(cols);
-    ui_mainview.clientsView->setItemDelegate(delegate);
+      clientsTableModel->setHeaderData(1, Qt::Horizontal, "Codice Fiscale");
+      clientsTableModel->setHeaderData(2, Qt::Horizontal, "Nome");
+      clientsTableModel->setHeaderData(3, Qt::Horizontal, "Cognome");
 
-    clientsModel->select();
-    ui_mainview.clientsView->setCurrentIndex(clientsModel->index(0, 0));
+      ui_mainview.clientsTableView->setModel(clientsTableModel);
+
+      ui_mainview.clientsTableView->setItemDelegate(new QSqlRelationalDelegate(ui_mainview.clientsTableView));
+      ui_mainview.clientsTableView->setSelectionBehavior(QAbstractItemView::SelectRows);
+
+      QString f;
+      f=QString("parent=''");
+      clientsTableModel->setFilter(f);
+
+      ui_mainview.clientsTableView->hideColumn(0); //id
+      ui_mainview.clientsTableView->hideColumn(4);
+      ui_mainview.clientsTableView->hideColumn(5);
+      ui_mainview.clientsTableView->hideColumn(6);
+      ui_mainview.clientsTableView->hideColumn(7);
+      ui_mainview.clientsTableView->hideColumn(8);
+      ui_mainview.clientsTableView->hideColumn(9);
+      ui_mainview.clientsTableView->hideColumn(10);
+      ui_mainview.clientsTableView->hideColumn(11);
+      ui_mainview.clientsTableView->hideColumn(12);
+      ui_mainview.clientsTableView->hideColumn(13);
+      ui_mainview.clientsTableView->hideColumn(14);
+      ui_mainview.clientsTableView->hideColumn(15);
+      ui_mainview.clientsTableView->hideColumn(16);
+      ui_mainview.clientsTableView->hideColumn(17);
+
+      clientsTableModel->select();
+
+
+
+      //clientsModel
+      clientsModel->setTable("clients");
+      ui_mainview.clientsView->setViewMode(QListView::IconMode);
+      ui_mainview.clientsView->setGridSize(QSize(170,170));
+      ui_mainview.clientsView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+      ui_mainview.clientsView->setResizeMode(QListView::Adjust);
+      ui_mainview.clientsView->setModel(clientsModel);
+      ui_mainview.clientsView->setModelColumn(clientsModel->fieldIndex("photo"));
+      ui_mainview.clientsView->setSelectionMode(QAbstractItemView::SingleSelection);
+
+      UsersDelegate *delegate = new UsersDelegate(ui_mainview.clientsView);
+      QList<int> cols;
+      cols.append(3);
+      cols.append(2);
+      delegate->setCol(cols);
+      ui_mainview.clientsView->setItemDelegate(delegate);
+
+      clientsModel->select();
+      ui_mainview.clientsView->setCurrentIndex(clientsModel->index(0, 0));
+
+//     connect(ui_mainview.clientsTableView->selectionModel(), SIGNAL (selectionChanged( const QItemSelection &, const QItemSelection &)), this, SLOT (filterClientsTable( const QItemSelection &, const QItemSelection &)));
 
   }
   else {
@@ -1374,6 +1413,13 @@ void squeezeView::setupClientsModel()
   }
 }
 
+/*void squeezeView::filterClientsTable(const QItemSelection & selected, const QItemSelection & deselected) {
+    QModelIndex q = selected.at(0).topLeft();
+    qDebug()<<q.data();
+
+
+}
+*/
 void squeezeView::setupLimitsModel()
 {
   qDebug()<<"Setting up Limits Model";

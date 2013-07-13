@@ -72,6 +72,7 @@ public:
     QSqlTableModel *categoriesModel;
     QSqlTableModel *balancesModel;
     QSqlTableModel *clientsModel;
+    QSqlRelationalTableModel *clientsTableModel;
     QSqlTableModel *donorsModel;
     QSqlRelationalTableModel *limitsModel;
     QSqlTableModel *randomMsgModel;
@@ -85,6 +86,7 @@ public:
     int offerIdIndex, offerDiscountIndex, offerDateStartIndex, offerDateEndIndex,offerProdIdIndex;
     int userIdIndex, usernameIndex, nameIndex, passwordIndex, saltIndex, addressIndex, phoneIndex, cellIndex, roleIndex,
     photoIndex;
+    QString clientCodeIndex, clientSurnameIndex, clientNameIndex;
     int transIdIndex, transClientidIndex, transTypeIndex,transAmountIndex,transDateIndex,transTimeIndex,transPaidWithIndex,
     transChangeGivenIndex,transPayMethodIndex,transStateIndex,transUseridIndex,transCardNumIndex,transItemCountIndex,transPointsIndex,
     transDiscMoneyIndex,transDiscIndex,transCardAuthNumberIndex,transUtilityIndex,transTerminalNumIndex,transItemsListIndex,  transSOIndex, transProvIdIndex;
@@ -222,6 +224,7 @@ signals:
    void setupMeasuresModel();
    void setupCategoriesModel();
    void setupClientsModel();
+//   void filterClientsTable(const QItemSelection &selected, const QItemSelection &deselected);
    void setupDonorsModel();
    void setupLimitsModel();
    void setupTransactionsModel();
