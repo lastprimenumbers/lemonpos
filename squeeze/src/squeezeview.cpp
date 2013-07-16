@@ -1371,6 +1371,7 @@ void squeezeView::setupClientsModel()
       ui_mainview.clientsTableView->hideColumn(16);
       ui_mainview.clientsTableView->hideColumn(17);
 
+      ui_mainview.clientsTableView->setSortingEnabled(true);
       clientsTableModel->select();
 
 
