@@ -2251,7 +2251,7 @@ void lemonView::finishCurrentTransaction()
       history.saleId = currentTransaction;
       // history will be committed to database after last canfinish check
       // Check if client's credit does not exceed monthly credit.
-      if (credit.total + totalSum > clientInfo.monthly) {
+      if (credit.total > clientInfo.monthly) {
           qDebug()<<__FUNCTION__<<" :: Insufficient monthly credit.";
           qDebug()<<"  credit.total    :"<<QString::number(credit.total,'f',64);
           qDebug()<<"  totalSum    :"<<QString::number(totalSum,'f',64);
@@ -2289,26 +2289,11 @@ void lemonView::finishCurrentTransaction()
     // COMMIT LIMITS
     myDb->commitLimits(family.limits);
 
-    if (finishingReservation) {
-        //set reservation status to rCompleted.
-        myDb->setReservationStatus(reservationId, rCompleted);
-        //Add the reservation details to the ticket
-        ticket.isAReservation = true;
-        ticket.reservationStarted = false;
-        ticket.reservationPayment = reservationPayment;
-        ticket.purchaseTotal = myDb->getReservationTotalAmount(reservationId);
-        qDebug()<<"*** Finishing RESERVATION ID:"<<reservationId<< " Purchase Total:"<<ticket.purchaseTotal<< " With a Payment of:"<<reservationPayment;
-    } else if (startingReservation) {
-        ticket.isAReservation     = true;
-        ticket.reservationStarted = true;
-        qDebug()<<"*** STARTING RESERVATION ID:"<<reservationId;
-        //No deberia entrar aqui, porque al iniciar apartados, no termina transaccion.
-    } else {
-        ticket.isAReservation     = false;
-        ticket.reservationStarted = false;
-        ticket.reservationId = 0;
-        qDebug()<<" >>>>>>>>>>>>>>>>>>>>>>>>>>>>> OK no reservation <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" ;
-    }
+
+   ticket.isAReservation     = false;
+   ticket.reservationStarted = false;
+   ticket.reservationId = 0;
+
 
 
     QHashIterator<QString, ProductInfo> i(productsHash);
@@ -2410,154 +2395,11 @@ void lemonView::finishCurrentTransaction()
     double soDiscounts = 0;
     QStringList ordersStr;
     int completePayments = 0;
-    //Now check the Special Items (Orders)
-    if (!specialOrders.isEmpty()) {
-      QStringList elementsStr;
-      foreach(SpecialOrderInfo siInfo, specialOrders) {
-        // NOTE: here the Special Item is taken as ONE -not counting its components- but COUNT QTY of each SO.
-        tInfo.itemcount += siInfo.qty; //specialOrders.count();
-        //Decrement each component stock!
-        myDb->decrementSOStock(siInfo.orderid, siInfo.qty, QDate::currentDate());
-        position++; //increment the existent positions.
-        ordersStr.append(QString::number(siInfo.orderid)+"/"+QString::number(siInfo.qty));
-        elementsStr.append(siInfo.groupElements);
-        //NOTE: Here the 'utilidad' = profit. Profit is CERO at this stage for the S.O,
-        //      Its going to be calculated when the payment is done (when picking up the product)
-        //      and is going to be emited other transaction with the profit/payment.
-        //      TODO: Add this note to the manual.
 
-        if (siInfo.status == stReady) {
-          if ( siInfo.completePayment ) {
-            //the Special Order is being completed... CALCULATE PROFIT.
-            double discount =  (siInfo.price * siInfo.disc * siInfo.qty) + lastDiscount;
-            qDebug()<<"LAST DISCOUNT:"<<lastDiscount;
-            utilidad += ((siInfo.price - siInfo.cost)*siInfo.qty) - discount;//FIXME: Now with REWRITTEN TOTALS CALCULATION!! WARNING with discount
-            qDebug()<<" Profit for the SO:"<<((siInfo.price - siInfo.cost)*siInfo.qty)-discount<<"discount here:"<<(siInfo.price * siInfo.disc * siInfo.qty)<<" All Discount on the SO:"<<discount;
-            //NOTE: Disconunts on any SO content is taken into consideration when adding to the transaction,
-            //      so the siInfo.price that comes from the SO Editor does NOT include discounts.
-            //      ALSO the price and cost is for ONE PACK. If incrementing/decrementing at lemon or at
-            //      the SpecialOrderEditor (qty for the Order, not components), the siInfo.qty will contain this
-            //      quantity, to be multiplied by the price and cost to get the TOTAL SALE cost and price for each SO.
-          }
-        }
-        
-        if (siInfo.units == 1) cantidad += siInfo.qty; else cantidad +=1;
-        //from Biel
-        // save transactionItem
-        tItemInfo.disc = 0;
-        tItemInfo.transactionid   = tInfo.id;
-        tItemInfo.position        = position;
-        tItemInfo.productCode     = "0";
-        tItemInfo.points          = 0;
-        tItemInfo.unitStr         = siInfo.unitStr;
-        tItemInfo.qty             = siInfo.qty;
-        tItemInfo.cost            = siInfo.cost;
-        tItemInfo.price           = siInfo.price;
-        tItemInfo.disc            = siInfo.disc * siInfo.price * siInfo.qty; //this is the total discount
-        soDiscounts              += tItemInfo.disc;
-        double disc2              = siInfo.disc * siInfo.payment * siInfo.qty; //this is the discount on the prepayment
-        double taxPercentage      = (myDb->getSpecialOrderAverageTax(siInfo.orderid));
-        double taxmoney           = myDb->getSpecialOrderAverageTax(siInfo.orderid, rtMoney)*siInfo.qty; // tax per qty (still needs to be multiplied by qty)
-        tItemInfo.total           = (siInfo.price*siInfo.qty)-tItemInfo.disc;
-        //NOTE: Apr 14 2011: I decided to print the tax % in product iteration in tickets. Instead of the money.
-        //                   This way, i dont need to fix the tax money amount if the item has discounts or the sale has a client/ocassional discount.
-        tItemInfo.tax             = taxPercentage; //taxmoney;
-        tItemInfo.name            = siInfo.name;
-        tItemInfo.soId            = "so."+QString::number(siInfo.orderid);
-        double sumTax =0;
-        if (Settings::addTax()) sumTax=taxmoney;
-        tItemInfo.payment         = (siInfo.payment*siInfo.qty) -disc2 + sumTax; //(taxPercentage*((siInfo.payment*siInfo.qty)-disc2));
-        //qDebug()<<"ItemInfo taxes:"<<taxmoney;
-        tItemInfo.completePayment = siInfo.completePayment;
-        tItemInfo.deliveryDateTime= siInfo.deliveryDateTime;
-        tItemInfo.isGroup         = false;
-
-        if (siInfo.completePayment && siInfo.status == stReady) completePayments++;
-        
-        myDb->insertTransactionItem(tItemInfo);
-        //re-select the transactionItems model
-        historyTicketsModel->select();
-        // add line to ticketLines
-        TicketLineInfo tLineInfo;
-        tLineInfo.disc = 0;
-        tLineInfo.qty     = siInfo.qty;
-        tLineInfo.unitStr = siInfo.unitStr;
-        tLineInfo.desc    = siInfo.name;
-        tLineInfo.price   = siInfo.price;
-        tLineInfo.disc    = siInfo.disc * siInfo.price * siInfo.qty; // april 5 2005: Now SO can have discounts
-        tLineInfo.partialDisc =disc2;
-        tLineInfo.total   = tItemInfo.total;
-        double gtotal     = tItemInfo.total + tItemInfo.tax; 
-        tLineInfo.gtotal  =  Settings::addTax()  ? gtotal : tLineInfo.total;
-        soGTotal         += tLineInfo.gtotal;
-        soDeliveryDT      = siInfo.deliveryDateTime; // this will be the same for all the SO, so it does not matter if overwrited.
-        tLineInfo.geForPrint = siInfo.geForPrint;
-        tLineInfo.completePayment = siInfo.completePayment;
-        tLineInfo.payment = tItemInfo.payment;
-        tLineInfo.isGroup = false;
-        tLineInfo.deliveryDateTime = siInfo.deliveryDateTime;
-        tLineInfo.tax     = tItemInfo.tax;
-        //qDebug()<<" \n==== total:"<<tLineInfo.total<<" Payment:"<< tLineInfo.payment<<" siInfo.payment:"<<siInfo.payment
-        //<<" pDisc:"<<disc2<<" % tax $"<<tItemInfo.tax<<" Gran Total:"<<tLineInfo.gtotal<<"\n";
-        ///NOTE: Testing with addTax setting and using a sample SO, there is a DIFFERENCE of 18 cents ( the client pays 18 cents less of the real price)
-        ///      (REAL PRICE = 285.18, PAID: 285 ). This is the result of the 'rounding' in multiple operations done during the process.
-        ///      The error is 0.063 % (285.18 * .00063 = .18)
-
-        ticketLines.append(tLineInfo);
-
-        switch (siInfo.status) {
-          case stPending:  
-            siInfo.status = stInProgress;
-            //some clients makes the total payment when ordering.
-            if (siInfo.completePayment)
-              siInfo.completedOnTrNum = tInfo.id;
-            myDb->updateSpecialOrder(siInfo);
-            break;
-          case stInProgress: 
-            qDebug()<<"There is an inappropiate state (In progress) for a SO to be here.";
-            break;
-          case stReady:
-            siInfo.status = stDelivered;
-            siInfo.completedOnTrNum = tInfo.id;
-            //siInfo.payment   = siInfo.price-siInfo.payment; //the final payment is what we save on db.
-            myDb->updateSpecialOrder(siInfo);
-            break;
-          case stDelivered:
-            qDebug()<<"There is an inappropiate state (Delivered) for a SO to be here.";
-            break;
-          default:
-            qDebug()<<"No state for the SO, setting as InProgress";
-            siInfo.status =stInProgress;
-            myDb->updateSpecialOrder(siInfo);
-            break;
-        }
-        //update special order info (when resume sale is used, deliveryDateTime is changed)
-        myDb->updateSpecialOrder(siInfo);
-        //update completingOrder flag
-        completingOrder = siInfo.completePayment; //considering the last one at the end, all SO must have the same status!
-      } //for each
-    }// !specialOrders.isEmpty
     
-    // taking into account the client discount. Applied over other products discount.
-    // discMoney is the money discounted because of client discount.
-    
-    //double _taxes = 0;
-    //if (!Settings::addTax()) _taxes = totalTax;
-    // NOTE: If taxes included in price ( !addTax() ) the profit include tax amount.
-    //       Taxes paid to the gov. are calculated with profit.TODO:VERIFY this information! accountants knowledge fro each country needed.
-    ///FIXME: Now with REWRITTEN TOTALS CALCULATION!! WARNING with discount
     utilidad = utilidad - discMoney; //The net profit  == profit minus the discount (client || occasional)
-    if ( !specialOrders.isEmpty() ) {
-      if ( !completingOrder ) {
-        //This means there are special orders, and if they are NOT completing, so profit must be ZERO.
-        utilidad = 0;
-        qDebug()<<"STARTING A SPECIAL ORDER.   The Profit set to ZERO *****";
-      }
-    }
     tInfo.utility = utilidad; //NOTE: ? - _taxes;
     tInfo.itemlist  = productIDs.join(",");
-
-    qDebug()<<"\nSALE NET PROFIT:"<< utilidad<<" discMoney:"<<discMoney<<"\n";
 
     //special orders Str on transactionInfo
     tInfo.specialOrders = ordersStr.join(","); //all special orders on the hash formated as id/qty,id/qty...
@@ -2565,29 +2407,29 @@ void lemonView::finishCurrentTransaction()
     //update transactions
     myDb->updateTransaction(tInfo);
 
-    if (drawerCreated) {
-        //FIXME: What to di first?... add or substract?... when there is No money or there is less money than the needed for the change.. what to do?
-        if (ui_mainview.checkCash->isChecked()) {
-          drawer->addCash(payWith);
-          drawer->substractCash(changeGiven);
-          drawer->incCashTransactions();
-          //open drawer only if there is a printer available.
-          if (Settings::openDrawer() && Settings::smallTicketDotMatrix() && Settings::printTicket())
-            drawer->open();
-        } else { /// OwnCredit also will be incremented in CARD transactions. No cash IN for this sales.
-          drawer->incCardTransactions();
-          drawer->addCard(payWith);
-        }
-        drawer->insertTransactionId(getCurrentTransaction());
-    }
-    else {
-       //KMessageBox::error(this, i18n("The Drawer is not initialized, please start operation first."), i18n("Error") );
-      KNotification *notify = new KNotification("information", this);
-      notify->setText(i18n("The Drawer is not initialized, please start operation first."));
-      QPixmap pixmap = DesktopIcon("dialog-information",32);
-      notify->setPixmap(pixmap);
-      notify->sendEvent();
-    }
+//    if (drawerCreated) {
+//        //FIXME: What to di first?... add or substract?... when there is No money or there is less money than the needed for the change.. what to do?
+//        if (ui_mainview.checkCash->isChecked()) {
+//          drawer->addCash(payWith);
+//          drawer->substractCash(changeGiven);
+//          drawer->incCashTransactions();
+//          //open drawer only if there is a printer available.
+//          if (Settings::openDrawer() && Settings::smallTicketDotMatrix() && Settings::printTicket())
+//            drawer->open();
+//        } else { /// OwnCredit also will be incremented in CARD transactions. No cash IN for this sales.
+//          drawer->incCardTransactions();
+//          drawer->addCard(payWith);
+//        }
+//        drawer->insertTransactionId(getCurrentTransaction());
+//    }
+//    else {
+//       //KMessageBox::error(this, i18n("The Drawer is not initialized, please start operation first."), i18n("Error") );
+//      KNotification *notify = new KNotification("information", this);
+//      notify->setText(i18n("The Drawer is not initialized, please start operation first."));
+//      QPixmap pixmap = DesktopIcon("dialog-information",32);
+//      notify->setPixmap(pixmap);
+//      notify->sendEvent();
+//    }
 
     //update client info in the hash....
     clientsHash.remove(clientInfo.id);
@@ -2600,7 +2442,7 @@ void lemonView::finishCurrentTransaction()
       //realSubtotal = KGlobal::locale()->formatMoney(subTotalSum-discMoney+soDiscounts+pDiscounts, QString(), 2);
         realSubtotal = KGlobal::locale()->formatMoney(subTotalSum+discMoney+soDiscounts+pDiscounts, currency(), 2);
     else
-      realSubtotal = KGlobal::locale()->formatMoney(subTotalSum-totalTax+discMoney+soDiscounts+pDiscounts, currency(), 2); //FIXME: es +discMoney o -discMoney??
+      realSubtotal = KGlobal::locale()->formatMoney(subTotalSum+discMoney+soDiscounts+pDiscounts, currency(), 2); //FIXME: es +discMoney o -discMoney??
     qDebug()<<"\n >>>>>>>>> Real SUBTOTAL = "<<realSubtotal<<"  subTotalSum = "<<subTotalSum<<" ADDTAXES:"<<Settings::addTax()<<"  Disc:"<<discMoney;
     qDebug()<<"\n********** Total Taxes:"<<totalTax<<" total Discount:"<<discMoney<< " SO Discount:"<<soDiscounts<<" Prod Discounts:"<<pDiscounts;
 
@@ -2632,7 +2474,7 @@ void lemonView::finishCurrentTransaction()
     ticket.terminal = QString::number(tInfo.terminalnum);
     ticket.monthly=clientInfo.monthly;
     ticket.expiry=clientInfo.expiry;
-    ticket.balance=clientInfo.monthly-totalSum;
+    ticket.balance=clientInfo.monthly-credit.total;
     qDebug()<<" \n soGTotal:"<<soGTotal<<" deliveryDT:"<<soDeliveryDT<<"\n";
 
     if (printDTticket)
@@ -3878,8 +3720,10 @@ void lemonView::setupModel()
     connect(ui_mainview.editFilterByDesc,SIGNAL(returnPressed()), this, SLOT( setFilter()) );
     connect(ui_mainview.rbFilterByDesc, SIGNAL(toggled(bool)), this, SLOT( setFilter()) );
     connect(ui_mainview.rbFilterByCategory, SIGNAL(toggled(bool)), this, SLOT( setFilter()) );
+    connect(ui_mainview.editFilterByCode,SIGNAL(returnPressed()), this, SLOT( setFilter()) );
+    connect(ui_mainview.rbFilterByCode, SIGNAL(toggled(bool)), this, SLOT( setFilter()) );
 
-    ui_mainview.rbFilterByCategory->setChecked(true);
+    ui_mainview.rbFilterByCode->setChecked(true);
     setFilter();
   }
  }
@@ -3989,8 +3833,7 @@ void lemonView::setFilter()
       else
         productsModel->setFilter(QString("products.isARawProduct=false and products.name REGEXP '%1'").arg(ui_mainview.editFilterByDesc->text()));
   }
-  else {
-    if (ui_mainview.rbFilterByCategory->isChecked()) { //by category
+  else if (ui_mainview.rbFilterByCategory->isChecked()) { //by category
       //Find catId for the text on the combobox.
       int catId=-1;
       QString catText = ui_mainview.comboFilterByCategory->currentText();
@@ -3998,9 +3841,12 @@ void lemonView::setFilter()
         catId = categoriesHash.value(catText);
       }
       productsModel->setFilter(QString("products.isARawProduct=false and products.category=%1").arg(catId));
-    } else { //by most sold products in current month --biel
+  }
+  else if (ui_mainview.rbFilterByCode->isChecked()) { //by code
+      productsModel->setFilter(QString("products.isARawProduct=false and products.code REGEXP '%1'").arg(ui_mainview.editFilterByCode->text()));
+  }
+  else { //by most sold products in current month --biel
       productsModel->setFilter("products.isARawProduct=false and (products.datelastsold > ADDDATE(sysdate( ), INTERVAL -31 DAY )) ORDER BY products.datelastsold DESC"); //limit or not the result to 5?
-    }
   }
   productsModel->select();
 }
@@ -4011,6 +3857,10 @@ void lemonView::setupDB()
   if (db.isOpen()) db.close();
   //QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
   //db = QSqlDatabase::addDatabase("QMYSQL");
+//    db.setHostName("localhost");
+//    db.setDatabaseName("lemondb");
+//    db.setUserName("lemonclient");
+//    db.setPassword("xarwit0721");
   db.setHostName(Settings::editDBServer());
   db.setDatabaseName(Settings::editDBName());
   db.setUserName(Settings::editDBUsername());

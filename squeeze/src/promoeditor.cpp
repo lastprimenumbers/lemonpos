@@ -117,7 +117,7 @@ void PromoEditor::discountChanged()
 {
   if (isProductSelected()){
     QString code = getSelectedProductCode();
-    if (code != 0){
+    if (code != "0"){
       Azahar *myDb = new Azahar;
       myDb->setDatabase(db);
       ProductInfo info = myDb->getProductInfo(code);
@@ -132,7 +132,7 @@ void PromoEditor::priceChanged()
 {
   if (isProductSelected()){
     QString code = getSelectedProductCode();
-    if (code != 0){
+    if (code != "0"){
       Azahar *myDb = new Azahar;
       myDb->setDatabase(db);
       ProductInfo info = myDb->getProductInfo(code);

@@ -212,13 +212,6 @@ void squeezeView::login(){
   }
   if (!db.isOpen()) {
     QString details = db.lastError().text();
-    //KPassivePopup::message( i18n("Error:"),details, DesktopIcon("dialog-error", 48), this );
-    KNotification *notify = new KNotification(i18n("Unable to connect to the database"), this);
-    notify->setText(details);
-    QPixmap pixmap = DesktopIcon("dialog-error",32); //NOTE: This does not works
-    notify->setPixmap(pixmap);
-    notify->sendEvent();
-    
     emit signalShowDbConfig();
   } else {
     bool doit = false;

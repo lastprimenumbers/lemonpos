@@ -224,7 +224,7 @@ void squeeze::enableUI()
 }
 
 void squeeze::disableUI()
-{   qDebug()<<"Disabling Actions..";
+{   qDebug()<<"Disabling Actions...";
   QAction *action = actionCollection()->action("productsBrowse");
   action->setDisabled(true);
   action = actionCollection()->action("offersBrowse");
