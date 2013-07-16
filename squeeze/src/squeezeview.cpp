@@ -263,6 +263,9 @@ void squeezeView::setupSignalConnections()
   connect(ui_mainview.usersView, SIGNAL(activated(const QModelIndex &)), SLOT(usersViewOnSelected(const QModelIndex &)));
   connect(ui_mainview.donorsView, SIGNAL(activated(const QModelIndex &)), SLOT(donorsViewOnSelected(const QModelIndex &)));
   connect(ui_mainview.clientsView, SIGNAL(activated(const QModelIndex &)), SLOT(clientsViewOnSelected(const QModelIndex &)));
+
+connect(ui_mainview.clientsTableView, SIGNAL (doubleClicked( const QModelIndex &)), SLOT (childClientsViewOnSelected(const QModelIndex &)));
+  connect(ui_mainview.clientsTableView, SIGNAL (clicked( const QModelIndex &)), SLOT (filterClientsTable( const QModelIndex &)));
   connect(ui_mainview.productsView, SIGNAL(activated(const QModelIndex &)), SLOT(productsViewOnSelected(const QModelIndex &)));
   connect(ui_mainview.productsViewAlt, SIGNAL(activated(const QModelIndex &)), SLOT(productsViewOnSelected(const QModelIndex &)));
   connect(ui_mainview.tableReservations, SIGNAL(activated(const QModelIndex &)), SLOT(reservationsOnSelected(const QModelIndex &)));
@@ -1346,13 +1349,11 @@ void squeezeView::setupClientsModel()
       clientsTableModel->setHeaderData(3, Qt::Horizontal, "Cognome");
 
       ui_mainview.clientsTableView->setModel(clientsTableModel);
-
       ui_mainview.clientsTableView->setItemDelegate(new QSqlRelationalDelegate(ui_mainview.clientsTableView));
       ui_mainview.clientsTableView->setSelectionBehavior(QAbstractItemView::SelectRows);
+      ui_mainview.clientsTableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
-      QString f;
-      f=QString("parent=''");
-      clientsTableModel->setFilter(f);
+      clientsTableModel->setFilter(QString("parent=''"));
 
       ui_mainview.clientsTableView->hideColumn(0); //id
       ui_mainview.clientsTableView->hideColumn(4);
@@ -1394,7 +1395,6 @@ void squeezeView::setupClientsModel()
       clientsModel->select();
       ui_mainview.clientsView->setCurrentIndex(clientsModel->index(0, 0));
 
-//     connect(ui_mainview.clientsTableView->selectionModel(), SIGNAL (selectionChanged( const QItemSelection &, const QItemSelection &)), this, SLOT (filterClientsTable( const QItemSelection &, const QItemSelection &)));
 
   }
   else {
@@ -1406,13 +1406,19 @@ void squeezeView::setupClientsModel()
   }
 }
 
-/*void squeezeView::filterClientsTable(const QItemSelection & selected, const QItemSelection & deselected) {
-    QModelIndex q = selected.at(0).topLeft();
-    qDebug()<<q.data();
-
+void squeezeView::filterClientsTable(const QModelIndex & selected) {
+    if (db.isOpen()) {
+        //getting data from model...
+        const QAbstractItemModel *model = selected.model();
+        int row = selected.row();
+        QModelIndex indx = model->index(row, clientsTableModel->fieldIndex("code"));
+        QString code = model->data(indx, Qt::DisplayRole).toString();
+        clientsModel->setFilter(QString("parent='%1' or code='%1'").arg(code));
+        clientsModel->select();
 
 }
-*/
+}
+
 void squeezeView::setupLimitsModel()
 {
   qDebug()<<"Setting up Limits Model";
@@ -2223,21 +2229,35 @@ void squeezeView::donorsViewOnSelected(const QModelIndex & index)
 
 void squeezeView::clientsViewOnSelected(const QModelIndex & index)
 {
+    _clientsViewOnSelected(index, *clientsModel);
+
+}
+
+void squeezeView::childClientsViewOnSelected(const QModelIndex & index)
+{
+    _clientsViewOnSelected(index, *clientsTableModel);
+
+}
+
+void squeezeView::_clientsViewOnSelected(const QModelIndex & index, QSqlTableModel & exmodel)
+{
   if (db.isOpen()) {
     //getting data from model...
     ClientInfo info;
     const QAbstractItemModel *model = index.model();
     int row = index.row();
 
-    QModelIndex indx = model->index(row, clientsModel->fieldIndex("id"));
-    indx = model->index(row, clientsModel->fieldIndex("code"));
+    QModelIndex indx = model->index(row, exmodel.fieldIndex("id"));
+    indx = model->index(row, exmodel.fieldIndex("code"));
     info.code = model->data(indx, Qt::DisplayRole).toString();
     //Launch Edit dialog
     ClientEditor *clientEditorDlg = new ClientEditor(db, this);
     clientEditorDlg->setClientInfo(info.code);
     if (clientEditorDlg->exec() ) {
       clientEditorDlg->commitClientInfo();
-      clientsModel->select();
+        clientsModel->select();
+        clientsTableModel->select();
+
     }
 //    Tasto Canc premuto
     delete clientEditorDlg;
@@ -2780,6 +2800,7 @@ void squeezeView::createClient()
       if (!myDb->insertClient(info)) qDebug()<<myDb->lastError();
 
       clientsModel->select();
+      clientsTableModel->select();
     }
     delete clientEditorDlg;
   }
@@ -2810,6 +2831,7 @@ void squeezeView::deleteSelectedClient()
           }
           clientsModel->submitAll();
           clientsModel->select();
+          clientsTableModel->select();
           delete myDb;
         }
     } else KMessageBox::information(this, i18n("Default client cannot be deleted."), i18n("Cannot delete"));

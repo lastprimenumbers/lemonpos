@@ -148,7 +148,9 @@ signals:
    void usersViewOnSelected(const QModelIndex & index);
    void productsViewOnSelected(const QModelIndex &index);
    void donorsViewOnSelected(const QModelIndex &index);
+   void _clientsViewOnSelected(const QModelIndex &index, QSqlTableModel &exmodel);
    void clientsViewOnSelected(const QModelIndex &index);
+   void childClientsViewOnSelected(const QModelIndex &index);
    void doPurchase();
    void stockCorrection();
    void adjustOffersTable();
@@ -224,7 +226,7 @@ signals:
    void setupMeasuresModel();
    void setupCategoriesModel();
    void setupClientsModel();
-//   void filterClientsTable(const QItemSelection &selected, const QItemSelection &deselected);
+   void filterClientsTable(const QModelIndex &selected);
    void setupDonorsModel();
    void setupLimitsModel();
    void setupTransactionsModel();
