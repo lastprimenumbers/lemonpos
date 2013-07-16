@@ -1713,7 +1713,7 @@ bool Azahar::_bindClient(ClientInfo &info, QSqlQuery &query)
     query.bindValue(":parent", info.parentClient);
     query.bindValue(":phone", info.phone);
     query.bindValue(":since", info.since);
-    query.bindValue(":birthDate", info.since);
+    query.bindValue(":birthDate", info.birthDate);
     query.bindValue(":expiry", info.expiry);
     query.bindValue(":beginsusp", info.beginsusp);
     query.bindValue(":endsusp", info.endsusp);
@@ -1845,7 +1845,7 @@ bool Azahar::getClientInfoFromQuery(QSqlQuery &qC, ClientInfo &info){
       info.photo      = qC.value(fieldPhoto).toByteArray();
       info.since      = qC.value(fieldSince).toDate();
       info.expiry     = qC.value(fieldExpiry).toDate();
-      info.birthDate      = qC.value(qC.record().indexOf("birthDate")).toDate();
+      info.birthDate      = qC.value(fieldBirthDate).toDate();
       info.phone      = qC.value(fieldPhone).toString();
       info.address    = qC.value(fieldAdd).toString();
       info.monthly   = qC.value(fieldMonthly).toDouble();

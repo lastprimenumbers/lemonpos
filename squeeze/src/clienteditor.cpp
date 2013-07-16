@@ -349,7 +349,7 @@ ClientInfo ClientEditor::getClientInfo()
 void ClientEditor::commitClientInfo()
 {
     ClientInfo cInfo = getClientInfo();
-    qDebug()<<"commitClientInfo: "<<cInfo.id<<cInfo.code<<cInfo.name<<cInfo.surname<<cInfo.parentClient<<cInfo.monthly;
+    qDebug()<<"commitClientInfo: "<<cInfo.id<<cInfo.code<<cInfo.name<<cInfo.surname<<cInfo.birthDate<<cInfo.monthly;
     if (!db.isOpen()) db.open();
     Azahar *myDb = new Azahar;
     myDb->setDatabase(db);
