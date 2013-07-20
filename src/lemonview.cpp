@@ -3692,18 +3692,18 @@ void lemonView::setupDB()
   if (db.isOpen()) db.close();
   //QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
   //db = QSqlDatabase::addDatabase("QMYSQL");
-    db.setHostName("localhost");
-    db.setDatabaseName("lemondb");
-    db.setUserName("lemonclient");
-    db.setPassword("xarwit0721");
+//    db.setHostName("localhost");
+//    db.setDatabaseName("lemondb");
+//    db.setUserName("lemonclient");
+//    db.setPassword("xarwit0721");
 //  db.setHostName("192.168.88.100");
 //  db.setDatabaseName("emporio");
 //  db.setUserName("emporio");
 //  db.setPassword("emporio");
-//  db.setHostName(Settings::editDBServer());
-//  db.setDatabaseName(Settings::editDBName());
-//  db.setUserName(Settings::editDBUsername());
-//  db.setPassword(Settings::editDBPassword());
+  db.setHostName(Settings::editDBServer());
+  db.setDatabaseName(Settings::editDBName());
+  db.setUserName(Settings::editDBUsername());
+  db.setPassword(Settings::editDBPassword());
   connectToDb();
 }
 
