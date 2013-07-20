@@ -24,6 +24,7 @@
 
 #include <QModelIndex>
 #include <QSqlRelationalDelegate>
+#include <QSqlRelationalTableModel>
 
 class OffersDelegate : public QSqlRelationalDelegate
  {
@@ -36,3 +37,11 @@ class OffersDelegate : public QSqlRelationalDelegate
  };
 
  #endif
+
+
+//class OffersModel: public QSqlRelationalTableModel
+//{
+//    Q_OBJECT
+// public:
+//    const data(const QModelIndex &item, int role);
+//};

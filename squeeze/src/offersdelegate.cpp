@@ -22,6 +22,7 @@
 
 #include <QtGui>
 #include <QDate>
+#include <QSqlRelationalTableModel>
 #include <QSqlRelationalDelegate>
 #include "offersdelegate.h"
 
@@ -83,5 +84,19 @@ QWidget *OffersDelegate::createEditor(QWidget *parent, const QStyleOptionViewIte
     return editor;
   }
 }
+
+
+//OffersModel::OffersModel(QObject *parent) : QSqlRelationalTableModel(parent)
+//{
+//}
+
+//const OffersModel::data(const QModelIndex &item, int role)
+//{
+//    if (role==Qt::UserRole) {
+
+//    } else {
+
+//    }
+//}
 
 #include "offersdelegate.moc"

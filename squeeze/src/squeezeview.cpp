@@ -864,14 +864,14 @@ void squeezeView::setupDb()
   qDebug()<<"SetupDB";
   if (db.isOpen()) db.close();
   qDebug()<<"SetupDB: closed";
-  db.setHostName(Settings::editDBServer());
-  db.setDatabaseName(Settings::editDBName());
-  db.setUserName(Settings::editDBUsername());
-  db.setPassword(Settings::editDBPassword());
-//  db.setHostName("localhost");
-//  db.setDatabaseName("lemondb");
-//  db.setUserName("lemonclient");
-//  db.setPassword("xarwit0721");
+//  db.setHostName(Settings::editDBServer());
+//  db.setDatabaseName(Settings::editDBName());
+//  db.setUserName(Settings::editDBUsername());
+//  db.setPassword(Settings::editDBPassword());
+  db.setHostName("localhost");
+  db.setDatabaseName("lemondb");
+  db.setUserName("lemonclient");
+  db.setPassword("xarwit0721");
 
   qDebug()<<"SetupDB: opening";
   db.open();

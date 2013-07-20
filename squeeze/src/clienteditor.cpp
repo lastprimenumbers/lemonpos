@@ -69,7 +69,6 @@ ClientEditor::ClientEditor( QSqlDatabase parentDb, QWidget *parent )
 
     ui->editParentClient->setCustomLayout(0);
 
-
     // Limits
     connect(ui->addLimitButton, SIGNAL(clicked()), SLOT( createLimit() ));
 
@@ -202,6 +201,7 @@ bool ClientEditor::validateParent(QString code)
     ui->parentClientPhoto->setPixmap(photo);
     hasParent=r;
     ui->editMonthlyPoints->setEnabled(false);
+
     pal.setColor(QPalette::Text,col);
     ui->editParentClient->setPalette(pal);
     return r;
@@ -281,6 +281,9 @@ void ClientEditor::loadLimits(ClientInfo info)
     f=QString("clientId=%1").arg(info.id);
     limitsModel->setFilter(f);
     limitsModel->select();
+    CreditInfo credit=myDb->getCreditInfoForClient(info.id,false);
+    ui->editCredit->setText(QString::number(info.monthly-credit.total));
+    delete myDb;
 }
 
 void ClientEditor::setClientInfo(ClientInfo info)

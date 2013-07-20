@@ -226,7 +226,7 @@ public:
     /**
      * Slot used to delete the current item.
     */
-    void deleteSelectedItem();
+    void deleteSelectedItem(double remqty);
    /**
      * Slot used to increment qty on doubleclick on an item
     */

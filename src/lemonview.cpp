@@ -1368,27 +1368,6 @@ void lemonView::insertItem(QString code)
       return;
   }
   
-//  if ( !specialOrders.isEmpty() ) {
-//    KNotification *notify = new KNotification("information", this);
-//    notify->setText(i18n("Only Special Orders can be added. Please finish the current special order before adding any other product."));
-//    QPixmap pixmap = DesktopIcon("dialog-information",32);
-//    notify->setPixmap(pixmap);
-//    notify->sendEvent();
-//    ui_mainview.editItemCode->clear();
-//    return;
-//  }
-
-//qDebug()<< __FUNCTION__ <<" doNotAddMoreItems = "<<doNotAddMoreItems;
-//if ( doNotAddMoreItems ) { //only for reservations
-//    KNotification *notify = new KNotification("information", this);
-//    notify->setText(i18n("Cannot Add more items to the Reservation."));
-//    QPixmap pixmap = DesktopIcon("dialog-information",32);
-//    notify->setPixmap(pixmap);
-//    notify->sendEvent();
-//    ui_mainview.editItemCode->clear();
-//    return;
-//}
-  
   double qty  = 1;
   bool qtyWritten = false;
   QString codeX = code;
@@ -1407,88 +1386,6 @@ void lemonView::insertItem(QString code)
   Azahar *myDb = new Azahar;
   myDb->setDatabase(db);
 
-  //Now ClientsID can be entered in the product editline for speed up clients selection.
-  //There are two ways of identifying clients.
-  //    1.- By using a 6 digit (UPC-E) barcode (code). Discarding any product with 6 digits code.
-  //    2.- By using a 12/13 (UPC/EAN) barcode (code). Discarding any 12/13 digits code starting with "4".
-  //    -A case where a qty (2*XXXXXX) is entered can bypass this client identification. So we know a product will be entered and not a client id.
-
-  if (Settings::groupUserIdAsCode() && !qtyWritten ) {
-      bool clientFound = false;
-      bool check=false;
-      ClientInfo cI;
-      if (!specialOrders.isEmpty()) {
-          notifierPanel->setSize(350,150);
-          notifierPanel->setOnBottom(false);
-          notifierPanel->showNotification(i18n("Cannot change client while Special Orders are in Purchase.",codeX),4000);
-          ui_mainview.editItemCode->clear();
-          ui_mainview.editItemCode->setFocus();
-          return;
-      }
-      if (Settings::rb6Digits() && codeX.length() == 6) {
-          //A 6 digit code for Customer ID.
-          cI = myDb->getClientInfo(codeX);
-          check = true;
-          if (cI.id >0)
-            clientFound = true;
-    } else if (codeX.length() >11 && codeX.startsWith("4")){
-        //A 12/13 digit code for Customer ID Starting with "4".
-        check = true;
-        cI = myDb->getClientInfo(codeX);
-        if (cI.id >0)
-          clientFound = true;
-    } else
-        check = false; // no 6digit or 12digit code configured,
-        //Check for products any way?
-    
-    if (check) {
-        if (clientFound) {
-            QString msg;
-            clientInfo = cI;
-            //get client Remaining credit (-) to inform the client.
-            CreditInfo credit = myDb->getCreditInfoForClient(cI.id);
-            if (credit.total <= 0) //if it is negative then inform.
-                msg = i18n("<b>Welcome</b> <i>%1</i>. You have remaining <b>debit</b> of %2 to use.",clientInfo.name, KGlobal::locale()->formatMoney(-credit.total,currency()));
-            else
-                msg = i18n("<b>Welcome</b> <i>%1</i>. You have remaining <b>credit</b> of %2 used.",clientInfo.name, KGlobal::locale()->formatMoney(-credit.total,currency()));
-            updateClientInfo();
-            refreshTotalLabel();
-            notifierPanel->setSize(350,150);
-            notifierPanel->setOnBottom(false);
-            notifierPanel->showNotification(msg,4000);
-            ui_mainview.editItemCode->clear();
-            ui_mainview.editItemCode->setFocus();
-            return;   
-        } else {
-            notifierPanel->setSize(350,150);
-            notifierPanel->setOnBottom(false);
-            notifierPanel->showNotification(i18n("No Client found with code %1.",codeX),4000);
-            ui_mainview.editItemCode->clear();
-            ui_mainview.editItemCode->setFocus();
-            return;
-        }
-    }//if check...
-  }//if config for client identification
-
-  //Here there are barcodes that support weight. Such products begin with a 2 and its length is 13.
-    ///@link http://en.wikipedia.org/wiki/Universal_Product_Code#Prefixes
-    qDebug()<<" EXAMINING PRODUCT CODE "<<codeX;
-    if ( codeX.length() == 13 && codeX.startsWith("2") ) {
-        ///This is a weighted product, such as meat and fruits...
-        //get the weight, which is at positions RRRRRR of the code ( SLLLLLLMRRRRRRE ).
-        QString pWeight = codeX.right(6);
-        pWeight = pWeight.remove(5, 1);
-        if (pWeight.length() == 5) {
-            //add the decimal point...
-            pWeight.insert(2, ".");
-            qty = pWeight.toDouble(); //convert weight to QTY.
-        }
-        ///now, exclude the weight from the codeX. NOTE: Document THIS!
-        codeX = codeX.left(7); // only the first 7 digits, the first digit is the prefix, which must be '2'.
-        //NOTE: Here, the prefix is considered to be part of the product code.
-        qDebug()<<"  New codeX:"<<codeX<<" weight:"<<pWeight<<" Double weight:"<<qty;
-    }
-
   info = myDb->getProductInfo(codeX); //includes discount and validdiscount
   qDebug()<<" CodeX = "<<codeX<<" Numeric Code:"<<info.code<<" Alphacode:"<<info.alphaCode<<" Required Qty:"<<qty;
 
@@ -1499,8 +1396,7 @@ void lemonView::insertItem(QString code)
 
     if (ui_mainview.deleteItem->isChecked()) {
         ui_mainview.tableWidget->setCurrentCell(info.row,1);
-        qDebug()<<"pippo"<<info.row;
-        deleteSelectedItem();
+        deleteSelectedItem(qty);
         ui_mainview.editItemCode->clear();
         return;
   }
@@ -1730,17 +1626,8 @@ int lemonView::doInsertItem(QString itemCode, QString itemDesc, double itemQty, 
   return rowCount;
 }
 
-void lemonView::deleteSelectedItem()
-{
-  if (startingReservation || finishingReservation) {
-      KNotification *notify = new KNotification("information", this);
-      notify->setText(i18n("Cannot delete items from a reservation."));
-      QPixmap pixmap = DesktopIcon("dialog-information",32);
-      notify->setPixmap(pixmap);
-      notify->sendEvent();
-      return;     
-  }
-  
+void lemonView::deleteSelectedItem(double remqty)
+{  
   bool continueIt=false;
   bool reinsert = false;
   double qty=0;
@@ -1758,58 +1645,6 @@ void lemonView::deleteSelectedItem()
       int row = ui_mainview.tableWidget->currentRow();
       QTableWidgetItem *item = ui_mainview.tableWidget->item(row, colCode);
       QString codeStr = item->data(Qt::DisplayRole).toString();
-
-//      if ( codeStr.toULongLong() == 0 ) {
-//        //its not a product, its a s.o.
-//        codeStr.remove(0,3); //remove the "so." string
-//        qulonglong id = codeStr.toULongLong();
-//        if (specialOrders.contains(id)) {
-//          SpecialOrderInfo info = specialOrders.take(id);
-//          //check if is completing the order
-//          if (info.status == stReady) { //yes, its completing the order, but wants to cancel the action.
-//            //remove from listview
-//            ui_mainview.tableWidget->removeRow(row);
-//            ui_mainview.editItemCode->setFocus();
-//            if (ui_mainview.tableWidget->rowCount() == 0) ui_mainview.comboClients->setEnabled(true);
-//            refreshTotalLabel();
-//            qDebug()<<" Removing a SO when completing the Order";
-//            return;
-//          }
-//          if ( info.qty == 1 ) {
-//            Azahar *myDb = new Azahar;
-//            myDb->setDatabase(db);
-//            myDb->deleteSpecialOrder(id);
-//            //remove from listview
-//            ui_mainview.tableWidget->removeRow(row);
-//            QString authBy = dlgPassword->username();
-//            if (authBy.isEmpty()) authBy = myDb->getUserName(1); //default admin.
-//            log(loggedUserId, QDate::currentDate(), QTime::currentTime(), i18n("Removing an Special Item from shopping list. Authorized by %1",authBy));
-//            if (ui_mainview.tableWidget->rowCount() == 0) ui_mainview.comboClients->setEnabled(true);
-//            ui_mainview.editItemCode->setFocus();
-//            refreshTotalLabel();
-//            delete myDb;
-//            return;
-//          }
-//          //more than one
-//          double iqty = info.qty-1;
-//          info.qty = iqty;
-//          double newdiscount = info.disc * info.payment * iqty;
-          
-//          item = ui_mainview.tableWidget->item(row, colQty);
-//          item->setData(Qt::EditRole, QVariant(iqty));
-//          item = ui_mainview.tableWidget->item(row, colDue);
-//          item->setData(Qt::EditRole, QVariant((iqty*info.payment)-newdiscount));
-//          item = ui_mainview.tableWidget->item(row, colDisc);
-//          item->setData(Qt::EditRole, QVariant(newdiscount));
-          
-//          //reinsert to the hash
-//          specialOrders.insert(info.orderid,info);
-//        }
-//        if (ui_mainview.tableWidget->rowCount() == 0) ui_mainview.comboClients->setEnabled(true);
-//        ui_mainview.editItemCode->setFocus();
-//        refreshTotalLabel();
-//        return; //to exit the method, we dont need to continue.
-//      }
       
       QString code = item->data(Qt::DisplayRole).toString();
       ProductInfo info = productsHash.take(code); //insert it later...
@@ -1823,8 +1658,8 @@ void lemonView::deleteSelectedItem()
        //NOTE:
        //  Here, we are going to delete only items that are bigger than 1. and remove them one by one..
        //  or are we goint to decrement items only sold by pieces?
-        if (qty>1 && info.units==uPiece) {
-          qty--;
+        if (qty>remqty && info.units==uPiece) {
+          qty-=remqty;
           item->setData(Qt::EditRole, QVariant(qty));
           double price    = info.price;
           double discountperitem = info.disc;
@@ -1842,7 +1677,7 @@ void lemonView::deleteSelectedItem()
           productsHash.remove(code);
           ui_mainview.tableWidget->removeRow(row);
           reinsert = false;
-        }//qty = 1...
+        }//qty <= remqty
       }//if canConvert
       if (reinsert) productsHash.insert(code, info); //we remove it with .take...
       Azahar *myDb = new Azahar;
@@ -3857,14 +3692,18 @@ void lemonView::setupDB()
   if (db.isOpen()) db.close();
   //QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
   //db = QSqlDatabase::addDatabase("QMYSQL");
-//    db.setHostName("localhost");
-//    db.setDatabaseName("lemondb");
-//    db.setUserName("lemonclient");
-//    db.setPassword("xarwit0721");
-  db.setHostName(Settings::editDBServer());
-  db.setDatabaseName(Settings::editDBName());
-  db.setUserName(Settings::editDBUsername());
-  db.setPassword(Settings::editDBPassword());
+    db.setHostName("localhost");
+    db.setDatabaseName("lemondb");
+    db.setUserName("lemonclient");
+    db.setPassword("xarwit0721");
+//  db.setHostName("192.168.88.100");
+//  db.setDatabaseName("emporio");
+//  db.setUserName("emporio");
+//  db.setPassword("emporio");
+//  db.setHostName(Settings::editDBServer());
+//  db.setDatabaseName(Settings::editDBName());
+//  db.setUserName(Settings::editDBUsername());
+//  db.setPassword(Settings::editDBPassword());
   connectToDb();
 }
 
