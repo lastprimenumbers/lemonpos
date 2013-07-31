@@ -64,7 +64,10 @@ class ClientEditor : public KDialog
     void setMsgsusp(QString msgsusp){ui->editClientMsgsusp->setText(msgsusp);}
     void setNotes(QString notes){ui->editClientNotes->setText(notes);}
 
-//    void setTags(QStringList tags);
+    void resetCredits ();
+    qulonglong insertCredit(const CreditInfo &info);
+
+    //    void setTags(QStringList tags);
 
     QString getCode(){ return ui->editClientCode->text();};
     QString getName(){ return ui->editClientName->text();};

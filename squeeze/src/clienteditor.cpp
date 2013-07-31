@@ -38,6 +38,23 @@ ClientEditorUI::ClientEditorUI( QWidget *parent )
     setupUi( this );
 }
 
+qulonglong  ClientEditor::insertCredit(const CreditInfo &info)
+{
+    qulonglong result = 0;
+    if (!db.isOpen()) db.open();
+    QSqlQuery query(db);
+    query.prepare("INSERT INTO credits (customerid, total) VALUES (:client, :total);");
+    query.bindValue(":client", info.clientId);
+    query.bindValue(":total", info.total);
+
+    if (!query.exec()) {
+       // setError(query.lastError().text());
+        qDebug()<< __FUNCTION__ << query.lastError().text();
+    }
+    else result = query.lastInsertId().toULongLong();
+    return result;
+}
+
 ClientEditor::ClientEditor( QSqlDatabase parentDb, QWidget *parent )
 : KDialog( parent )
 {
@@ -72,6 +89,10 @@ ClientEditor::ClientEditor( QSqlDatabase parentDb, QWidget *parent )
     // Limits
     connect(ui->addLimitButton, SIGNAL(clicked()), SLOT( createLimit() ));
 
+    qDebug()<<"primaDiReset";
+    connect(ui->resetCredits, SIGNAL(clicked()), SLOT(resetCredits()));
+    qDebug()<<"dopoReset";
+
     //since date picker
     ui->sinceDatePicker->setDate(QDate::currentDate());
     
@@ -87,15 +108,48 @@ ClientEditor::ClientEditor( QSqlDatabase parentDb, QWidget *parent )
     connect(ui->viewClientButton, SIGNAL(clicked()), SLOT(viewParentClient()));
     connect(ui->childrenTable, SIGNAL(cellDoubleClicked(int,int)), SLOT(viewChildClient(int,int)));
 
+
     limitsModel=new QSqlTableModel();
     ui->clientTagEditor->setDb(db);
     ui->editParentClient->setDb(db,"clients");
 }
 
+
+
 ClientEditor::~ClientEditor()
 {
     delete ui;
 }
+
+void ClientEditor::resetCredits (){
+    if (!db.isOpen()) db.open();
+    if (db.isOpen()) {
+      CreditInfo info;
+      QSqlQuery myQuery(db);
+      qDebug()<<"dopo2if";
+      if (myQuery.exec("select name from clients;")) {
+        while (myQuery.next()) {
+          int fieldId = myQuery.record().indexOf("id");
+          qlonglong id = myQuery.value(fieldId).toULongLong();
+          int fieldDate = myQuery.record().indexOf("since");
+          QDate date = myQuery.value(fieldDate).toDate();
+          QDate now=QDate::currentDate();
+          int diff=date.daysTo(now);
+          if (diff % 30 == 0) {
+              qDebug()<<"ciao";
+              info.clientId=id;
+              info.total=0;
+              insertCredit(info);
+          }
+        }
+      }
+      else {
+        qDebug()<<"ERROR: "<<myQuery.lastError();
+      }
+    }
+
+}
+
 
 void ClientEditor::changePhoto(bool del)
 {
@@ -112,6 +166,7 @@ void ClientEditor::changePhoto(bool del)
   }
 
 }
+
 
 void ClientEditor::openCamera()
 {

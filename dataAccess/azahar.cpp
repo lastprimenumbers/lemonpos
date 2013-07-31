@@ -61,6 +61,8 @@ bool Azahar::isConnected()
   return db.isOpen();
 }
 
+
+
 void Azahar::setError(QString err)
 {
   errorStr = err;
@@ -1783,6 +1785,7 @@ bool Azahar::updateClient(ClientInfo info)
   query.prepare(q);
   result=_bindClient(info,query);
   return result;
+
 }
 
 
@@ -2406,6 +2409,34 @@ QHash<int, ClientInfo> Azahar::getClientsHash()
   }
   return result;
 }
+
+/*void Azahar::resetCredits (){
+    if (!db.isOpen()) db.open();
+    if (db.isOpen()) {
+      CreditInfo info;
+      QSqlQuery myQuery(db);
+      if (myQuery.exec("select name from clients;")) {
+        while (myQuery.next()) {
+          int fieldId = myQuery.record().indexOf("id");
+          qlonglong id = myQuery.value(fieldId).toULongLong();
+          int fieldDate = myQuery.record().indexOf("since");
+          QDate date = myQuery.value(fieldDate).toDate();
+          QDate now=QDate::currentDate();
+          int diff=date.daysTo(now);
+          if (diff % 30 == 0) {
+              qDebug()<<"ciao";
+              info.clientId=id;
+              info.total=0;
+              insertCredit(info);
+          }
+        }
+      }
+      else {
+        qDebug()<<"ERROR: "<<myQuery.lastError();
+      }
+    }
+
+}*/
 
 QStringList Azahar::getClientsList()
 {

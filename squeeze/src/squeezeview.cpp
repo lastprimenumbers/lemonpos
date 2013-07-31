@@ -292,7 +292,8 @@ connect(ui_mainview.clientsTableView, SIGNAL (doubleClicked( const QModelIndex &
   connect(ui_mainview.btnDeleteMeasure, SIGNAL(clicked()), SLOT(deleteSelectedMeasure()) );
   connect(ui_mainview.btnDeleteCategory, SIGNAL(clicked()), SLOT(deleteSelectedCategory()) );
   connect(ui_mainview.btnDeleteClient, SIGNAL(clicked()), SLOT(deleteSelectedClient()));
-   connect(ui_mainview.btnDeleteDonor, SIGNAL(clicked()), SLOT(deleteSelectedDonor()));
+  connect(ui_mainview.btnDeleteDonor, SIGNAL(clicked()), SLOT(deleteSelectedDonor()));
+
 
   connect(ui_mainview.btnDeleteLimit, SIGNAL(clicked()), SLOT(deleteLimit()));
   connect(ui_mainview.btnCreateLimit, SIGNAL(clicked()), SLOT(createLimit()));
@@ -2839,6 +2840,7 @@ void squeezeView::deleteSelectedClient()
    }
  }
 }
+
 
 void squeezeView::deleteSelectedUser()
 {
