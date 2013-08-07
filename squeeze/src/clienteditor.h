@@ -61,10 +61,10 @@ class ClientEditor : public KDialog
     void setBirthDate(QDate date) {ui->birthDatePicker->setDate(date); }
     void setBeginsuspDate(QDate date) {ui->beginsuspPicker->setDate(date); }
     void setEndsuspDate(QDate date) {ui->endsuspPicker->setDate(date); }
+    void setLastCreditReset(QDate date) {ui->lastCreditResetPicker->setDate(date); }
     void setMsgsusp(QString msgsusp){ui->editClientMsgsusp->setText(msgsusp);}
     void setNotes(QString notes){ui->editClientNotes->setText(notes);}
 
-    void resetCredits ();
     qulonglong insertCredit(const CreditInfo &info);
 
     //    void setTags(QStringList tags);
@@ -84,6 +84,7 @@ class ClientEditor : public KDialog
     QDate   getBirthDate() { return ui->birthDatePicker->date(); }
     QDate   getBeginsuspDate() { return ui->beginsuspPicker->date(); }
     QDate   getEndsuspDate() { return ui->endsuspPicker->date(); }
+    QDate   getLastCreditReset() { return ui->lastCreditResetPicker->date(); }
     QString getMsgsusp(){ return ui->editClientMsgsusp->toPlainText();};
     QString getNotes(){ return ui->editClientNotes->toPlainText();};
     //    QStringList getTags();

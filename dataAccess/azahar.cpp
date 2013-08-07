@@ -27,7 +27,7 @@ Azahar::Azahar(QWidget * parent): QObject(parent)
 {
   errorStr = "";
   m_mainClient = "undefined";
-  clientFields= QString("name, surname, address, phone, email, nation, monthly, photo, since, expiry, birthDate, code, beginsusp, endsusp, msgsusp, notes, parent").split(", ");
+  clientFields= QString("name, surname, address, phone, email, nation, monthly, photo, since, expiry, birthDate, code, beginsusp, endsusp, msgsusp, notes, parent,lastCreditReset").split(", ");
   donorFields=QString("name, email, address, phone, photo, since, code, refname, refsurname, refemail, refphone, notes").split(", ");
   limitFields=QString("clientCode, clientTag, productCode, productCat, limit, current, priority, parent").split(", ");
 }
@@ -1721,6 +1721,7 @@ bool Azahar::_bindClient(ClientInfo &info, QSqlQuery &query)
     query.bindValue(":endsusp", info.endsusp);
     query.bindValue(":msgsusp", info.msgsusp);
     query.bindValue(":notes", info.notes);
+    query.bindValue(":lastCreditReset", info.lastCreditReset);
     qDebug()<<"Insert client lastQuery: "<<query.boundValues();
     if (!query.exec()) setError(query.lastError().text()); else result = true;
     return result;
@@ -1832,10 +1833,6 @@ bool Azahar::getClientInfoFromQuery(QSqlQuery &qC, ClientInfo &info){
       int fieldAdd    = qC.record().indexOf("address");
       int fieldParent = qC.record().indexOf("parent");
       int fieldMonthly = qC.record().indexOf("monthly");
-      int fieldBeginsusp = qC.record().indexOf("beginsusp");
-      int fieldEndsusp = qC.record().indexOf("endsusp");
-      int fieldMsgsusp = qC.record().indexOf("msgsusp");
-      int fieldNotes = qC.record().indexOf("notes");
 
       //Should be only one
       info.id         = qC.value(fieldId).toUInt();
@@ -1858,24 +1855,24 @@ bool Azahar::getClientInfoFromQuery(QSqlQuery &qC, ClientInfo &info){
       info.endsusp       = qC.value(qC.record().indexOf("endsusp")).toDate();
       info.msgsusp       = qC.value(qC.record().indexOf("msgsusp")).toString();
       info.notes       = qC.value(qC.record().indexOf("notes")).toString();
-//      info.       = qC.value(qC.record().indexOf("")).toString();
+      info.lastCreditReset      = qC.value(qC.record().indexOf("lastCreditReset")).toDate();
       return true;
     }
     return false;
 }
 
-qulonglong Azahar::checkParent(ClientInfo &info)
+ClientInfo Azahar::checkParent(ClientInfo &info)
 {
     ClientInfo parentInfo;
+    parentInfo.id=0;
     if (info.parentClient.count()>0){
-        parentInfo.id=0;
         parentInfo=_getClientInfo(info.parentClient);
         if (parentInfo.id > 0){
             info.monthly=parentInfo.monthly;
-            return parentInfo.id;
+            return parentInfo;
         }
     }
-    return info.id;
+    return parentInfo;
 }
 
 Family Azahar::getFamily(ClientInfo &info)
@@ -2410,33 +2407,49 @@ QHash<int, ClientInfo> Azahar::getClientsHash()
   return result;
 }
 
-/*void Azahar::resetCredits (){
+bool Azahar::resetCredits (ClientInfo info){
+    // Skip non-parent clients:
+    if (info.parentClient.count()>0) { return false; }
+    QDate now=QDate::currentDate();
+    int fromLastReset=info.lastCreditReset.daysTo(now);
+    if (fromLastReset < 30 ) {
+        qDebug()<<"not resetting "<<info.code<<info.id<<info.surname<<info.lastCreditReset;
+        return false;
+    }
     if (!db.isOpen()) db.open();
     if (db.isOpen()) {
-      CreditInfo info;
-      QSqlQuery myQuery(db);
-      if (myQuery.exec("select name from clients;")) {
-        while (myQuery.next()) {
-          int fieldId = myQuery.record().indexOf("id");
-          qlonglong id = myQuery.value(fieldId).toULongLong();
-          int fieldDate = myQuery.record().indexOf("since");
-          QDate date = myQuery.value(fieldDate).toDate();
-          QDate now=QDate::currentDate();
-          int diff=date.daysTo(now);
-          if (diff % 30 == 0) {
-              qDebug()<<"ciao";
-              info.clientId=id;
-              info.total=0;
-              insertCredit(info);
-          }
+        CreditInfo old=queryCreditInfoForClient(info.id);
+        if (old.clientId==0 or old.total==0) {
+            qDebug()<<"No credit found for this client, nothing to reset!"<<info.id;
+            return true;
         }
-      }
-      else {
-        qDebug()<<"ERROR: "<<myQuery.lastError();
-      }
+        qDebug()<<"resetting credit"<<info.id<<fromLastReset<<info.code<<info.surname<<old.total;
+        QSqlQuery query(db);
+        query.prepare("update credits set total=0 where `customerid`=:id;");
+        query.bindValue(":id", info.id);
+        query.exec();
+        // Update lastCreditResetRun
+        QSqlQuery q(db);
+        q.prepare("update clients set `lastCreditReset`=:now where `id`=:id;");
+        q.bindValue(":now",now);
+        q.bindValue(":id",info.id);
+        q.exec();
+        q.next();
+        qDebug()<<"Update last credit reset run"<<q.lastError()<<q.lastQuery();
+        CreditHistoryInfo chi;
+        chi.amount=0;
+        chi.date=now;
+        chi.customerId=info.id;
+        chi.saleId=0;
+        chi.time=QTime::currentTime();
+        insertCreditHistory(chi);
+        info.lastCreditReset=now;
+    } else {
+        qDebug()<<"ERROR OPENING DB";
+        return false;
     }
-
-}*/
+    return true;
+}
 
 QStringList Azahar::getClientsList()
 {
@@ -3383,12 +3396,10 @@ QList<TransactionItemInfo> Azahar::getTransactionItems(qulonglong id)
 //BALANCES
 
 double Azahar::getClientCredit(ClientInfo clientInfo, double totalSum)
-{
+{// returns residual credit, after subtracting totalSum
     CreditInfo credit = getCreditInfoForClient(clientInfo.id);
     double paid=clientInfo.monthly-credit.total;
-    double change = paid - totalSum;
-//    if (paid <= 0) change = 0.0;
-    return change;
+    return paid - totalSum;
 }
 
 qulonglong Azahar::insertBalance(BalanceInfo info)
@@ -4823,16 +4834,12 @@ ReservationInfo  Azahar::getReservationInfoFromTr(const qulonglong &trId)
     return result;
 }
 
-CreditInfo Azahar::getCreditInfoForClient(const qulonglong &clientId, const bool &create)
+CreditInfo Azahar::queryCreditInfoForClient(const qulonglong &cid, const bool &create)
 {
     CreditInfo result;
-    ClientInfo info;
-    qulonglong cid;
-    info= getClientInfo(clientId);
-    cid=checkParent(info);
     result.id=0;
     result.clientId = 0;
-    result.total = 0;
+    result.total = 0.0;
     if (!db.isOpen()) db.open();
     if (db.isOpen()) {
         QSqlQuery myQuery(db);
@@ -4847,11 +4854,11 @@ CreditInfo Azahar::getCreditInfoForClient(const qulonglong &clientId, const bool
                 result.total    = myQuery.value(fieldTotal).toDouble();
                 qDebug()<<__FUNCTION__<<" ----> Got credit:"<<result.id<<" for $"<<result.total;
             }
-            qDebug()<<__FUNCTION__<<" Getting CREDIT INFO FOR CLIENT ID:"<<clientId<<" .. create="<<create<<" query size:"<<myQuery.size();
+            qDebug()<<__FUNCTION__<<" Getting CREDIT INFO FOR CLIENT ID:"<<cid<<" .. create="<<create<<" query size:"<<myQuery.size();
             if (myQuery.size() <= 0 && create) {
                 //NO RECORD FOUND, CREATE A NEW ONE.
                 if ( getClientInfo(cid).id > 0 ) {
-                    qDebug()<<__FUNCTION__<<" Creating new credit for client ID:"<<clientId;
+                    qDebug()<<__FUNCTION__<<" Creating new credit for client ID:"<<cid;
                     result.clientId = cid;
                     result.total = 0;
                     qulonglong newId = insertCredit(result);
@@ -4859,15 +4866,30 @@ CreditInfo Azahar::getCreditInfoForClient(const qulonglong &clientId, const bool
                 } else { //NOTE: INVALID CLIENT ID. INVALID CREDIT ALSO!
                     result.clientId = 0;
                     result.total = 0;
-                    qDebug()<<__FUNCTION__<<" CREDIT NOT FOUND AND NOT CREATED BECAUSE NO CLIENT FOUND WITH ID:"<<clientId;
+                    qDebug()<<__FUNCTION__<<" CREDIT NOT FOUND AND NOT CREATED BECAUSE NO CLIENT FOUND WITH ID:"<<cid;
                 }
-
             }
         }
         else {
             setError(myQuery.lastError().text());
         }
     }
+    return result;
+}
+
+CreditInfo Azahar::getCreditInfoForClient(const qulonglong &clientId, const bool &create)
+{
+    qulonglong cid=0;
+    ClientInfo info= getClientInfo(clientId);
+    ClientInfo pInfo=checkParent(info);
+    if (pInfo.id == 0) {
+        cid=info.id;
+        resetCredits(info);
+    } else {
+        cid=pInfo.id;
+        resetCredits(pInfo);
+    }
+    CreditInfo result=queryCreditInfoForClient(cid);
     return result;
 }
 

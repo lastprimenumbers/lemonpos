@@ -882,7 +882,7 @@ bool PrintCUPS::printSmallTicket(const PrintTicketInfo &ptInfo, QPrinter &printe
     painter.drawText((printer.width() - textWidth.width() - Margin), Margin+yPos,ptInfo.thMonthly);
     yPos = yPos + 2*fm.lineSpacing();
 
- //Balance
+ //Expiry
     textWidth = fm.size(Qt::TextExpandTabs | Qt::TextDontClip, ptInfo.thExpiryStr);
     painter.drawText(printer.width()-(printer.width()/3)-textWidth.width(), Margin+yPos, ptInfo.thExpiryStr);
     yPos = yPos +  fm.lineSpacing();
@@ -890,7 +890,13 @@ bool PrintCUPS::printSmallTicket(const PrintTicketInfo &ptInfo, QPrinter &printe
     painter.drawText((printer.width() - textWidth.width() - Margin), Margin+yPos, ptInfo.thExpiry);
     yPos = yPos +  fm.lineSpacing();
 
-
+    //Reset
+    textWidth = fm.size(Qt::TextExpandTabs | Qt::TextDontClip, ptInfo.thNextResetStr);
+    painter.drawText(printer.width()-(printer.width()/3)-textWidth.width(), Margin+yPos, ptInfo.thNextResetStr);
+    yPos = yPos +  fm.lineSpacing();
+    textWidth = fm.size(Qt::TextExpandTabs | Qt::TextDontClip,ptInfo.thNextReset);
+    painter.drawText((printer.width() - textWidth.width() - Margin), Margin+yPos, ptInfo.thNextReset);
+    yPos = yPos +  fm.lineSpacing();
 
     //Random Message
     double maxL = ((printer.width())-Margin*2);

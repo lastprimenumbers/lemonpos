@@ -280,6 +280,8 @@ lemonView::lemonView(QWidget *parent) //: QWidget(parent)
   connect(ui_mainview.btnPrintCreditReport, SIGNAL(clicked()), SLOT(printCreditReport()));
   connect(ui_mainview.editClientIdForCredit, SIGNAL(returnPressed()), SLOT(filterClientForCredit()));
 
+
+
   timerClock->start(1000);
 
   drawer = new Gaveta();
@@ -2308,6 +2310,7 @@ void lemonView::finishCurrentTransaction()
     ticket.deliveryDT = soDeliveryDT;
     ticket.terminal = QString::number(tInfo.terminalnum);
     ticket.monthly=clientInfo.monthly;
+    ticket.nextReset=clientInfo.lastCreditReset.addDays(30);
     ticket.expiry=clientInfo.expiry;
     ticket.balance=clientInfo.monthly-credit.total;
     qDebug()<<" \n soGTotal:"<<soGTotal<<" deliveryDT:"<<soDeliveryDT<<"\n";
@@ -2594,6 +2597,8 @@ void lemonView::printTicket(TicketInfo ticket)
       ptInfo.thMonthlyStr= i18n("Ricarica Mensile");
       ptInfo.thExpiry    = KGlobal::locale()->formatDate(ptInfo.ticketInfo.expiry, KLocale::LongDate);
       ptInfo.thExpiryStr = i18n("Scadenza Tessera");
+      ptInfo.thNextReset    = KGlobal::locale()->formatDate(ptInfo.ticketInfo.nextReset, KLocale::LongDate);
+      ptInfo.thNextResetStr = i18n("Ricarica il");
       ptInfo.tDisc       = KGlobal::locale()->formatMoney(-tDisc, currency(), 2);
       ptInfo.thCard      = i18n("Card Number  : %1", ticket.cardnum);
       ptInfo.thCardAuth  = i18n("Authorization : %1", ticket.cardAuthNum);
@@ -2627,7 +2632,7 @@ void lemonView::printTicket(TicketInfo ticket)
       
       //This is lost when the user chooses a printer. Because the printer overrides the paper sizes.
       printer.setPageMargins(0,0,0,0,QPrinter::Millimeter);
-      printer.setPaperSize(QSizeF(72,200), QPrinter::Millimeter); //setting small ticket paper size. 72mm x 200mm
+      printer.setPaperSize(QSizeF(72,800), QPrinter::Millimeter); //setting small ticket paper size. 72mm x 200mm
 
       QString pName = printer.printerName(); //default printer name
       
@@ -4053,6 +4058,7 @@ void lemonView::printTicketFromTransaction(qulonglong transactionNumber)
   ticket.monthly=cInfo.monthly;
   ticket.expiry=cInfo.expiry;
   ticket.balance=myDb->getClientCredit(cInfo);
+  ticket.nextReset=cInfo.lastCreditReset.addDays(30);
 
   double subtotal = ticket.total + itemsDiscount + trInfo.discmoney; // - trInfo.totaltax;
   if (Settings::addTax())

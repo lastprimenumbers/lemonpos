@@ -121,6 +121,7 @@ struct ClientInfo
   QString      msgsusp;
   QString      notes;
   QStringList   tags;
+  QDate        lastCreditReset;
   // Effective limits for the current transaction
   QHash<int, Limit>         limits;
 };
@@ -310,6 +311,7 @@ struct TicketInfo {
   double     balance;
   double    monthly;
   QDate expiry;
+  QDate nextReset;
 };
 
 struct PrintTicketInfo {
@@ -361,6 +363,8 @@ struct PrintTicketInfo {
   QString    thBalanceStr;
   QString    thMonthly;
   QString    thMonthlyStr;
+  QString    thNextReset;
+  QString    thNextResetStr;
 };
 
 //TODO: add grouped products and special orders

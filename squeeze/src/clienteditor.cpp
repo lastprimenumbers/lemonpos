@@ -38,22 +38,6 @@ ClientEditorUI::ClientEditorUI( QWidget *parent )
     setupUi( this );
 }
 
-qulonglong  ClientEditor::insertCredit(const CreditInfo &info)
-{
-    qulonglong result = 0;
-    if (!db.isOpen()) db.open();
-    QSqlQuery query(db);
-    query.prepare("INSERT INTO credits (customerid, total) VALUES (:client, :total);");
-    query.bindValue(":client", info.clientId);
-    query.bindValue(":total", info.total);
-
-    if (!query.exec()) {
-       // setError(query.lastError().text());
-        qDebug()<< __FUNCTION__ << query.lastError().text();
-    }
-    else result = query.lastInsertId().toULongLong();
-    return result;
-}
 
 ClientEditor::ClientEditor( QSqlDatabase parentDb, QWidget *parent )
 : KDialog( parent )
@@ -85,13 +69,11 @@ ClientEditor::ClientEditor( QSqlDatabase parentDb, QWidget *parent )
     ui->editClientPhone->setEmptyMessage(i18n("Phone number"));
 
     ui->editParentClient->setCustomLayout(0);
+    ui->lastCreditResetPicker->setEnabled(false);
+    ui->nextCreditResetPicker->setEnabled(false);
 
     // Limits
     connect(ui->addLimitButton, SIGNAL(clicked()), SLOT( createLimit() ));
-
-    qDebug()<<"primaDiReset";
-    connect(ui->resetCredits, SIGNAL(clicked()), SLOT(resetCredits()));
-    qDebug()<<"dopoReset";
 
     //since date picker
     ui->sinceDatePicker->setDate(QDate::currentDate());
@@ -119,35 +101,6 @@ ClientEditor::ClientEditor( QSqlDatabase parentDb, QWidget *parent )
 ClientEditor::~ClientEditor()
 {
     delete ui;
-}
-
-void ClientEditor::resetCredits (){
-    if (!db.isOpen()) db.open();
-    if (db.isOpen()) {
-      CreditInfo info;
-      QSqlQuery myQuery(db);
-      qDebug()<<"dopo2if";
-      if (myQuery.exec("select name from clients;")) {
-        while (myQuery.next()) {
-          int fieldId = myQuery.record().indexOf("id");
-          qlonglong id = myQuery.value(fieldId).toULongLong();
-          int fieldDate = myQuery.record().indexOf("since");
-          QDate date = myQuery.value(fieldDate).toDate();
-          QDate now=QDate::currentDate();
-          int diff=date.daysTo(now);
-          if (diff % 30 == 0) {
-              qDebug()<<"ciao";
-              info.clientId=id;
-              info.total=0;
-              insertCredit(info);
-          }
-        }
-      }
-      else {
-        qDebug()<<"ERROR: "<<myQuery.lastError();
-      }
-    }
-
 }
 
 
@@ -216,6 +169,7 @@ void ClientEditor::setParentClient(QString code)
         qDebug()<<"setParentClient "<<code;
         validateParent(code);
         ui->editParentClient->setCode(code);
+
     }
     else {
         qDebug()<<"Empty parent client"<<code;
@@ -336,8 +290,11 @@ void ClientEditor::loadLimits(ClientInfo info)
     f=QString("clientId=%1").arg(info.id);
     limitsModel->setFilter(f);
     limitsModel->select();
-    CreditInfo credit=myDb->getCreditInfoForClient(info.id,false);
-    ui->editCredit->setText(QString::number(info.monthly-credit.total));
+    CreditInfo credit=myDb->getCreditInfoForClient(parentClientInfo.id,false);
+    ui->editDebit->setText(QString::number(credit.total));
+    ui->editCredit->setText(QString::number(parentClientInfo.monthly-credit.total));
+    setLastCreditReset(info.lastCreditReset);
+    ui->nextCreditResetPicker->setDate(info.lastCreditReset.addDays(30));
     delete myDb;
 }
 
@@ -350,7 +307,13 @@ void ClientEditor::setClientInfo(ClientInfo info)
     setEmail(info.email);
     setNation(info.nation);
     setBirthDate(info.birthDate);
+    parentClientInfo=info;
     setParentClient(info.parentClient);
+    if (parentClientInfo.id>0) {
+        loadLimits(parentClientInfo);
+    } else {
+        loadLimits(info);
+    }
     setAddress(info.address);
     setPhone(info.phone);
     setMonthly(info.monthly);
@@ -360,12 +323,12 @@ void ClientEditor::setClientInfo(ClientInfo info)
     setEndsuspDate(info.endsusp);
     setMsgsusp(info.msgsusp);
     setNotes(info.notes);
+
     QPixmap photo;
     photo.loadFromData(info.photo);
     setPhoto(photo);
     qDebug()<<"clientEditor setting tags"<<info.code<<info.tags;
     ui->clientTagEditor->setTags(info.tags);
-    loadLimits(info);
 }
 //Overloaded: imposta le informazioni basandosi sul codice!
 void ClientEditor::setClientInfo(QString code)
@@ -395,7 +358,7 @@ ClientInfo ClientEditor::getClientInfo()
     info.msgsusp = getMsgsusp();
     info.birthDate = getBirthDate();
     info.notes   = getNotes();
-
+    info.lastCreditReset=getLastCreditReset();
     QPixmap photo=getPhoto();
     info.photo = Misc::pixmap2ByteArray(new QPixmap(photo));
     info.parentClient=getParentClient();

@@ -60,7 +60,7 @@ class Azahar : public QObject
     void initDatabase(QString user, QString server, QString password, QString dbname);
     void setDatabase(const QSqlDatabase& database);
     QHash<int, BasicInfo> getBasicHash(QString table);
-//    void resetCredits ();
+    bool resetCredits (ClientInfo info);
     // PRODUCTS
     ProductInfo  getProductInfo(const QString &code, const bool &notConsiderDiscounts = false); //the 2nd parameter is to get the taxes for the group (not considering discounts)
     qulonglong   getProductOfferCode(QString code);
@@ -144,7 +144,7 @@ class Azahar : public QObject
     bool         updateClient(ClientInfo info);
     ClientInfo   getClientInfo(qulonglong clientId);
     ClientInfo   getClientInfo(QString clientCode);
-    qulonglong         checkParent(ClientInfo &info);
+    ClientInfo checkParent(ClientInfo &info);
     QHash<int, ClientInfo> getClientsHash();
     QStringList  getClientsList();
     void getChildrenClientsList(QString parentClient, QStringList &codes, QStringList &names);
@@ -283,6 +283,7 @@ class Azahar : public QObject
     bool     deleteCurrency(const qulonglong &cid);
 
     //Credits and its history
+    CreditInfo        queryCreditInfoForClient(const qulonglong &cid, const bool &create=true);
     CreditInfo        getCreditInfoForClient(const qulonglong &clientId, const bool &create=true); //by default it creates a new credit record if no one found for the customer.
     QList<CreditHistoryInfo> getCreditHistoryForClient(const qulonglong &clientId, const int &lastDays=0);
     
