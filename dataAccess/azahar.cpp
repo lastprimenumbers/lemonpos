@@ -2423,15 +2423,18 @@ bool Azahar::resetCredits (ClientInfo info){
             qDebug()<<"No credit found for this client, nothing to reset!"<<info.id;
             return true;
         }
-        qDebug()<<"resetting credit"<<info.id<<fromLastReset<<info.code<<info.surname<<old.total;
+        // Add 30 days * integer number of months from since date
+        info.lastCreditReset=info.lastCreditReset.addDays(30*(int(fromLastReset / 30)));
+        qDebug()<<"resetting credit"<<info.id<<fromLastReset<<info.code<<info.surname<<old.total<<info.lastCreditReset;
         QSqlQuery query(db);
         query.prepare("update credits set total=0 where `customerid`=:id;");
         query.bindValue(":id", info.id);
         query.exec();
+
         // Update lastCreditResetRun
         QSqlQuery q(db);
         q.prepare("update clients set `lastCreditReset`=:now where `id`=:id;");
-        q.bindValue(":now",now);
+        q.bindValue(":now",info.lastCreditReset);
         q.bindValue(":id",info.id);
         q.exec();
         q.next();
@@ -2443,7 +2446,7 @@ bool Azahar::resetCredits (ClientInfo info){
         chi.saleId=0;
         chi.time=QTime::currentTime();
         insertCreditHistory(chi);
-        info.lastCreditReset=now;
+
     } else {
         qDebug()<<"ERROR OPENING DB";
         return false;
