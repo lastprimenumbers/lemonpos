@@ -94,7 +94,8 @@ class ClientEditor : public KDialog
     void commitClientInfo();
     void loadLimits(ClientInfo info);
     QSqlTableModel *limitsModel;
-
+    QSqlTableModel *transModel;
+    QSqlTableModel *ticketModel;
 
   private slots:
     void createLimit();
@@ -107,6 +108,7 @@ class ClientEditor : public KDialog
     void viewParentClient();
     void viewChildClient(int row,int col);
     void changeDebit();
+    void ticketViewOnSelected(const QModelIndex &);
 
   private:
     ClientEditorUI *ui;

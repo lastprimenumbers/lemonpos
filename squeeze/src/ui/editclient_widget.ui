@@ -742,6 +742,33 @@
        </property>
       </widget>
      </widget>
+     <widget class="QWidget" name="tab_2">
+      <attribute name="title">
+       <string>Transazioni</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <widget class="QLabel" name="label">
+         <property name="text">
+          <string>Transazioni:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QTableView" name="transView"/>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_2">
+         <property name="text">
+          <string>Selezionare transazione per visualizzare il contenuto:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QTableView" name="ticketView"/>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </item>
   </layout>

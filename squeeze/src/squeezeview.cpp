@@ -263,8 +263,7 @@ void squeezeView::setupSignalConnections()
   connect(ui_mainview.usersView, SIGNAL(activated(const QModelIndex &)), SLOT(usersViewOnSelected(const QModelIndex &)));
   connect(ui_mainview.donorsView, SIGNAL(activated(const QModelIndex &)), SLOT(donorsViewOnSelected(const QModelIndex &)));
   connect(ui_mainview.clientsView, SIGNAL(activated(const QModelIndex &)), SLOT(clientsViewOnSelected(const QModelIndex &)));
-
-connect(ui_mainview.clientsTableView, SIGNAL (doubleClicked( const QModelIndex &)), SLOT (childClientsViewOnSelected(const QModelIndex &)));
+  connect(ui_mainview.clientsTableView, SIGNAL (doubleClicked( const QModelIndex &)), SLOT (childClientsViewOnSelected(const QModelIndex &)));
   connect(ui_mainview.clientsTableView, SIGNAL (clicked( const QModelIndex &)), SLOT (filterClientsTable( const QModelIndex &)));
   connect(ui_mainview.productsView, SIGNAL(activated(const QModelIndex &)), SLOT(productsViewOnSelected(const QModelIndex &)));
   connect(ui_mainview.productsViewAlt, SIGNAL(activated(const QModelIndex &)), SLOT(productsViewOnSelected(const QModelIndex &)));

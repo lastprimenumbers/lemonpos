@@ -92,8 +92,12 @@ ClientEditor::ClientEditor( QSqlDatabase parentDb, QWidget *parent )
     connect(ui->changeDebit, SIGNAL(clicked()), SLOT(changeDebit()));
     ui->editClientCode->setInputMask(">XXXXXXXXXXXXXXXXxxx");
     limitsModel=new QSqlTableModel();
+    transModel=new QSqlTableModel();
+    ticketModel=new QSqlTableModel();
     ui->clientTagEditor->setDb(db);
     ui->editParentClient->setDb(db,"clients");
+
+    connect(ui->transView, SIGNAL(clicked(const QModelIndex &)), SLOT(ticketViewOnSelected(const QModelIndex &)));
 }
 
 
@@ -124,6 +128,17 @@ void ClientEditor::changeDebit()
     }
     delete myDb;
     loadLimits(parentClientInfo);
+}
+
+void ClientEditor::ticketViewOnSelected(const QModelIndex & index) {
+        //getting data from model...
+        const QAbstractItemModel *model = index.model();
+        int row = index.row();
+        int fid=transModel->fieldIndex("id");
+        QModelIndex indx = model->index(row, fid);
+        qulonglong tid=model->data(indx, Qt::DisplayRole).toULongLong();
+        ticketModel->setFilter(QString("transaction_id=%1").arg(tid));
+        ticketModel->select();
 }
 
 void ClientEditor::changePhoto(bool del)
@@ -307,16 +322,37 @@ void ClientEditor::loadLimits(ClientInfo info)
     limitsModel->setTable("limits");
     ui->clientLimitsList->setModel(limitsModel);
     ui->clientLimitsList->setColumnHidden(0,true);
-    QString f;
-    f=QString("clientId=%1").arg(info.id);
-    limitsModel->setFilter(f);
+    limitsModel->setFilter(QString("clientId=%1").arg(info.id));
     limitsModel->select();
     CreditInfo credit=myDb->getCreditInfoForClient(parentClientInfo.id,false);
     ui->editDebit->setText(QString::number(credit.total));
     ui->editCredit->setText(QString::number(parentClientInfo.monthly-credit.total));
     setLastCreditReset(info.lastCreditReset);
     ui->nextCreditResetPicker->setDate(info.lastCreditReset.addDays(30));
+
     delete myDb;
+
+    transModel->setTable("transactions");
+    ui->transView->setModel(transModel);
+    ui->transView->setColumnHidden(1,true);
+    ui->transView->setColumnHidden(2,true);
+    for (int i=6; i<=25; ++i) {
+        ui->transView->setColumnHidden(i,true);
+    }
+    transModel->setFilter(QString("clientid=%1").arg(parentClientInfo.id));
+    transModel->select();
+
+
+    ticketModel->setTable("transactionitems");
+    ui->ticketView->setModel(ticketModel);
+    ui->ticketView->setColumnHidden(0,true);
+    ui->ticketView->setColumnHidden(1,true);
+    ui->ticketView->setColumnHidden(5,true);
+    ui->ticketView->setColumnHidden(6,true);
+    for (int i=11; i<=16; ++i) {
+        ui->ticketView->setColumnHidden(i,true);
+    }
+
 }
 
 void ClientEditor::setClientInfo(ClientInfo info)
