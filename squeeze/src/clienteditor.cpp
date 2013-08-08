@@ -89,8 +89,8 @@ ClientEditor::ClientEditor( QSqlDatabase parentDb, QWidget *parent )
     connect(ui->editParentClient, SIGNAL(selectCode(QString)), SLOT(validateParent(QString)));
     connect(ui->viewClientButton, SIGNAL(clicked()), SLOT(viewParentClient()));
     connect(ui->childrenTable, SIGNAL(cellDoubleClicked(int,int)), SLOT(viewChildClient(int,int)));
-
-
+    connect(ui->changeDebit, SIGNAL(clicked()), SLOT(changeDebit()));
+    ui->editClientCode->setInputMask(">XXXXXXXXXXXXXXXXxxx");
     limitsModel=new QSqlTableModel();
     ui->clientTagEditor->setDb(db);
     ui->editParentClient->setDb(db,"clients");
@@ -103,6 +103,28 @@ ClientEditor::~ClientEditor()
     delete ui;
 }
 
+void ClientEditor::changeDebit()
+{
+    QMessageBox::StandardButton sb=QMessageBox::question(this,"Modificare Credito?","Confermare la modifica del credito",QMessageBox::Ok|QMessageBox::Cancel);
+    if (sb==QMessageBox::Cancel) {
+        return;
+    }
+    qDebug()<<"Change debit";
+    QString n=ui->newDebit->text();
+    double ndf=n.toFloat();
+    qDebug()<<"Change debit"<<ndf<<parentClientInfo.id;
+    Azahar *myDb=new Azahar;
+    myDb->setDatabase(db);
+    CreditInfo cr= myDb->queryCreditInfoForClient(parentClientInfo.id);
+    cr.total=ndf;
+    if (cr.clientId==0) {
+        myDb->insertCredit(cr);
+    } else {
+        myDb->updateCredit(cr);
+    }
+    delete myDb;
+    loadLimits(parentClientInfo);
+}
 
 void ClientEditor::changePhoto(bool del)
 {
@@ -117,7 +139,6 @@ void ClientEditor::changePhoto(bool del)
         file.remove();
     }
   }
-
 }
 
 

@@ -64,7 +64,6 @@ class ClientEditor : public KDialog
     void setLastCreditReset(QDate date) {ui->lastCreditResetPicker->setDate(date); }
     void setMsgsusp(QString msgsusp){ui->editClientMsgsusp->setText(msgsusp);}
     void setNotes(QString notes){ui->editClientNotes->setText(notes);}
-
     qulonglong insertCredit(const CreditInfo &info);
 
     //    void setTags(QStringList tags);
@@ -107,6 +106,7 @@ class ClientEditor : public KDialog
     bool validateParent(QString code);
     void viewParentClient();
     void viewChildClient(int row,int col);
+    void changeDebit();
 
   private:
     ClientEditorUI *ui;
