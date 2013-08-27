@@ -43,7 +43,9 @@ class ClientEditor : public KDialog
     QSqlDatabase db;
     bool hasParent;
     bool hasChild;
+    bool inserting;
     ClientInfo parentClientInfo;
+    void setInserting(bool status) { inserting=status; };
     void setCode(QString code) { ui->editClientCode->setText(code); };
     void setName(QString name) { ui->editClientName->setText(name); };
     void setSurname(QString surname) { ui->editClientSurname->setText(surname); } ;

@@ -44,6 +44,7 @@ ClientEditor::ClientEditor( QSqlDatabase parentDb, QWidget *parent )
 {
     ui = new ClientEditorUI( this );
     hasParent=false;
+    inserting=false;
     setMainWidget( ui );
     setCaption( i18n("Client Editor") );
     setButtons( KDialog::Ok|KDialog::Cancel );
@@ -334,7 +335,8 @@ void ClientEditor::loadLimits(ClientInfo info)
 
     transModel->setTable("transactions");
     ui->transView->setModel(transModel);
-    ui->transView->setColumnHidden(1,true);
+//    ui->transView->setColumnHidden(1,true);
+
     ui->transView->setColumnHidden(2,true);
     for (int i=6; i<=25; ++i) {
         ui->transView->setColumnHidden(i,true);
@@ -415,7 +417,11 @@ ClientInfo ClientEditor::getClientInfo()
     info.msgsusp = getMsgsusp();
     info.birthDate = getBirthDate();
     info.notes   = getNotes();
-    info.lastCreditReset=getLastCreditReset();
+    if (inserting) {
+        info.lastCreditReset=info.since;
+    } else {
+        info.lastCreditReset=getLastCreditReset();
+    }
     QPixmap photo=getPhoto();
     info.photo = Misc::pixmap2ByteArray(new QPixmap(photo));
     info.parentClient=getParentClient();

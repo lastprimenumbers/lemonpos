@@ -27,7 +27,7 @@ Azahar::Azahar(QWidget * parent): QObject(parent)
 {
   errorStr = "";
   m_mainClient = "undefined";
-  clientFields= QString("name, surname, address, phone, email, nation, monthly, photo, since, expiry, birthDate, code, beginsusp, endsusp, msgsusp, notes, parent,lastCreditReset").split(", ");
+  clientFields= QString("name, surname, address, phone, email, nation, monthly, photo, since, expiry, birthDate, code, beginsusp, endsusp, msgsusp, notes, parent, lastCreditReset").split(", ");
   donorFields=QString("name, email, address, phone, photo, since, code, refname, refsurname, refemail, refphone, notes").split(", ");
   limitFields=QString("clientCode, clientTag, productCode, productCat, limit, current, priority, parent").split(", ");
 }
@@ -1785,6 +1785,7 @@ bool Azahar::updateClient(ClientInfo info)
   qDebug()<<"UpdateClient query:"<<q;
   query.prepare(q);
   result=_bindClient(info,query);
+  qDebug()<<query.boundValues();
   return result;
 
 }

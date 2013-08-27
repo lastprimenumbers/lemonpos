@@ -2253,6 +2253,7 @@ void squeezeView::_clientsViewOnSelected(const QModelIndex & index, QSqlTableMod
     info.code = model->data(indx, Qt::DisplayRole).toString();
     //Launch Edit dialog
     ClientEditor *clientEditorDlg = new ClientEditor(db, this);
+    clientEditorDlg->setInserting(false);
     clientEditorDlg->setClientInfo(info.code);
     if (clientEditorDlg->exec() ) {
       clientEditorDlg->commitClientInfo();
@@ -2793,6 +2794,7 @@ void squeezeView::createClient()
 
   if (db.isOpen()) {
     ClientEditor *clientEditorDlg = new ClientEditor(db,this);
+    clientEditorDlg->setInserting(true);
 //    ClientInfo info;
     QPixmap photo;
 
