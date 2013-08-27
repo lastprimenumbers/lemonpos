@@ -2801,6 +2801,11 @@ void squeezeView::createClient()
     if (clientEditorDlg->exec() ) {
         ClientInfo info = clientEditorDlg->getClientInfo();
       if (!db.isOpen()) openDB();
+      ClientInfo existentInfo=myDb->getClientInfo(info.code);
+      if (existentInfo.id>1) {
+          QMessageBox::critical(this,"Errore: Codice già inserito","Il codice inserito è già presente in archivio");
+          return;
+      }
       if (!myDb->insertClient(info)) qDebug()<<myDb->lastError();
 
       clientsModel->select();
