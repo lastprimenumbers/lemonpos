@@ -1355,7 +1355,7 @@ void squeezeView::setupClientsModel()
 
       clientsTableModel->setFilter(QString("parent=''"));
 
-      ui_mainview.clientsTableView->hideColumn(0); //id
+//      ui_mainview.clientsTableView->hideColumn(0); //id
       ui_mainview.clientsTableView->hideColumn(4);
       ui_mainview.clientsTableView->hideColumn(5);
       ui_mainview.clientsTableView->hideColumn(6);

@@ -52,6 +52,10 @@
       <label>DB Name</label>
       <default>lemondb</default>
     </entry>
+    <entry name="usersFolder" type="String">
+      <label>Shared Users Folder</label>
+      <default>/home/administrator/Documenti/</default>
+    </entry>
   </group>
   <group name="Printer">
     <entry name="showDialogOnPrinting" type="Bool">
