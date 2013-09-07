@@ -513,6 +513,7 @@ struct CreditInfo
     qulonglong id;
     qulonglong clientId;
     double     total;
+    QDate       lastCreditReset;
 };
 
 struct CreditHistoryInfo

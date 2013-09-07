@@ -315,6 +315,11 @@ void ClientEditor::viewChildClient(int row, int col)
 
 }
 
+void ClientEditor::setLastCreditReset(QDate date) {
+    ui->lastCreditResetPicker->setDate(date);
+    ui->nextCreditResetPicker->setDate(date.addDays(30));
+    parentClientInfo.lastCreditReset=date;
+}
 
 void ClientEditor::loadLimits(ClientInfo info)
 {
@@ -328,9 +333,9 @@ void ClientEditor::loadLimits(ClientInfo info)
     CreditInfo credit=myDb->getCreditInfoForClient(parentClientInfo.id,false);
     ui->editDebit->setText(QString::number(credit.total));
     ui->editCredit->setText(QString::number(parentClientInfo.monthly-credit.total));
-    setLastCreditReset(info.lastCreditReset);
-    ui->nextCreditResetPicker->setDate(info.lastCreditReset.addDays(30));
-
+    setLastCreditReset(credit.lastCreditReset);
+    info.lastCreditReset=credit.lastCreditReset;
+    qDebug()<<"loadLimits: Last Credit Reset"<<credit.lastCreditReset;
     delete myDb;
 
     transModel->setTable("transactions");

@@ -2393,6 +2393,7 @@ QHash<int, ClientInfo> Azahar::getClientsHash()
     if (qC.exec("select * from clients;")) {
 
       while (getClientInfoFromQuery(qC,info)) {
+//        correct24Ago(info);
         checkParent(info);
         info.photo = "";
         result.insert(info.id, info);
@@ -2408,9 +2409,30 @@ QHash<int, ClientInfo> Azahar::getClientsHash()
   return result;
 }
 
-bool Azahar::resetCredits (ClientInfo info){
+void Azahar::correct24Ago(ClientInfo &info) {
+    if (info.parentClient.count()>0) {
+        return;
+    }
+    QDate now=QDate::currentDate();
+    QDate err;
+    err=QDate(2013,8,24);
+    if (info.lastCreditReset!=err) {
+        return;
+    }
+    qDebug()<<"Correct 24 Ago"<<info.code<<info.lastCreditReset;
+    int fromSince=info.since.daysTo(now);
+    if (fromSince<30) {
+        info.lastCreditReset=info.since;
+    } else {
+        info.lastCreditReset=info.since.addDays(30*(int(fromSince / 30)));
+    }
+    qDebug()<<"Corrected to:"<<info.lastCreditReset<<info.since;
+}
+
+bool Azahar::resetCredits (ClientInfo &info){
     // Skip non-parent clients:
     if (info.parentClient.count()>0) { return false; }
+    correct24Ago(info);
     QDate now=QDate::currentDate();
     int fromLastReset=info.lastCreditReset.daysTo(now);
     if (fromLastReset < 30 ) {
@@ -2420,19 +2442,18 @@ bool Azahar::resetCredits (ClientInfo info){
     if (!db.isOpen()) db.open();
     if (db.isOpen()) {
         CreditInfo old=queryCreditInfoForClient(info.id);
-        if (old.clientId==0 or old.total==0) {
-            qDebug()<<"No credit found for this client, nothing to reset!"<<info.id;
-            return true;
-        }
-        // Add 30 days * integer number of months from since date
-        info.lastCreditReset=info.lastCreditReset.addDays(30*(int(fromLastReset / 30)));
-        qDebug()<<"resetting credit"<<info.id<<fromLastReset<<info.code<<info.surname<<old.total<<info.lastCreditReset;
-        QSqlQuery query(db);
-        query.prepare("update credits set total=0 where `customerid`=:id;");
-        query.bindValue(":id", info.id);
-        query.exec();
 
-        // Update lastCreditResetRun
+        if (old.clientId>0) {
+            // Add 30 days * integer number of months from since date
+            info.lastCreditReset=info.lastCreditReset.addDays(30*(int(fromLastReset / 30)));
+            qDebug()<<"resetting credit"<<info.id<<fromLastReset<<info.code<<info.surname<<old.total<<info.lastCreditReset;
+            QSqlQuery query(db);
+            query.prepare("update credits set total=0 where `customerid`=:id;");
+            query.bindValue(":id", info.id);
+            query.exec();
+        }
+
+        // Update lastCreditReset anyway
         QSqlQuery q(db);
         q.prepare("update clients set `lastCreditReset`=:now where `id`=:id;");
         q.bindValue(":now",info.lastCreditReset);
@@ -4885,15 +4906,22 @@ CreditInfo Azahar::getCreditInfoForClient(const qulonglong &clientId, const bool
 {
     qulonglong cid=0;
     ClientInfo info= getClientInfo(clientId);
+    QDate lastCreditReset;
+    // Get parent info
     ClientInfo pInfo=checkParent(info);
+    // If clientId is parent, reset its credits
     if (pInfo.id == 0) {
         cid=info.id;
         resetCredits(info);
+        lastCreditReset=info.lastCreditReset;
+    // If clientId is child, reset parent credits
     } else {
         cid=pInfo.id;
         resetCredits(pInfo);
+        lastCreditReset=pInfo.lastCreditReset;
     }
     CreditInfo result=queryCreditInfoForClient(cid);
+    result.lastCreditReset=lastCreditReset;
     return result;
 }
 

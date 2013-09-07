@@ -2805,6 +2805,8 @@ void squeezeView::createClient()
       if (existentInfo.id>1) {
           QMessageBox::critical(this,"Errore: Codice già inserito","Il codice inserito è già presente in archivio");
           return;
+      } else {
+          qDebug()<<"Inserisco codice"<<info.code;
       }
       if (!myDb->insertClient(info)) qDebug()<<myDb->lastError();
 

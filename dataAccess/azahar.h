@@ -55,12 +55,13 @@ class Azahar : public QObject
   public:
     Azahar(QWidget * parent = 0);
     ~ Azahar();
+    void correct24Ago(ClientInfo &info);
     bool isConnected();
     QString lastError();
     void initDatabase(QString user, QString server, QString password, QString dbname);
     void setDatabase(const QSqlDatabase& database);
     QHash<int, BasicInfo> getBasicHash(QString table);
-    bool resetCredits (ClientInfo info);
+    bool resetCredits (ClientInfo &info);
     // PRODUCTS
     ProductInfo  getProductInfo(const QString &code, const bool &notConsiderDiscounts = false); //the 2nd parameter is to get the taxes for the group (not considering discounts)
     qulonglong   getProductOfferCode(QString code);
