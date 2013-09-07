@@ -2393,7 +2393,6 @@ QHash<int, ClientInfo> Azahar::getClientsHash()
     if (qC.exec("select * from clients;")) {
 
       while (getClientInfoFromQuery(qC,info)) {
-//        correct24Ago(info);
         checkParent(info);
         info.photo = "";
         result.insert(info.id, info);
@@ -2441,7 +2440,6 @@ QHash<int, ClientInfo> Azahar::getClientsHash()
 bool Azahar::resetCredits (ClientInfo &info){
     // Skip non-parent clients:
     if (info.parentClient.count()>0) { return false; }
-//    correct24Ago(info);
     QDate now=QDate::currentDate();
     int fromLastReset=info.lastCreditReset.daysTo(now);
     if (fromLastReset < 30 ) {
