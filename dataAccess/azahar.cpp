@@ -2409,30 +2409,39 @@ QHash<int, ClientInfo> Azahar::getClientsHash()
   return result;
 }
 
-void Azahar::correct24Ago(ClientInfo &info) {
-    if (info.parentClient.count()>0) {
-        return;
-    }
-    QDate now=QDate::currentDate();
-    QDate err;
-    err=QDate(2013,8,24);
-    if (info.lastCreditReset!=err) {
-        return;
-    }
-    qDebug()<<"Correct 24 Ago"<<info.code<<info.lastCreditReset;
-    int fromSince=info.since.daysTo(now);
-    if (fromSince<30) {
-        info.lastCreditReset=info.since;
-    } else {
-        info.lastCreditReset=info.since.addDays(30*(int(fromSince / 30)));
-    }
-    qDebug()<<"Corrected to:"<<info.lastCreditReset<<info.since;
-}
+//void Azahar::correct24Ago(ClientInfo &info) {
+//    if (info.parentClient.count()>0) {
+//        return;
+//    }
+//    QDate now=QDate::currentDate();
+//    QDate err;
+//    err=QDate(2013,8,24);
+//    if (info.lastCreditReset!=err) {
+//        return;
+//    }
+//    qDebug()<<"Correct 24 Ago"<<info.code<<info.lastCreditReset;
+//    int fromSince=info.since.daysTo(now);
+//    if (fromSince<30) {
+//        info.lastCreditReset=info.since;
+//    } else {
+//        info.lastCreditReset=info.since.addDays(30*(int(fromSince / 30)));
+//    }
+//    qDebug()<<"Correcting to:"<<info.lastCreditReset<<info.since;
+//    if (!db.isOpen()) db.open();
+//    QSqlQuery q(db);
+//    q.prepare("update clients set `lastCreditReset`=:now where `id`=:id;");
+//    q.bindValue(":now",info.lastCreditReset);
+//    q.bindValue(":id",info.id);
+//    q.exec();
+//    q.next();
+//    qDebug()<<"Update last credit reset run"<<q.lastError()<<q.lastQuery();
+
+//}
 
 bool Azahar::resetCredits (ClientInfo &info){
     // Skip non-parent clients:
     if (info.parentClient.count()>0) { return false; }
-    correct24Ago(info);
+//    correct24Ago(info);
     QDate now=QDate::currentDate();
     int fromLastReset=info.lastCreditReset.daysTo(now);
     if (fromLastReset < 30 ) {

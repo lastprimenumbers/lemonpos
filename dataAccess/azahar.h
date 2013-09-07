@@ -55,7 +55,7 @@ class Azahar : public QObject
   public:
     Azahar(QWidget * parent = 0);
     ~ Azahar();
-    void correct24Ago(ClientInfo &info);
+//    void correct24Ago(ClientInfo &info);
     bool isConnected();
     QString lastError();
     void initDatabase(QString user, QString server, QString password, QString dbname);
