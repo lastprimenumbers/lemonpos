@@ -127,16 +127,6 @@ struct ClientInfo
 };
 
 
-struct Family
-{
-    QList<ClientInfo> members;
-    QHash<QString, Limit> limits;
-    ProductInfo lastProduct;
-    QStringList applicable;
-    double effectiveLimit;
-
-};
-
 struct DonorInfo
 {
   unsigned int id;
@@ -390,6 +380,36 @@ struct TransactionItemInfo
   bool       isGroup;
   QDateTime  deliveryDateTime;
   double     tax; // total tax in percentage.
+};
+
+
+// Holds the statistics about the consumes of a family in a time range.
+struct FamilyStatistics
+{
+    // Start date for the statistic
+    QDate start;
+    // End date for the statistic
+    QDate end;
+    // List of items in the statistic
+    QList<TransactionItemInfo> items;
+    // Mapping between product code and expense
+    QHash<QString,double> products;
+    // Mapping between product id and quantity (TODO)
+    QHash<QString,double> quantities;
+    // Mapping between category id and expense
+    QHash<int,double> categories;
+    // Total expense
+    double total;
+};
+
+struct Family
+{
+    QList<ClientInfo> members;
+    QHash<QString, Limit> limits;
+    ProductInfo lastProduct;
+    QStringList applicable;
+    double effectiveLimit;
+    FamilyStatistics stats;
 };
 
 

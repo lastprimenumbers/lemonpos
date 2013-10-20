@@ -376,20 +376,6 @@ ProductInfo Azahar::getProductInfo(const QString &code, const bool &notConsiderD
   return info;
 }
 
-// QList<ProductInfo> Azahar::getTransactionGroupsList(qulonglong tid)
-// {
-//   QList<ProductInfo> list;
-//   QStringList groupsList = getTransactionInfo(tid).groups.split(",");
-//   foreach(QString ea, groupsList) {
-//     qulonglong c = ea.section('/',0,0).toULongLong();
-//     double     q = ea.section('/',1,1).toDouble();
-//     ProductInfo pi = getProductInfo(c);
-//     pi.qtyOnList = q;
-//     list.append(pi);
-//   }
-//   return list;
-// }
-
 QString Azahar::getProductCode(QString text)
 {
   QSqlQuery query(db);
@@ -1062,7 +1048,6 @@ QHash<QString, int> Azahar::getCategoriesHash()
 
 QStringList Azahar::getCategoriesList()
 {
-    // Alphabetical order!
   QStringList result;
   result.clear();
   if (!db.isOpen()) db.open();
@@ -1914,6 +1899,68 @@ Family Azahar::getFamily(ClientInfo &info)
     return family;
 }
 
+QString Azahar::getFamilyInStatement(Family family)
+{
+    QString ins="\"";
+    for (int i=0; i<family.members.count(); i++) {
+        ins.append(QString::number(family.members[i].id));
+        ins.append("\"");
+        if (i<family.members.count()-1) {ins.append(", \"");}
+        }
+    qDebug()<<ins;
+    return ins;
+}
+
+bool Azahar::getFamilyStatistics(Family &family, QDate start, QDate end)
+{
+    // Combined query
+    QSqlQuery query;
+    query.prepare(QString("SELECT *\
+    FROM transactions AS tr, transactionitems AS item, products AS product \
+     WHERE tr.clientid IN (%1) \
+    AND tr.id=item.transaction_id \
+    AND product.code=item.product_id \
+    AND ( tr.date BETWEEN :start AND :end )\
+    ORDER BY tr.date;").arg(getFamilyInStatement(family)));
+    query.bindValue(":start", start.toString("yyyy-MM-dd"));
+    query.bindValue(":end", end.toString("yyyy-MM-dd"));
+    if (!query.exec()) {
+        qDebug()<<query.lastError()<<query.lastQuery()<<query.boundValues();
+        return false;
+    }
+
+    // Zero-out any previous stat
+    family.stats.start=start;
+    family.stats.end=end;
+    family.stats.products.clear();
+    family.stats.categories.clear();
+    family.stats.items.clear();
+    family.stats.total=0.0;
+    TransactionItemInfo item;
+    int cat;
+    qulonglong pid;
+    int fieldCat=query.record().indexOf("category");
+    qDebug()<<"Collecting stats from"<<query.size()<<query.boundValues();
+    while (getTransactionItemInfoFromQuery(query,item)) {
+        qDebug()<<"Stats for item:"<<item.name<<item.productCode;
+        family.stats.items.append(item);
+        family.stats.total+=item.total;
+        if (family.stats.products.contains(item.productCode)) {
+            family.stats.products[item.productCode]+=item.total;
+        } else {
+            family.stats.products[item.productCode]=item.total;
+        }
+        // Find out the category of the product
+        cat=query.value(fieldCat).toULongLong();
+        if (family.stats.categories.contains(cat)) {
+            family.stats.categories[cat]+=item.total;
+        } else {
+            family.stats.categories[cat]=item.total;
+        }
+    }
+    return true;
+}
+
 
 bool Azahar::getLimitFromQuery(QSqlQuery &query, Limit &result)
 {
@@ -2045,6 +2092,8 @@ bool Azahar::modifyLimit(Limit &lim)
     }
     return true;
 }
+
+
 
 QStringList Azahar::getClientLimits(ClientInfo &cInfo, ProductInfo &pInfo, QHash<QString,Limit> &currentLimits){
     // Retrieve the list of limits regarding client cInfo for product pInfo
@@ -2332,8 +2381,6 @@ ClientInfo Azahar::_getClientInfo(QString clientCode)
     return info;
 }
 
-
-
 QString Azahar::getMainClient()
 {
  QString result;
@@ -2408,34 +2455,6 @@ QHash<int, ClientInfo> Azahar::getClientsHash()
   return result;
 }
 
-//void Azahar::correct24Ago(ClientInfo &info) {
-//    if (info.parentClient.count()>0) {
-//        return;
-//    }
-//    QDate now=QDate::currentDate();
-//    QDate err;
-//    err=QDate(2013,8,24);
-//    if (info.lastCreditReset!=err) {
-//        return;
-//    }
-//    qDebug()<<"Correct 24 Ago"<<info.code<<info.lastCreditReset;
-//    int fromSince=info.since.daysTo(now);
-//    if (fromSince<30) {
-//        info.lastCreditReset=info.since;
-//    } else {
-//        info.lastCreditReset=info.since.addDays(30*(int(fromSince / 30)));
-//    }
-//    qDebug()<<"Correcting to:"<<info.lastCreditReset<<info.since;
-//    if (!db.isOpen()) db.open();
-//    QSqlQuery q(db);
-//    q.prepare("update clients set `lastCreditReset`=:now where `id`=:id;");
-//    q.bindValue(":now",info.lastCreditReset);
-//    q.bindValue(":id",info.id);
-//    q.exec();
-//    q.next();
-//    qDebug()<<"Update last credit reset run"<<q.lastError()<<q.lastQuery();
-
-//}
 
 bool Azahar::resetCredits (ClientInfo &info){
     // Skip non-parent clients:
@@ -2572,6 +2591,63 @@ bool Azahar::deleteClient(qulonglong id)
 
 //TRANSACTIONS
 
+bool Azahar::getTransactionInfoFromQuery(QSqlQuery &query, TransactionInfo &info)
+{
+    info.id=0;
+    if (query.next()) {
+        int fieldId = query.record().indexOf("id");
+        int fieldAmount = query.record().indexOf("amount");
+        int fieldDate   = query.record().indexOf("date");
+        int fieldTime   = query.record().indexOf("time");
+        int fieldPaidWith = query.record().indexOf("paidwith");
+        int fieldPayMethod = query.record().indexOf("paymethod");
+        int fieldType      = query.record().indexOf("type");
+        int fieldChange    = query.record().indexOf("changegiven");
+        int fieldState     = query.record().indexOf("state");
+        int fieldUserId    = query.record().indexOf("userid");
+        int fieldClientId  = query.record().indexOf("clientid");
+        int fieldCardNum   = query.record().indexOf("cardnumber");
+        int fieldCardAuth  = query.record().indexOf("cardauthnumber");
+        int fieldItemCount = query.record().indexOf("itemcount");
+        int fieldItemsList = query.record().indexOf("itemsList");
+        int fieldDiscount  = query.record().indexOf("disc");
+        int fieldDiscMoney = query.record().indexOf("discmoney");
+        int fieldPoints    = query.record().indexOf("points");
+        int fieldUtility   = query.record().indexOf("utility");
+        int fieldTerminal  = query.record().indexOf("terminalnum");
+        int fieldTax       = query.record().indexOf("totalTax");
+        int fieldSpecialOrders = query.record().indexOf("specialOrders");
+        int fieldDonor       = query.record().indexOf("donor");
+
+        info.id     = query.value(fieldId).toULongLong();
+        info.amount = query.value(fieldAmount).toDouble();
+        info.date   = query.value(fieldDate).toDate();
+        info.time   = query.value(fieldTime).toTime();
+        info.paywith= query.value(fieldPaidWith).toDouble();
+        info.paymethod = query.value(fieldPayMethod).toInt();
+        info.type      = query.value(fieldType).toInt();
+        info.changegiven = query.value(fieldChange).toDouble();
+        info.state     = query.value(fieldState).toInt();
+        info.userid    = query.value(fieldUserId).toULongLong();
+        info.clientid  = query.value(fieldClientId).toULongLong();
+        info.cardnumber= query.value(fieldCardNum).toString();//.replace(0,15,"***************"); //FIXED: Only save last 4 digits;
+        info.cardauthnum=query.value(fieldCardAuth).toString();
+        info.itemcount = query.value(fieldItemCount).toInt();
+        info.itemlist  = query.value(fieldItemsList).toString();
+        info.disc      = query.value(fieldDiscount).toDouble();
+        info.discmoney = query.value(fieldDiscMoney).toDouble();
+        info.points    = query.value(fieldPoints).toULongLong();
+        info.utility   = query.value(fieldUtility).toDouble();
+        info.terminalnum=query.value(fieldTerminal).toInt();
+        info.totalTax   = query.value(fieldTax).toDouble();
+        info.specialOrders = query.value(fieldSpecialOrders).toString();
+        info.donor = query.value(fieldDonor).toString();
+        return true;
+    } else {
+        return false;
+    }
+}
+
 TransactionInfo Azahar::getTransactionInfo(qulonglong id)
 {
   TransactionInfo info;
@@ -2580,55 +2656,7 @@ TransactionInfo Azahar::getTransactionInfo(qulonglong id)
   QSqlQuery query;
   if (!query.exec(qry)) { qDebug()<<query.lastError(); }
   else {
-    while (query.next()) {
-      int fieldId = query.record().indexOf("id");
-      int fieldAmount = query.record().indexOf("amount");
-      int fieldDate   = query.record().indexOf("date");
-      int fieldTime   = query.record().indexOf("time");
-      int fieldPaidWith = query.record().indexOf("paidwith");
-      int fieldPayMethod = query.record().indexOf("paymethod");
-      int fieldType      = query.record().indexOf("type");
-      int fieldChange    = query.record().indexOf("changegiven");
-      int fieldState     = query.record().indexOf("state");
-      int fieldUserId    = query.record().indexOf("userid");
-      int fieldClientId  = query.record().indexOf("clientid");
-      int fieldCardNum   = query.record().indexOf("cardnumber");
-      int fieldCardAuth  = query.record().indexOf("cardauthnumber");
-      int fieldItemCount = query.record().indexOf("itemcount");
-      int fieldItemsList = query.record().indexOf("itemsList");
-      int fieldDiscount  = query.record().indexOf("disc");
-      int fieldDiscMoney = query.record().indexOf("discmoney");
-      int fieldPoints    = query.record().indexOf("points");
-      int fieldUtility   = query.record().indexOf("utility");
-      int fieldTerminal  = query.record().indexOf("terminalnum");
-      int fieldTax       = query.record().indexOf("totalTax");
-      int fieldSpecialOrders = query.record().indexOf("specialOrders");
-      int fieldDonor       = query.record().indexOf("donor");
-      
-      info.id     = query.value(fieldId).toULongLong();
-      info.amount = query.value(fieldAmount).toDouble();
-      info.date   = query.value(fieldDate).toDate();
-      info.time   = query.value(fieldTime).toTime();
-      info.paywith= query.value(fieldPaidWith).toDouble();
-      info.paymethod = query.value(fieldPayMethod).toInt();
-      info.type      = query.value(fieldType).toInt();
-      info.changegiven = query.value(fieldChange).toDouble();
-      info.state     = query.value(fieldState).toInt();
-      info.userid    = query.value(fieldUserId).toULongLong();
-      info.clientid  = query.value(fieldClientId).toULongLong();
-      info.cardnumber= query.value(fieldCardNum).toString();//.replace(0,15,"***************"); //FIXED: Only save last 4 digits;
-      info.cardauthnum=query.value(fieldCardAuth).toString();
-      info.itemcount = query.value(fieldItemCount).toInt();
-      info.itemlist  = query.value(fieldItemsList).toString();
-      info.disc      = query.value(fieldDiscount).toDouble();
-      info.discmoney = query.value(fieldDiscMoney).toDouble();
-      info.points    = query.value(fieldPoints).toULongLong();
-      info.utility   = query.value(fieldUtility).toDouble();
-      info.terminalnum=query.value(fieldTerminal).toInt();
-      info.totalTax   = query.value(fieldTax).toDouble();
-      info.specialOrders = query.value(fieldSpecialOrders).toString();
-      info.donor = query.value(fieldDonor).toString();
-    }
+        getTransactionInfoFromQuery(query,info);
   }
   return info;
 }
@@ -3372,6 +3400,51 @@ bool Azahar::deleteAllTransactionItem(qulonglong id)
   return result;
 }
 
+bool Azahar::getTransactionItemInfoFromQuery(QSqlQuery &query, TransactionItemInfo &info)
+{
+    if (query.next()){
+        int fieldId   = query.record().indexOf("transaction_id");
+        int fieldPosition = query.record().indexOf("position");
+        int fieldProductCode   = query.record().indexOf("product_id");
+        int fieldQty     = query.record().indexOf("qty");
+        int fieldPoints  = query.record().indexOf("points");
+        int fieldCost    = query.record().indexOf("cost");
+        int fieldPrice   = query.record().indexOf("price");
+        int fieldDisc    = query.record().indexOf("disc");
+        int fieldTotal   = query.record().indexOf("total");
+        int fieldName    = query.record().indexOf("name");
+        int fieldUStr    = query.record().indexOf("unitstr");
+        int fieldPayment = query.record().indexOf("payment");
+        int fieldCPayment = query.record().indexOf("completePayment");
+        int fieldSoid = query.record().indexOf("soId");
+        int fieldIsG = query.record().indexOf("isGroup");
+        int fieldDDT = query.record().indexOf("deliveryDateTime");
+        int fieldTax = query.record().indexOf("tax");
+
+        info.transactionid     = query.value(fieldId).toULongLong();
+        info.position      = query.value(fieldPosition).toInt();
+        info.productCode   = query.value(fieldProductCode).toString();
+        info.qty           = query.value(fieldQty).toDouble();
+        info.points        = query.value(fieldPoints).toDouble();
+        info.unitStr       = query.value(fieldUStr).toString();
+        info.cost          = query.value(fieldCost).toDouble();
+        info.price         = query.value(fieldPrice).toDouble();
+        info.disc          = query.value(fieldDisc).toDouble();
+        info.total         = query.value(fieldTotal).toDouble();
+        info.name          = query.value(fieldName).toString();
+        info.payment       = query.value(fieldPayment).toDouble();
+        info.completePayment  = query.value(fieldCPayment).toBool();
+        info.soId          = query.value(fieldSoid).toString();
+        info.isGroup       = query.value(fieldIsG).toBool();
+        info.deliveryDateTime=query.value(fieldDDT).toDateTime();
+        info.tax           = query.value(fieldTax).toDouble();
+        return true;
+    } else {
+        qDebug()<<"getTransactionItemInfoFromQuery failed!"<<query.lastError()<<query.executedQuery();
+        return false;
+    }
+}
+
 QList<TransactionItemInfo> Azahar::getTransactionItems(qulonglong id)
 {
   QList<TransactionItemInfo> result;
@@ -3379,42 +3452,8 @@ QList<TransactionItemInfo> Azahar::getTransactionItems(qulonglong id)
   QSqlQuery query(db);
   QString qry = QString("SELECT * FROM transactionitems WHERE transaction_id=%1 ORDER BY POSITION").arg(id);
   if (query.exec(qry)) {
-    while (query.next()) {
-      TransactionItemInfo info;
-      int fieldPosition = query.record().indexOf("position");
-      int fieldProductCode   = query.record().indexOf("product_id");
-      int fieldQty     = query.record().indexOf("qty");
-      int fieldPoints  = query.record().indexOf("points");
-      int fieldCost    = query.record().indexOf("cost");
-      int fieldPrice   = query.record().indexOf("price");
-      int fieldDisc    = query.record().indexOf("disc");
-      int fieldTotal   = query.record().indexOf("total");
-      int fieldName    = query.record().indexOf("name");
-      int fieldUStr    = query.record().indexOf("unitstr");
-      int fieldPayment = query.record().indexOf("payment");
-      int fieldCPayment = query.record().indexOf("completePayment");
-      int fieldSoid = query.record().indexOf("soId");
-      int fieldIsG = query.record().indexOf("isGroup");
-      int fieldDDT = query.record().indexOf("deliveryDateTime");
-      int fieldTax = query.record().indexOf("tax");
-      
-      info.transactionid     = id;
-      info.position      = query.value(fieldPosition).toInt();
-      info.productCode   = query.value(fieldProductCode).toULongLong();
-      info.qty           = query.value(fieldQty).toDouble();
-      info.points        = query.value(fieldPoints).toDouble();
-      info.unitStr       = query.value(fieldUStr).toString();
-      info.cost          = query.value(fieldCost).toDouble();
-      info.price         = query.value(fieldPrice).toDouble();
-      info.disc          = query.value(fieldDisc).toDouble();
-      info.total         = query.value(fieldTotal).toDouble();
-      info.name          = query.value(fieldName).toString();
-      info.payment       = query.value(fieldPayment).toDouble();
-      info.completePayment  = query.value(fieldCPayment).toBool();
-      info.soId          = query.value(fieldSoid).toString();
-      info.isGroup       = query.value(fieldIsG).toBool();
-      info.deliveryDateTime=query.value(fieldDDT).toDateTime();
-      info.tax           = query.value(fieldTax).toDouble();
+    TransactionItemInfo info;
+    while (getTransactionItemInfoFromQuery(query,info)) {
       result.append(info);
     }
   }

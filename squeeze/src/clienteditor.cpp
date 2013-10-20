@@ -57,6 +57,10 @@ ClientEditor::ClientEditor( QSqlDatabase parentDb, QWidget *parent )
     connect(ui->editClientCode, SIGNAL(returnPressed()),ui->editClientName, SLOT(setFocus()) );
     connect(ui->editClientCode, SIGNAL(editingFinished()),this, SLOT( checkNameDelayed() )); //both returnPressed and lost focus fires this signal. But only fired if validator is accepted.
 
+    // STATS
+    connect(ui->statDo,SIGNAL(clicked()),this,SLOT(statistics()));
+    ui->statEnd->setDate(QDate::currentDate());
+
     QRegExp regexpC("[0-9]{1,13}");
     QRegExpValidator * validator = new QRegExpValidator(regexpC, this);
     ui->editMonthlyPoints->setValidator((new QDoubleValidator(0.00, 1000.000, 3,ui->editMonthlyPoints)));
@@ -107,6 +111,40 @@ ClientEditor::~ClientEditor()
 {
     delete ui;
 }
+
+void ClientEditor::statistics(){
+//Update statistical tables
+    Azahar *myDb=new Azahar;
+    myDb->setDatabase(db);
+    myDb->getFamilyStatistics(family,ui->statStart->date(),ui->statEnd->date());
+    ui->statTotal->setText(QString::number(family.stats.total));
+
+    // Fill the category table
+    QList<int> ck=family.stats.categories.keys();
+    ui->categoryTable->setRowCount(ck.count());
+    ui->categoryTable->setColumnCount(3);
+    QHash<QString,int> cats=myDb->getCategoriesHash();
+    for (int i=0; i<ck.count(); i++) {
+        ui->categoryTable->setItem(i,0,new QTableWidgetItem(QString::number(ck[i])));
+        ui->categoryTable->setItem(i,1,new QTableWidgetItem(cats.key(ck[i])));
+        ui->categoryTable->setItem(i,2,new QTableWidgetItem(QString::number(family.stats.categories[ck[i]])));
+    }
+
+    // Fill the product table
+    QList<QString> pk=family.stats.products.keys();
+    qDebug()<<"Mapped products"<<pk.count();
+    ui->productTable->setRowCount(pk.count());
+    ui->productTable->setColumnCount(3);
+    for (int i=0; i<pk.count(); i++) {
+        qDebug()<<"Appending product"<<pk[i]<<family.stats.products[pk[i]];
+        ui->productTable->setItem(i,0,new QTableWidgetItem(pk[i]));
+        ProductInfo pInfo=myDb->getProductInfo(pk[i]);
+        ui->productTable->setItem(i,1,new QTableWidgetItem(pInfo.desc));
+        ui->productTable->setItem(i,2,new QTableWidgetItem(QString::number(family.stats.products[pk[i]])));
+    }
+
+}
+
 
 void ClientEditor::changeDebit()
 {
@@ -257,7 +295,6 @@ void ClientEditor::updateChildren()
     ClientInfo info=getClientInfo();
     info.parentClient=getParentClient();
     qDebug()<<"updateChildren"<<info.code<<info.parentClient;
-    Family family;
     // Retrieve from db
     Azahar *myDb=new Azahar;
     myDb->setDatabase(db);
@@ -346,7 +383,7 @@ void ClientEditor::loadLimits(ClientInfo info)
     for (int i=6; i<=25; ++i) {
         ui->transView->setColumnHidden(i,true);
     }
-    transModel->setFilter(QString("clientid=%1").arg(parentClientInfo.id));
+    transModel->setFilter(QString("clientid IN (%1)").arg(myDb->getFamilyInStatement(family)));
     transModel->select();
 
 
@@ -393,6 +430,7 @@ void ClientEditor::setClientInfo(ClientInfo info)
     setPhoto(photo);
     qDebug()<<"clientEditor setting tags"<<info.code<<info.tags;
     ui->clientTagEditor->setTags(info.tags);
+    ui->statStart->setDate(info.lastCreditReset);
 }
 //Overloaded: imposta le informazioni basandosi sul codice!
 void ClientEditor::setClientInfo(QString code)

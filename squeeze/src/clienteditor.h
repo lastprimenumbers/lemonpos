@@ -45,6 +45,7 @@ class ClientEditor : public KDialog
     bool hasChild;
     bool inserting;
     ClientInfo parentClientInfo;
+    Family family;
     void setInserting(bool status) { inserting=status; };
     void setCode(QString code) { ui->editClientCode->setText(code); };
     void setName(QString name) { ui->editClientName->setText(name); };
@@ -111,6 +112,7 @@ class ClientEditor : public KDialog
     void viewChildClient(int row,int col);
     void changeDebit();
     void ticketViewOnSelected(const QModelIndex &);
+    void statistics();
 
   private:
     ClientEditorUI *ui;

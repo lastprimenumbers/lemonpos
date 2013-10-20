@@ -153,6 +153,8 @@ class Azahar : public QObject
     unsigned int getClientId(QString uname);
     bool         deleteClient(qulonglong id);
     Family getFamily(ClientInfo &info);
+    QString getFamilyInStatement(Family family);
+    bool getFamilyStatistics(Family &family, QDate start, QDate end);
     bool getFamilyLimits(Family &family, ProductInfo &pInfo, double qty=1);
     bool changeFamilyLimits(Family &family, ProductInfo &pInfo, double sign=1);
     Limit getLimit(qulonglong limitId);
@@ -173,6 +175,7 @@ class Azahar : public QObject
     bool deleteLimit(Limit &lim);
 
     //TRANSACTIONS
+    bool getTransactionInfoFromQuery(QSqlQuery &query, TransactionInfo &info);
     TransactionInfo getTransactionInfo(qulonglong id);
     qulonglong  insertTransaction(TransactionInfo info);
     //QList<ProductInfo>     getTransactionGroupsList(qulonglong tid);
@@ -196,6 +199,7 @@ class Azahar : public QObject
     bool        setTransactionStatus(qulonglong trId, TransactionState state);
     
     // TRANSACTIONITEMS
+    bool getTransactionItemInfoFromQuery(QSqlQuery &query, TransactionItemInfo &info);
     bool        insertTransactionItem(TransactionItemInfo info);
     bool        deleteAllTransactionItem(qulonglong id);
     QList<TransactionItemInfo> getTransactionItems(qulonglong id);
