@@ -17,7 +17,6 @@ limiteditor::limiteditor(QWidget *parent) :
     lim.productCode=QString("*");
     lim.parent=0;
     lim.limit=0;
-    lim.current=0;
     lim.priority=0;
 
     connect( this   , SIGNAL( accepted() ), this, SLOT( addLimit() ) );

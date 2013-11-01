@@ -380,6 +380,8 @@ struct TransactionItemInfo
   bool       isGroup;
   QDateTime  deliveryDateTime;
   double     tax; // total tax in percentage.
+  // Optional: transaction date, compiled during joint queries
+  QDate      date;
 };
 
 
