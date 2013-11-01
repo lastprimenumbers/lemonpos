@@ -407,6 +407,16 @@ struct Family
     double total;
 };
 
+struct LiveStats
+{
+    // Mapping between product code and expense
+    QHash<QString,double> products;
+    // Mapping between product id and quantity (TODO)
+    QHash<QString,double> quantities;
+    // Mapping between category id and expense
+    QHash<int,double> categories;
+};
+
 struct CashFlowInfo
 {
   qulonglong id;

@@ -265,7 +265,7 @@ ProductInfo Azahar::getProductInfo(const QString &code, const bool &notConsiderD
         info.utility  = info.price - info.cost;
         info.row      = -1;
         info.points   = query.value(fieldPoints).toInt();
-        info.qtyOnList = -1;
+        info.qtyOnList = 0;
         info.purchaseQty = -1;
         info.lastProviderId = query.value(fieldLastProviderId).toULongLong();
         info.soldUnits = query.value(fieldSoldU).toDouble();
@@ -281,22 +281,6 @@ ProductInfo Azahar::getProductInfo(const QString &code, const bool &notConsiderD
 
       if ( info.hasUnlimitedStock )
             info.stockqty = 999999; //just make sure we do not return 0 for unlimited stock items.
-      
-      /** @TODO: for future releases where taxmodel is included in code
-      //get missing stuff - tax,offers for the requested product
-      if (info.isAGroup) //If its a group, the taxmodel is ignored, the tax will be its elements taxes
-        info.tax = getGroupAverageTax(info.code); ///NOTE: This may be deprecated.. see the getGroupPriceAndTax() method
-      else
-          info.tax = getTotalTaxPercent(info.taxElements);
-      if (getConfigTaxIsIncludedInPrice()) {
-          ///tax is included in price... mexico style.
-          double pWOtax = info.price/(1+((info.tax)/100));
-          info.totaltax = pWOtax*((info.tax)/100); // in money...
-      } else {
-          ///tax is not included in price... usa style.
-          info.totaltax = info.price*(1+(info.tax/100)); //tax in money
-      }
-      **/
       
       ///NOTE FOR DISCOUNTS:  TODO: ADD THIS TO THE USER MANUAL
       //     If a group contains product with discounts THOSE ARE NOT TAKEN INTO CONSIDERATION,

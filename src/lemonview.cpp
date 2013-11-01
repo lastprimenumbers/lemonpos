@@ -1260,6 +1260,8 @@ void lemonView::updateFamily(ClientInfo info) {
         Azahar *myDb = new Azahar;
         myDb->setDatabase(db);
         family=myDb->getFamily(info);
+        // retrieve also statistics from last credit reset
+        myDb->getFamilyStatistics(family,info.lastCreditReset,QDate::currentDate());
     }
 }
 
@@ -1344,7 +1346,6 @@ bool lemonView::incrementTableItemQty(QString code, double q)
         double discountperitem = (discount_old/qty_old);
         double newdiscount = discountperitem*qty;
         itemD->setData(Qt::EditRole, QVariant(newdiscount));
-        //qDebug()<<"incrementTableQty... old discount:"<<discount_old<<" old qty:"<<qty_old<<" new discount:"<<newdiscount<<"new qty:"<<qty<<" disc per item:"<<discountperitem;
 
         // Update qty on list
         info.qtyOnList = qty;
@@ -1392,7 +1393,7 @@ void lemonView::insertItem(QString code)
   qDebug()<<" CodeX = "<<codeX<<" Numeric Code:"<<info.code<<" Alphacode:"<<info.alphaCode<<" Required Qty:"<<qty;
 
 
-  //the next 'if' checks if the hash contains the product and got values from there.. To include qtyOnList, that we need!
+  //checks if the hash contains the product and got values from there.. To include qtyOnList, that we need!
   if (productsHash.contains( info.code )) 
       info = productsHash.value( info.code );
 
@@ -1424,31 +1425,45 @@ void lemonView::insertItem(QString code)
   Limit lim=myDb->getFamilyLimit(family,info);
   qDebug()<<"Get Applicable LIMIT:"<<lim.id<<lim.limit<<lim.productCat;
   delete myDb;
-  // If lim is a category limit, add the relevant category stats
+  // If a valid limit was found, calculate the residual
   if (lim.id>0) {
       // residual limit
-      double res=lim.limit-info.qtyOnList*info.price;
-      qDebug()<<"RES LIMIT"<<res<<info.qtyOnList;
+      double res=lim.limit;
+      qDebug()<<"RES LIMIT"<<res;
+      LiveStats stats=liveStats();
+      // If lim is a category limit, add the relevant category stats
       if (lim.productCode=="*") {
+          // substract monthly category stats
           if (family.categories.contains(info.category)) {
-              res+=family.categories[info.category];
+              res-=family.categories[info.category];
+              qDebug()<<"Category Limit:"<<res;
+          }
+          // subtract current transaction category stats
+          if (stats.categories.contains(info.category)) {
+              res-=stats.categories[info.category];
           }
       // If lim is a product limit, add the relevant product stats
       } else {
+          // substract monthly products stats
           if (family.products.contains(info.code)) {
-              res+=family.products[info.code];
+              res-=family.products[info.code];
+              qDebug()<<"Product Limit:"<<res;
+          }
+          // subtract current transaction products stats
+          if (stats.products.contains(info.code)) {
+              res-=stats.products[info.code];
           }
       }
       qDebug()<<"FIN RES LIMIT"<<res<<qty*info.price;
       // if the limit is valid and the residual is less than the request
       if (res<qty*info.price) {
-          msg=i18n("Limite di acquisto \"%1\" oltrepassato. La disponibilità residua è solamente di %2.", lim.label,res);
+          msg=i18n("Limite \"%1\"=%2 oltrepassato. Rimanenti %3 punti.", lim.label,lim.limit,res);
           tipCode->showTip(msg, 6000);
           return;
       }
   }
   // Increment quantity or add to the list
-  if (!incrementTableItemQty( info.code /*codeX*/, qty) ) {
+  if (!incrementTableItemQty( info.code, qty) ) {
     // Item was not on list!
     info.qtyOnList = qty;
     int insertedAtRow = -1;
@@ -1514,7 +1529,7 @@ void lemonView::insertItem(QString code)
     }
     info.row = insertedAtRow;
     if (info.row >-1 && info.desc != "[INVALID]" && info.code>0){
-      productsHash.insert(info.code /*codeX.toULongLong()*/, info);
+      productsHash.insert(info.code, info);
       QTableWidgetItem *item = ui_mainview.tableWidget->item(info.row, colCode);
       displayItemInfo(item);
       refreshTotalLabel();
@@ -1529,6 +1544,31 @@ void lemonView::insertItem(QString code)
   updateBalance(false);
   updateTransaction();
 }//insertItem
+
+LiveStats lemonView::liveStats() {
+    // Compile statistics based on items in list
+    LiveStats res;
+    foreach (ProductInfo pi, productsHash) {
+        double val=pi.qtyOnList*pi.price;
+        if (!res.products.contains(pi.code)) {
+            res.products[pi.code]=val;
+        } else {
+            res.products[pi.code]+=val;
+        }
+        if (!res.categories.contains(pi.category)) {
+            res.categories[pi.category]=val;
+        } else {
+            res.categories[pi.category]+=val;
+        }
+        //TODO: multiply by unit factor
+        if (!res.quantities.contains(pi.code)) {
+            res.quantities[pi.code]=pi.qtyOnList;
+        } else {
+            res.quantities[pi.code]+=pi.qtyOnList;
+        }
+    }
+    return res;
+}
 
 double lemonView::getTotalQtyOnList(const ProductInfo &info)
 {
@@ -1593,9 +1633,8 @@ void lemonView::updateItem(ProductInfo prod)
     ui_mainview.tableWidget->resizeRowsToContents();
 }
 
-int lemonView::doInsertItem(QString itemCode, QString itemDesc, double itemQty, double itemPrice, double itemDiscount, QString itemUnits)
-{
-
+int lemonView::doInsertItem(QString itemCode, QString itemDesc, double itemQty, double itemPrice, double itemDiscount, QString itemUnits) {
+  // Create a new row for a new item
   int rowCount = ui_mainview.tableWidget->rowCount();
   ui_mainview.tableWidget->insertRow(rowCount);
   ui_mainview.tableWidget->setItem(rowCount, colCode, new QTableWidgetItem(itemCode));
@@ -1611,12 +1650,10 @@ int lemonView::doInsertItem(QString itemCode, QString itemDesc, double itemQty, 
     QBrush b = QBrush(QColor::fromRgb(255,0,0), Qt::SolidPattern);
     item->setForeground(b);
   }
-  //HACK:The next 4 lines are for setting numbers with comas (1,234.00) instead of 1234.00.
-  //      seems to be an effect of QVariant(double d)
   item->setData(Qt::EditRole, QVariant(itemDiscount));
   item = ui_mainview.tableWidget->item(rowCount, colDue);
   //item->setData(Qt::EditRole, QVariant(itemQty*(itemPrice-itemDiscount)));
-  item->setData(Qt::EditRole, QVariant((itemQty*itemPrice)-itemDiscount)); //fixed on april 30 2009 00:35.
+  item->setData(Qt::EditRole, QVariant((itemQty*itemPrice)-itemDiscount));
   item = ui_mainview.tableWidget->item(rowCount, colPrice);
   item->setData(Qt::EditRole, QVariant(itemPrice));
 
@@ -1636,8 +1673,6 @@ int lemonView::doInsertItem(QString itemCode, QString itemDesc, double itemQty, 
   ui_mainview.editItemCode->setText("");
   ui_mainview.editItemCode->setCursorPosition(0);
   ui_mainview.mainPanel->setCurrentIndex(pageMain);
-
-
   return rowCount;
 }
 
@@ -1751,9 +1786,10 @@ void lemonView::itemDoubleClicked(QTableWidgetItem* item)
     return; //to exit the method, we dont need to continue.
   }
   
-  ProductInfo info = productsHash.take(code);
+//  ProductInfo info = productsHash.take(code);
+  ProductInfo info = productsHash[code];
   double dmaxItems = info.stockqty;
-  QString msg = i18n("Enter the number of %1", info.unitStr); //Added on Dec 15, 2007
+  QString msg = i18n("Enter the number of %1", info.unitStr);
 
   //Launch a dialog to as the new qty
   if (info.units == uPiece) {
@@ -1772,26 +1808,30 @@ void lemonView::itemDoubleClicked(QTableWidgetItem* item)
     }
   }
   if (ok) {
-    double newqty = dqty+iqty; //one must be zero
-    //modify Qty and discount...
-    i2Modify = ui_mainview.tableWidget->item(row, colQty);
-    i2Modify->setData(Qt::EditRole, QVariant(newqty));
-    double price    = info.price;
-    double discountperitem = info.disc;
-    double newdiscount = discountperitem*newqty;
-    i2Modify = ui_mainview.tableWidget->item(row, colDue);
-    i2Modify->setData(Qt::EditRole, QVariant((newqty*price)-newdiscount));
-    i2Modify = ui_mainview.tableWidget->item(row, colDisc);
-    i2Modify->setData(Qt::EditRole, QVariant(newdiscount));
-    info.qtyOnList = newqty;
-
+      if (ui_mainview.deleteItem->isChecked()) {
+        deleteSelectedItem(1);
+      } else {
+        insertItem( code );
+      }
+//    double newqty = dqty+iqty; //one must be zero
+//    //modify Qty and discount...
+//    i2Modify = ui_mainview.tableWidget->item(row, colQty);
+//    i2Modify->setData(Qt::EditRole, QVariant(newqty));
+//    double price    = info.price;
+//    double discountperitem = info.disc;
+//    double newdiscount = discountperitem*newqty;
+//    i2Modify = ui_mainview.tableWidget->item(row, colDue);
+//    i2Modify->setData(Qt::EditRole, QVariant((newqty*price)-newdiscount));
+//    i2Modify = ui_mainview.tableWidget->item(row, colDisc);
+//    i2Modify->setData(Qt::EditRole, QVariant(newdiscount));
+//    info.qtyOnList = newqty;
     ui_mainview.editItemCode->setFocus();
   } else {
     msg = i18n("<html><font color=red><b>Product not available in stock for the requested quantity.</b></font></html>");
     tipCode->showTip(msg, 6000);
   }
-  productsHash.insert(code, info);
-  refreshTotalLabel();
+//  productsHash.insert(code, info);
+//  refreshTotalLabel();
 }
 
 void lemonView::itemSearchDoubleClicked(QTableWidgetItem *item)
@@ -1800,6 +1840,13 @@ void lemonView::itemSearchDoubleClicked(QTableWidgetItem *item)
   QTableWidgetItem *cItem = ui_mainview.tableSearch->item(row,2); //get item code
   QString code = cItem->data(Qt::DisplayRole).toString();
   //qDebug()<<"Linea 981: Data at column 2:"<<cItem->data(Qt::DisplayRole).toString();
+  if (ui_mainview.deleteItem->isChecked()) {
+      if (!productsHash.contains(code)) {return;}
+      ui_mainview.tableWidget->setCurrentCell(productsHash[code].row,1);
+      deleteSelectedItem(1);
+      ui_mainview.mainPanel->setCurrentIndex(pageMain);
+      return;
+  }
   if (productsHash.contains(code)) {
     int pos = getItemRow(code);
     if (pos>=0) {

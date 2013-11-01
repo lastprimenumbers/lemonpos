@@ -11,6 +11,7 @@ limiteditor::limiteditor(QWidget *parent) :
     ui->setupUi(this);
 
     // An empty limit
+    lim.id=0;
     lim.clientCode=QString("*");
     lim.clientTag=QString("*");
     lim.productCat=0;

@@ -101,6 +101,7 @@ public:
     ClientInfo clientInfo;
     Family  family;
     void updateFamily(ClientInfo info);
+    LiveStats liveStats();
     QHash<int, ClientInfo> clientsHash;
     qulonglong buyPoints;
     double discMoney;
@@ -226,7 +227,7 @@ public:
     /**
      * Slot used to delete the current item.
     */
-    void deleteSelectedItem(double remqty);
+    void deleteSelectedItem(double remqty = 1);
    /**
      * Slot used to increment qty on doubleclick on an item
     */
