@@ -29,7 +29,7 @@ Azahar::Azahar(QWidget * parent): QObject(parent)
   m_mainClient = "undefined";
   clientFields= QString("name, surname, address, phone, email, nation, monthly, photo, since, expiry, birthDate, code, beginsusp, endsusp, msgsusp, notes, parent, lastCreditReset").split(", ");
   donorFields=QString("name, email, address, phone, photo, since, code, refname, refsurname, refemail, refphone, notes").split(", ");
-  limitFields=QString("clientCode, clientTag, productCode, productCat, limit, current, priority, parent").split(", ");
+  limitFields=QString("clientCode, clientTag, productCode, productCat, limit, priority, label").split(", ");
 }
 
 Azahar::~Azahar()
@@ -1805,44 +1805,44 @@ bool Azahar::getClientInfoFromQuery(QSqlQuery &qC, ClientInfo &info){
     info.parentClient="";
     info.name="";
     if (qC.next()) {
-      int fieldId     = qC.record().indexOf("id");
-      int fieldCode   = qC.record().indexOf("code");
-      int fieldName   = qC.record().indexOf("name");
-      int fieldSurname   = qC.record().indexOf("surname");
-      int fieldNation   = qC.record().indexOf("nation");
-      int fieldEmail   = qC.record().indexOf("email");
-      int fieldPhoto  = qC.record().indexOf("photo");
-      int fieldSince  = qC.record().indexOf("since");
-      int fieldExpiry = qC.record().indexOf("expiry");
-      int fieldBirthDate   = qC.record().indexOf("birthDate");
-      int fieldPhone  = qC.record().indexOf("phone");
-      int fieldAdd    = qC.record().indexOf("address");
-      int fieldParent = qC.record().indexOf("parent");
-      int fieldMonthly = qC.record().indexOf("monthly");
+        int fieldId     = qC.record().indexOf("id");
+        int fieldCode   = qC.record().indexOf("code");
+        int fieldName   = qC.record().indexOf("name");
+        int fieldSurname   = qC.record().indexOf("surname");
+        int fieldNation   = qC.record().indexOf("nation");
+        int fieldEmail   = qC.record().indexOf("email");
+        int fieldPhoto  = qC.record().indexOf("photo");
+        int fieldSince  = qC.record().indexOf("since");
+        int fieldExpiry = qC.record().indexOf("expiry");
+        int fieldBirthDate   = qC.record().indexOf("birthDate");
+        int fieldPhone  = qC.record().indexOf("phone");
+        int fieldAdd    = qC.record().indexOf("address");
+        int fieldParent = qC.record().indexOf("parent");
+        int fieldMonthly = qC.record().indexOf("monthly");
 
-      //Should be only one
-      info.id         = qC.value(fieldId).toUInt();
-      info.code       = qC.value(fieldCode).toString();      
-      info.name       = qC.value(fieldName).toString();
-      info.surname       = qC.value(qC.record().indexOf("surname")).toString();
-      info.email       = qC.value(fieldEmail).toString();
-      info.nation       = qC.value(fieldNation).toString();
-      info.parentClient = qC.value(fieldParent).toString();
-      info.photo      = qC.value(fieldPhoto).toByteArray();
-      info.since      = qC.value(fieldSince).toDate();
-      info.expiry     = qC.value(fieldExpiry).toDate();
-      info.birthDate      = qC.value(fieldBirthDate).toDate();
-      info.phone      = qC.value(fieldPhone).toString();
-      info.address    = qC.value(fieldAdd).toString();
-      info.monthly   = qC.value(fieldMonthly).toDouble();
-      info.email       = qC.value(qC.record().indexOf("email")).toString();
-      info.nation       = qC.value(qC.record().indexOf("nation")).toString();
-      info.beginsusp       = qC.value(qC.record().indexOf("beginsusp")).toDate();
-      info.endsusp       = qC.value(qC.record().indexOf("endsusp")).toDate();
-      info.msgsusp       = qC.value(qC.record().indexOf("msgsusp")).toString();
-      info.notes       = qC.value(qC.record().indexOf("notes")).toString();
-      info.lastCreditReset      = qC.value(qC.record().indexOf("lastCreditReset")).toDate();
-      return true;
+        //Should be only one
+        info.id         = qC.value(fieldId).toUInt();
+        info.code       = qC.value(fieldCode).toString();
+        info.name       = qC.value(fieldName).toString();
+        info.surname       = qC.value(fieldSurname).toString();
+        info.email       = qC.value(fieldEmail).toString();
+        info.nation       = qC.value(fieldNation).toString();
+        info.parentClient = qC.value(fieldParent).toString();
+        info.photo      = qC.value(fieldPhoto).toByteArray();
+        info.since      = qC.value(fieldSince).toDate();
+        info.expiry     = qC.value(fieldExpiry).toDate();
+        info.birthDate      = qC.value(fieldBirthDate).toDate();
+        info.phone      = qC.value(fieldPhone).toString();
+        info.address    = qC.value(fieldAdd).toString();
+        info.monthly   = qC.value(fieldMonthly).toDouble();
+        info.email       = qC.value(qC.record().indexOf("email")).toString();
+        info.nation       = qC.value(qC.record().indexOf("nation")).toString();
+        info.beginsusp       = qC.value(qC.record().indexOf("beginsusp")).toDate();
+        info.endsusp       = qC.value(qC.record().indexOf("endsusp")).toDate();
+        info.msgsusp       = qC.value(qC.record().indexOf("msgsusp")).toString();
+        info.notes       = qC.value(qC.record().indexOf("notes")).toString();
+        info.lastCreditReset      = qC.value(qC.record().indexOf("lastCreditReset")).toDate();
+        return true;
     }
     return false;
 }
@@ -1929,12 +1929,12 @@ bool Azahar::getFamilyStatistics(Family &family, QDate start, QDate end)
         return false;
     }
     // Zero-out any previous stat
-    family.stats.start=start;
-    family.stats.end=end;
-    family.stats.products.clear();
-    family.stats.categories.clear();
-    family.stats.items.clear();
-    family.stats.total=0.0;
+    family.start=start;
+    family.end=end;
+    family.products.clear();
+    family.categories.clear();
+    family.items.clear();
+    family.total=0.0;
     TransactionItemInfo item;
     int cat;
     qulonglong pid;
@@ -1942,50 +1942,52 @@ bool Azahar::getFamilyStatistics(Family &family, QDate start, QDate end)
     qDebug()<<"Collecting stats from"<<query.size()<<query.boundValues();
     while (getTransactionItemInfoFromQuery(query,item)) {
         qDebug()<<"Stats for item:"<<item.name<<item.productCode;
-        family.stats.items.append(item);
-        family.stats.total+=item.total;
-        if (family.stats.products.contains(item.productCode)) {
-            family.stats.products[item.productCode]+=item.total;
-            family.stats.quantities[item.productCode]+=item.qty;
+        family.items.append(item);
+        family.total+=item.total;
+        if (family.products.contains(item.productCode)) {
+            family.products[item.productCode]+=item.total;
+            family.quantities[item.productCode]+=item.qty;
         } else {
-            family.stats.products[item.productCode]=item.total;
-            family.stats.quantities[item.productCode]=item.qty;
+            family.products[item.productCode]=item.total;
+            family.quantities[item.productCode]=item.qty;
         }
         // Find out the category of the product
         cat=query.value(fieldCat).toULongLong();
-        if (family.stats.categories.contains(cat)) {
-            family.stats.categories[cat]+=item.total;
+        if (family.categories.contains(cat)) {
+            family.categories[cat]+=item.total;
         } else {
-            family.stats.categories[cat]=item.total;
+            family.categories[cat]=item.total;
         }
     }
     return true;
 }
 
 
-bool Azahar::getLimitFromQuery(QSqlQuery &query, Limit &result)
-{
+bool Azahar::getLimitFromQuery(QSqlQuery &query, Limit &result) {
     if (query.next()) {
-    int fieldId     = query.record().indexOf("id");
-    int fieldClientCode     = query.record().indexOf("clientCode");
-    int fieldClientTag     = query.record().indexOf("clientTag");
-    int fieldProductCode    = query.record().indexOf("productCode");
-    int fieldProductCat     = query.record().indexOf("productCat");
-    int fieldPriority     = query.record().indexOf("priority");
-    int fieldLimit     = query.record().indexOf("limit");
-    result.id=query.value(fieldId).toLongLong();
-    result.clientCode=query.value(fieldClientCode).toString();
-    result.clientTag=query.value(fieldClientTag).toString();
-    result.productCode=query.value(fieldProductCode).toString();
-    result.productCat=query.value(fieldProductCat).toInt();
-    result.priority=query.value(fieldPriority).toInt();
-    result.limit=query.value(fieldLimit).toDouble();
-    return true;
+        int fieldId         = query.record().indexOf("id");
+        int fieldClientCode = query.record().indexOf("clientCode");
+        int fieldClientTag  = query.record().indexOf("clientTag");
+        int fieldProductCode= query.record().indexOf("productCode");
+        int fieldProductCat = query.record().indexOf("productCat");
+        int fieldPriority   = query.record().indexOf("priority");
+        int fieldLimit      = query.record().indexOf("limit");
+        int fieldLabel      = query.record().indexOf("label");
+        result.id=query.value(fieldId).toLongLong();
+        result.clientCode=query.value(fieldClientCode).toString();
+        result.clientTag=query.value(fieldClientTag).toString();
+        result.productCode=query.value(fieldProductCode).toString();
+        result.productCat=query.value(fieldProductCat).toInt();
+        result.priority=query.value(fieldPriority).toInt();
+        result.limit=query.value(fieldLimit).toDouble();
+        result.label=query.value(fieldLabel).toString();
+        return true;
     } else {
-        qDebug()<<query.lastError()<<query.lastQuery()<<query.boundValues();
+        qDebug()<<"NO LIMIT FROM QUERY!"<<query.lastError()<<query.lastQuery()<<query.boundValues();
         return false;
     }
 }
+
 
 bool Azahar::_bindLimit(Limit &info, QSqlQuery &query)
 {
@@ -1999,9 +2001,11 @@ bool Azahar::_bindLimit(Limit &info, QSqlQuery &query)
     query.bindValue(":productCat", info.productCat);
     query.bindValue(":limit", info.limit);
     query.bindValue(":priority", info.priority);
+    query.bindValue(":label", info.label);
     if (!query.exec()) setError(query.lastError().text()); else result = true;
     return result;
 }
+
 
 Limit Azahar::getLimit(qulonglong limitId) {
     Limit lim;
@@ -2018,6 +2022,7 @@ Limit Azahar::getLimit(qulonglong limitId) {
     return lim;
 }
 
+
 bool Azahar::deleteLimit(qlonglong &limitId)
 {
     if (!db.isOpen()) db.open();
@@ -2031,10 +2036,12 @@ bool Azahar::deleteLimit(qlonglong &limitId)
     return true;
 }
 
+
 bool Azahar::deleteLimit(Limit &lim) {
      qDebug()<<"deleting limit:"<<lim.clientCode<<lim.clientTag<<lim.productCode<<lim.productCat<<lim.limit<<lim.priority;
     return deleteLimit(lim.id);
 }
+
 
 bool Azahar::insertLimit(Limit &lim)
 {
@@ -2071,51 +2078,36 @@ bool Azahar::modifyLimit(Limit &lim)
     return true;
 }
 
-Limit Azahar::getFamilyLimits(Family &family, ProductInfo &pInfo) {
+
+Limit Azahar::getFamilyLimit(Family &family, ProductInfo &pInfo) {
     // Find the highest priority and lowest threshold Limit
     // applicable for family and pInfo.
     Limit lim;
     lim.id=0;
     if (!db.isOpen()) { db.open();}
-    if (!db.isOpen()) {return QStringList();}
+    if (!db.isOpen()) {return lim;}
     QSqlQuery query(db);
     QString ctags="";
-    for (int i; i<cInfo.tags.count(); ++i) {
-        ctags+="'"+cInfo.tags.at(i)+"', ";
+    ClientInfo cInfo;
+    for (int j; j<family.members.count(); ++j) {
+        cInfo=family.members[j];
+        for (int i; i<cInfo.tags.count(); ++i) {
+            ctags+="'"+cInfo.tags.at(i)+"', ";
+        }
     }
     ctags+="'*'";
-    qDebug()<<"Querying getClientLimits"<<cInfo.code<<currentLimits.count()<<ctags;
-    QString q=QString("select * from limits where (                         \
-                      (clientCode=':clientCode' or                          \
-                            (clientCode='*' and clientTag in (:clientTag))) \
-                      and                                                   \
-                      (productCode=':productCode' or                        \
-                        (productCode='*' and productCat=:productCat)) )     \
-                       ORDER BY priority DESC, limit ASC;");
-    query.prepare(q);
-    query.bindValue(":clientCode", cInfo.code);
-    query.bindValue(":clientTag", ctags);
-    query.bindValue(":productCode", pInfo.code);
-    query.bindValue(":productCat", pInfo.category);
-    query.exec();
-    qDebug()<<"getClientLimits:"<<query.lastError()<<query.boundValues()<<query.lastQuery();
+    qDebug()<<"Querying getClientLimits"<<cInfo.code<<ctags;
+    QString q=QString("select * from limits where \
+            (`clientCode`=%1 or (`clientCode`='*' and `clientTag` in (%2))) and \
+            (`productCode`='%3' or (`productCode`='*' and `productCat`=%4)) \
+            ORDER BY limits.priority DESC, limits.limit ASC;").arg(cInfo.code, ctags, pInfo.code, QString::number(pInfo.category));
+    if (!query.exec(q)) {
+        qDebug()<<"QUERY EXECUTION FAILED!"<<query.lastError()<<query.boundValues()<<query.lastQuery();
+        return lim;
+    }
     getLimitFromQuery(query,lim);
+    qDebug()<<"getClientLimits:"<<lim.id;
     return lim;
-
-}
-
-bool Azahar::changeFamilyLimits(Family &family, ProductInfo &pInfo, double qty) {
-    // Increment/decrement by one product unit the current limit consumption for that product.
-    if (getFamilyLimits(family,pInfo,qty)==false and qty>=1) {
-        return false;
-    }
-    double mod=qty*pInfo.price/family.applicable.count();
-    for (int i=0; i<family.applicable.count(); ++i) {
-        QString key=family.applicable.at(i);
-        Limit lim=family.limits.value(key);
-        family.limits[key]=lim;
-    }
-    return true;
 }
 
 
@@ -2137,6 +2129,7 @@ QStringList Azahar::getClientTags(QString clientCode)
     }
     return tags;
 }
+
 
 void Azahar::setClientTags(ClientInfo info)
 {
@@ -2170,6 +2163,7 @@ void Azahar::setClientTags(ClientInfo info)
     }
 }
 
+
 QStringList Azahar::getAvailableTags()
 {
     qDebug()<<"getAvail";
@@ -2199,6 +2193,7 @@ QStringList Azahar::getAvailableTags()
     return tags;
 }
 
+
 ClientInfo Azahar::getClientInfo(qulonglong clientId)
 {
   ClientInfo info;
@@ -2209,22 +2204,19 @@ ClientInfo Azahar::getClientInfo(qulonglong clientId)
 
 ClientInfo Azahar::_getClientInfo(qulonglong clientId)
 {
-  ClientInfo info;
-//  info.name = "";
-//  info.parentClient="";
-//  info.id = 0;//to recognize errors.
+    ClientInfo info;
     if (!db.isOpen()) db.open();
     if (db.isOpen()) {
-      QSqlQuery qC(db);
-      if (qC.exec(QString("select * from clients where id=%1;").arg(clientId))) {
-        getClientInfoFromQuery(qC,info);
-        info.tags=getClientTags(info.code);
-      }
-      else {
-        qDebug()<<"ERROR: "<<qC.lastError();
-      }
+        QSqlQuery qC(db);
+        if (qC.exec(QString("select * from clients where id=%1;").arg(clientId))) {
+            getClientInfoFromQuery(qC,info);
+            info.tags=getClientTags(info.code);
+        }
+        else {
+            qDebug()<<"ERROR: "<<qC.lastError();
+        }
     }
- return info;
+    return info;
 }
 
 ClientInfo Azahar::getClientInfo(QString clientCode)

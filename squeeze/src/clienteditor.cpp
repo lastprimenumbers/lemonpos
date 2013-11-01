@@ -117,32 +117,31 @@ void ClientEditor::statistics(){
     Azahar *myDb=new Azahar;
     myDb->setDatabase(db);
     myDb->getFamilyStatistics(family,ui->statStart->date(),ui->statEnd->date());
-    ui->statTotal->setText(QString::number(family.stats.total));
+    ui->statTotal->setText(QString::number(family.total));
 
     // Fill the category table
-    QList<int> ck=family.stats.categories.keys();
+    QList<int> ck=family.categories.keys();
     ui->categoryTable->setRowCount(ck.count());
     ui->categoryTable->setColumnCount(3);
     QHash<QString,int> cats=myDb->getCategoriesHash();
     for (int i=0; i<ck.count(); i++) {
         ui->categoryTable->setItem(i,0,new QTableWidgetItem(QString::number(ck[i])));
         ui->categoryTable->setItem(i,1,new QTableWidgetItem(cats.key(ck[i])));
-        ui->categoryTable->setItem(i,2,new QTableWidgetItem(QString::number(family.stats.categories[ck[i]])));
+        ui->categoryTable->setItem(i,2,new QTableWidgetItem(QString::number(family.categories[ck[i]])));
     }
 
     // Fill the product table
-    QList<QString> pk=family.stats.products.keys();
+    QList<QString> pk=family.products.keys();
     qDebug()<<"Mapped products"<<pk.count();
     ui->productTable->setRowCount(pk.count());
     ui->productTable->setColumnCount(3);
     for (int i=0; i<pk.count(); i++) {
-        qDebug()<<"Appending product"<<pk[i]<<family.stats.products[pk[i]];
+        qDebug()<<"Appending product"<<pk[i]<<family.products[pk[i]];
         ui->productTable->setItem(i,0,new QTableWidgetItem(pk[i]));
         ProductInfo pInfo=myDb->getProductInfo(pk[i]);
         ui->productTable->setItem(i,1,new QTableWidgetItem(pInfo.desc));
-        ui->productTable->setItem(i,2,new QTableWidgetItem(QString::number(family.stats.products[pk[i]])));
+        ui->productTable->setItem(i,2,new QTableWidgetItem(QString::number(family.products[pk[i]])));
     }
-
 }
 
 

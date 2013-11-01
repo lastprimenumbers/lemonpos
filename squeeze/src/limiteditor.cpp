@@ -15,11 +15,28 @@ limiteditor::limiteditor(QWidget *parent) :
     lim.clientTag=QString("*");
     lim.productCat=0;
     lim.productCode=QString("*");
-    lim.parent=0;
     lim.limit=0;
     lim.priority=0;
 
     connect( this   , SIGNAL( accepted() ), this, SLOT( addLimit() ) );
+    connect( ui->radioAllClients, SIGNAL(clicked()), this, SLOT(updatePriority()));
+    connect( ui->radioSingleClient, SIGNAL(clicked()), this, SLOT(updatePriority()));
+    connect( ui->radioTagClient, SIGNAL(clicked()), this, SLOT(updatePriority()));
+    connect( ui->radioProductCat, SIGNAL(clicked()), this, SLOT(updatePriority()));
+    connect( ui->radioProductCode, SIGNAL(clicked()), this, SLOT(updatePriority()));
+}
+
+void limiteditor::updatePriority() {
+    int prio=0;
+    if (ui->radioProductCode->isChecked()) {
+        prio+=3;
+    }
+    if (ui->radioTagClient->isChecked()) {
+        prio+=1;
+    } else if (ui->radioSingleClient->isChecked()) {
+        prio+=2;
+    }
+    ui->inputPriority->setValue(prio);
 }
 
 void limiteditor::setDb(QSqlDatabase parentDb)
@@ -77,6 +94,7 @@ void limiteditor::setLimit(Limit &nlim) {
 
     ui->inputLimit->setValue(lim.limit);
     ui->inputPriority->setValue(lim.priority);
+    ui->inputLabel->setText(lim.label);
 }
 
 void limiteditor::setLimit(qulonglong limitId) {
@@ -87,11 +105,7 @@ void limiteditor::setLimit(qulonglong limitId) {
     delete myDb;
 }
 
-
-void limiteditor::addLimit()
-
-{
-
+void limiteditor::addLimit() {
     Azahar *myDb = new Azahar;
     myDb->setDatabase(db);    
 
@@ -130,15 +144,14 @@ void limiteditor::addLimit()
     // The limit threshold
     lim.limit = ui->inputLimit->value();
     lim.priority = ui->inputPriority->value();
-
-    // Must check feasibility?
-    if (lim.parent>0){
-        // If parent is defined, we are modifying an existing limit
+    // The label
+    lim.label = ui->inputLabel->text();
+    if (lim.id>0) {
         myDb->modifyLimit(lim);
     } else {
-        // If parent was -1, we are inserting a new limit
         myDb->insertLimit(lim);
     }
+
     delete myDb;
 }
 

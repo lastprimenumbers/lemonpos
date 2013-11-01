@@ -27,6 +27,7 @@ public:
 
 private slots:
     void addLimit();
+    void updatePriority();
     
 private:
     Ui::limit_editor *ui;

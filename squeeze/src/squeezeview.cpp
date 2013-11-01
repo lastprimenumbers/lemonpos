@@ -1440,10 +1440,10 @@ void squeezeView::setupLimitsModel()
     QString f;
     f=QString("clientCode='*'");
     limitsModel->setFilter(f);
-    ui_mainview.limitsView->hideColumn(0); //id
-    ui_mainview.limitsView->hideColumn(1); //clientcode
-    ui_mainview.limitsView->hideColumn(6); //priorità
-    ui_mainview.limitsView->hideColumn(8); //parent
+//    ui_mainview.limitsView->hideColumn(0); //id
+//    ui_mainview.limitsView->hideColumn(1); //clientcode
+//    ui_mainview.limitsView->hideColumn(6); //priorità
+    ui_mainview.limitsView->setSortingEnabled(true);
     limitsModel->select();
 
   }
@@ -2573,7 +2573,6 @@ void squeezeView::createLimit() {
     limiteditor *limed = new limiteditor;
     limed->setDb(db);
     limed->show();
-    //FIXME: controlla modelReset!
     connect(limed,SIGNAL(accepted()),SLOT(limitsModelSelect()));
 }
 
@@ -2582,19 +2581,19 @@ void squeezeView::limitsModelSelect() {
 }
 
 void squeezeView::modifyLimit() {
-          QModelIndex index = ui_mainview.limitsView->currentIndex();
-          if (limitsModel->tableName().isEmpty()) setupLimitsModel();
-          if (index == limitsModel->index(-1,-1) ) {
-            KMessageBox::information(this, i18n("Please select a limit to modify, then press the modify button again."), i18n("Cannot modify"));
-          }
-          else  {
-            qulonglong limitId = limitsModel->record(index.row()).value("id").toULongLong();
-            limiteditor *limed = new limiteditor;
-            limed->setDb(db);
-            limed->setLimit(limitId);
-            limed->show();
-
-      }
+    QModelIndex index = ui_mainview.limitsView->currentIndex();
+    if (limitsModel->tableName().isEmpty()) setupLimitsModel();
+    if (index == limitsModel->index(-1,-1) ) {
+        KMessageBox::information(this, i18n("Please select a limit to modify, then press the modify button again."), i18n("Cannot modify"));
+    }
+    else  {
+        qulonglong limitId = limitsModel->record(index.row()).value("id").toULongLong();
+        limiteditor *limed = new limiteditor;
+        limed->setDb(db);
+        limed->setLimit(limitId);
+        limed->show();
+        connect(limed,SIGNAL(accepted()),SLOT(limitsModelSelect()));
+    }
 }
 
 void squeezeView::deleteLimit() {

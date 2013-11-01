@@ -1270,97 +1270,97 @@ void lemonView::doEmitSignalQueryDb()
 
 bool lemonView::incrementTableItemQty(QString code, double q)
 {
-  double qty  = 1;
-  double discount_old=0.0;
-  double qty_old=0.0;
-  double stockqty=0;
-  bool done=false;
-  ProductInfo info;
+    double qty  = 1;
+    double discount_old=0.0;
+    double qty_old=0.0;
+    double stockqty=0;
+    bool done=false;
+    ProductInfo info;
 
-   if (productsHash.contains(code)) {
-    //get product info...
-    info = productsHash.value(code);
+    if (productsHash.contains(code)) {
+        //get product info...
+        info = productsHash.value(code);
 
-    stockqty = info.stockqty;
-    qty = info.qtyOnList;
-    qty_old = qty;
-    QStringList itemsNotAvailable;
-    
-    //stock qty for groups are different.
-    bool available = true;
-    if (info.isAGroup) {
-      Azahar *myDb = new Azahar;
-      myDb->setDatabase(db);
-      QStringList lelem = info.groupElementsStr.split(",");
-      foreach(QString ea, lelem) {
-        qulonglong c  = ea.section('/',0,0).toULongLong();
-        double     qq = ea.section('/',1,1).toDouble();
-        ProductInfo pi = myDb->getProductInfo(QString::number(c));
-        QString unitStr;
-//        bool yes = false;
-         bool yes = true;
-        double onList = getTotalQtyOnList(pi); // item itself and contained in any gruped product.
-        // q     : item qty to add.
-        // qq    : item qty on current grouped element to add
-        // qq*q  : total items to add for this product.
-        // onList: items of the same product already on the shopping list.
-//        if (pi.stockqty >= ((qq*q)+onList) ) yes = true;
-//        available = (available && yes );
-//        if (!yes) {
-//          itemsNotAvailable << i18n("%1 has %2 %3 but requested %4 + %5",pi.desc,pi.stockqty,unitStr,qq*q,onList);
-//        }
-        qDebug()<<pi.desc<<" qtyonstock:"<<pi.stockqty<<" needed qty (onlist and new):"<<QString::number((qq*q)+onList);
-      }
-      delete myDb;
-    } else {
-      double onList = getTotalQtyOnList(info); // item itself and contained in any gruped product.
-//      if (stockqty >= q+onList) available = true; else available = false;
-      qDebug()<<info.desc<<" qtyonstock:"<<info.stockqty<<" needed qty (onlist and new):"<<QString::number(q+onList);
-    }
-      
-    if (available) qty+=q; else {
-      QString msg;
-      double onList = getTotalQtyOnList(info); // item itself and contained in any gruped product.
-//      if (!itemsNotAvailable.isEmpty())
-//        msg = i18n("<html><font color=red><b>The group/pack is not available because:<br>%1</b></font></html>", itemsNotAvailable.join("<br>"));
-//      else
-//        msg = i18n("<html><font color=red><b>There are only %1 articles of your choice at stock.<br> You requested %2</b></font></html>", info.stockqty,q+onList);
-      
-      if (ui_mainview.mainPanel->currentIndex() == pageMain) {
-         tipCode->showTip(msg, 6000);
-      }
-      if (ui_mainview.mainPanel->currentIndex() == pageSearch) {
-         ui_mainview.labelSearchMsg->setText(msg);
-         ui_mainview.labelSearchMsg->show();
-         QTimer::singleShot(3000, this, SLOT(clearLabelSearchMsg()) );
-      }
-    }
-    QTableWidgetItem *itemQ = ui_mainview.tableWidget->item(info.row, colQty);//item qty
-    itemQ->setData(Qt::EditRole, QVariant(qty));
-    done = true;
-    QTableWidgetItem *itemD = ui_mainview.tableWidget->item(info.row, colDisc);//item discount
-    discount_old = itemD->data(Qt::DisplayRole).toDouble();
-    //calculate new discount
-    double discountperitem = (discount_old/qty_old);
-    double newdiscount = discountperitem*qty;
-    itemD->setData(Qt::EditRole, QVariant(newdiscount));
-    //qDebug()<<"incrementTableQty... old discount:"<<discount_old<<" old qty:"<<qty_old<<" new discount:"<<newdiscount<<"new qty:"<<qty<<" disc per item:"<<discountperitem;
+        stockqty = info.stockqty;
+        qty = info.qtyOnList;
+        qty_old = qty;
+        QStringList itemsNotAvailable;
 
-    info.qtyOnList = qty;
-    //qDebug()<<"  New qty on list:"<<info.qtyOnList;
-    productsHash.remove(code);
-    productsHash.insert(info.code, info);
+        //stock qty for groups are different.
+        bool available = true;
+        if (info.isAGroup) {
+            Azahar *myDb = new Azahar;
+            myDb->setDatabase(db);
+            QStringList lelem = info.groupElementsStr.split(",");
+            foreach(QString ea, lelem) {
+                qulonglong c  = ea.section('/',0,0).toULongLong();
+                double     qq = ea.section('/',1,1).toDouble();
+                ProductInfo pi = myDb->getProductInfo(QString::number(c));
+                QString unitStr;
+                //        bool yes = false;
+                bool yes = true;
+                double onList = getTotalQtyOnList(pi); // item itself and contained in any gruped product.
+                // q     : item qty to add.
+                // qq    : item qty on current grouped element to add
+                // qq*q  : total items to add for this product.
+                // onList: items of the same product already on the shopping list.
+                //        if (pi.stockqty >= ((qq*q)+onList) ) yes = true;
+                //        available = (available && yes );
+                //        if (!yes) {
+                //          itemsNotAvailable << i18n("%1 has %2 %3 but requested %4 + %5",pi.desc,pi.stockqty,unitStr,qq*q,onList);
+                //        }
+                qDebug()<<pi.desc<<" qtyonstock:"<<pi.stockqty<<" needed qty (onlist and new):"<<QString::number((qq*q)+onList);
+            }
+            delete myDb;
+        } else {
+            double onList = getTotalQtyOnList(info); // item itself and contained in any gruped product.
+            //      if (stockqty >= q+onList) available = true; else available = false;
+            qDebug()<<info.desc<<" qtyonstock:"<<info.stockqty<<" needed qty (onlist and new):"<<QString::number(q+onList);
+        }
 
-    //get item Due to update it.
-    QTableWidgetItem *itemDue = ui_mainview.tableWidget->item(info.row, colDue); //4 item Due
-    itemDue->setData(Qt::EditRole, QVariant((info.price*qty)-newdiscount));//fixed on april 30 2009 00:35. Added *qtyqDebug()<<"INCREMENTING TABLE ITEM QTY";
-    refreshTotalLabel();
-    QTableWidgetItem *item = ui_mainview.tableWidget->item(info.row, colCode);//item code
-    displayItemInfo(item); //TODO: Cambiar para desplegar de ProductInfo.
-    ui_mainview.editItemCode->clear();
-   }//if productsHash.contains...
+        if (available) qty+=q; else {
+            QString msg;
+            double onList = getTotalQtyOnList(info); // item itself and contained in any gruped product.
+            //      if (!itemsNotAvailable.isEmpty())
+            //        msg = i18n("<html><font color=red><b>The group/pack is not available because:<br>%1</b></font></html>", itemsNotAvailable.join("<br>"));
+            //      else
+            //        msg = i18n("<html><font color=red><b>There are only %1 articles of your choice at stock.<br> You requested %2</b></font></html>", info.stockqty,q+onList);
 
-  return done;
+            if (ui_mainview.mainPanel->currentIndex() == pageMain) {
+                tipCode->showTip(msg, 6000);
+            }
+            if (ui_mainview.mainPanel->currentIndex() == pageSearch) {
+                ui_mainview.labelSearchMsg->setText(msg);
+                ui_mainview.labelSearchMsg->show();
+                QTimer::singleShot(3000, this, SLOT(clearLabelSearchMsg()) );
+            }
+        }
+        QTableWidgetItem *itemQ = ui_mainview.tableWidget->item(info.row, colQty);//item qty
+        itemQ->setData(Qt::EditRole, QVariant(qty));
+        done = true;
+        QTableWidgetItem *itemD = ui_mainview.tableWidget->item(info.row, colDisc);//item discount
+        discount_old = itemD->data(Qt::DisplayRole).toDouble();
+        //calculate new discount
+        double discountperitem = (discount_old/qty_old);
+        double newdiscount = discountperitem*qty;
+        itemD->setData(Qt::EditRole, QVariant(newdiscount));
+        //qDebug()<<"incrementTableQty... old discount:"<<discount_old<<" old qty:"<<qty_old<<" new discount:"<<newdiscount<<"new qty:"<<qty<<" disc per item:"<<discountperitem;
+
+        // Update qty on list
+        info.qtyOnList = qty;
+        productsHash.remove(code);
+        productsHash.insert(info.code, info);
+
+        //get item Due to update it.
+        QTableWidgetItem *itemDue = ui_mainview.tableWidget->item(info.row, colDue); //4 item Due
+        itemDue->setData(Qt::EditRole, QVariant((info.price*qty)-newdiscount));
+        refreshTotalLabel();
+        QTableWidgetItem *item = ui_mainview.tableWidget->item(info.row, colCode);//item code
+        displayItemInfo(item); //TODO: Cambiar para desplegar de ProductInfo.
+        ui_mainview.editItemCode->clear();
+    }//if productsHash.contains...
+
+    return done;
 }
 
 void lemonView::insertItem(QString code)
@@ -1392,7 +1392,7 @@ void lemonView::insertItem(QString code)
   qDebug()<<" CodeX = "<<codeX<<" Numeric Code:"<<info.code<<" Alphacode:"<<info.alphaCode<<" Required Qty:"<<qty;
 
 
-  //the next 'if' checks if the hash contains the product and got values from there.. To include purchaseQty, that we need!
+  //the next 'if' checks if the hash contains the product and got values from there.. To include qtyOnList, that we need!
   if (productsHash.contains( info.code )) 
       info = productsHash.value( info.code );
 
@@ -1420,15 +1420,36 @@ void lemonView::insertItem(QString code)
 
   // Check for limits
   updateFamily(clientInfo);
-  if (myDb->getFamilyLimits(family,info,qty)==false) {
-      msg=i18n("Limite di acquisto oltrepassato. La disponibilità residua è solamente di %1.", family.effectiveLimit);
-      tipCode->showTip(msg, 6000);
-      delete myDb;
-      return;
-  }
 
+  Limit lim=myDb->getFamilyLimit(family,info);
+  qDebug()<<"Get Applicable LIMIT:"<<lim.id<<lim.limit<<lim.productCat;
   delete myDb;
+  // If lim is a category limit, add the relevant category stats
+  if (lim.id>0) {
+      // residual limit
+      double res=lim.limit-info.qtyOnList*info.price;
+      qDebug()<<"RES LIMIT"<<res<<info.qtyOnList;
+      if (lim.productCode=="*") {
+          if (family.categories.contains(info.category)) {
+              res+=family.categories[info.category];
+          }
+      // If lim is a product limit, add the relevant product stats
+      } else {
+          if (family.products.contains(info.code)) {
+              res+=family.products[info.code];
+          }
+      }
+      qDebug()<<"FIN RES LIMIT"<<res<<qty*info.price;
+      // if the limit is valid and the residual is less than the request
+      if (res<qty*info.price) {
+          msg=i18n("Limite di acquisto \"%1\" oltrepassato. La disponibilità residua è solamente di %2.", lim.label,res);
+          tipCode->showTip(msg, 6000);
+          return;
+      }
+  }
+  // Increment quantity or add to the list
   if (!incrementTableItemQty( info.code /*codeX*/, qty) ) {
+    // Item was not on list!
     info.qtyOnList = qty;
     int insertedAtRow = -1;
     bool productFound = false;
@@ -1502,14 +1523,6 @@ void lemonView::insertItem(QString code)
 
   // move the focus on the last row
   ui_mainview.tableWidget->setCurrentCell(info.row,1);
-
-  // Increment limit counter
-  if (qty>0){
-    Azahar *myDb = new Azahar;
-    myDb->setDatabase(db);
-    myDb->changeFamilyLimits(family,info,qty);
-    delete myDb;
-  }
 
   //Saving session.
   qDebug()<<"** INSERTING A PRODUCT [updating balance/transaction]";
@@ -2122,10 +2135,6 @@ void lemonView::finishCurrentTransaction()
         // Commit to db the previously prepared credit history record
         myDb->insertCreditHistory(history);
     }
-
-    // COMMIT LIMITS
-    myDb->commitLimits(family.limits);
-
 
    ticket.isAReservation     = false;
    ticket.reservationStarted = false;

@@ -98,6 +98,7 @@ struct Limit
     double current;
     int priority;
     qlonglong parent;
+    QString label;
 };
 
 struct ClientInfo
@@ -384,10 +385,12 @@ struct TransactionItemInfo
   QDate      date;
 };
 
-
 // Holds the statistics about the consumes of a family in a time range.
-struct FamilyStatistics
+struct Family
 {
+    // COMPOSITION
+    QList<ClientInfo> members;
+    // STATISTICS
     // Start date for the statistic
     QDate start;
     // End date for the statistic
@@ -403,17 +406,6 @@ struct FamilyStatistics
     // Total expense
     double total;
 };
-
-struct Family
-{
-    QList<ClientInfo> members;
-    QHash<QString, Limit> limits;
-    ProductInfo lastProduct;
-    QStringList applicable;
-    double effectiveLimit;
-    FamilyStatistics stats;
-};
-
 
 struct CashFlowInfo
 {

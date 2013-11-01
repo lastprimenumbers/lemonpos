@@ -16,8 +16,8 @@
   <widget class="QDialogButtonBox" name="buttonBox">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>440</y>
+     <x>18</x>
+     <y>449</y>
      <width>621</width>
      <height>32</height>
     </rect>
@@ -34,11 +34,14 @@
     <rect>
      <x>10</x>
      <y>10</y>
-     <width>631</width>
+     <width>621</width>
      <height>421</height>
     </rect>
    </property>
    <property name="currentIndex">
+    <number>0</number>
+   </property>
+   <property name="tabSpacing">
     <number>0</number>
    </property>
    <widget class="QWidget" name="pageClient">
@@ -46,8 +49,8 @@
      <rect>
       <x>0</x>
       <y>0</y>
-      <width>631</width>
-      <height>359</height>
+      <width>621</width>
+      <height>371</height>
      </rect>
     </property>
     <attribute name="label">
@@ -98,7 +101,7 @@
        <x>20</x>
        <y>160</y>
        <width>571</width>
-       <height>191</height>
+       <height>181</height>
       </rect>
      </property>
     </widget>
@@ -118,8 +121,8 @@
      <rect>
       <x>0</x>
       <y>0</y>
-      <width>631</width>
-      <height>359</height>
+      <width>621</width>
+      <height>371</height>
      </rect>
     </property>
     <attribute name="label">
@@ -167,7 +170,7 @@
        <x>270</x>
        <y>80</y>
        <width>331</width>
-       <height>81</height>
+       <height>121</height>
       </rect>
      </property>
     </widget>
@@ -176,14 +179,14 @@
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
-     <x>230</x>
-     <y>440</y>
-     <width>131</width>
+     <x>346</x>
+     <y>450</y>
+     <width>61</width>
      <height>21</height>
     </rect>
    </property>
    <property name="text">
-    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:large;&quot;&gt;Soglia Mensile:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:large;&quot;&gt;Soglia:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
    <property name="textFormat">
     <enum>Qt::RichText</enum>
@@ -192,8 +195,8 @@
   <widget class="QSpinBox" name="inputLimit">
    <property name="geometry">
     <rect>
-     <x>360</x>
-     <y>440</y>
+     <x>400</x>
+     <y>450</y>
      <width>60</width>
      <height>27</height>
     </rect>
@@ -214,14 +217,14 @@
   <widget class="QLabel" name="label_2">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>440</y>
-     <width>71</width>
+     <x>280</x>
+     <y>450</y>
+     <width>41</width>
      <height>21</height>
     </rect>
    </property>
    <property name="text">
-    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:large;&quot;&gt;Priorità:&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:large;&quot;&gt;P:&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
    <property name="textFormat">
     <enum>Qt::RichText</enum>
@@ -230,9 +233,9 @@
   <widget class="QSpinBox" name="inputPriority">
    <property name="geometry">
     <rect>
-     <x>95</x>
-     <y>440</y>
-     <width>60</width>
+     <x>300</x>
+     <y>450</y>
+     <width>41</width>
      <height>27</height>
     </rect>
    </property>
@@ -247,6 +250,32 @@
    </property>
    <property name="value">
     <number>0</number>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_3">
+   <property name="geometry">
+    <rect>
+     <x>5</x>
+     <y>450</y>
+     <width>71</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:large;&quot;&gt;Nome:&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
+   <property name="textFormat">
+    <enum>Qt::RichText</enum>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="inputLabel">
+   <property name="geometry">
+    <rect>
+     <x>60</x>
+     <y>450</y>
+     <width>216</width>
+     <height>27</height>
+    </rect>
    </property>
   </widget>
  </widget>

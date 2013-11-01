@@ -155,8 +155,7 @@ class Azahar : public QObject
     Family getFamily(ClientInfo &info);
     QString getFamilyInStatement(Family family);
     bool getFamilyStatistics(Family &family, QDate start, QDate end);
-    Limit getFamilyLimits(Family &family, ProductInfo &pInfo);
-    bool changeFamilyLimits(Family &family, ProductInfo &pInfo, double sign=1);
+    Limit getFamilyLimit(Family &family, ProductInfo &pInfo);
     Limit getLimit(qulonglong limitId);
 
 
