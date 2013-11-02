@@ -1925,6 +1925,7 @@ bool Azahar::getFamilyStatistics(Family &family, QDate start, QDate end)
     int fieldCat=query.record().indexOf("category");
     qDebug()<<"Collecting stats from"<<query.size()<<query.boundValues();
     while (getTransactionItemInfoFromQuery(query,item)) {
+        if (item.productCode=="0") {continue;}
         qDebug()<<"Stats for item:"<<item.name<<item.productCode;
         family.items.append(item);
         family.total+=item.total;
