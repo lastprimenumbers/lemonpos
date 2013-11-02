@@ -71,6 +71,8 @@ struct ProductInfo {
   //aug 11 2011, for 0.9.4.rc9
   bool hasUnlimitedStock;
   bool isNotDiscountable;
+  double quantity;
+  int qunit;
 };
 
 struct UserInfo

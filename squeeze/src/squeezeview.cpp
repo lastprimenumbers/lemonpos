@@ -2119,13 +2119,13 @@ void squeezeView::usersViewOnSelected(const QModelIndex & index)
 
 void squeezeView::productsViewOnSelected(const QModelIndex &index)
 {
- if (db.isOpen()) {
-  //getting data from model...
+    if (!db.isOpen()) {return;}
+    //getting data from model...
     const QAbstractItemModel *model = index.model();
     int row = index.row();
     QModelIndex indx = model->index(row, productsModel->fieldIndex("code"));
     QString id = model->data(indx, Qt::DisplayRole).toString();
-    
+
     indx = model->index(row, productsModel->fieldIndex("photo"));
     QByteArray photoBA = model->data(indx, Qt::DisplayRole).toByteArray();
     QPixmap photo;
@@ -2134,73 +2134,40 @@ void squeezeView::productsViewOnSelected(const QModelIndex &index)
     ProductInfo pInfo;
 
     //Launch Edit dialog
-    ProductEditor *productEditorDlg = new ProductEditor(this, false);
+    KDialog *dlg=new KDialog(this);
+    ProductEditor *productEditorDlg = new ProductEditor(dlg, false);
+    dlg->setMainWidget(productEditorDlg->ui);
     //Set data on dialog
     productEditorDlg->setModel(productsModel);
     productEditorDlg->disableCode(); //On Edit product, code cannot be changed.
     productEditorDlg->setStockQtyReadOnly(true); //on edit, cannot change qty to force use stockCorrection
     productEditorDlg->setDb(db);
     productEditorDlg->setCode(id);
-   
+
     QString newcode="0";
     //Launch dialog, and if dialog is accepted...
-    if (productEditorDlg->exec() ) {
-      //get changed|unchanged values
-      newcode        = productEditorDlg->getCode();
-      pInfo.alphaCode= productEditorDlg->getAlphacode();
-      pInfo.code     = newcode;
-      pInfo.desc     = productEditorDlg->getDescription();
-      //be aware of grouped products related to stock.
-      if (productEditorDlg->isGroup()) {
-        pInfo.stockqty = productEditorDlg->getGRoupStockMax();
-        pInfo.groupElementsStr = productEditorDlg->getGroupElementsStr();
-        pInfo.groupPriceDrop = productEditorDlg->getGroupPriceDrop(); 
-      }
-      else {
-        pInfo.stockqty = productEditorDlg->getStockQty();
-        pInfo.groupElementsStr = "";
-        pInfo.groupPriceDrop = 0;
-      }
-
-      pInfo.hasUnlimitedStock = productEditorDlg->hasUnlimitedStock();
-      pInfo.isNotDiscountable = productEditorDlg->isNotDiscountable();
-      
-      pInfo.price    = productEditorDlg->getPrice();
-      pInfo.cost     = productEditorDlg->getCost();
-      pInfo.units    = productEditorDlg->getMeasureId();
-      pInfo.tax      = productEditorDlg->getTax1();
-      pInfo.extratax = productEditorDlg->getTax2();
-      pInfo.category = productEditorDlg->getCategoryId();
-      pInfo.points   = productEditorDlg->getPoints();
-      photo          = productEditorDlg->getPhoto();
-      pInfo.photo    = Misc::pixmap2ByteArray(new QPixmap(photo)); //Photo ByteArray
-      //FIXME: NEXT line is temporal remove on 0.8 version
-      pInfo.lastProviderId = 1;
-      //Next lines are for groups
-      pInfo.isAGroup = productEditorDlg->isGroup();
-      pInfo.isARawProduct = productEditorDlg->isRaw();
-      
-
-      //Update database
-      Azahar *myDb = new Azahar;
-      myDb->setDatabase(db);
-      if (!myDb->updateProduct(pInfo, id)) qDebug()<<myDb->lastError();
-      // Checar ofertas y cambiarlas/borrarlas
-      if (id != newcode) {
-        if (!myDb->moveOffer(id, newcode)) qDebug()<<myDb->lastError();
-      }
-      //now change stock if so --7/Sept/09
-      if (productEditorDlg->isCorrectingStock()) {
-        qDebug()<<"Correcting stock. Old:"<<productEditorDlg->getOldStock()<<" New:"<<productEditorDlg->getStockQty()<<" Reason"<<productEditorDlg->getReason();
-        correctStock(pInfo.code, productEditorDlg->getOldStock(), productEditorDlg->getStockQty(), productEditorDlg->getReason());
-      }
-      //FIXME: We must see error types, which ones are for duplicate KEYS (codes) to advertise the user.
-      productsModel->select();
-      delete myDb;
+    if (dlg->exec() ) {
+        pInfo=productEditorDlg->getProductInfo();
+        newcode=pInfo.code;
+        //Update database
+        Azahar *myDb = new Azahar;
+        myDb->setDatabase(db);
+        if (!myDb->updateProduct(pInfo, id)) qDebug()<<myDb->lastError();
+        // Checar ofertas y cambiarlas/borrarlas
+        if (id != pInfo.code) {
+            if (!myDb->moveOffer(id, newcode)) qDebug()<<myDb->lastError();
+        }
+        //now change stock if so --7/Sept/09
+        if (productEditorDlg->isCorrectingStock()) {
+            qDebug()<<"Correcting stock. Old:"<<productEditorDlg->getOldStock()<<" New:"<<productEditorDlg->getStockQty()<<" Reason"<<productEditorDlg->getReason();
+            correctStock(pInfo.code, productEditorDlg->getOldStock(), productEditorDlg->getStockQty(), productEditorDlg->getReason());
+        }
+        //FIXME: We must see error types, which ones are for duplicate KEYS (codes) to advertise the user.
+        productsModel->select();
+        delete myDb;
     }
     delete productEditorDlg;
     setProductsFilter();
-  }
 }
 
 void squeezeView::donorsViewOnSelected(const QModelIndex & index)
@@ -2282,7 +2249,7 @@ void squeezeView::doPurchase()
 
     qDebug()<<"doPurchase...";
     PurchaseEditor *purchaseEditorDlg = new PurchaseEditor(this);
-    purchaseEditorDlg->setDb(db);
+    purchaseEditorDlg->setDb(db,productsModel);
     if (purchaseEditorDlg->exec()) {
       //Now add a transaction for buy
 //      QDate date = QDate::currentDate();
@@ -2312,7 +2279,6 @@ void squeezeView::doPurchase()
       tInfo.providerid  = 1; //FIXME!
       tInfo.specialOrders = "";
       tInfo.balanceId = 0;
-      tInfo.totalTax  = purchaseEditorDlg->getTotalTaxes();
       tInfo.donor       = purchaseEditorDlg->getDonor();
       tInfo.note= purchaseEditorDlg->getNote();
       qulonglong trnum = myDb->insertTransaction(tInfo); //to get the transaction number to insert in the log.
@@ -2500,14 +2466,15 @@ void squeezeView::createOffer()
 void squeezeView::createProduct()
 {
  if (db.isOpen()) {
-  ProductEditor *prodEditorDlg = new ProductEditor(this, true);
+  KDialog *dlg=new KDialog(this);
+  ProductEditor *prodEditorDlg = new ProductEditor(dlg, true);
+  dlg->setMainWidget(prodEditorDlg->ui);
   prodEditorDlg->setModel(productsModel);
   prodEditorDlg->setDb(db);
   prodEditorDlg->enableCode();
   prodEditorDlg->setStockQtyReadOnly(false);
   QString newcode = "0";
-
-  if (prodEditorDlg->exec()) {
+  if (dlg->exec()) {
     int resultado = prodEditorDlg->result();
 
     newcode = prodEditorDlg->getCode();
@@ -2519,37 +2486,7 @@ void squeezeView::createProduct()
     switch (resultado) {
       case QDialog::Accepted:
       case statusNormal:
-        if (prodEditorDlg->isGroup()) {
-          info.stockqty = prodEditorDlg->getGRoupStockMax(); //FIXME!!!! returns 1
-          info.groupElementsStr = prodEditorDlg->getGroupElementsStr();
-          info.groupPriceDrop = prodEditorDlg->getGroupPriceDrop();
-        }
-        else {
-          info.stockqty = prodEditorDlg->getStockQty();
-          info.groupElementsStr = "";
-          info.groupPriceDrop = 0;
-        }
-        info.code = newcode;
-        info.alphaCode = prodEditorDlg->getAlphacode();
-        info.desc    = prodEditorDlg->getDescription();
-        info.price   = prodEditorDlg->getPrice();
-        info.cost    = prodEditorDlg->getCost();
-        info.purchaseQty = info.stockqty;
-        info.units   = prodEditorDlg->getMeasureId();
-        info.tax     = prodEditorDlg->getTax1();
-        info.extratax= prodEditorDlg->getTax2();
-        info.photo   = Misc::pixmap2ByteArray(new QPixmap(prodEditorDlg->getPhoto()));
-        info.category= prodEditorDlg->getCategoryId();
-        info.points  = prodEditorDlg->getPoints();
-        //FIXME: NEXT line is temporal remove on 0.8 version
-        info.lastProviderId = 1;
-        //Next lines are for groups
-        info.isAGroup         = prodEditorDlg->isGroup();
-        info.isARawProduct    = prodEditorDlg->isRaw();
-
-        info.hasUnlimitedStock = prodEditorDlg->hasUnlimitedStock();
-        info.isNotDiscountable = prodEditorDlg->isNotDiscountable();
-        
+        info=prodEditorDlg->getProductInfo();
         if (!myDb->insertProduct(info))
             qDebug()<<"ERROR:"<<myDb->lastError();
         else {

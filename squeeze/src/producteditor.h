@@ -26,7 +26,7 @@
 #include <QtGui>
 #include <QPixmap>
 #include <QtSql>
-
+#include "../../src/misc.h"
 #include "ui_producteditor.h"
 
 class MibitFloatPanel;
@@ -42,26 +42,28 @@ class ProductEditorUI : public QFrame, public Ui::productEditor
     ProductEditorUI( QWidget *parent=0);
 };
 
-class ProductEditor : public KDialog
+class ProductEditor : public QWidget
 {
   Q_OBJECT
   public:
-    ProductEditor( QWidget *parent=0, bool newProduct = false  );
+    ProductEditor( QWidget *parent=0, bool newProduct = true  );
     ~ProductEditor();
-
+    ProductEditorUI *ui;
+    int result();
+    QHash<QString, ProductInfo> productsHash;
+    void setProductsHash(QHash<QString, ProductInfo> hash);
     QString getCode()     { return ui->editCode->text(); };
     QString getAlphacode()   { return ui->editAlphacode->text(); };
     QString getDescription() { return ui->editDesc->text(); };
     double  getStockQty()    { return ui->editStockQty->text().toDouble(); };
     int     getCategoryId();
     int     getMeasureId();
+    int     getQunitId();
     QString getCategoryStr(int c);
     QString getMeasureStr(int c);
+    double  getQuantity()    { return ui->editQuantity->text().toDouble(); };
     double  getCost()        { return ui->editCost->text().toDouble(); };
-    double  getTax1()        { return ui->editTax->text().toDouble(); };
-    double  getTax2()        { return ui->editExtraTaxes->text().toDouble(); };
     double  getPrice()       { return ui->editFinalPrice->text().toDouble(); };
-    qulonglong getPoints()   { return ui->editPoints->text().toULongLong(); };
     QPixmap getPhoto()       { qDebug()<<"pixmap Size:"<<pix.size(); return pix; };
     QString getReason()      { return reason; };
     bool    isCorrectingStock() {return correctingStockOk;};
@@ -69,8 +71,6 @@ class ProductEditor : public KDialog
     double  getGRoupStockMax();
     double  getGroupPriceDrop() { return groupInfo.priceDrop; };
     void    setStockQtyReadOnly(bool enabled) { ui->editStockQty->setReadOnly(enabled); };
-
-    
 
     void    populateCategoriesCombo();
     void    populateMeasuresCombo();
@@ -85,11 +85,10 @@ class ProductEditor : public KDialog
     void    setCategory(int i);
     void    setMeasure(QString str);
     void    setMeasure(int i);
+    void    setQunit(QString str);
+    void    setQunit(int i);
     void    setCost(double c)          {ui->editCost->setText(QString::number(c)); };
-    void    setTax1(double t)          {ui->editTax->setText(QString::number(t)); };
-    void    setTax2(double t)          {ui->editExtraTaxes->setText(QString::number(t)); };
     void    setPrice(double p)         {ui->editFinalPrice->setText(QString::number(p)); };
-    void    setPoints(qulonglong p)    {ui->editPoints->setText(QString::number(p)); };
     void    setPhoto(QPixmap p);
     void    setIsAGroup(bool value);
     void    setIsARaw(bool value);
@@ -106,13 +105,14 @@ class ProductEditor : public KDialog
     bool    isRaw();
     bool    isNotDiscountable();
     bool    hasUnlimitedStock();
+
+    ProductInfo getProductInfo();
     
 private slots:
     void    changePhoto();
     void    changeCode();
     void    modifyStock();
     void    calculatePrice();
-    void    calculateProfit(QString amountStr);
     void    checkIfCodeExists();
     void    checkFieldsState();
     void    toggleGroup(bool checked);
@@ -125,10 +125,8 @@ private slots:
     void    updatePriceDrop(double value);
     void    setNotDiscountable(bool value);
     void    setUnlimitedStock(bool value);
-protected slots:
-    virtual void slotButtonClicked(int button);
+
   private:
-    ProductEditorUI *ui;
     QSqlDatabase db;
     QPixmap pix;
     returnType status;

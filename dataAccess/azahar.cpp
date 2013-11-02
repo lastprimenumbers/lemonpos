@@ -179,6 +179,8 @@ ProductInfo Azahar::getProductInfo(const QString &code, const bool &notConsiderD
   info.groupPriceDrop = 0;
   info.hasUnlimitedStock = false;
   info.isNotDiscountable = false;
+  info.qunit=0;
+  info.quantity=0.0;
   QString rawCondition;
 
   if (!db.isOpen()) db.open();
@@ -204,6 +206,7 @@ ProductInfo Azahar::getProductInfo(const QString &code, const bool &notConsiderD
     P.soldunits as SOLDUNITS, \
     P.isNotDiscountable as NONDISCOUNT, \
     P.hasUnlimitedStock as UNLIMITEDSTOCK, \
+    P.qunit as QUNIT, P.quantity as QUANTITY, \
     U.text as UNITSDESC, \
     C.text as CATEGORY, \
     T.tname as TAXNAME, \
@@ -233,12 +236,9 @@ ProductInfo Azahar::getProductInfo(const QString &code, const bool &notConsiderD
         int fieldCost= query.record().indexOf("COST");
         int fieldUnits= query.record().indexOf("UNITS");
         int fieldUnitsDESC= query.record().indexOf("UNITSDESC");
-        //int fieldTaxName= query.record().indexOf("TAXNAME");
         int fieldTaxModelId= query.record().indexOf("TAXMODELID");
-        //int fieldCategoryName= query.record().indexOf("CATEGORY");
         int fieldCategoryId= query.record().indexOf("CATID");
         int fieldPoints= query.record().indexOf("POINTS");
-        //int fieldLastProviderName = query.record().indexOf("LASTPROVIDER");
         int fieldLastProviderId = query.record().indexOf("PROVIDERID");
         int fieldAlphaCode = query.record().indexOf("ALPHACODE");
         int fieldTaxElem = query.record().indexOf("TAXELEM");
@@ -249,7 +249,8 @@ ProductInfo Azahar::getProductInfo(const QString &code, const bool &notConsiderD
         int fieldSoldU = query.record().indexOf("SOLDUNITS");
         int fieldUnlimited = query.record().indexOf("UNLIMITEDSTOCK");
         int fieldNonDiscount = query.record().indexOf("NONDISCOUNT");
-
+        int fieldQunit= query.record().indexOf("QUNIT");
+        int fieldQuantity= query.record().indexOf("QUANTITY");
         info.code     = query.value(fieldCODE).toString();
         info.alphaCode = query.value(fieldAlphaCode).toString();
         info.desc     = query.value(fieldDesc).toString();
@@ -277,6 +278,8 @@ ProductInfo Azahar::getProductInfo(const QString &code, const bool &notConsiderD
         info.groupElementsStr = query.value(fieldGE).toString();
         info.hasUnlimitedStock = query.value(fieldUnlimited).toBool();
         info.isNotDiscountable = query.value(fieldNonDiscount).toBool();
+        info.quantity = query.value(fieldQuantity).toDouble();
+        info.qunit = query.value(fieldQunit).toInt();
       }
 
       if ( info.hasUnlimitedStock )
@@ -333,30 +336,10 @@ ProductInfo Azahar::getProductInfo(const QString &code, const bool &notConsiderD
       info.tax   = gInfo.tax;
       info.extratax = 0; //accumulated in tax...
       priceDrop = gInfo.priceDrop;
-      //qDebug()<<"=================== GROUP Price:"<<info.price<<" Tax:"<<info.tax<<"======================";
      }
-     ///tax calculation - it depends on discounts... @note: this will be removed when taxmodels are coded.
-     double pWOtax = 0;
-     if (getConfigTaxIsIncludedInPrice()) //added on jan 28 2010. 
-       pWOtax= info.price/(1+((info.tax+info.extratax)/100));
-     else
-       pWOtax = info.price;
-     //take into account the discount.
-     if (info.validDiscount) {
-       double iDisc=0;
-       iDisc = (notConsiderDiscounts) ? 0 : (info.discpercentage/100)*pWOtax;
-       //if (notConsiderDiscounts) qDebug()<<" ================= WARNING: NOT CONSIDERING DISCOUNT FOR TAX CALCULATION! ======================= ";
-       pWOtax = pWOtax - iDisc;
-     }
-     //finally we have on pWOtax the price without tax and discount for 1 item
-     ///NOTE: Aug 17 2011: this tax does not take into account the ocassional discounts or price changes. It may be false.
-     double tax1m = (info.tax/100)*pWOtax;
-     double tax2m = (info.extratax/100)*pWOtax;
-     info.totaltax = tax1m + tax2m;
-     //qDebug()<<"  getProductInfo() :: Total tax for product "<<info.desc<<info.tax+info.extratax<< " $:"<<info.totaltax;
-     ///end of tax calculation
     }
   }
+  qDebug()<<"db.getProductInfo"<<info.qunit<<info.quantity;
   return info;
 }
 
@@ -454,7 +437,7 @@ bool Azahar::insertProduct(ProductInfo info)
   if (info.hasUnlimitedStock)
       info.stockqty = 1; //for not showing "Not Available" in the product delegate.
   
-  query.prepare("INSERT INTO products (code, name, price, stockqty, cost, soldunits, datelastsold, units, taxpercentage, extrataxes, photo, category, points, alphacode, lastproviderid, isARawProduct,isAGroup, groupElements, groupPriceDrop, taxmodel, hasUnlimitedStock, isNotDiscountable ) VALUES (:code, :name, :price, :stock, :cost, :soldunits, :lastgetld, :units, :tax1, :tax2, :photo, :category, :points, :alphacode, :lastproviderid, :isARaw, :isAGroup, :groupE, :groupPriceDrop, :taxmodel, :unlimitedStock, :NonDiscountable);");
+  query.prepare("INSERT INTO products (code, name, price, stockqty, cost, soldunits, datelastsold, units, taxpercentage, extrataxes, photo, category, points, alphacode, lastproviderid, isARawProduct,isAGroup, groupElements, groupPriceDrop, taxmodel, hasUnlimitedStock, isNotDiscountable, qunit, quantity ) VALUES (:code, :name, :price, :stock, :cost, :soldunits, :lastgetld, :units, :tax1, :tax2, :photo, :category, :points, :alphacode, :lastproviderid, :isARaw, :isAGroup, :groupE, :groupPriceDrop, :taxmodel, :unlimitedStock, :NonDiscountable, :qunit, :quantity);");
   query.bindValue(":code", info.code);
   query.bindValue(":name", info.desc);
   query.bindValue(":price", info.price);
@@ -477,7 +460,8 @@ bool Azahar::insertProduct(ProductInfo info)
   query.bindValue(":taxmodel", info.taxmodelid); //for later use
   query.bindValue(":unlimitedStock", info.hasUnlimitedStock);
   query.bindValue(":NonDiscountable", info.isNotDiscountable);
-
+  query.bindValue(":qunit", info.qunit);
+  query.bindValue(":quantity", info.quantity);
   if (!query.exec()) setError(query.lastError().text()); else result=true;
 
   /** @note & TODO: Document this for the user.
@@ -518,7 +502,7 @@ bool Azahar::updateProduct(ProductInfo info, QString oldcode)
   if (info.hasUnlimitedStock)
       info.stockqty = 1; //for not showing "Not Available" in the product delegate.
   
-  //query.prepare("UPDATE products SET code=:newcode, photo=:photo, name=:name, price=:price, stockqty=:stock, cost=:cost, units=:measure, taxpercentage=:tax1, extrataxes=:tax2, category=:category, points=:points, alphacode=:alphacode, lastproviderid=:lastproviderid , isARawProduct=:isRaw, isAGroup=:isGroup, groupElements=:ge, groupPriceDrop=:groupPriceDrop WHERE code=:id");
+  //query.prepare("UPDATE products SET code=:newcode, photo=:photo, name=:name, price=:price, stockqty=:stock, cost=:cost, units=:measure, taxpercentage=:tax1, extrataxes=:tax2, category=:category, points=:points, alphacode=:alphacode, lastproviderid=:lastproviderid , isARawProduct=:isRaw, isAGroup=:isGroup, groupElements=:ge, groupPriceDrop=:groupPriceDrop, qunit=:qunit, quantity=:quantity WHERE code=:id");
   ///TODO: remove the taxpercentage and extrataxes when taxmodel is implemented
   query.prepare("UPDATE products SET \
   code=:newcode, \
@@ -540,7 +524,7 @@ bool Azahar::updateProduct(ProductInfo info, QString oldcode)
   groupElements=:ge, \
   groupPriceDrop=:groupPriceDrop, \
   isNotDiscountable=:NonDiscountable, \
-  hasUnlimitedStock=:unlimitedStock \
+  hasUnlimitedStock=:unlimitedStock, qunit=:qunit, quantity=:quantity \
   WHERE code=:id;");
   
   query.bindValue(":newcode", info.code);
@@ -564,6 +548,8 @@ bool Azahar::updateProduct(ProductInfo info, QString oldcode)
   query.bindValue(":taxmodel", info.taxmodelid);
   query.bindValue(":unlimitedStock", info.hasUnlimitedStock);
   query.bindValue(":NonDiscountable", info.isNotDiscountable);
+  query.bindValue(":qunit", info.qunit);
+  query.bindValue(":quantity", info.quantity);
 
   if (!query.exec()) setError(query.lastError().text()); else result=true;
   return result;

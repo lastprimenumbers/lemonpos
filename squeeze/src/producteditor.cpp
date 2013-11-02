@@ -41,8 +41,9 @@ ProductEditorUI::ProductEditorUI( QWidget *parent )
 }
 
 ProductEditor::ProductEditor( QWidget *parent, bool newProduct )
-: KDialog( parent )
+: QWidget( parent )
 {
+    productsHash.clear();
     oldStockQty = 0;
     correctingStockOk = false;
     m_modelAssigned = false;
@@ -55,9 +56,7 @@ ProductEditor::ProductEditor( QWidget *parent, bool newProduct )
     groupInfo.taxMoney = 0;
     
     ui = new ProductEditorUI( this );
-    setMainWidget( ui );
-    setCaption( i18n("Product Editor") );
-    setButtons( KDialog::Ok|KDialog::Cancel );
+    setWindowTitle( i18n("Product Editor") );
     
     QString path = KStandardDirs::locate("appdata", "styles/");
     path = path+"tip.svg";
@@ -78,19 +77,14 @@ ProductEditor::ProductEditor( QWidget *parent, bool newProduct )
     QRegExp regexpC("[0-9]{1,13}"); //(EAN-13 y EAN-8) .. y productos sin codigo de barras?
     QRegExpValidator * validatorEAN13 = new QRegExpValidator(regexpC, this);
     ui->editCode->setValidator(validatorEAN13);
-    ui->editUtility->setValidator(new QDoubleValidator(0.00, 999999999999.99, 3,ui->editUtility));
-    ui->editTax->setValidator(new QDoubleValidator(0.00, 999999999999.99, 3,ui->editTax));
-    ui->editExtraTaxes->setValidator(new QDoubleValidator(0.00, 999999999999.99, 3,ui->editExtraTaxes));
     ui->editCost->setValidator(new QDoubleValidator(0.00, 999999999999.99, 3, ui->editCost));
     ui->editStockQty->setValidator(new QDoubleValidator(0.00,999999999999.99, 3, ui->editStockQty));
-    ui->editPoints->setValidator(new QIntValidator(0,999999999, ui->editPoints));
     ui->editFinalPrice->setValidator(new QDoubleValidator(0.00,999999999999.99, 3, ui->editFinalPrice));
     QRegExp regexpAC("[0-9]*[//.]{0,1}[0-9]{0,2}[//*]{0,1}[0-9]*[A-Za-z_0-9\\\\/\\-]{0,30}"); // Instead of {0,13} fro EAN13, open for up to 30 chars.
     QRegExpValidator * validatorAC = new QRegExpValidator(regexpAC, this);
     ui->editAlphacode->setValidator(validatorAC);
 
     connect( ui->btnPhoto          , SIGNAL( clicked() ), this, SLOT( changePhoto() ) );
-    connect( ui->btnCalculatePrice , SIGNAL( clicked() ), this, SLOT( calculatePrice() ) );
     connect( ui->btnChangeCode,      SIGNAL( clicked() ), this, SLOT( changeCode() ) );
     connect( ui->editCode, SIGNAL(textEdited(const QString &)), SLOT(checkIfCodeExists()));
     connect( ui->editCode, SIGNAL(editingFinished()), this, SLOT(checkFieldsState()));
@@ -99,10 +93,7 @@ ProductEditor::ProductEditor( QWidget *parent, bool newProduct )
 
     connect( ui->editDesc, SIGNAL(editingFinished()), this, SLOT(checkFieldsState()));
     connect( ui->editStockQty, SIGNAL(editingFinished()), this, SLOT(checkFieldsState()));
-    connect( ui->editPoints, SIGNAL(editingFinished()), this, SLOT(checkFieldsState()));
     connect( ui->editCost, SIGNAL(editingFinished()), this, SLOT(checkFieldsState()));
-    connect( ui->editTax, SIGNAL(editingFinished()), this, SLOT(checkFieldsState()));
-    connect( ui->editExtraTaxes, SIGNAL(editingFinished()), this, SLOT(checkFieldsState()));
     connect( ui->editFinalPrice, SIGNAL(textChanged(const QString &)), SLOT(checkFieldsState()));
 
     connect( ui->chIsAGroup, SIGNAL(clicked(bool)), SLOT(toggleGroup(bool)) );
@@ -116,7 +107,6 @@ ProductEditor::ProductEditor( QWidget *parent, bool newProduct )
     connect( ui->groupView, SIGNAL(itemDoubleClicked(QTableWidgetItem*)), SLOT(itemDoubleClicked(QTableWidgetItem*)) );
 
     connect( ui->editGroupPriceDrop, SIGNAL(valueChanged(double)), SLOT(updatePriceDrop(double)) );
-    connect( ui->editFinalPrice, SIGNAL(textChanged(QString) ), SLOT(calculateProfit(QString)) );
 
     connect( ui->chUnlimitedStock, SIGNAL(clicked(bool)), SLOT(setUnlimitedStock(bool)) );
 
@@ -126,14 +116,14 @@ ProductEditor::ProductEditor( QWidget *parent, bool newProduct )
     if (newProduct) {
       ui->labelStockQty->setText(i18n("Purchase Qty:"));
       disableStockCorrection();
-    } else ui->labelStockQty->setText(i18n("Stock Qty:"));
+    } else {
+        ui->labelStockQty->setText(i18n("Stock Qty:"));
+        QTimer::singleShot(350, this, SLOT(checkIfCodeExists()));
+        QTimer::singleShot(450, this, SLOT(applyFilter()));
+    }
 
-    QTimer::singleShot(350, this, SLOT(checkIfCodeExists()));
-    QTimer::singleShot(450, this, SLOT(applyFilter()));
 
     ui->editStockQty->setText("0.0");
-    ui->editPoints->setText("0.0");
-    ui->editExtraTaxes->setText("0.0");
 }
 
 ProductEditor::~ProductEditor()
@@ -141,9 +131,49 @@ ProductEditor::~ProductEditor()
     //remove products filter
     m_model->setFilter("");
     m_model->select();
-
-    
     delete ui;
+}
+
+int ProductEditor::result() {
+    return status;
+}
+
+ProductInfo ProductEditor::getProductInfo() {
+    // Returns a ProductInfo structure
+    //get changed|unchanged values
+    ProductInfo pInfo;
+    pInfo.alphaCode= getAlphacode();
+    pInfo.code     = getCode();
+    pInfo.desc     = getDescription();
+    //be aware of grouped products related to stock.
+    if (isGroup()) {
+      pInfo.stockqty = getGRoupStockMax();
+      pInfo.groupElementsStr = getGroupElementsStr();
+      pInfo.groupPriceDrop = getGroupPriceDrop();
+    }
+    else {
+      pInfo.stockqty = getStockQty();
+      pInfo.groupElementsStr = "";
+      pInfo.groupPriceDrop = 0;
+    }
+
+    pInfo.hasUnlimitedStock = hasUnlimitedStock();
+    pInfo.isNotDiscountable = isNotDiscountable();
+
+    pInfo.price    = getPrice();
+    pInfo.cost     = getCost();
+    pInfo.units    = getMeasureId();
+    pInfo.category = getCategoryId();
+    pInfo.quantity = getQuantity();
+    pInfo.qunit    = getQunitId();
+    QPixmap photo          = getPhoto();
+    pInfo.photo    = Misc::pixmap2ByteArray(new QPixmap(photo)); //Photo ByteArray
+    //FIXME: NEXT line is temporal remove on 0.8 version
+    pInfo.lastProviderId = 1;
+    //Next lines are for groups
+    pInfo.isAGroup = isGroup();
+    pInfo.isARawProduct = isRaw();
+    return pInfo;
 }
 
 void ProductEditor::applyFilter(const QString &text)
@@ -191,7 +221,9 @@ void ProductEditor::populateMeasuresCombo()
 {
   Azahar *myDb = new Azahar;
   myDb->setDatabase(db);
-  ui->measuresCombo->addItems(myDb->getMeasuresList());
+  QStringList list=myDb->getMeasuresList();
+  ui->measuresCombo->addItems(list);
+  ui->qunitCombo->addItems(list);
   delete myDb;
 }
 
@@ -211,6 +243,17 @@ int ProductEditor::getMeasureId()
 {
   int code=-1;
   QString currentText = ui->measuresCombo->currentText();
+  Azahar *myDb = new Azahar;
+  myDb->setDatabase(db);
+  code = myDb->getMeasureId(currentText);
+  delete myDb;
+  return code;
+}
+
+int ProductEditor::getQunitId()
+{
+  int code=-1;
+  QString currentText = ui->qunitCombo->currentText();
   Azahar *myDb = new Azahar;
   myDb->setDatabase(db);
   code = myDb->getMeasureId(currentText);
@@ -250,6 +293,22 @@ int idx = ui->measuresCombo->findText(str,Qt::MatchCaseSensitive);
   }
 }
 
+void ProductEditor::setQunit(int i)
+{
+ QString text = getMeasureStr(i);
+ setQunit(text);
+ qDebug()<<"SET QUNIT INT :: measure Id:"<<i<<" Name:"<<text;
+}
+
+void ProductEditor::setQunit(QString str)
+{
+int idx = ui->qunitCombo->findText(str,Qt::MatchCaseSensitive);
+ if (idx > -1) ui->qunitCombo->setCurrentIndex(idx);
+ else {
+  qDebug()<<"Qunit not found:"<<str;
+  }
+}
+
 QString ProductEditor::getCategoryStr(int c)
 {
   Azahar *myDb = new Azahar;
@@ -283,80 +342,13 @@ void ProductEditor::calculatePrice()
  if (ui->editCost->text().isEmpty()) {
    ui->editCost->setFocus();
  }
- else if (ui->editUtility->text().isEmpty()) {
-   ui->editUtility->setFocus();
- }
- else if (ui->editTax->text().isEmpty()) {
-   ui->editTax->setText("0.0");
-   ui->editTax->setFocus();
-   ui->editTax->selectAll();
- }
  else {
-  if (ui->editExtraTaxes->text().isEmpty()) {
-   ui->editExtraTaxes->setText("0.0");
-   ui->editExtraTaxes->setFocus();
-   ui->editExtraTaxes->selectAll();
-  }
-  Azahar *myDb = new Azahar;
-  myDb->setDatabase(db);
-  bool taxIncluded = myDb->getConfigTaxIsIncludedInPrice();
-  delete myDb;
-  double cost    = ui->editCost->text().toDouble();
-  double profit  = ui->editUtility->text().toDouble();
-  double tax     = ui->editTax->text().toDouble();
-  double tax2    = ui->editExtraTaxes->text().toDouble();
-  //Profit is calculated before taxes... 
-  profit = ((profit/100)*cost);
-  double cu = cost + profit;
-  //FIXME: Taxes include profit... is it ok?
-  tax     = ((tax/100)*cu);
-  tax2    = ((tax2/100)*cu);
-
-  /** @note: taxIncludedInPrice means that the product.price has embedded the tax already, and it is not necessary to add it at the time we are selling.
-   *         So, here (editing product price) when using autocalculate price, when taxIncluded=true we need to embed the tax in the price.
-   *         It is just the opposite way we do in lemon when selling (taxIncluded=true --> DO NOT add taxes).
-   **/
-  
-  if (taxIncluded) 
-    finalPrice = cost + profit + tax + tax2; 
-  else
-    finalPrice = cost + profit;
-    
-  qDebug()<<"Profit:"<<profit<<" Cost + profit:"<<cu<<" Taxes:"<<tax+tax2<<" Final Price: $"<<finalPrice;
-  
-  // BFB: avoid more than 2 decimal digits in finalPrice. Round.
+  finalPrice    = ui->editCost->text().toDouble();
+  // avoid more than 2 decimal digits in finalPrice. Round.
   ui->editFinalPrice->setText(QString::number(finalPrice,'f',2));
   ui->editFinalPrice->selectAll();
   ui->editFinalPrice->setFocus();
   }
-}
-
-void ProductEditor::calculateProfit(QString amountStr)
-{
-    double amount = amountStr.toDouble();
-    if (amount >0) {
-        double profit = 0;
-        double profitMoney = 0;
-        double cost = 0;
-        double pWOtax = 0;
-        Azahar *myDb = new Azahar;
-        myDb->setDatabase(db);
-        bool taxIsIncluded = myDb->getConfigTaxIsIncludedInPrice();
-        cost = ui->editCost->text().toDouble();
-        if ( taxIsIncluded ) 
-          pWOtax= ui->editFinalPrice->text().toDouble()/(1+((ui->editTax->text().toDouble()+ui->editExtraTaxes->text().toDouble())/100));
-        else
-          pWOtax = ui->editFinalPrice->text().toDouble();
-        //TODO:use the pWOtax
-
-        profitMoney = ( pWOtax - cost );
-        profit      = ( profitMoney / cost );
-        
-        //qDebug()<<" calculateProfit()  Profit % "<<profit<<" Profit $ "<<profitMoney<<" Price Without Taxes:"<<pWOtax<<" Cost + profit:"<<cost+profitMoney;
-        ui->lblProfit->setText(i18n("Gross Profit: %1% (%2)", QString::number(profit*100, 'f', 2) ,  KGlobal::locale()->formatMoney(profitMoney, QString(), 2) ));
-    } else {
-        ui->lblProfit->clear();
-    }
 }
 
 void ProductEditor::changeCode()
@@ -393,9 +385,13 @@ void ProductEditor::modifyStock()
   }
 }
 
+void ProductEditor::setProductsHash(QHash<QString,ProductInfo> hash) {
+    productsHash=hash;
+}
+
 void ProductEditor::checkIfCodeExists()
 {
-  enableButtonOk( false );
+//  enableButtonOk( false );
   QString codeStr = ui->editCode->text();
   if (codeStr.isEmpty()) {
     codeStr="-1";
@@ -403,7 +399,12 @@ void ProductEditor::checkIfCodeExists()
 
   Azahar *myDb = new Azahar;
   myDb->setDatabase(db);
-  ProductInfo pInfo = myDb->getProductInfo(codeStr);
+  ProductInfo pInfo;
+  if (productsHash.contains(codeStr)) {
+      pInfo=productsHash[codeStr];
+  } else {
+      pInfo = myDb->getProductInfo(codeStr);
+  }
   if (pInfo.isAGroup) {
     // get it again with the appropiate tax and price.
     pInfo = myDb->getProductInfo(codeStr, true); //the 2nd parameter is to get the taxes for the group (not considering discounts)
@@ -419,11 +420,10 @@ void ProductEditor::checkIfCodeExists()
       ui->editStockQty->setText(QString::number(pInfo.stockqty));
       setCategory(pInfo.category);
       setMeasure(pInfo.units);
+      setQunit(pInfo.qunit);
+      ui->editQuantity->setText(QString::number(pInfo.quantity));
       ui->editCost->setText(QString::number(pInfo.cost));
-      ui->editTax->setText(QString::number(pInfo.tax));
-      ui->editExtraTaxes->setText(QString::number(pInfo.extratax));
       ui->editFinalPrice->setText(QString::number(pInfo.price));
-      ui->editPoints->setText(QString::number(pInfo.points));
       ui->btnShowGroup->setEnabled(pInfo.isAGroup);
       ui->btnStockCorrect->setDisabled(pInfo.isAGroup); //dont allow grouped products to make stock correction
       ui->chIsARaw->setChecked(pInfo.isARawProduct);
@@ -443,7 +443,7 @@ void ProductEditor::checkIfCodeExists()
     }//if !modifyCode
     else {
       errorPanel->showTip(i18n("Code %1 already exists.", codeStr),3000);
-      enableButtonOk( false );
+//      enableButtonOk( false );
     }
   }
   else { //code does not exists... its a new product
@@ -455,12 +455,10 @@ void ProductEditor::checkIfCodeExists()
       ui->editStockQty->clear();
       setCategory(1);
       setMeasure(1);
+      setQunit(1);
+      ui->editQuantity->clear();
       ui->editCost->clear();
-      ui->editTax->clear();
-      ui->editExtraTaxes->clear();
       ui->editFinalPrice->clear();
-      ui->editPoints->clear();
-      ui->editUtility->clear();
       ui->editFinalPrice->clear();
       ui->labelPhoto->setText("No Photo");
     }
@@ -475,17 +473,12 @@ void ProductEditor::checkFieldsState()
   bool ready = false;
   if ( !ui->editCode->text().isEmpty()    &&
     !ui->editDesc->text().isEmpty()       &&
-    //!ui->editStockQty->text().isEmpty()   &&   Comment: This requirement was removed in order to use check-in/check-out procedures.
-    !ui->editPoints->text().isEmpty()     && 
     !ui->editCost->text().isEmpty()       &&
-    //!ui->editTax->text().isEmpty()        &&
-    //!ui->editExtraTaxes->text().isEmpty() &&
-    !ui->editFinalPrice->text().isEmpty() &&
-    ui->editTax->text().toDouble() >= 0     /// See Ticket #74. Allow ZERO tax for some products.
+    !ui->editFinalPrice->text().isEmpty()
     )  {
     ready = true;
   }
-  enableButtonOk(ready);
+//  enableButtonOk(ready);
   
   if (!ready  && ui->editCode->hasFocus() && ui->editCode->isReadOnly() ) {
     ui->editDesc->setFocus();
@@ -509,18 +502,6 @@ void ProductEditor::setPhoto(QPixmap p)
   } else newPix=p;
   ui->labelPhoto->setPixmap(newPix);
   pix=newPix;
-}
-
-void ProductEditor::slotButtonClicked(int button)
-{
-  if (button == KDialog::Ok) {
-    if (status == statusNormal) QDialog::accept();
-    else {
-      qDebug()<< "Button = OK, status == statusMOD";
-      done(statusMod);
-    }
-  }
-  else QDialog::reject();
 }
 
 void ProductEditor::setModel(QSqlRelationalTableModel *model)
@@ -582,7 +563,6 @@ void ProductEditor::addItem()
   }
   //reload groupView
   updatePriceDrop(ui->editGroupPriceDrop->value());//calculateGroupValues();
-  calculateProfit( ui->editFinalPrice->text() );
 
   //qDebug()<<"There are "<<groupInfo.count<<" items in group. The cost is:"<<groupInfo.cost<<", The price is:"<<groupInfo.price<<" And is available="<<groupInfo.isAvailable;
 
@@ -625,7 +605,6 @@ void ProductEditor::removeItem()
 
   //reload groupView
   updatePriceDrop(ui->editGroupPriceDrop->value());//calculateGroupValues();
-  calculateProfit( ui->editFinalPrice->text() );
   
   //qDebug()<<"There are "<<groupInfo.count<<" items in group. The cost is:"<<groupInfo.cost<<", The price is:"<<groupInfo.price<<" And is available="<<groupInfo.isAvailable;
 }
@@ -656,7 +635,6 @@ void ProductEditor::itemDoubleClicked(QTableWidgetItem* item)
   
   //reload groupView
   updatePriceDrop(ui->editGroupPriceDrop->value()); //calculateGroupValues();
-  calculateProfit( ui->editFinalPrice->text() );
   delete myDb;
 }
 
@@ -720,12 +698,8 @@ void ProductEditor::toggleGroup(bool checked)
     m_model->setFilter("");
     m_model->select();
   }
-
-  ui->editTax->setReadOnly(checked);
-  ui->editExtraTaxes->setReadOnly(checked);
   ui->editCost->setReadOnly(checked);
   ui->editFinalPrice->setReadOnly(checked);
-  ui->groupBox->setDisabled(checked);
 }
 
 void ProductEditor::toggleRaw(bool checked)
@@ -744,11 +718,8 @@ void ProductEditor::setIsAGroup(bool value)
   ui->chIsAGroup->setChecked(value);
   ui->btnShowGroup->setEnabled(value);
   ui->btnStockCorrect->setDisabled(value); //dont allow grouped products to make stock correction
-  ui->editTax->setReadOnly(value);
-  ui->editExtraTaxes->setReadOnly(value);
   ui->editCost->setReadOnly(value);
   ui->editFinalPrice->setReadOnly(value);
-  ui->groupBox->setDisabled(value);
 }
 
 void ProductEditor::setIsARaw(bool value)
@@ -788,10 +759,8 @@ void ProductEditor::setGroupElements(ProductInfo pi)
   ui->groupView->resizeColumnsToContents();
   delete myDb;
 
-  ui->editTax->setText(QString::number(groupInfo.tax));
   ui->editCost->setText(QString::number(groupInfo.cost));
   ui->editFinalPrice->setText(QString::number(groupInfo.price));
-  ui->editExtraTaxes->setText("0.0");
   ui->lblGPrice->setText(KGlobal::locale()->formatMoney(groupInfo.price, QString(), 2));
   ui->editGroupPriceDrop->setValue(groupInfo.priceDrop);
 }
@@ -821,8 +790,6 @@ void ProductEditor::updatePriceDrop(double value)
     groupInfo = giTemp;
     ui->editCost->setText(QString::number(groupInfo.cost));
     ui->editFinalPrice->setText(QString::number(groupInfo.price));
-    ui->editExtraTaxes->setText("0.0");
-    ui->editTax->setText(QString::number(groupInfo.tax));
     ui->lblGPrice->setText(KGlobal::locale()->formatMoney(groupInfo.price, QString(), 2));
     //update listview
     while (ui->groupView->rowCount() > 0) ui->groupView->removeRow(0);
@@ -867,7 +834,6 @@ void ProductEditor::calculateGroupValues()
   //update cost and price on the form
   ui->editCost->setText(QString::number(groupInfo.cost));
   ui->editFinalPrice->setText(QString::number(groupInfo.price));
-  ui->editExtraTaxes->setText("0.0");
   
   //calculate compound tax for the group.
   groupInfo.tax = 0;
@@ -875,7 +841,6 @@ void ProductEditor::calculateGroupValues()
     groupInfo.tax += (info.totaltax*info.qtyOnList/groupInfo.price)*100; // totalTaxMoney = price*(taxPercentage/100)
     qDebug()<<" <Calculating Values>  qtyOnList:"<<info.qtyOnList<<" tax money for product: "<<info.totaltax<<" group price:"<<groupInfo.price<<" taxMoney for group:"<<groupInfo.taxMoney<<" tax % for group:"<< groupInfo.tax;
   }
-  ui->editTax->setText(QString::number(groupInfo.tax));
   ui->lblGPrice->setText(KGlobal::locale()->formatMoney(groupInfo.price, QString(), 2));
 }
 

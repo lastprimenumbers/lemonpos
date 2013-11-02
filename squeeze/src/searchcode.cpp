@@ -40,8 +40,6 @@ SearchCode::SearchCode( QWidget *parent )
 : QWidget( parent )
 {
     ui = new SearchCodeUI( this );
-//    setMainWidget( ui );
-    //ui.comboName
     connect( ui->editCode, SIGNAL(editingFinished()), SLOT(updatedCode()));
     connect( ui->comboName, SIGNAL(currentIndexChanged(int)), SLOT(updatedName(int)));
     (ui->comboName) ->setEditable(true);
