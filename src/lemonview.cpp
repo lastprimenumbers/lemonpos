@@ -1457,8 +1457,15 @@ void lemonView::insertItem(QString code)
       qDebug()<<"FIN RES LIMIT"<<res<<qty*info.price;
       // if the limit is valid and the residual is less than the request
       if (res<qty*info.price) {
+          QApplication::beep();
+          system("beep -f 600 -r 5 -l 80");
           msg=i18n("Limite \"%1\"=%2 oltrepassato. Rimanenti %3 punti.", lim.label,lim.limit,res);
           tipCode->showTip(msg, 6000);
+          QMessageBox::warning(this,
+                               i18n("LIMITE OLTREPASSATO"),
+                               i18n("Limite \"%1\"=%2 oltrepassato. Rimanenti %3 punti.", lim.label,lim.limit,res),
+                               QMessageBox::Abort,
+                               QMessageBox::Abort);
           return;
       }
   }

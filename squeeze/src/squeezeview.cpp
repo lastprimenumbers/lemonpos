@@ -1429,17 +1429,18 @@ void squeezeView::setupLimitsModel()
 //    limitsModel->setRelation(2, QSqlRelation("tags", "tag", "tag"));
     limitsModel->setRelation(3, QSqlRelation("products", "code", "name"));
     limitsModel->setRelation(4, QSqlRelation("categories", "catid", "text"));
-//    limitsModel->setHeaderData(1, Qt::Horizontal, "Cliente");
+    limitsModel->setHeaderData(1, Qt::Horizontal, "Cliente");
     limitsModel->setHeaderData(2, Qt::Horizontal, "Etichetta");
     limitsModel->setHeaderData(3, Qt::Horizontal, "Prodotto");
     limitsModel->setHeaderData(4, Qt::Horizontal, "Categoria");
     limitsModel->setHeaderData(5, Qt::Horizontal, "Limite");
-//    limitsModel->setHeaderData(6, Qt::Horizontal, "Priorità");
+    limitsModel->setHeaderData(6, Qt::Horizontal, "Priorità");
+    limitsModel->setHeaderData(7, Qt::Horizontal, "Nome");
     ui_mainview.limitsView->setModel(limitsModel);
     ui_mainview.limitsView->setItemDelegate(new QSqlRelationalDelegate(ui_mainview.limitsView));
-    QString f;
-    f=QString("clientCode='*'");
-    limitsModel->setFilter(f);
+//    QString f;
+//    f=QString("clientCode='*'");
+//    limitsModel->setFilter(f);
 //    ui_mainview.limitsView->hideColumn(0); //id
 //    ui_mainview.limitsView->hideColumn(1); //clientcode
 //    ui_mainview.limitsView->hideColumn(6); //priorità
