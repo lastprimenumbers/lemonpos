@@ -448,9 +448,9 @@
           </widget>
          </item>
          <item>
-          <widget class="QCheckBox" name="checkIsSuspended">
+          <widget class="QPushButton" name="pushButton">
            <property name="text">
-            <string>Attiva sospensione</string>
+            <string>Calcola sospensione</string>
            </property>
           </widget>
          </item>

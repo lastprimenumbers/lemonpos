@@ -1226,23 +1226,22 @@ void lemonView::loadClient()
 {
     ClientInfo info;
     Azahar *myDb = new Azahar;
-  myDb->setDatabase(db);
-  info = myDb->getClientInfo(ui_mainview.editClientCode->text());
-  if ( info.id == 0)  {
-      qDebug()<<"KNOT";
-      QMessageBox::warning(this,
-                           i18n("Warning: Client Code Not Found"),
-                           i18n("Please provide a correct client code."),
-                           QMessageBox::Abort,
-                           QMessageBox::Abort);
-  } else {
-    clientInfo=info;
-    qDebug()<<"loadClient"<<info.name<<info.monthly;
-    updateFamily(info);
-    updateClientInfo();
-
-
-  }
+    myDb->setDatabase(db);
+    info = myDb->getClientInfo(ui_mainview.editClientCode->text());
+    qDebug()<<"loadClient"<<info.beginsusp.toString("dd.MM.yyyy")<<info.endsusp.toString("dd.MM.yyyy")<<info.msgsusp;
+    if ( info.id == 0)  {
+        qDebug()<<"KNOT";
+        QMessageBox::warning(this,
+                             i18n("Warning: Client Code Not Found"),
+                             i18n("Please provide a correct client code."),
+                             QMessageBox::Abort,
+                             QMessageBox::Abort);
+    } else {
+            clientInfo=info;
+            qDebug()<<"loadClient"<<info.name<<info.monthly;
+            updateFamily(info);
+            updateClientInfo();
+    }
 }
 
 void lemonView::updateFamily(ClientInfo info) {
@@ -3877,11 +3876,6 @@ void lemonView::updateClientInfo()
   }
   QString pStr = "";
 
-  //QString frmDisc = i18n("[%1]", KGlobal::locale()->formatMoney(discMoney));
-  //dStr = dStr + "\n"+KGlobal::locale()->formatMoney(discMoney);
-//  ui_mainview.lblClientDiscount->setText(dStr);
-//  ui_mainview.labelClientDiscounted->setText(pStr);
-
   int comboIdx = ui_mainview.comboClients->findData(clientInfo.id);
   ui_mainview.comboClients->setCurrentIndex(comboIdx);
 
@@ -3894,10 +3888,18 @@ void lemonView::updateClientInfo()
 
 
   clientInfo= myDb->getClientInfo(clientInfo.code);
-
   pix.loadFromData(clientInfo.photo);
   ui_mainview.lblClientPhoto->setPixmap(pix);
 
+  QDate d=QDate::currentDate();
+  if (clientInfo.endsusp>=d && clientInfo.beginsusp<=d) {
+      QMessageBox::warning(this,
+                           i18n("ATTENZIONE: CLIENTE SOSPESO"),
+                           i18n("Il cliente risulta sospeso dal %1 al %2 compresi. Messaggio di sospensione: \"%3\" ").arg(clientInfo.beginsusp.toString("dd.MM.yyyy"),clientInfo.endsusp.toString("dd.MM.yyyy"),clientInfo.msgsusp),
+                           QMessageBox::Abort,
+                           QMessageBox::Abort);
+      clientInfo.monthly=0;
+  } else {
   CreditInfo credit = myDb->getCreditInfoForClient(clientInfo.id, false);//do not create new credit if not found.
   if (credit.id > 0 and credit.total != 0 )
       ui_mainview.lblCreditInfo->setText(i18n("Credito Residuo: %1", KGlobal::locale()->formatMoney(clientInfo.monthly-credit.total,currency())));
@@ -3905,6 +3907,7 @@ void lemonView::updateClientInfo()
       ui_mainview.lblCreditInfo->setText("");
   delete myDb;
   qDebug()<<"Updating client info..."<<clientInfo.id<<clientInfo.name<<clientInfo.monthly;
+  }
 }
 
 void lemonView::setHistoryFilter() {

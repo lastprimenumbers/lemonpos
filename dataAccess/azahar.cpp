@@ -1825,6 +1825,9 @@ ClientInfo Azahar::checkParent(ClientInfo &info)
         parentInfo=_getClientInfo(info.parentClient);
         if (parentInfo.id > 0){
             info.monthly=parentInfo.monthly;
+            info.beginsusp=parentInfo.beginsusp;
+            info.endsusp=parentInfo.endsusp;
+            info.msgsusp=parentInfo.msgsusp;
             return parentInfo;
         }
     }

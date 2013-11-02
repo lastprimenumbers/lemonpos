@@ -68,6 +68,9 @@
      <property name="text">
       <string>Tutti i clienti</string>
      </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
     </widget>
     <widget class="QRadioButton" name="radioSingleClient">
      <property name="geometry">
@@ -281,15 +284,15 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>clienttag</class>
+   <class>SearchCode</class>
    <extends>QWidget</extends>
-   <header location="global">clienttag.h</header>
+   <header>searchcode.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>SearchCode</class>
+   <class>clienttag</class>
    <extends>QWidget</extends>
-   <header location="global">searchcode.h</header>
+   <header location="global">clienttag.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
