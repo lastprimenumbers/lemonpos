@@ -366,6 +366,7 @@ void ClientEditor::loadLimits(ClientInfo info)
     ui->clientLimitsList->setColumnHidden(0,true);
     limitsModel->setFilter(QString("clientId=%1").arg(info.id));
     limitsModel->select();
+
     CreditInfo credit=myDb->getCreditInfoForClient(parentClientInfo.id,false);
     ui->editDebit->setText(QString::number(credit.total));
     ui->editCredit->setText(QString::number(parentClientInfo.monthly-credit.total));

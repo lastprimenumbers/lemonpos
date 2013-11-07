@@ -3816,22 +3816,21 @@ void lemonView::connectToDb()
 
 void lemonView::setupClients()
 {
-  qDebug()<<"Setting up clients...";
-  ClientInfo info;
-  QString mainClient;
-  clientsHash.clear();
-  ui_mainview.comboClients->clear();
-  Azahar *myDb = new Azahar;
-  myDb->setDatabase(db);
-  clientsHash = myDb->getClientsHash();
-  mainClient  = myDb->getMainClient();
+    qDebug()<<"Setting up clients...";
+    ClientInfo info;
+    clientsHash.clear();
+    ui_mainview.comboClients->clear();
+    Azahar *myDb = new Azahar;
+    myDb->setDatabase(db);
+    clientsHash = myDb->getClientsHash();
+    mainClient  = myDb->getMainClient();
 
     //Set by default the 'general' client.
     QHashIterator<int, ClientInfo> i(clientsHash);
     while (i.hasNext()) {
-      i.next();
-      info = i.value();
-      ui_mainview.comboClients->addItem(info.name, info.id);
+        i.next();
+        info = i.value();
+        ui_mainview.comboClients->addItem(info.name, info.id);
     }
     int idx = ui_mainview.comboClients->findText(mainClient,Qt::MatchCaseSensitive);
     if (idx>-1) ui_mainview.comboClients->setCurrentIndex(idx);
@@ -3890,24 +3889,37 @@ void lemonView::updateClientInfo()
   clientInfo= myDb->getClientInfo(clientInfo.code);
   pix.loadFromData(clientInfo.photo);
   ui_mainview.lblClientPhoto->setPixmap(pix);
-
   QDate d=QDate::currentDate();
-  if (clientInfo.endsusp>=d && clientInfo.beginsusp<=d) {
+  // Check client suspension
+  if (clientInfo.endsusp>=d && clientInfo.beginsusp<=d && clientInfo.id>1) {
       QMessageBox::warning(this,
                            i18n("ATTENZIONE: CLIENTE SOSPESO"),
-                           i18n("Il cliente risulta sospeso dal %1 al %2 compresi. Messaggio di sospensione: \"%3\" ").arg(clientInfo.beginsusp.toString("dd.MM.yyyy"),clientInfo.endsusp.toString("dd.MM.yyyy"),clientInfo.msgsusp),
+                           i18n("Il cliente \"%1 %2\" risulta sospeso dal %3 al %4 compresi. Messaggio di sospensione: \"%5\" ").arg(clientInfo.name, clientInfo.surname, clientInfo.beginsusp.toString("dd.MM.yyyy"),clientInfo.endsusp.toString("dd.MM.yyyy"),clientInfo.msgsusp),
                            QMessageBox::Abort,
                            QMessageBox::Abort);
+      // Erase monthly credit and replace hash entry
       clientInfo.monthly=0;
+      clientsHash[clientInfo.id]=clientInfo;
+  // Check client expiry
+  } else if (d>clientInfo.expiry && clientInfo.id>1) {
+      QMessageBox::warning(this,
+                           i18n("ATTENZIONE: CLIENTE TERMINATO"),
+                           i18n("Il cliente \"%1 %2\" era abilitato fino al %3 compreso. Il servizio è pertanto terminato.").arg(clientInfo.name, clientInfo.surname, clientInfo.beginsusp.toString("dd.MM.yyyy"),clientInfo.endsusp.toString("dd.MM.yyyy"),clientInfo.msgsusp),
+                           QMessageBox::Abort,
+                           QMessageBox::Abort);
+      ui_mainview.comboClients->setCurrentIndex(0);// Reset to general
+      // Erase monthly credit and replace hash entry
+      clientInfo.monthly=0;
+      clientsHash[clientInfo.id]=clientInfo;
   } else {
   CreditInfo credit = myDb->getCreditInfoForClient(clientInfo.id, false);//do not create new credit if not found.
   if (credit.id > 0 and credit.total != 0 )
       ui_mainview.lblCreditInfo->setText(i18n("Credito Residuo: %1", KGlobal::locale()->formatMoney(clientInfo.monthly-credit.total,currency())));
   else
       ui_mainview.lblCreditInfo->setText("");
+  }
   delete myDb;
   qDebug()<<"Updating client info..."<<clientInfo.id<<clientInfo.name<<clientInfo.monthly;
-  }
 }
 
 void lemonView::setHistoryFilter() {

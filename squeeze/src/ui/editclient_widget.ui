@@ -23,7 +23,7 @@
    <item row="0" column="0">
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>2</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="basePage">
       <property name="enabled">
@@ -626,7 +626,7 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>96</width>
+            <width>98</width>
             <height>96</height>
            </rect>
           </property>

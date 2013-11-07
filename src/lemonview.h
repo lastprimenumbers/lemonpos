@@ -54,7 +54,7 @@ public:
     lemonView(QWidget *parent);
 
     virtual ~lemonView();
-
+    QString mainClient;
     QString getLoggedUser();
     QString getLoggedUserName(QString id);
     qulonglong getLoggedUserId(QString uname); //BUG FIXED on nov82009: it was unsigned int...
