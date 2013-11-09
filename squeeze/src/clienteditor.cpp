@@ -68,14 +68,12 @@ ClientEditor::ClientEditor( QSqlDatabase parentDb, QWidget *parent )
 
     ui->editClientCode->setEmptyMessage(i18n("Enter a 6, 12, or 13 digits Bar Code."));
     ui->editClientName->setEmptyMessage(i18n("Enter client full name"));
-    ui->editClientSurname->setEmptyMessage("");
-    ui->editClientEmail->setEmptyMessage("");
+    ui->editClientSurname->setEmptyMessage(i18n("Surname"));
+    ui->editClientEmail->setEmptyMessage(i18n("email@address"));
     ui->editClientNation->setEmptyMessage("");
     ui->editClientPhone->setEmptyMessage(i18n("Phone number"));
 
     ui->editParentClient->setCustomLayout(0);
-    ui->lastCreditResetPicker->setEnabled(false);
-    ui->nextCreditResetPicker->setEnabled(false);
 
     // Limits
     connect(ui->addLimitButton, SIGNAL(clicked()), SLOT( createLimit() ));
@@ -138,7 +136,6 @@ void ClientEditor::statistics(){
     for (int i=0; i<pk.count(); i++) {
         qDebug()<<"Appending product"<<pk[i]<<family.products[pk[i]];
         ui->productTable->setItem(i,0,new QTableWidgetItem(pk[i]));
-//        ProductInfo pInfo=myDb->getProductInfo(pk[i]);
         ui->productTable->setItem(i,1,new QTableWidgetItem(family.items[pk[i]].name));
         ui->productTable->setItem(i,2,new QTableWidgetItem(QString::number(family.products[pk[i]])));
     }
@@ -283,7 +280,6 @@ bool ClientEditor::validateParent(QString code)
     ui->parentClientLabel->setText(info.name);
     ui->parentClientPhoto->setPixmap(photo);
     hasParent=r;
-    ui->editMonthlyPoints->setEnabled(false);
 
     pal.setColor(QPalette::Text,col);
     ui->editParentClient->setPalette(pal);
@@ -310,14 +306,26 @@ void ClientEditor::updateChildren()
         ui->editParentClient->setEnabled(true);
         hasChild=false;
         hasParent=false;
+        ui->editClientMsgsusp->setReadOnly(true);
     } else if (family.members.at(0).code==info.code) {
         hasChild=true;
+        hasParent=false;
         ui->editParentClient->setName("");
         ui->parentClientLabel->setText(tr("Disabled"));
-        ui->editParentClient->setEnabled(false);
     } else {
+        hasChild=false;
         hasParent=true;
     }
+    // Enable or Disable parent client controls
+    ui->lastCreditResetPicker->setEnabled(!hasParent);
+    ui->nextCreditResetPicker->setEnabled(!hasParent);
+    ui->editMonthlyPoints->setEnabled(!hasParent);
+    ui->sinceDatePicker->setEnabled(!hasParent);
+    ui->expiryDatePicker->setEnabled(!hasParent);
+    ui->beginsuspPicker->setEnabled(!hasParent);
+    ui->endsuspPicker->setEnabled(!hasParent);
+    ui->editClientMsgsusp->setReadOnly(hasParent);
+
     for (int i=0 ; i<family.members.count(); ++i ) {
         ClientInfo fc=family.members.at(i);
         QTableWidgetItem *codeItem = new QTableWidgetItem(fc.code);

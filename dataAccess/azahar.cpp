@@ -1826,6 +1826,9 @@ bool Azahar::getClientInfoFromQuery(QSqlQuery &qC, ClientInfo &info){
 
 ClientInfo Azahar::checkParent(ClientInfo &info)
 {
+    /*!
+    If info is a child, overwrite family data with it's parent data.
+    */
     ClientInfo parentInfo;
     parentInfo.id=0;
     if (info.parentClient.count()>0){
@@ -1835,6 +1838,9 @@ ClientInfo Azahar::checkParent(ClientInfo &info)
             info.beginsusp=parentInfo.beginsusp;
             info.endsusp=parentInfo.endsusp;
             info.msgsusp=parentInfo.msgsusp;
+            info.expiry=parentInfo.expiry;
+            info.since=parentInfo.since;
+            info.lastCreditReset=parentInfo.lastCreditReset;
             return parentInfo;
         }
     }
