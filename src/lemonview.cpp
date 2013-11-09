@@ -912,7 +912,7 @@ void lemonView::doSearchItemDesc()
      QString c = pList.at(i);
      ProductInfo pInfo = myDb->getProductInfo(c);
      if (pInfo.isARawProduct) numRaw++;
-     if (pInfo.code==0 || pInfo.isARawProduct) continue; //discard this item, continue loop.
+     if (pInfo.code=="0" || pInfo.isARawProduct) continue; //discard this item, continue loop.
      //insert each product to the search table...
      int rowCount = ui_mainview.tableSearch->rowCount();
       ui_mainview.tableSearch->insertRow(rowCount);
@@ -1389,7 +1389,7 @@ void lemonView::insertItem(QString code)
   myDb->setDatabase(db);
 
   info = myDb->getProductInfo(codeX); //includes discount and validdiscount
-  qDebug()<<" CodeX = "<<codeX<<" Numeric Code:"<<info.code<<" Alphacode:"<<info.alphaCode<<" Required Qty:"<<qty;
+  qDebug()<<" CodeX = "<<codeX<<" Code:"<<info.code<<" Alphacode:"<<info.alphaCode<<" Required Qty:"<<qty;
 
 
   //checks if the hash contains the product and got values from there.. To include qtyOnList, that we need!
@@ -1474,7 +1474,7 @@ void lemonView::insertItem(QString code)
     info.qtyOnList = qty;
     int insertedAtRow = -1;
     bool productFound = false;
-    if ( info.code > 0 ) productFound = true;
+    if ( info.code != "0" ) productFound = true;
     if ( info.isARawProduct ) productFound = false;
     double descuento=0.0;
     if (info.validDiscount) descuento = info.disc*qty;
@@ -1534,7 +1534,7 @@ void lemonView::insertItem(QString code)
     ui_mainview.editItemCode->clear();
     }
     info.row = insertedAtRow;
-    if (info.row >-1 && info.desc != "[INVALID]" && info.code>0){
+    if (info.row >-1 && info.desc != "[INVALID]" && info.code!="0"){
       productsHash.insert(info.code, info);
       QTableWidgetItem *item = ui_mainview.tableWidget->item(info.row, colCode);
       displayItemInfo(item);

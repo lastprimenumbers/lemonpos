@@ -158,74 +158,79 @@ qulonglong Azahar::getProductOfferCode(QString code)
 
 ProductInfo Azahar::getProductInfo(const QString &code, const bool &notConsiderDiscounts)
 {
-  ProductInfo info;
-  info.code="0";
-  info.desc="Ninguno";
-  info.price=0;
-  info.disc=0;
-  info.cost=0;
-  info.lastProviderId = 0;
-  info.category=0;
-  info.taxmodelid=0; //for future use! MCH DEC 28 2010
-  info.units=0;
-  info.points=0;
-  info.row=-1;info.qtyOnList=-1;info.purchaseQty=-1;
-  info.discpercentage=0;
-  info.validDiscount=false;
-  info.alphaCode = "-NA-";
-  info.lastProviderId = 0;
-  info.isAGroup = false;
-  info.isARawProduct = false;
-  info.groupPriceDrop = 0;
-  info.hasUnlimitedStock = false;
-  info.isNotDiscountable = false;
-  info.qunit=0;
-  info.quantity=0.0;
-  QString rawCondition;
+    qDebug()<<"getProductInfo"<<code;
+    ProductInfo info;
+    info.code="0";
+    info.desc="ERROR";
+    info.price=0;
+    info.disc=0;
+    info.cost=0;
+    info.lastProviderId = 0;
+    info.category=0;
+    info.taxmodelid=0; //for future use! MCH DEC 28 2010
+    info.units=0;
+    info.points=0;
+    info.row=-1;info.qtyOnList=-1;info.purchaseQty=-1;
+    info.discpercentage=0;
+    info.validDiscount=false;
+    info.alphaCode = "-NA-";
+    info.lastProviderId = 0;
+    info.isAGroup = false;
+    info.isARawProduct = false;
+    info.groupPriceDrop = 0;
+    info.hasUnlimitedStock = false;
+    info.isNotDiscountable = false;
+    info.qunit=0;
+    info.quantity=0.0;
+    QString rawCondition;
 
-  if (!db.isOpen()) db.open();
-  if (db.isOpen()) {
-    QString qry = QString("SELECT  P.code as CODE, \
-    P.alphacode as ALPHACODE, \
-    P.name as NAME ,\
-    P.price as PRICE, \
-    P.cost as COST ,\
-    P.stockqty as STOCKQTY, \
-    P.units as UNITS, \
-    P.points as POINTS, \
-    P.photo as PHOTO, \
-    P.category as CATID, \
-    P.lastproviderid as PROVIDERID, \
-    P.taxpercentage as TAX1, \
-    P.extrataxes as TAX2, \
-    P.taxmodel as TAXMODELID, \
-    P.isARawProduct as ISRAW, \
-    P.isAGroup as ISGROUP, \
-    P.groupElements as GE, \
-    P.groupPriceDrop as GPRICEDROP,\
-    P.soldunits as SOLDUNITS, \
-    P.isNotDiscountable as NONDISCOUNT, \
-    P.hasUnlimitedStock as UNLIMITEDSTOCK, \
-    P.qunit as QUNIT, P.quantity as QUANTITY, \
-    U.text as UNITSDESC, \
-    C.text as CATEGORY, \
-    T.tname as TAXNAME, \
-    T.elementsid as TAXELEM \
-    FROM products AS P, taxmodels as T, categories as C, measures as U \
-    WHERE T.modelid=P.taxmodel \
-    AND C.catid=P.category AND U.id=P.units\
-    AND (CODE='%1' or ALPHACODE='%1');").arg(code);
-    
-    QSqlQuery query(db);
-    if (!query.exec(qry)) {
-      int errNum = query.lastError().number();
-      QSqlError::ErrorType errType = query.lastError().type();
-      QString error = query.lastError().text();
-      QString details = i18n("Error #%1, Type:%2\n'%3'",QString::number(errNum), QString::number(errType),error);
-      setError(i18n("Error getting product information for code %1, Rows affected: %2", code,query.size()));
+    if (!db.isOpen()) db.open();
+    if (!db.isOpen()) {
+        qDebug()<<"Failed db!" ;
+        return info;
     }
-    else {
-      while (query.next()) {
+    QString qry = QString("SELECT  P.code as CODE, \
+                          P.alphacode as ALPHACODE, \
+                          P.name as NAME ,\
+                          P.price as PRICE, \
+                          P.cost as COST ,\
+                          P.stockqty as STOCKQTY, \
+                          P.units as UNITS, \
+                          P.points as POINTS, \
+                          P.photo as PHOTO, \
+                          P.category as CATID, \
+                          P.lastproviderid as PROVIDERID, \
+                          P.taxpercentage as TAX1, \
+                          P.extrataxes as TAX2, \
+                          P.taxmodel as TAXMODELID, \
+                          P.isARawProduct as ISRAW, \
+                          P.isAGroup as ISGROUP, \
+                          P.groupElements as GE, \
+                          P.groupPriceDrop as GPRICEDROP,\
+                          P.soldunits as SOLDUNITS, \
+                          P.isNotDiscountable as NONDISCOUNT, \
+                          P.hasUnlimitedStock as UNLIMITEDSTOCK, \
+                          P.qunit as QUNIT, P.quantity as QUANTITY, \
+                          U.text as UNITSDESC, \
+                          C.text as CATEGORY, \
+                          T.tname as TAXNAME, \
+                          T.elementsid as TAXELEM \
+                          FROM products AS P, taxmodels as T, categories as C, measures as U \
+                          WHERE T.modelid=P.taxmodel \
+            AND C.catid=P.category AND U.id=P.units\
+            AND (CODE='%1' or ALPHACODE='%1');").arg(code);
+
+            QSqlQuery query(db);
+    if (!query.exec(qry)) {
+        int errNum = query.lastError().number();
+        QSqlError::ErrorType errType = query.lastError().type();
+        QString error = query.lastError().text();
+        QString details = i18n("Error #%1, Type:%2\n'%3'",QString::number(errNum), QString::number(errType),error);
+        setError(i18n("Error getting product information for code %1, Rows affected: %2", code,query.size()));
+        qDebug()<<"QUERY FAILURE!"<<query.lastError()<<query.lastQuery()<<query.boundValues();
+        return info;
+    }
+    while (query.next()) {
         int fieldTax1= query.record().indexOf("TAX1");
         int fieldTax2= query.record().indexOf("TAX2");
         int fieldGroupPD = query.record().indexOf("GPRICEDROP");
@@ -280,67 +285,69 @@ ProductInfo Azahar::getProductInfo(const QString &code, const bool &notConsiderD
         info.isNotDiscountable = query.value(fieldNonDiscount).toBool();
         info.quantity = query.value(fieldQuantity).toDouble();
         info.qunit = query.value(fieldQunit).toInt();
-      }
+    }
+    if (info.code=="0") {
+        qDebug()<<"!!!query failed!"<<query.lastQuery()<<query.boundValues();
+        return info;
+    }
+    if ( info.hasUnlimitedStock )
+        info.stockqty = 999999; //just make sure we do not return 0 for unlimited stock items.
 
-      if ( info.hasUnlimitedStock )
-            info.stockqty = 999999; //just make sure we do not return 0 for unlimited stock items.
-      
-      ///NOTE FOR DISCOUNTS:  TODO: ADD THIS TO THE USER MANUAL
-      //     If a group contains product with discounts THOSE ARE NOT TAKEN INTO CONSIDERATION,
-      //     The only DISCOUNT for a GROUP is the DISCOUNT created for the GROUP PRODUCT -not for its contents-.
-      //     The discounts for GROUPS are PERPETUAL.
-      //     Another way to assign a "discount" for a group is reducing the price in the product editor
-      //     this is not considered a discount but a lower price, and both can coexist so
-      ///    be CAREFUL with this!
-      
-     //get discount info... if have one.
-     QSqlQuery query2(db);
-     if ( !info.isNotDiscountable ) { //get discounts if !isNotDiscountable...
+    ///NOTE FOR DISCOUNTS:  TODO: ADD THIS TO THE USER MANUAL
+    //     If a group contains product with discounts THOSE ARE NOT TAKEN INTO CONSIDERATION,
+    //     The only DISCOUNT for a GROUP is the DISCOUNT created for the GROUP PRODUCT -not for its contents-.
+    //     The discounts for GROUPS are PERPETUAL.
+    //     Another way to assign a "discount" for a group is reducing the price in the product editor
+    //     this is not considered a discount but a lower price, and both can coexist so
+    ///    be CAREFUL with this!
+
+    //get discount info... if have one.
+    QSqlQuery query2(db);
+    if ( !info.isNotDiscountable ) { //get discounts if !isNotDiscountable...
         if (query2.exec(QString("Select * from offers where product_id=%1").arg(info.code) )) {
-        QList<double> descuentos; descuentos.clear();
-        while (query2.next()) // return the valid discount only (and the greater one if many).
+            QList<double> descuentos; descuentos.clear();
+            while (query2.next()) // return the valid discount only (and the greater one if many).
             {
-            int fieldDisc = query2.record().indexOf("discount");
-            int fieldDateStart = query2.record().indexOf("datestart");
-            int fieldDateEnd   = query2.record().indexOf("dateend");
-            double descP= query2.value(fieldDisc).toDouble();
-            QDate dateStart = query2.value(fieldDateStart).toDate();
-            QDate dateEnd   = query2.value(fieldDateEnd).toDate();
-            QDate now = QDate::currentDate();
-            //See if the offer is in a valid range...
-            if (info.isAGroup) { /// if produc is a group, the discount has NO DATE LIMITS!!! its valid forever.
-                descuentos.append(descP);
-            }
-            else if ((dateStart<dateEnd) && (dateStart<=now) && (dateEnd>=now)  ) {
-                //save all discounts here and decide later to return the bigger valid discount.
-                descuentos.append(descP);
-            }
+                int fieldDisc = query2.record().indexOf("discount");
+                int fieldDateStart = query2.record().indexOf("datestart");
+                int fieldDateEnd   = query2.record().indexOf("dateend");
+                double descP= query2.value(fieldDisc).toDouble();
+                QDate dateStart = query2.value(fieldDateStart).toDate();
+                QDate dateEnd   = query2.value(fieldDateEnd).toDate();
+                QDate now = QDate::currentDate();
+                //See if the offer is in a valid range...
+                if (info.isAGroup) { /// if produc is a group, the discount has NO DATE LIMITS!!! its valid forever.
+                    descuentos.append(descP);
+                }
+                else if ((dateStart<dateEnd) && (dateStart<=now) && (dateEnd>=now)  ) {
+                    //save all discounts here and decide later to return the bigger valid discount.
+                    descuentos.append(descP);
+                }
             }
             //now which is the bigger valid discount?
             qSort(descuentos.begin(), descuentos.end(), qGreater<int>());
             //qDebug()<<"DESCUENTOS ORDENADOS DE MAYOR A MENOR:"<<descuentos;
             if (!descuentos.isEmpty()) {
-            //get the first item, which is the greater one.
-            info.validDiscount = true;
-            info.discpercentage = descuentos.first();
-            info.disc =       (info.discpercentage/100) * (info.price); //round((info.discpercentage/100) * (info.price*100))/100; //FIXME:This is not necesary VALID.
+                //get the first item, which is the greater one.
+                info.validDiscount = true;
+                info.discpercentage = descuentos.first();
+                info.disc =       (info.discpercentage/100) * (info.price); //round((info.discpercentage/100) * (info.price*100))/100; //FIXME:This is not necesary VALID.
             } else {info.disc = 0; info.validDiscount =false;}
         }
-     } else {info.disc = 0; info.validDiscount = false;} // if !nondiscountable
-     /// If its a group, calculate the right price first.  @note: this will be removed when taxmodels are coded.
-     double priceDrop = 0;
-     if (info.isAGroup) {
-      //get each content price and tax percentage.
-      GroupInfo gInfo = getGroupPriceAndTax(info);
-      info.price = gInfo.price; //it includes price drop!
-      info.tax   = gInfo.tax;
-      info.extratax = 0; //accumulated in tax...
-      priceDrop = gInfo.priceDrop;
-     }
+    } else {info.disc = 0; info.validDiscount = false;} // if !nondiscountable
+    /// If its a group, calculate the right price first.  @note: this will be removed when taxmodels are coded.
+    double priceDrop = 0;
+    if (info.isAGroup) {
+        //get each content price and tax percentage.
+        GroupInfo gInfo = getGroupPriceAndTax(info);
+        info.price = gInfo.price; //it includes price drop!
+        info.tax   = gInfo.tax;
+        info.extratax = 0; //accumulated in tax...
+        priceDrop = gInfo.priceDrop;
     }
-  }
-  qDebug()<<"db.getProductInfo"<<info.qunit<<info.quantity;
-  return info;
+
+    qDebug()<<"db.getProductInfo"<<info.code<<info.qunit<<info.quantity<<info.desc;
+    return info;
 }
 
 QString Azahar::getProductCode(QString text)
@@ -1854,6 +1861,9 @@ Family Azahar::getFamily(ClientInfo &info)
         result.append(parentInfo);
         result.append(info);
     }
+    if (parentCode=="0" or parentCode=="") {
+        return family;
+    }
     QSqlQuery query(db);
     qDebug()<<"getFamily pre-query"<<parentCode;
     query.exec(QString("select * from clients where parent='%1';").arg(parentCode));
@@ -1888,13 +1898,19 @@ bool Azahar::getFamilyStatistics(Family &family, QDate start, QDate end)
 {
     // Combined query
     QSqlQuery query;
+    QString instat=getFamilyInStatement(family);
+    if (instat=="\"") {
+        return false;
+    }
     query.prepare(QString("SELECT *\
     FROM transactions AS tr, transactionitems AS item, products AS product \
      WHERE tr.clientid IN (%1) \
     AND tr.id=item.transaction_id \
     AND product.code=item.product_id \
+    AND item.product_id!='0' \
+    AND product.code!='0' \
     AND ( tr.date BETWEEN :start AND :end )\
-    ORDER BY tr.date;").arg(getFamilyInStatement(family)));
+    ORDER BY tr.date;").arg(instat));
     query.bindValue(":start", start.toString("yyyy-MM-dd"));
     query.bindValue(":end", end.toString("yyyy-MM-dd"));
     if (!query.exec()) {
@@ -1916,7 +1932,7 @@ bool Azahar::getFamilyStatistics(Family &family, QDate start, QDate end)
     while (getTransactionItemInfoFromQuery(query,item)) {
         if (item.productCode=="0") {continue;}
         qDebug()<<"Stats for item:"<<item.name<<item.productCode;
-        family.items.append(item);
+        family.items[item.productCode]=item;
         family.total+=item.total;
         if (family.products.contains(item.productCode)) {
             family.products[item.productCode]+=item.total;
@@ -4190,7 +4206,7 @@ SpecialOrderInfo Azahar::getSpecialOrderInfo(qulonglong id)
 {
   SpecialOrderInfo info;
   info.orderid=0;
-  info.name="Ninguno";
+  info.name="ERROR";
   info.price=0;
 
   if (!db.isOpen()) db.open();

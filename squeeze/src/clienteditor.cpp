@@ -138,8 +138,8 @@ void ClientEditor::statistics(){
     for (int i=0; i<pk.count(); i++) {
         qDebug()<<"Appending product"<<pk[i]<<family.products[pk[i]];
         ui->productTable->setItem(i,0,new QTableWidgetItem(pk[i]));
-        ProductInfo pInfo=myDb->getProductInfo(pk[i]);
-        ui->productTable->setItem(i,1,new QTableWidgetItem(pInfo.desc));
+//        ProductInfo pInfo=myDb->getProductInfo(pk[i]);
+        ui->productTable->setItem(i,1,new QTableWidgetItem(family.items[pk[i]].name));
         ui->productTable->setItem(i,2,new QTableWidgetItem(QString::number(family.products[pk[i]])));
     }
 }

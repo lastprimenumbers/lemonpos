@@ -398,7 +398,7 @@ struct Family
     // End date for the statistic
     QDate end;
     // List of items in the statistic
-    QList<TransactionItemInfo> items;
+    QHash<QString,TransactionItemInfo> items;
     // Mapping between product code and expense
     QHash<QString,double> products;
     // Mapping between product id and quantity (TODO)
