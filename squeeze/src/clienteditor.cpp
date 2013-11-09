@@ -292,6 +292,9 @@ bool ClientEditor::validateParent(QString code)
 void ClientEditor::updateChildren()
 {
     ClientInfo info=getClientInfo();
+    if (info.code=="") {
+        return;
+    }
     info.parentClient=getParentClient();
     qDebug()<<"updateChildren"<<info.code<<info.parentClient;
     // Retrieve from db
