@@ -91,12 +91,11 @@ ClientEditor::ClientEditor( QSqlDatabase parentDb, QWidget *parent )
     connect(ui->changeDebit, SIGNAL(clicked()), SLOT(changeDebit()));
     ui->editClientCode->setInputMask(">XXXXXXXXXXXXXXXXxxx");
     limitsModel=new QSqlTableModel();
-    transModel=new QSqlTableModel();
-    ticketModel=new QSqlTableModel();
     ui->clientTagEditor->setDb(db);
     ui->editParentClient->setDb(db,"clients");
     ui->stats->setDb(db);
-    connect(ui->transView, SIGNAL(clicked(const QModelIndex &)), SLOT(ticketViewOnSelected(const QModelIndex &)));
+    ui->trans->setDb(db);
+
 }
 
 
@@ -129,16 +128,6 @@ void ClientEditor::changeDebit()
     loadLimits(parentClientInfo);
 }
 
-void ClientEditor::ticketViewOnSelected(const QModelIndex & index) {
-        //getting data from model...
-        const QAbstractItemModel *model = index.model();
-        int row = index.row();
-        int fid=transModel->fieldIndex("id");
-        QModelIndex indx = model->index(row, fid);
-        qulonglong tid=model->data(indx, Qt::DisplayRole).toULongLong();
-        ticketModel->setFilter(QString("transaction_id=%1").arg(tid));
-        ticketModel->select();
-}
 
 void ClientEditor::changePhoto(bool del)
 {
@@ -262,6 +251,8 @@ void ClientEditor::updateChildren()
     myDb->setDatabase(db);
     family=myDb->getFamily(info);
     delete myDb;
+    ui->stats->setStats(family.stats);
+    ui->trans->setStats(family.stats);
     // Populate family table
     ui->childrenTable->setRowCount(family.members.count());
     hasChild=true;
@@ -351,31 +342,12 @@ void ClientEditor::loadLimits(ClientInfo info)
 
     // Prepare statistical structure
     Family family=myDb->getFamily(info);
-    ui->stats->setStats(family.stats);
-
     delete myDb;
-
-    transModel->setTable("transactions");
-    ui->transView->setModel(transModel);
-//    ui->transView->setColumnHidden(1,true);
-
-    ui->transView->setColumnHidden(2,true);
-    for (int i=6; i<=25; ++i) {
-        ui->transView->setColumnHidden(i,true);
-    }
-    transModel->setFilter(QString("clientid IN (%1)").arg(myDb->getFamilyInStatement(family)));
-    transModel->select();
+    ui->stats->setStats(family.stats);
+    ui->trans->setStats(family.stats);
 
 
-    ticketModel->setTable("transactionitems");
-    ui->ticketView->setModel(ticketModel);
-    ui->ticketView->setColumnHidden(0,true);
-    ui->ticketView->setColumnHidden(1,true);
-    ui->ticketView->setColumnHidden(5,true);
-    ui->ticketView->setColumnHidden(6,true);
-    for (int i=11; i<=16; ++i) {
-        ui->ticketView->setColumnHidden(i,true);
-    }
+
 
 }
 

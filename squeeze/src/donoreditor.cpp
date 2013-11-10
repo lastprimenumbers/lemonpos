@@ -73,6 +73,7 @@ DonorEditor::DonorEditor( QSqlDatabase parentDb, QWidget *parent )
     hl<<tr("Code")<<tr("Name");
 
     ui->stats->setDb(db);
+    ui->trans->setDb(db);
 
 }
 
@@ -129,6 +130,7 @@ void DonorEditor::setClientInfo(DonorInfo info)
     photo.loadFromData(info.photo);
     setPhoto(photo);
     ui->stats->setStats(info.stats);
+    ui->trans->setStats(info.stats);
 }
 //Overloaded: imposta le informazioni basandosi sul codice!
 void DonorEditor::setClientInfo(QString code)

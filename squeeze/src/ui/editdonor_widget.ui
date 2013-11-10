@@ -23,7 +23,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>2</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -267,6 +267,16 @@
        </item>
       </layout>
      </widget>
+     <widget class="QWidget" name="tab_4">
+      <attribute name="title">
+       <string>Transazioni</string>
+      </attribute>
+      <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <item>
+        <widget class="transactions" name="trans" native="true"/>
+       </item>
+      </layout>
+     </widget>
      <widget class="QWidget" name="tab_3">
       <attribute name="title">
        <string>Statistiche</string>
@@ -296,6 +306,12 @@
    <class>statistics</class>
    <extends>QWidget</extends>
    <header>statistics.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>transactions</class>
+   <extends>QWidget</extends>
+   <header>transactions.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

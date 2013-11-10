@@ -136,6 +136,7 @@ class Azahar : public QObject
     // STATISTICS
     bool        getStatisticsFromQuery(QSqlQuery &query, Statistics &stats);
     Statistics  getStatistics(Statistics &stats);
+    QStringList getInStatements(Statistics &stats);
     //DONORS
     bool         insertDonor(DonorInfo info);
     bool         updateDonor(DonorInfo info);

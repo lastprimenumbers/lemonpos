@@ -15,6 +15,7 @@ set(squeeze_SRCS
    clienttag.cpp
    searchcode.cpp
    statistics.cpp
+   transactions.cpp
    ../../src/inputdialog.cpp
    ../../src/loginwindow.cpp
    ../../src/misc.cpp
@@ -45,6 +46,7 @@ kde4_add_ui_files( squeeze_SRCS
   ui/clienttag.ui
   ui/searchcode.ui
   ui/statistics.ui
+  ui/transactions.ui
   )
 
 

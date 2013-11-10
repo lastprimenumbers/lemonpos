@@ -4,8 +4,9 @@
 #include <QWidget>
 #include <QtGui>
 #include "../../dataAccess/azahar.h"
-#include "ui_statistics.h"
 #include <QtSql>
+#include "ui_statistics.h"
+
 
 namespace Ui {
 class statistics;

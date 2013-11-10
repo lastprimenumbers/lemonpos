@@ -1937,11 +1937,8 @@ bool Azahar::getStatisticsFromQuery(QSqlQuery &query, Statistics &stats) {
     return true;
 }
 
-
-
-Statistics Azahar::getStatistics(Statistics &stats)
-{
-    // Prepare the IN statements
+QStringList Azahar::getInStatements(Statistics &stats) {
+    //! Prepare the IN statements - UGLY!
     QString inid="\"";
     QString incd="\"";
     QString intp="\"";
@@ -1963,22 +1960,33 @@ Statistics Azahar::getStatistics(Statistics &stats)
         incd.append("\"");
         if (i<stats.code.count()-1) {incd.append(", \"");}
     }
-    if ((inid=="\"" && incd=="\"") or intp=="\"") {
-        return stats;
-    }
+
     if (inid=="\"") inid="";
     if (incd=="\"") incd="";
+    QStringList result;
+    result.append(inid);
+    result.append(incd);
+    result.append(intp);
+    return result;
+}
+
+Statistics Azahar::getStatistics(Statistics &stats)
+{
+    QStringList instat=getInStatements(stats);
+    if ((instat[0]=="\"" && instat[1]=="\"") or instat[2]=="\"") {
+        return stats;
+    }
     QSqlQuery query;
     // Combined query
     query.prepare(QString("SELECT *\
     FROM transactions AS tr, transactionitems AS item, products AS product \
-     WHERE ( tr.clientid IN (%1) or  donor IN (%2) ) \
-    AND tr.id=item.transaction_id AND tr.type in (%3) \
+     WHERE ( tr.clientid IN (%1) or  donor IN (%2) ) AND tr.type in (%3)\
+    AND tr.id=item.transaction_id  \
     AND product.code=item.product_id \
     AND item.product_id!='0' \
     AND product.code!='0' \
     AND ( tr.date BETWEEN :start AND :end )\
-    ORDER BY tr.date;").arg(inid,incd,intp));
+            ORDER BY tr.date;").arg(instat[0],instat[1],instat[2]));
     query.bindValue(":start", stats.start.toString("yyyy-MM-dd"));
     query.bindValue(":end", stats.end.toString("yyyy-MM-dd"));
     if (!query.exec()) {
