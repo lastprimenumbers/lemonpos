@@ -1645,6 +1645,10 @@ bool Azahar::getDonorInfoFromQuery(QSqlQuery &qC, DonorInfo &info){
       info.emailRefDonor    = qC.value(qC.record().indexOf("refemail")).toString();
       info.phoneRefDonor    = qC.value(qC.record().indexOf("refphone")).toString();
       info.notesRefDonor    =   qC.value(qC.record().indexOf("notes")).toString();
+      info.stats.code.append(info.code);
+      info.stats.id.append(info.id);
+      info.stats.type.append(2);
+      info.stats.type.append(7);
       return true;
     }
     return false;
@@ -1867,6 +1871,7 @@ Family Azahar::getFamily(ClientInfo &info)
         result.append(parentInfo);
         result.append(info);
     }
+
     if (parentCode=="0" or parentCode=="") {
         return family;
     }
@@ -1876,6 +1881,7 @@ Family Azahar::getFamily(ClientInfo &info)
     qDebug()<<"getFamily query"<<query.lastError()<<query.lastQuery();
     // Cycle over results, to build the limits hash
     ClientInfo ci;
+
     while (getClientInfoFromQuery(query,ci)) {
         qDebug()<<"GET Family"<<info.code<<ci.code<<result.count();
         if (ci.code==info.code or ci.code==parentCode) {continue;}
@@ -1885,7 +1891,103 @@ Family Azahar::getFamily(ClientInfo &info)
     }
 
     family.members=result;
+    // Prepare statistics fields
+    family.stats.type.clear();
+    family.stats.id.clear();
+    family.stats.code.clear();
+    family.stats.type.append(1);
+    for (int i=0; i<result.count(); ++i) {
+        family.stats.id.append(result[i].id);
+        family.stats.code.append(result[i].code);
+    }
+    family.stats.start=parentInfo.lastCreditReset;
     return family;
+}
+
+bool Azahar::getStatisticsFromQuery(QSqlQuery &query, Statistics &stats) {
+    // Zero-out any previous stat
+    stats.products.clear();
+    stats.categories.clear();
+    stats.items.clear();
+    stats.total=0.0;
+    TransactionItemInfo item;
+    int cat;
+    int fieldCat=query.record().indexOf("category");
+    qDebug()<<"Collecting stats from"<<query.size()<<query.boundValues();
+    while (getTransactionItemInfoFromQuery(query,item)) {
+        if (item.productCode=="0") {continue;}
+        qDebug()<<"Stats for item:"<<item.name<<item.productCode;
+        stats.items[item.productCode]=item;
+        stats.total+=item.total;
+        if (stats.products.contains(item.productCode)) {
+            stats.products[item.productCode]+=item.total;
+            stats.quantities[item.productCode]+=item.qty;
+        } else {
+            stats.products[item.productCode]=item.total;
+            stats.quantities[item.productCode]=item.qty;
+        }
+        // Find out the category of the product
+        cat=query.value(fieldCat).toULongLong();
+        if (stats.categories.contains(cat)) {
+            stats.categories[cat]+=item.total;
+        } else {
+            stats.categories[cat]=item.total;
+        }
+    }
+    return true;
+}
+
+
+
+Statistics Azahar::getStatistics(Statistics &stats)
+{
+    // Prepare the IN statements
+    QString inid="\"";
+    QString incd="\"";
+    QString intp="\"";
+    // Get the clientid IN statement
+    for (int i=0; i<stats.id.count(); ++i) {
+        inid.append(QString::number(stats.id[i]));
+        inid.append("\"");
+        if (i<stats.id.count()-1) {inid.append(", \"");}
+    }
+    // Get the type IN statement
+    for (int i=0; i<stats.type.count(); ++i) {
+        intp.append(QString::number(stats.type[i]));
+        intp.append("\"");
+        if (i<stats.type.count()-1) {intp.append(", \"");}
+    }
+    // Get the donor IN statement
+    for (int i=0; i<stats.code.count(); ++i) {
+        incd.append(stats.code[i]);
+        incd.append("\"");
+        if (i<stats.code.count()-1) {incd.append(", \"");}
+    }
+    if ((inid=="\"" && incd=="\"") or intp=="\"") {
+        return stats;
+    }
+    if (inid=="\"") inid="";
+    if (incd=="\"") incd="";
+    QSqlQuery query;
+    // Combined query
+    query.prepare(QString("SELECT *\
+    FROM transactions AS tr, transactionitems AS item, products AS product \
+     WHERE ( tr.clientid IN (%1) or  donor IN (%2) ) \
+    AND tr.id=item.transaction_id AND tr.type in (%3) \
+    AND product.code=item.product_id \
+    AND item.product_id!='0' \
+    AND product.code!='0' \
+    AND ( tr.date BETWEEN :start AND :end )\
+    ORDER BY tr.date;").arg(inid,incd,intp));
+    query.bindValue(":start", stats.start.toString("yyyy-MM-dd"));
+    query.bindValue(":end", stats.end.toString("yyyy-MM-dd"));
+    if (!query.exec()) {
+        qDebug()<<query.lastError()<<query.lastQuery()<<query.boundValues();
+        return stats;
+    }
+    getStatisticsFromQuery(query,stats);
+    return stats;
+
 }
 
 QString Azahar::getFamilyInStatement(Family family)
@@ -1902,62 +2004,128 @@ QString Azahar::getFamilyInStatement(Family family)
 
 bool Azahar::getFamilyStatistics(Family &family, QDate start, QDate end)
 {
-    // Combined query
-    QSqlQuery query;
-    QString instat=getFamilyInStatement(family);
-    if (instat=="\"") {
-        return false;
-    }
-    query.prepare(QString("SELECT *\
-    FROM transactions AS tr, transactionitems AS item, products AS product \
-     WHERE tr.clientid IN (%1) \
-    AND tr.id=item.transaction_id \
-    AND product.code=item.product_id \
-    AND item.product_id!='0' \
-    AND product.code!='0' \
-    AND ( tr.date BETWEEN :start AND :end )\
-    ORDER BY tr.date;").arg(instat));
-    query.bindValue(":start", start.toString("yyyy-MM-dd"));
-    query.bindValue(":end", end.toString("yyyy-MM-dd"));
-    if (!query.exec()) {
-        qDebug()<<query.lastError()<<query.lastQuery()<<query.boundValues();
-        return false;
-    }
-    // Zero-out any previous stat
-    family.start=start;
-    family.end=end;
-    family.products.clear();
-    family.categories.clear();
-    family.items.clear();
-    family.total=0.0;
-    TransactionItemInfo item;
-    int cat;
-    qulonglong pid;
-    int fieldCat=query.record().indexOf("category");
-    qDebug()<<"Collecting stats from"<<query.size()<<query.boundValues();
-    while (getTransactionItemInfoFromQuery(query,item)) {
-        if (item.productCode=="0") {continue;}
-        qDebug()<<"Stats for item:"<<item.name<<item.productCode;
-        family.items[item.productCode]=item;
-        family.total+=item.total;
-        if (family.products.contains(item.productCode)) {
-            family.products[item.productCode]+=item.total;
-            family.quantities[item.productCode]+=item.qty;
-        } else {
-            family.products[item.productCode]=item.total;
-            family.quantities[item.productCode]=item.qty;
-        }
-        // Find out the category of the product
-        cat=query.value(fieldCat).toULongLong();
-        if (family.categories.contains(cat)) {
-            family.categories[cat]+=item.total;
-        } else {
-            family.categories[cat]=item.total;
-        }
-    }
+    family.stats.start=start;
+    family.stats.end=end;
+    family.stats=getStatistics(family.stats);
     return true;
+    // Combined query
+//    QSqlQuery query;
+//    QString instat=getFamilyInStatement(family);
+//    if (instat=="\"") {
+//        return false;
+//    }
+//    family.stats.start=start;
+//    family.stats.end=end;
+//    query.prepare(QString("SELECT *\
+//    FROM transactions AS tr, transactionitems AS item, products AS product \
+//     WHERE tr.clientid IN (%1) \
+//    AND tr.id=item.transaction_id \
+//    AND product.code=item.product_id \
+//    AND item.product_id!='0' \
+//    AND product.code!='0' \
+//    AND ( tr.date BETWEEN :start AND :end )\
+//    ORDER BY tr.date;").arg(instat));
+//    query.bindValue(":start", start.toString("yyyy-MM-dd"));
+//    query.bindValue(":end", end.toString("yyyy-MM-dd"));
+//    if (!query.exec()) {
+//        qDebug()<<query.lastError()<<query.lastQuery()<<query.boundValues();
+//        return false;
+//    }
+
+//    return getStatisticsFromQuery(query,family.stats);
+
 }
 
+
+
+bool Azahar::getDonorStatistics(DonorInfo &info, QDate start, QDate end)
+{
+    //! Build statistics about a single donor.
+    info.stats.start=start;
+    info.stats.end=end;
+    info.stats=getStatistics(info.stats);
+    return true;
+//    // Combined query
+//    QSqlQuery query;
+//    query.prepare(QString("SELECT *\
+//    FROM transactions AS tr, transactionitems AS item, products AS product \
+//     WHERE tr.donor=%1 AND tr.type in (2,7)\
+//    AND tr.id=item.transaction_id \
+//    AND product.code=item.product_id \
+//    AND item.product_id!='0' \
+//    AND product.code!='0' \
+//    AND ( tr.date BETWEEN :start AND :end )\
+//    ORDER BY tr.date;").arg(info.code));
+//    query.bindValue(":start", start.toString("yyyy-MM-dd"));
+//    query.bindValue(":end", end.toString("yyyy-MM-dd"));
+//    if (!query.exec()) {
+//        qDebug()<<query.lastError()<<query.lastQuery()<<query.boundValues();
+//        return false;
+//    }
+//    // Zero-out any previous stat
+//    info.stats.start=start;
+//    info.stats.end=end;
+//    return getStatisticsFromQuery(query,info.stats);
+}
+
+void Azahar::migrateDonations()
+{
+    //! Rebuild transaction items from all donation transactions and inserts them in db.
+    QSqlQuery query;
+    query.prepare(QString("SELECT * from transactions where type in (2,7)"));
+    if (!query.exec()) {
+        qDebug()<<query.lastError()<<query.lastQuery();
+        return;
+    }
+    TransactionInfo tr;
+    TransactionItemInfo tItemInfo;
+    QStringList itemlist;
+    QStringList codenum;
+    double qty;
+    ProductInfo info;
+    while  (getTransactionInfoFromQuery(query,tr)) {
+        qDebug()<<"Considering transaction"<<tr.id<<tr.date;
+        if (tr.itemlist.count()==0) {
+            qDebug()<<"Skipping empty transaction"<<tr.id;
+            continue;
+        }
+        itemlist=tr.itemlist.split(";");
+        qDebug()<<"itemlist"<<itemlist<<itemlist.count();
+        deleteAllTransactionItem(tr.id);
+        for (int i=0; i<itemlist.count();++i) {
+            codenum=itemlist[i].split("/");
+            qDebug()<<"codenum"<<codenum;
+            info=getProductInfo(codenum[0]);
+            if (info.code=="0") {
+                qDebug()<<"Impossible to retrive product from item list:"<<tr.id<<codenum[0];
+                continue;
+            }
+            qty=codenum[1].toFloat();
+            // Compiling transactionitems
+            tItemInfo.transactionid   = tr.id;
+            tItemInfo.position        = i;
+            tItemInfo.productCode     = info.code;
+            tItemInfo.unitStr         = info.unitStr;
+            tItemInfo.qty             = qty;
+            tItemInfo.cost            = info.cost;
+            tItemInfo.price           = info.price;
+            tItemInfo.disc            = info.disc * qty;
+            tItemInfo.total           = info.cost * qty;
+            // use the selling price if not cost is available
+            if (tItemInfo.total<=0.001) {
+                tItemInfo.total           = info.price * qty;
+                tItemInfo.cost            = info.price;
+            }
+            tItemInfo.completePayment = true;
+            if (info.isAGroup)
+              tItemInfo.name            = info.desc.replace("\n", "|");
+            else
+              tItemInfo.name            = info.desc;
+            tItemInfo.isGroup = info.isAGroup;
+            insertTransactionItem(tItemInfo);
+        }
+    }
+}
 
 bool Azahar::getLimitFromQuery(QSqlQuery &query, Limit &result) {
     if (query.next()) {
@@ -2085,9 +2253,9 @@ Limit Azahar::getFamilyLimit(Family &family, ProductInfo &pInfo) {
     QSqlQuery query(db);
     QString ctags="";
     ClientInfo cInfo;
-    for (int j; j<family.members.count(); ++j) {
+    for (int j=0; j<family.members.count(); ++j) {
         cInfo=family.members[j];
-        for (int i; i<cInfo.tags.count(); ++i) {
+        for (int i=0; i<cInfo.tags.count(); ++i) {
             ctags+="'"+cInfo.tags.at(i)+"', ";
         }
     }
@@ -3216,7 +3384,7 @@ bool Azahar::insertTransactionItem(TransactionItemInfo info)
   if (!db.isOpen()) db.open();
   if (db.isOpen()) {
     QSqlQuery query(db);
-    query.prepare("INSERT INTO transactionitems (transaction_id, position, product_id, qty, points, unitstr, cost, price, disc, total, name, payment, completePayment, soId, isGroup, deliveryDateTime, tax) VALUES(:transactionid, :position, :productCode, :qty, :points, :unitStr, :cost, :price, :disc, :total, :name, :payment, :completeP, :soid, :isGroup, :deliveryDT, :tax)");
+    query.prepare("INSERT INTO transactionitems (transaction_id, position, product_id, qty, points, unitstr, cost, price, disc, total, name, payment, completePayment, soId, isGroup, deliveryDateTime) VALUES(:transactionid, :position, :productCode, :qty, :points, :unitStr, :cost, :price, :disc, :total, :name, :payment, :completeP, :soid, :isGroup, :deliveryDT)");
     query.bindValue(":transactionid", info.transactionid);
     query.bindValue(":position", info.position);
     query.bindValue(":productCode", info.productCode);
@@ -3233,7 +3401,6 @@ bool Azahar::insertTransactionItem(TransactionItemInfo info)
     query.bindValue(":soid", info.soId);
     query.bindValue(":isGroup", info.isGroup);
     query.bindValue(":deliveryDT", info.deliveryDateTime);
-    query.bindValue(":tax", info.tax);
     if (!query.exec()) {
       setError(query.lastError().text());
       qDebug()<<"Insert TransactionItems error:"<<query.lastError().text();

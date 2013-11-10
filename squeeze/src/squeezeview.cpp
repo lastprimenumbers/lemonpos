@@ -155,12 +155,21 @@ squeezeView::squeezeView(QWidget *parent)
   ui_mainview.btnTransactions->setIcon(DesktopIcon("wallet-open", 32));
   ui_mainview.btnSO->setIcon(DesktopIcon("lemon-box", 32));
 
-
   logoBottomFile = KStandardDirs::locate("appdata", "styles/");
   logoBottomFile = logoBottomFile+"tip.svg";
   notifierPanel = new MibitNotifier(this,logoBottomFile, DesktopIcon("dialog-warning", 32));
   qDebug()<<"exiting from init function";
 
+  connect(ui_mainview.migratedb,SIGNAL(clicked()), SLOT(migratedb()) );
+
+}
+
+void squeezeView::migratedb() {
+    qDebug()<<"migratedb()";
+    db.open();
+    Azahar *myDb = new Azahar;
+    myDb->setDatabase(db);
+    myDb->migrateDonations();
 }
 
 void squeezeView::checkDefaultView()
@@ -2236,99 +2245,14 @@ void squeezeView::_clientsViewOnSelected(const QModelIndex & index, QSqlTableMod
 
 void squeezeView::doPurchase()
 {
-//NOTE: Unlimited stock items cannot be purchased. This limitation is in the purchase editor, so here we do not need to do anything.
-  if (db.isOpen()) {
-    QStringList items;
-    items.clear();
-
-    //temporal items list
-    items.append("empty list"); //just a tweak for creating the transaction, celaning after creating it.
-
-    Azahar *myDb = new Azahar;
-    myDb->setDatabase(db);
-
+    if (!db.isOpen()) db.open();
+    if (!db.isOpen()) return;
     qDebug()<<"doPurchase...";
     PurchaseEditor *purchaseEditorDlg = new PurchaseEditor(this);
     purchaseEditorDlg->setDb(db,productsModel);
     if (purchaseEditorDlg->exec()) {
-      //Now add a transaction for buy
-//      QDate date = QDate::currentDate();
-//      QTime time = QTime::currentTime();
-        qDebug()<<"DATE:"<<purchaseEditorDlg->getDate().toString()<<purchaseEditorDlg->getTime().toString();
-      TransactionInfo tInfo;
-      if (purchaseEditorDlg->getPurchased()) {
-          tInfo.type    = tBuy;
-      } else {
-          tInfo.type    = tDonation;
-      }
-      tInfo.amount  = purchaseEditorDlg->getTotalBuy();
-      tInfo.date    = purchaseEditorDlg->getDate();
-      tInfo.time    = purchaseEditorDlg->getTime();
-      tInfo.paywith = 0.0;
-      tInfo.changegiven = 0.0;
-      tInfo.paymethod   = pCash;
-      tInfo.state   = tCompleted;
-      tInfo.userid  = 1;
-      tInfo.clientid= 1;
-      tInfo.cardnumber  = "-NA-";
-      tInfo.cardauthnum = "-NA-";
-      tInfo.itemcount   = purchaseEditorDlg->getItemCount();
-      tInfo.itemlist    = items.join(";");
-      tInfo.utility     = 0; //FIXME: utility is calculated until products are sold, not before.
-      tInfo.terminalnum = 0; //NOTE: Not really a terminal... from admin computer.
-      tInfo.providerid  = 1; //FIXME!
-      tInfo.specialOrders = "";
-      tInfo.balanceId = 0;
-      tInfo.donor       = purchaseEditorDlg->getDonor();
-      tInfo.note= purchaseEditorDlg->getNote();
-      qulonglong trnum = myDb->insertTransaction(tInfo); //to get the transaction number to insert in the log.
-      if ( trnum <= 0 ) {
-          qDebug()<<"ERROR: Could not create a Purchase Transaction ::doPurchase()";
-          qDebug()<<"Error:"<<myDb->lastError();
-          //TODO: Notify the user about the error.
-      }
-
-      //Now cleaning the items to fill with real items...
-      items.clear();
-      //assigning new transaction id to the tInfo.
-      tInfo.id = trnum;
-
-      QHash<QString, ProductInfo> hash = purchaseEditorDlg->getHash();
-      ProductInfo info;
-      //Iterate the hash
-      QHashIterator<QString, ProductInfo> i(hash);
-      while (i.hasNext()) {
-          i.next();
-          info = i.value();
-          double oldstockqty = info.stockqty;
-          info.stockqty = info.purchaseQty+oldstockqty;
-          //Modify data on mysql...
-          //validDiscount is for checking if product already exists on db. see line # 396 of purchaseeditor.cpp
-          if (info.validDiscount) {
-              if (!myDb->updateProduct(info, info.code))
-                  qDebug()<<myDb->lastError();
-              else {
-                  log(loggedUserId, QDate::currentDate(), QTime::currentTime(), i18n("Purchase #%4 - %1 x %2 (%3)", info.purchaseQty, info.desc, info.code, trnum) );
-                  qDebug()<<"Product updated [purchase] ok...";
-              }
-              
-          } else {
-              if (!myDb->insertProduct(info))
-                  qDebug()<<myDb->lastError();
-              else {
-                  log(loggedUserId, QDate::currentDate(), QTime::currentTime(), i18n("Purchase #%4 - [new] - %1 x %2 (%3)", info.purchaseQty, info.desc, info.code, trnum) );
-              }
-          }
-          
-          productsModel->select();
-          items.append(info.code+"/"+QString::number(info.purchaseQty));
-      }
-      //update items in transaction data
-      tInfo.itemlist = items.join(";");
-      myDb->updateTransaction(tInfo);
+        purchaseEditorDlg->doPurchase();
     }
-  delete myDb;
-  }
 }
 
 void squeezeView::stockCorrection()
@@ -2661,7 +2585,7 @@ void squeezeView::updateCategoriesCombo()
 {
   populateCategoriesHash();
   ui_mainview.comboProductsFilterByCategory->clear();
-  for (int i; i<categoriesList.count(); ++i) {
+  for (int i=0; i<categoriesList.count(); ++i) {
       ui_mainview.comboProductsFilterByCategory->addItem(categoriesList.at(i));
   }
 }

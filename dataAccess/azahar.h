@@ -56,6 +56,7 @@ class Azahar : public QObject
     Azahar(QWidget * parent = 0);
     ~ Azahar();
 //    void correct24Ago(ClientInfo &info);
+    void migrateDonations();
     bool isConnected();
     QString lastError();
     void initDatabase(QString user, QString server, QString password, QString dbname);
@@ -132,13 +133,16 @@ class Azahar : public QObject
     UserInfo     getUserInfo(const qulonglong &userid);
     bool         deleteUser(qulonglong id);
 
-
+    // STATISTICS
+    bool        getStatisticsFromQuery(QSqlQuery &query, Statistics &stats);
+    Statistics  getStatistics(Statistics &stats);
     //DONORS
     bool         insertDonor(DonorInfo info);
     bool         updateDonor(DonorInfo info);
     bool         deleteDonor(qulonglong id);
     DonorInfo   getDonorInfo(qulonglong clientId);
     DonorInfo   getDonorInfo(QString clientCode);
+    bool getDonorStatistics(DonorInfo &info, QDate start, QDate end);
 
     //CLIENTS
     bool         insertClient(ClientInfo info);

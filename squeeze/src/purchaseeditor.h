@@ -67,7 +67,7 @@ class PurchaseEditor : public KDialog
     void    disableCode()              { ui->p->ui->editCode->setReadOnly(true); };
     void    enableCode()               { ui->p->ui->editCode->setReadOnly(false); };
     void    resetEdits();
-    
+    void    doPurchase();
 private slots:
     void    addItemToList();
     void    setupTable();

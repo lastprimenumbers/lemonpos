@@ -112,7 +112,6 @@ class ClientEditor : public KDialog
     void viewChildClient(int row,int col);
     void changeDebit();
     void ticketViewOnSelected(const QModelIndex &);
-    void statistics();
 
   private:
     ClientEditorUI *ui;

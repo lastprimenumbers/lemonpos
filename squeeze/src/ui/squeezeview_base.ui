@@ -26,12 +26,6 @@
    <string>Form</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
-   <property name="spacing">
-    <number>1</number>
-   </property>
-   <property name="margin">
-    <number>2</number>
-   </property>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
      <property name="spacing">
@@ -93,16 +87,39 @@
    <item>
     <widget class="QStackedWidget" name="stackedWidget">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
      <property name="currentIndex">
-      <number>7</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="pageWelcome">
       <layout class="QGridLayout" name="gridLayout">
+       <item row="1" column="0">
+        <widget class="KPlotWidget" name="plotSales">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>500</width>
+           <height>300</height>
+          </size>
+         </property>
+         <property name="backgroundColor">
+          <color>
+           <red>96</red>
+           <green>111</green>
+           <blue>0</blue>
+          </color>
+         </property>
+        </widget>
+       </item>
        <item row="2" column="0">
         <widget class="QLabel" name="lblGraphSoldItems">
          <property name="sizePolicy">
@@ -129,22 +146,6 @@
          </property>
          <property name="text">
           <string>Almost Sold Out Items (Top 5 sold items)</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignCenter</set>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="0">
-        <widget class="QLabel" name="lblGraphSales">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="text">
-          <string>Sales</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>
@@ -197,6 +198,22 @@
          </property>
          <property name="grid" stdset="0">
           <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QLabel" name="lblGraphSales">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>Sales</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
          </property>
         </widget>
        </item>
@@ -786,29 +803,6 @@
          </layout>
         </widget>
        </item>
-       <item row="1" column="0">
-        <widget class="KPlotWidget" name="plotSales">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>500</width>
-           <height>300</height>
-          </size>
-         </property>
-         <property name="backgroundColor">
-          <color>
-           <red>96</red>
-           <green>111</green>
-           <blue>0</blue>
-          </color>
-         </property>
-        </widget>
-       </item>
        <item row="1" column="1">
         <widget class="KPlotWidget" name="plotProfit">
          <property name="sizePolicy">
@@ -866,21 +860,28 @@
          <item>
           <widget class="QPushButton" name="btnAddDonor">
            <property name="text">
-            <string>Add Donor</string>
+            <string>Aggiungi nuovo</string>
            </property>
           </widget>
          </item>
          <item>
           <widget class="QPushButton" name="btnDeleteDonor">
            <property name="text">
-            <string>Delete Selected</string>
+            <string>Cancella Selezionato</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="migratedb">
+           <property name="text">
+            <string>Aggiorna Costi</string>
            </property>
           </widget>
          </item>
          <item>
           <widget class="QPushButton" name="btnExportDonors">
            <property name="text">
-            <string>Export</string>
+            <string>Esporta CSV</string>
            </property>
           </widget>
          </item>

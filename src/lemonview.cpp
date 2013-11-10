@@ -1429,7 +1429,7 @@ void lemonView::insertItem(QString code)
       // residual limit
       double res=lim.limit;
       qDebug()<<"RES LIMIT"<<res;
-      LiveStats stats=liveStats();
+      Statistics stats=liveStats();
       // If lim is a category limit, add the relevant category stats
       if (lim.productCode=="*") {
           // substract monthly category stats
@@ -1551,9 +1551,9 @@ void lemonView::insertItem(QString code)
   updateTransaction();
 }//insertItem
 
-LiveStats lemonView::liveStats() {
+Statistics lemonView::liveStats() {
     // Compile statistics based on items in list
-    LiveStats res;
+    Statistics res;
     foreach (ProductInfo pi, productsHash) {
         double val=pi.qtyOnList*pi.price;
         if (!res.products.contains(pi.code)) {
@@ -2257,10 +2257,6 @@ void lemonView::finishCurrentTransaction()
       tItemInfo.payment         = 0; //not used
       tItemInfo.completePayment = true;
       tItemInfo.isGroup = i.value().isAGroup;
-      tItemInfo.tax = (i.value().tax + i.value().extratax); //tax percentage (15 == 15%), as it was originally planed.
-      //NOTE: Apr 14 2011: I decided to print the tax % in product iteration in tickets. Instead of the money.
-      //                   This way, i dont need to fix the tax money amount if the item has discounts or the sale has a client/ocassional discount.
-      //tItemInfo.tax = i.value().totaltax*i.value().qtyOnList; //((i.value().tax + i.value().extratax)/100)*tItemInfo.total;
 
       myDb->insertTransactionItem(tItemInfo);
 

@@ -293,6 +293,121 @@ double PurchaseEditor::getPurchaseQty()
 }
 
 
+void PurchaseEditor::doPurchase()
+{
+    if (!db.isOpen()) db.open();
+    if (!db.isOpen()) {return;}
+
+    QStringList items;
+    items.clear();
+
+    //temporal items list
+    items.append("empty list"); //just a tweak for creating the transaction, cleaning after creating it.
+
+    Azahar *myDb = new Azahar;
+    myDb->setDatabase(db);
+
+    qDebug()<<"doPurchase...";
+    qDebug()<<"DATE:"<<getDate().toString()<<getTime().toString();
+
+    TransactionInfo tInfo;
+    if (getPurchased()) {
+        tInfo.type    = tBuy;
+    } else {
+        tInfo.type    = tDonation;
+    }
+    tInfo.amount  = getTotalBuy();
+    tInfo.date    = getDate();
+    tInfo.time    = getTime();
+    tInfo.paywith = 0.0;
+    tInfo.changegiven = 0.0;
+    tInfo.paymethod   = pCash;
+    tInfo.state   = tCompleted;
+    tInfo.userid  = 1;
+    tInfo.clientid= 1;
+    tInfo.cardnumber  = "-NA-";
+    tInfo.cardauthnum = "-NA-";
+    tInfo.itemcount   = getItemCount();
+    tInfo.itemlist    = items.join(";");
+    tInfo.utility     = 0; //FIXME: utility is calculated until products are sold, not before.
+    tInfo.terminalnum = 0; //NOTE: Not really a terminal... from admin computer.
+    tInfo.providerid  = 1; //FIXME!
+    tInfo.specialOrders = "";
+    tInfo.balanceId = 0;
+    tInfo.donor       = getDonor();
+    tInfo.note= getNote();
+    qulonglong trnum = myDb->insertTransaction(tInfo); //to get the transaction number to insert in the log.
+    if ( trnum <= 0 ) {
+        qDebug()<<"ERROR: Could not create a Purchase Transaction ::doPurchase()";
+        qDebug()<<"Error:"<<myDb->lastError();
+        //TODO: Notify the user about the error.
+    }
+    //Now cleaning the items to fill with real items...
+    items.clear();
+    //assigning new transaction id to the tInfo.
+    tInfo.id = trnum;
+
+    QHash<QString, ProductInfo> hash = getHash();
+    ProductInfo info;
+    TransactionItemInfo tItemInfo;
+    //Iterate the hash
+    QHashIterator<QString, ProductInfo> i(hash);
+    int j=-1;
+    while (i.hasNext()) {
+        j+=1;
+        i.next();
+        info = i.value();
+        double oldstockqty = info.stockqty;
+        info.stockqty = info.purchaseQty+oldstockqty;
+        //Modify data on mysql...
+        //validDiscount is for checking if product already exists on db. see line # 396 of purchaseeditor.cpp
+        if (info.validDiscount) {
+            if (!myDb->updateProduct(info, info.code))
+                qDebug()<<myDb->lastError();
+            else {
+                //FIXME: loggedUserId, logging in widgets!?
+//                log(1, QDate::currentDate(), QTime::currentTime(), i18n("Purchase #%4 - %1 x %2 (%3)", info.purchaseQty, info.desc, info.code, trnum) );
+                qDebug()<<"Product updated [purchase] ok..."<<i18n("Purchase #%4 - %1 x %2 (%3)", info.purchaseQty, info.desc, info.code, trnum);
+            }
+
+        } else {
+            if (!myDb->insertProduct(info))
+                qDebug()<<myDb->lastError();
+            else {
+                //FIXME: loggedUserId, logging in widgets!?
+//                log(1, QDate::currentDate(), QTime::currentTime(), i18n("Purchase #%4 - [new] - %1 x %2 (%3)", info.purchaseQty, info.desc, info.code, trnum) );
+                qDebug()<<i18n("Purchase #%4 - [new] - %1 x %2 (%3)", info.purchaseQty, info.desc, info.code, trnum);
+            }
+        }
+
+        ui->p->m_model->select();
+        items.append(info.code+"/"+QString::number(info.purchaseQty));
+
+        // Compiling transactionitems
+        tItemInfo.transactionid   = tInfo.id;
+        tItemInfo.position        = j;
+        tItemInfo.productCode     = i.key();
+        tItemInfo.unitStr         = info.unitStr;
+        tItemInfo.qty             = info.purchaseQty;
+        tItemInfo.cost            = info.cost;
+        tItemInfo.price           = info.price;
+        tItemInfo.disc            = info.disc * info.purchaseQty;
+        tItemInfo.total           = info.cost * info.purchaseQty;
+        tItemInfo.completePayment = true;
+        if (info.isAGroup)
+          tItemInfo.name            = info.desc.replace("\n", "|");
+        else
+          tItemInfo.name            = info.desc;
+        tItemInfo.isGroup = info.isAGroup;
+        myDb->insertTransactionItem(tItemInfo);
+    }
+    //update items in transaction data
+    tInfo.itemlist = items.join(";");
+    myDb->updateTransaction(tInfo);
+    delete myDb;
+}
+
+
 PurchaseEditor::~PurchaseEditor()
 {
     delete ui;

@@ -107,6 +107,7 @@ class ProductEditor : public QWidget
     bool    hasUnlimitedStock();
 
     ProductInfo getProductInfo();
+    QSqlRelationalTableModel *m_model;
     
 private slots:
     void    changePhoto();
@@ -136,7 +137,6 @@ private slots:
     bool correctingStockOk;
     GroupInfo groupInfo;
     bool m_modelAssigned;
-    QSqlRelationalTableModel *m_model;
 
     MibitFloatPanel *groupPanel;
     MibitTip        *errorPanel;

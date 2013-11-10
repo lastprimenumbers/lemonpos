@@ -128,6 +128,7 @@ signals:
 
  private slots:
    /* Ui related slot */
+   void migratedb();
    void login();
    void settingsChanged();
    void settingsChangedOnInitConfig();

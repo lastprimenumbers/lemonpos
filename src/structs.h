@@ -130,24 +130,6 @@ struct ClientInfo
 };
 
 
-struct DonorInfo
-{
-  unsigned int id;
-  QString      code;
-  QString      name;
-  QString      surname; //dummy
-  QString      address;
-  QString      phone;
-  QString      emailDonor;
-  QString      nameRefDonor;
-  QString      surnameRefDonor;
-  QString      emailRefDonor;
-  QString      phoneRefDonor;
-  QByteArray   photo;
-  QDate        since;
-  QString      notesRefDonor;
-};
-
 struct OfferInfo
 {
   QString productCode;
@@ -387,12 +369,14 @@ struct TransactionItemInfo
   QDate      date;
 };
 
-// Holds the statistics about the consumes of a family in a time range.
-struct Family
+struct Statistics
 {
-    // COMPOSITION
-    QList<ClientInfo> members;
-    // STATISTICS
+    // Owners code
+    QStringList code;
+    // Owners id
+    QList<unsigned int> id;
+    // Transaction types ids
+    QList<int> type;
     // Start date for the statistic
     QDate start;
     // End date for the statistic
@@ -409,14 +393,32 @@ struct Family
     double total;
 };
 
-struct LiveStats
+// Holds the statistics about the consumes of a family in a time range.
+struct Family
 {
-    // Mapping between product code and expense
-    QHash<QString,double> products;
-    // Mapping between product id and quantity (TODO)
-    QHash<QString,double> quantities;
-    // Mapping between category id and expense
-    QHash<int,double> categories;
+    // COMPOSITION
+    QList<ClientInfo> members;
+    Statistics stats;
+};
+
+
+struct DonorInfo
+{
+  unsigned int id;
+  QString      code;
+  QString      name;
+  QString      surname; //dummy
+  QString      address;
+  QString      phone;
+  QString      emailDonor;
+  QString      nameRefDonor;
+  QString      surnameRefDonor;
+  QString      emailRefDonor;
+  QString      phoneRefDonor;
+  QByteArray   photo;
+  QDate        since;
+  QString      notesRefDonor;
+  Statistics   stats;
 };
 
 struct CashFlowInfo

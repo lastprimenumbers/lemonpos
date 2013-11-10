@@ -101,7 +101,7 @@ public:
     ClientInfo clientInfo;
     Family  family;
     void updateFamily(ClientInfo info);
-    LiveStats liveStats();
+    Statistics liveStats();
     QHash<int, ClientInfo> clientsHash;
     qulonglong buyPoints;
     double discMoney;
