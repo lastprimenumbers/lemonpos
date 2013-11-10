@@ -1567,10 +1567,10 @@ Statistics lemonView::liveStats() {
             res.categories[pi.category]+=val;
         }
         //TODO: multiply by unit factor
-        if (!res.quantities.contains(pi.code)) {
-            res.quantities[pi.code]=pi.qtyOnList;
+        if (!res.qty_products.contains(pi.code)) {
+            res.qty_products[pi.code]=pi.qtyOnList;
         } else {
-            res.quantities[pi.code]+=pi.qtyOnList;
+            res.qty_products[pi.code]+=pi.qtyOnList;
         }
     }
     return res;

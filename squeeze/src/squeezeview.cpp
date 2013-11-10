@@ -2249,7 +2249,7 @@ void squeezeView::doPurchase()
     if (!db.isOpen()) return;
     qDebug()<<"doPurchase...";
     PurchaseEditor *purchaseEditorDlg = new PurchaseEditor(this);
-    purchaseEditorDlg->setDb(db,productsModel);
+    purchaseEditorDlg->setDb(db,productsModel,loggedUserId);
     if (purchaseEditorDlg->exec()) {
         purchaseEditorDlg->doPurchase();
     }

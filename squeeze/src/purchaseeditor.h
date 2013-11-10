@@ -60,8 +60,8 @@ class PurchaseEditor : public KDialog
     QHash<QString, ProductInfo> getHash()    { return productsHash; };
     double  getTotalBuy()    { return totalBuy; };
     double  getItemCount()   { return itemCount; };
-
-    void    setDb(QSqlDatabase database, QSqlRelationalTableModel *model);
+    int loggedUserId;
+    void    setDb(QSqlDatabase database, QSqlRelationalTableModel *model, int user);
     void    setPurchaseQty(double q)   {ui->editQty->setText(QString::number(q)); };
     
     void    disableCode()              { ui->p->ui->editCode->setReadOnly(true); };

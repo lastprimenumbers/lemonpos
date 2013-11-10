@@ -73,10 +73,11 @@ PurchaseEditor::PurchaseEditor( QWidget *parent)
     QTimer::singleShot(500, this, SLOT(setupTable()));
 }
 
-void PurchaseEditor::setDb(QSqlDatabase database, QSqlRelationalTableModel *model)
+void PurchaseEditor::setDb(QSqlDatabase database, QSqlRelationalTableModel *model, int user)
 {
   db = database;
   if (!db.isOpen()) db.open();
+  loggedUserId=user;
   ui->p->setDb(db);
   ui->editDonor->setDb(db,"donors");
 
@@ -323,8 +324,8 @@ void PurchaseEditor::doPurchase()
     tInfo.changegiven = 0.0;
     tInfo.paymethod   = pCash;
     tInfo.state   = tCompleted;
-    tInfo.userid  = 1;
-    tInfo.clientid= 1;
+    tInfo.userid  = loggedUserId;
+    tInfo.clientid= 0;
     tInfo.cardnumber  = "-NA-";
     tInfo.cardauthnum = "-NA-";
     tInfo.itemcount   = getItemCount();
@@ -366,7 +367,7 @@ void PurchaseEditor::doPurchase()
                 qDebug()<<myDb->lastError();
             else {
                 //FIXME: loggedUserId, logging in widgets!?
-//                log(1, QDate::currentDate(), QTime::currentTime(), i18n("Purchase #%4 - %1 x %2 (%3)", info.purchaseQty, info.desc, info.code, trnum) );
+                myDb->insertLog(loggedUserId, QDate::currentDate(), QTime::currentTime(), "[PURCHASE] "+i18n("Purchase #%4 - %1 x %2 (%3)", info.purchaseQty, info.desc, info.code, trnum));
                 qDebug()<<"Product updated [purchase] ok..."<<i18n("Purchase #%4 - %1 x %2 (%3)", info.purchaseQty, info.desc, info.code, trnum);
             }
 
@@ -374,8 +375,7 @@ void PurchaseEditor::doPurchase()
             if (!myDb->insertProduct(info))
                 qDebug()<<myDb->lastError();
             else {
-                //FIXME: loggedUserId, logging in widgets!?
-//                log(1, QDate::currentDate(), QTime::currentTime(), i18n("Purchase #%4 - [new] - %1 x %2 (%3)", info.purchaseQty, info.desc, info.code, trnum) );
+                myDb->insertLog(loggedUserId, QDate::currentDate(), QTime::currentTime(), "[PURCHASE] "+i18n("Purchase #%4 - [new] - %1 x %2 (%3)", info.purchaseQty, info.desc, info.code, trnum) );
                 qDebug()<<i18n("Purchase #%4 - [new] - %1 x %2 (%3)", info.purchaseQty, info.desc, info.code, trnum);
             }
         }

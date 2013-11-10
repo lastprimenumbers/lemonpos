@@ -365,8 +365,9 @@ struct TransactionItemInfo
   bool       isGroup;
   QDateTime  deliveryDateTime;
   double     tax; // total tax in percentage.
-  // Optional: transaction date, compiled during joint queries
+  // Optional: compiled during joint queries
   QDate      date;
+  double    quantity;
 };
 
 struct Statistics
@@ -383,12 +384,18 @@ struct Statistics
     QDate end;
     // List of items in the statistic
     QHash<QString,TransactionItemInfo> items;
-    // Mapping between product code and expense
+    // Mapping between product code and point expense
     QHash<QString,double> products;
-    // Mapping between product id and quantity (TODO)
-    QHash<QString,double> quantities;
+    // Mapping between product code and market value
+    QHash<QString,double> val_products;
+    // Mapping between product id and physical quantity
+    QHash<QString,double> qty_products;
     // Mapping between category id and expense
     QHash<int,double> categories;
+    // Mapping between category id and expense
+    QHash<int,double> val_categories;
+    // Mapping between category id and physical quantity
+    QHash<int,double> qty_categories;
     // Total expense
     double total;
 };

@@ -1920,18 +1920,27 @@ bool Azahar::getStatisticsFromQuery(QSqlQuery &query, Statistics &stats) {
         stats.items[item.productCode]=item;
         stats.total+=item.total;
         if (stats.products.contains(item.productCode)) {
-            stats.products[item.productCode]+=item.total;
-            stats.quantities[item.productCode]+=item.qty;
+            stats.products[item.productCode]+=item.total;                   // Points value
+            stats.val_products[item.productCode]+=item.cost*item.qty;       // Market value
+            stats.qty_products[item.productCode]+=item.quantity*item.qty;   // Physical quantity
+
         } else {
-            stats.products[item.productCode]=item.total;
-            stats.quantities[item.productCode]=item.qty;
+            stats.products[item.productCode]=item.total;                   // Points value
+            stats.val_products[item.productCode]=item.cost*item.qty;       // Market value
+            stats.qty_products[item.productCode]=item.quantity*item.qty;   // Physical quantity
+
         }
         // Find out the category of the product
         cat=query.value(fieldCat).toULongLong();
         if (stats.categories.contains(cat)) {
             stats.categories[cat]+=item.total;
+            stats.qty_categories[cat]+=item.quantity*item.qty;
+            stats.val_categories[cat]+=item.cost*item.qty;
+
         } else {
             stats.categories[cat]=item.total;
+            stats.qty_categories[cat]=item.quantity*item.qty;
+            stats.val_categories[cat]=item.cost*item.qty;
         }
     }
     return true;
@@ -3458,7 +3467,9 @@ bool Azahar::getTransactionItemInfoFromQuery(QSqlQuery &query, TransactionItemIn
         int fieldIsG = query.record().indexOf("isGroup");
         int fieldDDT = query.record().indexOf("deliveryDateTime");
         int fieldTax = query.record().indexOf("tax");
+        // Fields for joint queries
         int fieldDate = query.record().indexOf("date");
+        int fieldQuantity = query.record().indexOf("quantity");
 
         info.transactionid     = query.value(fieldId).toULongLong();
         info.position      = query.value(fieldPosition).toInt();
@@ -3477,9 +3488,8 @@ bool Azahar::getTransactionItemInfoFromQuery(QSqlQuery &query, TransactionItemIn
         info.isGroup       = query.value(fieldIsG).toBool();
         info.deliveryDateTime=query.value(fieldDDT).toDateTime();
         info.tax           = query.value(fieldTax).toDouble();
-        if (fieldDate>=0) {
-            info.date= query.value(fieldDate).toDate();
-        }
+        if (fieldDate>=0) info.date= query.value(fieldDate).toDate();
+        if (fieldQuantity>=0) info.quantity= query.value(fieldQuantity).toDouble();
         return true;
     } else {
         qDebug()<<"getTransactionItemInfoFromQuery failed!"<<query.lastError()<<query.executedQuery();

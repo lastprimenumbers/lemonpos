@@ -20,6 +20,8 @@ public:
     explicit statistics(QWidget *parent);
     ~statistics();
     Statistics stats;
+    QStringList hCat;
+    QStringList hProd;
     QSqlDatabase db;
     void setStats(Statistics &parentStats);
     void setDb(QSqlDatabase db);
