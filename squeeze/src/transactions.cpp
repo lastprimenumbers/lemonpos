@@ -46,7 +46,15 @@ void transactions::setDb(QSqlDatabase parentDb){
 void transactions::setStats(Statistics &stats) {
     Azahar *myDb=new Azahar;
     QStringList instat=myDb->getInStatements(stats);
+    transModel->setFilter("");
     transModel->setFilter(QString("( clientid IN (%1) or  donor IN (%2) )").arg(instat[0],instat[1]));
+    transModel->select();
+}
+
+void transactions::setProduct(QString &code) {
+    qDebug()<<"Setting product code"<<code;
+    transModel->setFilter("");
+    transModel->setFilter(QString("productCode=%1").arg(code));
     transModel->select();
 }
 

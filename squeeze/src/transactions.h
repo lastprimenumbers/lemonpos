@@ -22,6 +22,7 @@ public:
     QSqlDatabase db;
     void setDb(QSqlDatabase parentDb);
     void setStats(Statistics &stats);
+    void setProduct(QString &code);
     
 private:
     Ui::transactions *ui;

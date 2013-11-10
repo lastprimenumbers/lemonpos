@@ -23,7 +23,7 @@
 
 #ifndef MIBITLINEEDIT_H
 #define MIBITLINEEDIT_H
-
+#include <QtCore>
 #include <QLineEdit>
 class QTimer;
 

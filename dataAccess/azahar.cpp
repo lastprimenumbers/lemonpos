@@ -186,7 +186,7 @@ ProductInfo Azahar::getProductInfo(const QString &code, const bool &notConsiderD
 
     if (!db.isOpen()) db.open();
     if (!db.isOpen()) {
-        qDebug()<<"Failed db!" ;
+        qDebug()<<"Failed db!"<<code;
         return info;
     }
     QString qry = QString("SELECT  P.code as CODE, \

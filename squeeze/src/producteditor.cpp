@@ -40,7 +40,7 @@ ProductEditorUI::ProductEditorUI( QWidget *parent )
     setupUi( this );
 }
 
-ProductEditor::ProductEditor( QWidget *parent, bool newProduct )
+ProductEditor::ProductEditor( QWidget *parent )
 : QWidget( parent )
 {
     productsHash.clear();
@@ -86,7 +86,7 @@ ProductEditor::ProductEditor( QWidget *parent, bool newProduct )
 
     connect( ui->btnPhoto          , SIGNAL( clicked() ), this, SLOT( changePhoto() ) );
     connect( ui->btnChangeCode,      SIGNAL( clicked() ), this, SLOT( changeCode() ) );
-    connect( ui->editCode, SIGNAL(textEdited(const QString &)), SLOT(checkIfCodeExists()));
+    connect( ui->editCode, SIGNAL(textChanged(const QString &)), SLOT(checkIfCodeExists()));
     connect( ui->editCode, SIGNAL(editingFinished()), this, SLOT(checkFieldsState()));
     connect( ui->editCode, SIGNAL(returnPressed()), this, SLOT(checkFieldsState()));
     connect( ui->btnStockCorrect,      SIGNAL( clicked() ), this, SLOT( modifyStock() ));
@@ -113,6 +113,10 @@ ProductEditor::ProductEditor( QWidget *parent, bool newProduct )
     status = statusNormal;
     modifyCode = false;
 
+    ui->editStockQty->setText("0.0");
+}
+
+void ProductEditor::setNewProduct(bool newProduct) {
     if (newProduct) {
       ui->labelStockQty->setText(i18n("Purchase Qty:"));
       disableStockCorrection();
@@ -121,16 +125,10 @@ ProductEditor::ProductEditor( QWidget *parent, bool newProduct )
         QTimer::singleShot(350, this, SLOT(checkIfCodeExists()));
         QTimer::singleShot(450, this, SLOT(applyFilter()));
     }
-
-
-    ui->editStockQty->setText("0.0");
 }
 
 ProductEditor::~ProductEditor()
 {
-    //remove products filter
-    m_model->setFilter("");
-    m_model->select();
     delete ui;
 }
 
@@ -205,6 +203,10 @@ void ProductEditor::setDb(QSqlDatabase database)
 {
   db = database;
   if (!db.isOpen()) db.open();
+  if (!db.isOpen()) {
+      qDebug()<<"ProductEditor::setDb Failed opening db!";
+      return;
+  }
   populateCategoriesCombo();
   populateMeasuresCombo();
 }
@@ -462,7 +464,7 @@ void ProductEditor::checkIfCodeExists()
       ui->editFinalPrice->clear();
       ui->labelPhoto->setText("No Photo");
     }
-    //qDebug()<< "no product found with code "<<codeStr<<" .query.size()=="<<query.size();
+    qDebug()<< "no product found with code "<<codeStr;
   }
   delete myDb;
 }

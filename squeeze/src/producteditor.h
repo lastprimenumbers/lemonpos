@@ -46,10 +46,11 @@ class ProductEditor : public QWidget
 {
   Q_OBJECT
   public:
-    ProductEditor( QWidget *parent=0, bool newProduct = true  );
+    ProductEditor( QWidget *parent=0  );
     ~ProductEditor();
     ProductEditorUI *ui;
     int result();
+    void setNewProduct(bool newProduct);
     QHash<QString, ProductInfo> productsHash;
     void setProductsHash(QHash<QString, ProductInfo> hash);
     QString getCode()     { return ui->editCode->text(); };

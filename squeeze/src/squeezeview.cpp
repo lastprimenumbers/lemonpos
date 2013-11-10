@@ -28,7 +28,7 @@
 #include "usereditor.h"
 #include "clienteditor.h"
 #include "promoeditor.h"
-#include "producteditor.h"
+#include "productView.h"
 #include "purchaseeditor.h"
 #include "../../src/hash.h"
 #include "../../src/misc.h"
@@ -2144,14 +2144,16 @@ void squeezeView::productsViewOnSelected(const QModelIndex &index)
 
     //Launch Edit dialog
     KDialog *dlg=new KDialog(this);
-    ProductEditor *productEditorDlg = new ProductEditor(dlg, false);
+    ProductView *productEditorDlg = new ProductView();
+
     dlg->setMainWidget(productEditorDlg->ui);
     //Set data on dialog
+    productEditorDlg->setDb(db);
     productEditorDlg->setModel(productsModel);
     productEditorDlg->disableCode(); //On Edit product, code cannot be changed.
     productEditorDlg->setStockQtyReadOnly(true); //on edit, cannot change qty to force use stockCorrection
-    productEditorDlg->setDb(db);
     productEditorDlg->setCode(id);
+    productEditorDlg->setNewProduct(false);
 
     QString newcode="0";
     //Launch dialog, and if dialog is accepted...
@@ -2391,12 +2393,13 @@ void squeezeView::createProduct()
 {
  if (db.isOpen()) {
   KDialog *dlg=new KDialog(this);
-  ProductEditor *prodEditorDlg = new ProductEditor(dlg, true);
-  dlg->setMainWidget(prodEditorDlg->ui);
-  prodEditorDlg->setModel(productsModel);
+  ProductView *prodEditorDlg = new ProductView();
   prodEditorDlg->setDb(db);
+  prodEditorDlg->setModel(productsModel);
   prodEditorDlg->enableCode();
   prodEditorDlg->setStockQtyReadOnly(false);
+  prodEditorDlg->setNewProduct(true);
+  dlg->setMainWidget(prodEditorDlg->ui);
   QString newcode = "0";
   if (dlg->exec()) {
     int resultado = prodEditorDlg->result();

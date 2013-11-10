@@ -169,7 +169,7 @@ void DonorEditor::commitClientInfo()
     if (!db.isOpen()) db.open();
     Azahar *myDb = new Azahar;//
     myDb->setDatabase(db);
-    bool result=myDb->updateDonor(cInfo);
+    myDb->updateDonor(cInfo);
     db.commit();
     delete myDb;
 }
