@@ -1422,7 +1422,7 @@ void lemonView::insertItem(QString code)
   updateFamily(clientInfo);
 
   Limit lim=myDb->getFamilyLimit(family,info);
-  qDebug()<<"Get Applicable LIMIT:"<<lim.id<<lim.limit<<lim.productCat;
+  qDebug()<<"Get Applicable LIMIT:"<<lim.id<<lim.limit<<lim.productCat<<info.code;
   delete myDb;
   // If a valid limit was found, calculate the residual
   if (lim.id>0) {
@@ -1433,8 +1433,8 @@ void lemonView::insertItem(QString code)
       // If lim is a category limit, add the relevant category stats
       if (lim.productCode=="*") {
           // substract monthly category stats
-          if (family.categories.contains(info.category)) {
-              res-=family.categories[info.category];
+          if (family.stats.categories.contains(info.category)) {
+              res-=family.stats.categories[info.category];
               qDebug()<<"Category Limit:"<<res;
           }
           // subtract current transaction category stats
@@ -1444,8 +1444,8 @@ void lemonView::insertItem(QString code)
       // If lim is a product limit, add the relevant product stats
       } else {
           // substract monthly products stats
-          if (family.products.contains(info.code)) {
-              res-=family.products[info.code];
+          if (family.stats.products.contains(info.code)) {
+              res-=family.stats.products[info.code];
               qDebug()<<"Product Limit:"<<res;
           }
           // subtract current transaction products stats
@@ -1467,6 +1467,8 @@ void lemonView::insertItem(QString code)
                                QMessageBox::Abort);
           return;
       }
+  } else {
+      qDebug()<<"Product is not limited.";
   }
   // Increment quantity or add to the list
   if (!incrementTableItemQty( info.code, qty) ) {
@@ -3826,7 +3828,7 @@ void lemonView::setupClients()
     while (i.hasNext()) {
         i.next();
         info = i.value();
-        ui_mainview.comboClients->addItem(info.name, info.id);
+        ui_mainview.comboClients->addItem(QString("%1, %2").arg(info.surname,info.name), info.id);
     }
     int idx = ui_mainview.comboClients->findText(mainClient,Qt::MatchCaseSensitive);
     if (idx>-1) ui_mainview.comboClients->setCurrentIndex(idx);
@@ -3849,7 +3851,7 @@ void lemonView::comboClientsOnChange(int idx)
   QString newClientName    = ui_mainview.comboClients->currentText();
   int newClientIdx = ui_mainview.comboClients->itemData(idx).toInt();
   qDebug()<<"Client info changed by user.";
-  qDebug()<<"comboClientsOnChange"<<newClientIdx;
+  qDebug()<<"comboClientsOnChange"<<newClientIdx<<newClientName;
   if (clientsHash.contains(newClientIdx)) {
     clientInfo = clientsHash.value(newClientIdx);
     qDebug()<<'OK comboClientsOnChange'<<clientInfo.id<<clientInfo.name<<clientInfo.monthly;
