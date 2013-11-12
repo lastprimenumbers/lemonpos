@@ -74,9 +74,9 @@ ProductEditor::ProductEditor( QWidget *parent )
     ui->btnChangeCode->setIcon(QIcon(DesktopIcon("edit-clear", 32)));
 
     //Set Validators for input boxes
-    QRegExp regexpC("[0-9]{1,13}"); //(EAN-13 y EAN-8) .. y productos sin codigo de barras?
-    QRegExpValidator * validatorEAN13 = new QRegExpValidator(regexpC, this);
-    ui->editCode->setValidator(validatorEAN13);
+//    QRegExp regexpC("[0-9]{1,13}"); //(EAN-13 y EAN-8) .. y productos sin codigo de barras?
+//    QRegExpValidator * validatorEAN13 = new QRegExpValidator(regexpC, this);
+//    ui->editCode->setValidator(validatorEAN13);
     ui->editCost->setValidator(new QDoubleValidator(0.00, 999999999999.99, 3, ui->editCost));
     ui->editStockQty->setValidator(new QDoubleValidator(0.00,999999999999.99, 3, ui->editStockQty));
     ui->editFinalPrice->setValidator(new QDoubleValidator(0.00,999999999999.99, 3, ui->editFinalPrice));
@@ -86,7 +86,7 @@ ProductEditor::ProductEditor( QWidget *parent )
 
     connect( ui->btnPhoto          , SIGNAL( clicked() ), this, SLOT( changePhoto() ) );
     connect( ui->btnChangeCode,      SIGNAL( clicked() ), this, SLOT( changeCode() ) );
-    connect( ui->editCode, SIGNAL(textChanged(const QString &)), SLOT(checkIfCodeExists()));
+    connect( ui->editCode, SIGNAL(textEdited(const QString &)), SLOT(checkIfCodeExists()));
     connect( ui->editCode, SIGNAL(editingFinished()), this, SLOT(checkFieldsState()));
     connect( ui->editCode, SIGNAL(returnPressed()), this, SLOT(checkFieldsState()));
     connect( ui->btnStockCorrect,      SIGNAL( clicked() ), this, SLOT( modifyStock() ));
@@ -122,8 +122,8 @@ void ProductEditor::setNewProduct(bool newProduct) {
       disableStockCorrection();
     } else {
         ui->labelStockQty->setText(i18n("Stock Qty:"));
-        QTimer::singleShot(350, this, SLOT(checkIfCodeExists()));
-        QTimer::singleShot(450, this, SLOT(applyFilter()));
+//        QTimer::singleShot(350, this, SLOT(checkIfCodeExists()));
+//        QTimer::singleShot(450, this, SLOT(applyFilter()));
     }
 }
 
@@ -209,13 +209,16 @@ void ProductEditor::setDb(QSqlDatabase database)
   }
   populateCategoriesCombo();
   populateMeasuresCombo();
+  qDebug()<<"ProductEditor::setDb()"<<db.connectionNames()<<db.databaseName()<<db.connectionName()<<db.connectOptions();
 }
 
 void ProductEditor::populateCategoriesCombo()
 {
   Azahar *myDb = new Azahar;
   myDb->setDatabase(db);
-  ui->categoriesCombo->addItems(myDb->getCategoriesList());
+  QStringList cats=myDb->getCategoriesList();
+  qDebug()<<"Categories:"<<cats;
+  ui->categoriesCombo->addItems(cats);
   delete myDb;
 }
 
@@ -224,6 +227,7 @@ void ProductEditor::populateMeasuresCombo()
   Azahar *myDb = new Azahar;
   myDb->setDatabase(db);
   QStringList list=myDb->getMeasuresList();
+  qDebug()<<"Measures:"<<list;
   ui->measuresCombo->addItems(list);
   ui->qunitCombo->addItems(list);
   delete myDb;
@@ -291,7 +295,7 @@ void ProductEditor::setMeasure(QString str)
 int idx = ui->measuresCombo->findText(str,Qt::MatchCaseSensitive);
  if (idx > -1) ui->measuresCombo->setCurrentIndex(idx);
  else {
-  qDebug()<<"Measure not found:"<<str;
+  qDebug()<<"Measure not found:"<<str<<idx;
   }
 }
 
@@ -307,7 +311,7 @@ void ProductEditor::setQunit(QString str)
 int idx = ui->qunitCombo->findText(str,Qt::MatchCaseSensitive);
  if (idx > -1) ui->qunitCombo->setCurrentIndex(idx);
  else {
-  qDebug()<<"Qunit not found:"<<str;
+  qDebug()<<"Qunit not found:"<<str<<idx;
   }
 }
 
@@ -391,14 +395,23 @@ void ProductEditor::setProductsHash(QHash<QString,ProductInfo> hash) {
     productsHash=hash;
 }
 
+void ProductEditor::setCode(QString c) {
+    qDebug()<<"ProductEditor::setCode"<<c;
+    ui->editCode->setText(c);
+    checkIfCodeExists();
+}
+
 void ProductEditor::checkIfCodeExists()
 {
 //  enableButtonOk( false );
+    if (!db.isOpen()) db.open();
+    qDebug()<<"ProductEditor::checkIfCodeExists()"<<ui->editCode->text()<<db.isOpen()<<db.databaseName();
+    if (!db.isOpen()) return;
+
   QString codeStr = ui->editCode->text();
   if (codeStr.isEmpty()) {
     codeStr="-1";
   }
-
   Azahar *myDb = new Azahar;
   myDb->setDatabase(db);
   ProductInfo pInfo;
@@ -451,40 +464,52 @@ void ProductEditor::checkIfCodeExists()
   else { //code does not exists... its a new product
     status = statusNormal;
     if (!modifyCode) {
-      //clear all used edits
-      ui->editAlphacode->clear();
-      ui->editDesc->clear();
-      ui->editStockQty->clear();
-      setCategory(1);
-      setMeasure(1);
-      setQunit(1);
-      ui->editQuantity->clear();
-      ui->editCost->clear();
-      ui->editFinalPrice->clear();
-      ui->editFinalPrice->clear();
-      ui->labelPhoto->setText("No Photo");
+        resetEdits();
     }
     qDebug()<< "no product found with code "<<codeStr;
   }
+  qDebug()<<"DESC:"<<getDescription();
   delete myDb;
 }
 
+void ProductEditor::resetEdits() {
+    //clear all used edits
+    ui->editAlphacode->clear();
+    ui->editDesc->clear();
+    ui->editStockQty->clear();
+    setCategory(1);
+    setMeasure(1);
+    setQunit(1);
+    ui->editQuantity->clear();
+    ui->editCost->clear();
+    ui->editFinalPrice->clear();
+    ui->editFinalPrice->clear();
+    ui->labelPhoto->setText("No Photo");
+    ui->chIsAGroup->setChecked(false);
+}
 
-void ProductEditor::checkFieldsState()
+
+bool ProductEditor::checkFieldsState()
 {
-  bool ready = false;
-  if ( !ui->editCode->text().isEmpty()    &&
-    !ui->editDesc->text().isEmpty()       &&
-    !ui->editCost->text().isEmpty()       &&
-    !ui->editFinalPrice->text().isEmpty()
-    )  {
-    ready = true;
-  }
-//  enableButtonOk(ready);
-  
-  if (!ready  && ui->editCode->hasFocus() && ui->editCode->isReadOnly() ) {
-    ui->editDesc->setFocus();
-  }
+    if (ui->editCode->text().isEmpty()) {
+        ui->editCode->setFocus();
+        return false;
+    }
+    else if (ui->editDesc->text().isEmpty()) {
+        ui->editDesc->setFocus();
+        return false;
+    }
+    else if (ui->editFinalPrice->text().isEmpty()) {
+        ui->editFinalPrice->setFocus();
+        return false;
+    }
+    else if ((ui->editFinalPrice->text().isEmpty()) || ui->editFinalPrice->text().toDouble() < 0.0 ) {
+        ui->editFinalPrice->setFocus();
+        return false;
+    }
+  //  else if (ui->groupBoxedItem->isChecked() && (ui->editItemsPerBox->text().isEmpty() || ui->editItemsPerBox->text()=="0"))  ui->editItemsPerBox->setFocus();
+  //  else if (ui->groupBoxedItem->isChecked() && (ui->editPricePerBox->text().isEmpty() || ui->editPricePerBox->text()=="0")) ui->editPricePerBox->setFocus();
+    return true;
 }
 
 void ProductEditor::setPhoto(QPixmap p)

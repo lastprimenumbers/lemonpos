@@ -99,19 +99,12 @@ void PurchaseEditor::addItemToList()
     ProductInfo pInfo;
     Azahar *myDb = new Azahar;
     myDb->setDatabase(db);
-    bool ok=false;
-
-    if (ui->p->ui->editCode->text().isEmpty()) ui->p->ui->editCode->setFocus();
-    else if (ui->p->ui->editDesc->text().isEmpty()) ui->p->ui->editDesc->setFocus();
-    else if (ui->p->ui->editFinalPrice->text().isEmpty()) ui->p->ui->editFinalPrice->setFocus();
-    else if (ui->editQty->text().isEmpty() || ui->editQty->text()=="0") ui->editQty->setFocus();
-    else if ((ui->p->ui->editFinalPrice->text().isEmpty()) || ui->p->ui->editFinalPrice->text().toDouble() < 0.0 ) ui->p->ui->editFinalPrice->setFocus();
-    //  else if (ui->p->ui->groupBoxedItem->isChecked() && (ui->p->ui->editItemsPerBox->text().isEmpty() || ui->p->ui->editItemsPerBox->text()=="0"))  ui->p->ui->editItemsPerBox->setFocus();
-    //  else if (ui->p->ui->groupBoxedItem->isChecked() && (ui->p->ui->editPricePerBox->text().isEmpty() || ui->p->ui->editPricePerBox->text()=="0")) ui->p->ui->editPricePerBox->setFocus();
-    else ok = true;
     // Exit here
-    if (!ok) {return;}
-
+    if (!ui->p->checkFieldsState()) {return;}
+    if (ui->editQty->text().isEmpty() || ui->editQty->text()=="0") {
+            ui->editQty->setFocus();
+            return;
+        }
     // in-db definition
     ProductInfo info = myDb->getProductInfo(  ui->p->getCode() );
     productExists=(info.code!="0");
@@ -144,7 +137,6 @@ void PurchaseEditor::addItemToList()
         insertProduct(info);
     }
     resetEdits();
-    ui->p->ui->editCode->setFocus();
 }
 
 void PurchaseEditor::insertProduct(ProductInfo info)
@@ -268,16 +260,8 @@ void PurchaseEditor::deleteSelectedItem() //added on dec 3, 2009
 
 void PurchaseEditor::resetEdits()
 {
-  ui->p->ui->editCode->setText("");
-  ui->p->ui->editDesc->setText("");
-  ui->p->ui->editFinalPrice->setText("");
-  qtyOnDb = 0;
-  pix = QPixmap(0,0); //null pixmap.
-  ui->p->ui->labelPhoto->setText(i18n("No Photo"));
-//  ui->p->ui->editItemsPerBox->setText("");
-//  ui->p->ui->editPricePerBox->setText("");
+    ui->p->resetEdits();
   ui->editQty->setText("");
-  ui->p->ui->chIsAGroup->setChecked(false);
   gelem = "";
 //  Notify current productsHash to the producteditor
   ui->p->setProductsHash(productsHash);

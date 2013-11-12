@@ -877,10 +877,10 @@ void squeezeView::setupDb()
   db.setDatabaseName(Settings::editDBName());
   db.setUserName(Settings::editDBUsername());
   db.setPassword(Settings::editDBPassword());
-  db.setHostName("localhost");
-  db.setDatabaseName("lemondb");
-  db.setUserName("lemonclient");
-  db.setPassword("xarwit0721");
+//  db.setHostName("localhost");
+//  db.setDatabaseName("lemondb");
+//  db.setUserName("lemonclient");
+//  db.setPassword("xarwit0721");
 
   qDebug()<<"SetupDB: opening";
   db.open();
@@ -2144,19 +2144,20 @@ void squeezeView::productsViewOnSelected(const QModelIndex &index)
 
     //Launch Edit dialog
     KDialog *dlg=new KDialog(this);
-    ProductView *productEditorDlg = new ProductView();
-
-    dlg->setMainWidget(productEditorDlg->ui);
+//    QDialog *dlg=new QDialog(this);
+    ProductView *productEditorDlg = new ProductView(dlg);
     //Set data on dialog
     productEditorDlg->setDb(db);
     productEditorDlg->setModel(productsModel);
     productEditorDlg->disableCode(); //On Edit product, code cannot be changed.
     productEditorDlg->setStockQtyReadOnly(true); //on edit, cannot change qty to force use stockCorrection
     productEditorDlg->setCode(id);
-    productEditorDlg->setNewProduct(false);
+
 
     QString newcode="0";
     //Launch dialog, and if dialog is accepted...
+    dlg->setMainWidget(productEditorDlg);
+
     if (dlg->exec() ) {
         pInfo=productEditorDlg->getProductInfo();
         newcode=pInfo.code;
@@ -2179,6 +2180,7 @@ void squeezeView::productsViewOnSelected(const QModelIndex &index)
     }
     delete productEditorDlg;
     setProductsFilter();
+
 }
 
 void squeezeView::donorsViewOnSelected(const QModelIndex & index)
@@ -2393,13 +2395,13 @@ void squeezeView::createProduct()
 {
  if (db.isOpen()) {
   KDialog *dlg=new KDialog(this);
-  ProductView *prodEditorDlg = new ProductView();
+  ProductView *prodEditorDlg = new ProductView(dlg);
   prodEditorDlg->setDb(db);
   prodEditorDlg->setModel(productsModel);
   prodEditorDlg->enableCode();
   prodEditorDlg->setStockQtyReadOnly(false);
   prodEditorDlg->setNewProduct(true);
-  dlg->setMainWidget(prodEditorDlg->ui);
+  dlg->setMainWidget(prodEditorDlg);
   QString newcode = "0";
   if (dlg->exec()) {
     int resultado = prodEditorDlg->result();

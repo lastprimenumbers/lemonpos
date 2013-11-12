@@ -48,7 +48,6 @@ class ProductEditor : public QWidget
   public:
     ProductEditor( QWidget *parent=0  );
     ~ProductEditor();
-    ProductEditorUI *ui;
     int result();
     void setNewProduct(bool newProduct);
     QHash<QString, ProductInfo> productsHash;
@@ -78,7 +77,7 @@ class ProductEditor : public QWidget
     void    calculateGroupValues();
 
     void    setDb(QSqlDatabase database);
-    void    setCode(QString c)      {ui->editCode->setText(c); };
+    void    setCode(QString c);
     void    setAlphacode(QString c)    { ui->editAlphacode->setText(c); };
     void    setDescription(QString d)  {ui->editDesc->setText(d); };
     void    setStockQty(double q)      {ui->editStockQty->setText(QString::number(q)); };
@@ -109,6 +108,10 @@ class ProductEditor : public QWidget
 
     ProductInfo getProductInfo();
     QSqlRelationalTableModel *m_model;
+    void resetEdits();
+
+public slots:
+    bool checkFieldsState();
     
 private slots:
     void    changePhoto();
@@ -116,7 +119,6 @@ private slots:
     void    modifyStock();
     void    calculatePrice();
     void    checkIfCodeExists();
-    void    checkFieldsState();
     void    toggleGroup(bool checked);
     void    toggleRaw(bool checked);
     void    applyFilter(const QString &text);
@@ -129,6 +131,7 @@ private slots:
     void    setUnlimitedStock(bool value);
 
   private:
+    ProductEditorUI *ui;
     QSqlDatabase db;
     QPixmap pix;
     returnType status;

@@ -36,6 +36,7 @@ void transactions::setDb(QSqlDatabase parentDb){
     ui->ticketView->setModel(ticketModel);
     ui->ticketView->setColumnHidden(0,true);
     ui->ticketView->setColumnHidden(1,true);
+    ui->ticketView->setColumnHidden(4,true);
     ui->ticketView->setColumnHidden(5,true);
     ui->ticketView->setColumnHidden(6,true);
     for (int i=11; i<=16; ++i) {
@@ -54,8 +55,9 @@ void transactions::setStats(Statistics &stats) {
 void transactions::setProduct(QString &code) {
     qDebug()<<"Setting product code"<<code;
     transModel->setFilter("");
-    transModel->setFilter(QString("productCode=%1").arg(code));
+    transModel->setFilter(QString("itemslist REGEXP '%1/'").arg(code));
     transModel->select();
+    productCode=code;
 }
 
 void transactions::ticketViewOnSelected(const QModelIndex & index) {
@@ -64,8 +66,12 @@ void transactions::ticketViewOnSelected(const QModelIndex & index) {
         int row = index.row();
         int fid=transModel->fieldIndex("id");
         QModelIndex indx = model->index(row, fid);
-        qulonglong tid=model->data(indx, Qt::DisplayRole).toULongLong();
-        ticketModel->setFilter(QString("transaction_id=%1").arg(tid));
+        QString tid=model->data(indx, Qt::DisplayRole).toString();
+        if (productCode=="") {
+            ticketModel->setFilter(QString("transaction_id=%1").arg(tid));
+        } else {
+            ticketModel->setFilter(QString("transaction_id=%1 AND product_id=%2").arg(tid,productCode));
+        }
         ticketModel->select();
 }
 

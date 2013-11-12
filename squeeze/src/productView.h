@@ -28,7 +28,6 @@ class ProductView : public QWidget
 public:
     ProductView(QWidget *parent = 0 );
     ~ProductView();
-    ProductViewUI *ui;
     QSqlDatabase db;
     void    setDb(QSqlDatabase database);
     void    setNewProduct(bool newProduct);
@@ -51,6 +50,9 @@ public:
     double  getStockQty()           {return  ui->edit->getStockQty();};
     int result()                    {return  ui->edit->result() ;};
     QString getCode()     { return ui->edit->getCode(); };
+private:
+    ProductViewUI *ui;
 };
+
 
 #endif // PRODUCTVIEW_H

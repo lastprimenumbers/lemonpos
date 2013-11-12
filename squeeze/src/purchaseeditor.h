@@ -64,8 +64,8 @@ class PurchaseEditor : public KDialog
     void    setDb(QSqlDatabase database, QSqlRelationalTableModel *model, int user);
     void    setPurchaseQty(double q)   {ui->editQty->setText(QString::number(q)); };
     
-    void    disableCode()              { ui->p->ui->editCode->setReadOnly(true); };
-    void    enableCode()               { ui->p->ui->editCode->setReadOnly(false); };
+    void    disableCode()              { ui->p->disableCode(); };
+    void    enableCode()               { ui->p->enableCode(); };
     void    resetEdits();
     void    doPurchase();
 private slots:

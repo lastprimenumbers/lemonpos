@@ -10,7 +10,7 @@
 ProductViewUI::ProductViewUI( QWidget *parent )
 : QFrame( parent )
 {
-    setupUi( this );
+//    setupUi( this );
 }
 
 ProductView::ProductView(QWidget *parent)
@@ -30,13 +30,14 @@ void ProductView::setDb(QSqlDatabase database) {
 
 void ProductView::setNewProduct(bool newProduct) {
     ui->edit->setNewProduct(newProduct);
-    ui->trans->setEnabled(!newProduct);
-    ui->stats->setEnabled(!newProduct);
+//    ui->tabTrans->setVisible(!newProduct);
+//    ui->tabStats->setVisible(!newProduct);
 }
 
 void ProductView::setCode(QString c){
     ui->edit->setCode(c);
     ui->trans->setProduct(c);
+    setNewProduct(false);
 }
 
 ProductView::~ProductView()
