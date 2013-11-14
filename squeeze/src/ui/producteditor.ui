@@ -354,6 +354,9 @@ color: blue;</string>
     </item>
     <item row="1" column="0">
      <widget class="QLabel" name="label_11">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
       <property name="text">
        <string>Alphacode:</string>
       </property>
@@ -713,6 +716,9 @@ color: blue;</string>
     </item>
     <item row="1" column="1" colspan="2">
      <widget class="QLineEdit" name="editAlphacode">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
       <property name="sizePolicy">
        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
         <horstretch>0</horstretch>

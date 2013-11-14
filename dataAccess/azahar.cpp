@@ -2279,7 +2279,7 @@ Limit Azahar::getFamilyLimit(Family &family, ProductInfo &pInfo) {
     ctags+="'*'";
     qDebug()<<"Querying getClientLimits"<<cInfo.code<<ctags;
     QString q=QString("select * from limits where \
-            (`clientCode`=%1 or (`clientCode`='*' and `clientTag` in (%2))) and \
+            (`clientCode`='%1' or (`clientCode`='*' and `clientTag` in (%2))) and \
             (`productCode`='%3' or (`productCode`='*' and `productCat`=%4)) \
             ORDER BY limits.priority DESC, limits.limit ASC;").arg(cInfo.code, ctags, pInfo.code, QString::number(pInfo.category));
     if (!query.exec(q)) {

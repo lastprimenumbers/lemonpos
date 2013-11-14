@@ -411,6 +411,40 @@ void squeezeView::setupSignalConnections()
 
   connect(ui_mainview.btnAddCurrency, SIGNAL(clicked()), SLOT(createCurrency()));
   connect(ui_mainview.btnDeleteCurrency, SIGNAL(clicked()), SLOT(deleteSelectedCurrency()));
+
+  // Connect client filter slots
+  connect(ui_mainview.editClientsFilter, SIGNAL(textEdited(const QString &)), SLOT(updateClientFilter()));
+  connect(ui_mainview.rbClientsFilterSurname, SIGNAL(clicked()), SLOT(updateClientFilter()));
+  connect(ui_mainview.rbClientsFilterName, SIGNAL(clicked()), SLOT(updateClientFilter()));
+  connect(ui_mainview.rbClientsFilterId, SIGNAL(clicked()), SLOT(updateClientFilter()));
+  connect(ui_mainview.rbClientsFilterCode, SIGNAL(clicked()), SLOT(updateClientFilter()));
+  connect(ui_mainview.checkBoxParent, SIGNAL(clicked()), SLOT(updateClientFilter()));
+}
+
+void squeezeView::updateClientFilter() {
+    //filters
+         QRegExp regexp3 = QRegExp(ui_mainview.editClientsFilter->text());
+         if (!regexp3.isValid()) ui_mainview.editClientsFilter->setText("");
+         if (ui_mainview.editClientsFilter->text()=="*" || ui_mainview.editClientsFilter->text()==""){
+             clientsTableModel->setFilter("");
+         }
+         else if(ui_mainview.rbClientsFilterSurname->isChecked()){
+             clientsTableModel->setFilter(QString("clients.surname REGEXP '%1'").arg(ui_mainview.editClientsFilter->text()));}
+         else if(ui_mainview.rbClientsFilterName->isChecked()){
+             clientsTableModel->setFilter(QString("clients.name REGEXP '%1'").arg(ui_mainview.editClientsFilter->text()));}
+         else if(ui_mainview.rbClientsFilterCode->isChecked()){
+             clientsTableModel->setFilter(QString("clients.code REGEXP '%1'").arg(ui_mainview.editClientsFilter->text()));}
+         else if(ui_mainview.rbClientsFilterId->isChecked()){
+             clientsTableModel->setFilter(QString("clients.id REGEXP '%1'").arg(ui_mainview.editClientsFilter->text()));}
+
+         if(ui_mainview.checkBoxParent->isChecked()){
+             QString f=clientsTableModel->filter();
+             if(f=="") {f.append("parent=''");}
+             else {f.append(" AND parent=''");}
+             clientsTableModel->setFilter(f);
+         }
+
+         clientsTableModel->select();
 }
 
 void squeezeView::doEmitSignalSalir()
