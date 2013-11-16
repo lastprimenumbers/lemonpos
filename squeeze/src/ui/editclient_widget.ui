@@ -135,7 +135,7 @@
             <rect>
              <x>9</x>
              <y>9</y>
-             <width>247</width>
+             <width>248</width>
              <height>499</height>
             </rect>
            </property>
@@ -350,9 +350,6 @@
             </item>
            </layout>
           </widget>
-          <zorder>verticalLayoutWidget_2</zorder>
-          <zorder>verticalLayoutWidget_3</zorder>
-          <zorder>label_14</zorder>
          </widget>
          <widget class="QWidget" name="advancedPage">
           <attribute name="title">

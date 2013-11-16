@@ -17,8 +17,8 @@ class transactions : public QWidget
 public:
     explicit transactions(QWidget *parent = 0);
     ~transactions();
-    QSqlTableModel *transModel;
-    QSqlTableModel *ticketModel;
+    QSqlRelationalTableModel *transModel;
+    QSqlRelationalTableModel *ticketModel;
     QSqlDatabase db;
     void setDb(QSqlDatabase parentDb);
     void setStats(Statistics &stats);

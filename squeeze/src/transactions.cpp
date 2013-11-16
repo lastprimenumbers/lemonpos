@@ -16,8 +16,8 @@ transactions::transactions(QWidget *parent) :
     ui(new Ui::transactions)
 {
     ui->setupUi(this);
-    transModel=new QSqlTableModel();
-    ticketModel=new QSqlTableModel();
+    transModel=new QSqlRelationalTableModel();
+    ticketModel=new QSqlRelationalTableModel();
     connect(ui->transView, SIGNAL(clicked(const QModelIndex &)), SLOT(ticketViewOnSelected(const QModelIndex &)));
 }
 
@@ -42,6 +42,7 @@ void transactions::setDb(QSqlDatabase parentDb){
     for (int i=11; i<=16; ++i) {
         ui->ticketView->setColumnHidden(i,true);
     }
+    transModel->setRelation(1, QSqlRelation("clients", "id", "code"));
 }
 
 void transactions::setStats(Statistics &stats) {

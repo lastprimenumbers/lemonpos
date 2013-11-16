@@ -76,6 +76,8 @@ ClientEditor::ClientEditor( QSqlDatabase parentDb, QWidget *parent )
 
     //since date picker
     ui->sinceDatePicker->setDate(QDate::currentDate());
+    ui->beginsuspPicker->setDate(QDate(1970,1,1));
+    ui->endsuspPicker->setDate(QDate(1970,1,1));
     
     QTimer::singleShot(750, this, SLOT(checkName()));
     ui->editClientCode->setFocus();

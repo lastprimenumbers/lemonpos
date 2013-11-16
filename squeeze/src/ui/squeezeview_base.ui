@@ -1366,7 +1366,7 @@ p, li { white-space: pre-wrap; }
               <string>Solo capi famiglia</string>
              </property>
              <property name="checked">
-              <bool>false</bool>
+              <bool>true</bool>
              </property>
             </widget>
            </item>

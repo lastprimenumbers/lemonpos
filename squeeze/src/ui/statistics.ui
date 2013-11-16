@@ -65,7 +65,7 @@
     </widget>
    </item>
    <item row="3" column="0" colspan="3">
-    <widget class="QToolBox" name="toolBox">
+    <widget class="QToolBox" name="statBox">
      <property name="currentIndex">
       <number>0</number>
      </property>

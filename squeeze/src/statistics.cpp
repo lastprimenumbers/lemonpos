@@ -25,6 +25,8 @@ statistics::statistics(QWidget *parent) :
 
 void statistics::setStats(Statistics &parentStats) {
     stats=parentStats;
+    ui->statBox->setItemText(0,"Acquisti per Categoria");
+    ui->statBox->setItemText(1,"Acquisti per Prodotto");
 }
 void statistics::setDb(QSqlDatabase parentDb) {
     db=parentDb;
