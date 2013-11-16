@@ -86,7 +86,8 @@ ProductEditor::ProductEditor( QWidget *parent )
 
     connect( ui->btnPhoto          , SIGNAL( clicked() ), this, SLOT( changePhoto() ) );
     connect( ui->btnChangeCode,      SIGNAL( clicked() ), this, SLOT( changeCode() ) );
-    connect( ui->editCode, SIGNAL(textEdited(const QString &)), SLOT(checkIfCodeExists()));
+    connect( ui->editCode, SIGNAL(editingFinished()), SLOT(checkIfCodeExists()));
+    connect( ui->editCode, SIGNAL(returnPressed()), SLOT(checkIfCodeExists()));
     connect( ui->editCode, SIGNAL(editingFinished()), this, SLOT(checkFieldsState()));
     connect( ui->editCode, SIGNAL(returnPressed()), this, SLOT(checkFieldsState()));
     connect( ui->btnStockCorrect,      SIGNAL( clicked() ), this, SLOT( modifyStock() ));
@@ -361,8 +362,8 @@ void ProductEditor::changeCode()
 {
   //this enables the code editing... to prevent unwanted code changes...
   enableCode();
-  ui->editCode->setFocus();
-  ui->editCode->selectAll();
+//  ui->editCode->setFocus();
+//  ui->editCode->selectAll();
 }
 
 
@@ -430,7 +431,7 @@ void ProductEditor::checkIfCodeExists()
     status = statusMod;
     if (!modifyCode){
       //Prepopulate dialog...
-      ui->editAlphacode->setText( pInfo.alphaCode );
+//      ui->editAlphacode->setText( pInfo.alphaCode );
       ui->editDesc->setText(pInfo.desc);
       ui->editStockQty->setText(QString::number(pInfo.stockqty));
       setCategory(pInfo.category);
@@ -458,7 +459,6 @@ void ProductEditor::checkIfCodeExists()
     }//if !modifyCode
     else {
       errorPanel->showTip(i18n("Code %1 already exists.", codeStr),3000);
-//      enableButtonOk( false );
     }
   }
   else { //code does not exists... its a new product
@@ -496,15 +496,15 @@ bool ProductEditor::checkFieldsState()
         return false;
     }
     else if (ui->editDesc->text().isEmpty()) {
-        ui->editDesc->setFocus();
+//        ui->editDesc->setFocus();
         return false;
     }
     else if (ui->editFinalPrice->text().isEmpty()) {
-        ui->editFinalPrice->setFocus();
+//        ui->editFinalPrice->setFocus();
         return false;
     }
     else if ((ui->editFinalPrice->text().isEmpty()) || ui->editFinalPrice->text().toDouble() < 0.0 ) {
-        ui->editFinalPrice->setFocus();
+//        ui->editFinalPrice->setFocus();
         return false;
     }
   //  else if (ui->groupBoxedItem->isChecked() && (ui->editItemsPerBox->text().isEmpty() || ui->editItemsPerBox->text()=="0"))  ui->editItemsPerBox->setFocus();
@@ -707,8 +707,8 @@ void ProductEditor::toggleGroup(bool checked)
 {
   if (checked) {
     groupPanel->showPanel();
-    ui->btnStockCorrect->setDisabled(true);
-    ui->chIsARaw->setDisabled(true);
+    ui->btnStockCorrect->setEnabled(true);
+    ui->chIsARaw->setEnabled(true);
     ui->chIsARaw->setChecked(false);
     ui->btnShowGroup->setEnabled(true);
     m_model->setFilter("products.isAGroup=0 AND products.isARawProduct=0");

@@ -260,7 +260,9 @@ void PurchaseEditor::deleteSelectedItem() //added on dec 3, 2009
 
 void PurchaseEditor::resetEdits()
 {
+    int oldcat=ui->p->getCategoryId();
     ui->p->resetEdits();
+    ui->p->setCategory(oldcat);
   ui->editQty->setText("");
   gelem = "";
 //  Notify current productsHash to the producteditor
