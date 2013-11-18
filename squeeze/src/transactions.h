@@ -17,6 +17,7 @@ class transactions : public QWidget
 public:
     explicit transactions(QWidget *parent = 0);
     ~transactions();
+    QList<int> transaction_types;
     QSqlRelationalTableModel *transModel;
     QSqlRelationalTableModel *ticketModel;
     QSqlDatabase db;

@@ -42,21 +42,44 @@ void transactions::setDb(QSqlDatabase parentDb){
     for (int i=11; i<=16; ++i) {
         ui->ticketView->setColumnHidden(i,true);
     }
-    transModel->setRelation(1, QSqlRelation("clients", "id", "code"));
+
 }
 
+
 void transactions::setStats(Statistics &stats) {
+    //! Set client/donor statistics.
     Azahar *myDb=new Azahar;
     QStringList instat=myDb->getInStatements(stats);
-    transModel->setFilter("");
-    transModel->setFilter(QString("( clientid IN (%1) or  donor IN (%2) )").arg(instat[0],instat[1]));
+    delete myDb;
+    QString f;
+
+    // Select only SELL transaction (type=1) with corresponding client id.
+    if (stats.type.contains(1)) {
+        f=QString("( clientid IN (%1) )").arg(instat[0]);
+        // Model connecting clientid column to client code.
+        transModel->setRelation(1, QSqlRelation("clients", "id", "code"));
+
+    }
+    else if (stats.type.contains(2) or stats.type.contains(7)) {
+        f=QString("( donor IN (%1) )").arg(instat[1]);
+        // Model connecting clientid with donor name
+        transModel->setRelation(24, QSqlRelation("donors", "code", "name"));
+        ui->transView->setColumnHidden(24,false);
+        ui->transView->setColumnHidden(1,true);
+    }
+
+    transModel->setFilter(f);
     transModel->select();
 }
 
 void transactions::setProduct(QString &code) {
+    // View purchase/donation transactions regarding a product
     qDebug()<<"Setting product code"<<code;
-    transModel->setFilter("");
-    transModel->setFilter(QString("itemslist REGEXP '%1/'").arg(code));
+    ui->transView->setColumnHidden(24,false);
+    ui->transView->setColumnHidden(1,true);
+    transModel->setRelation(24, QSqlRelation("donors", "code", "name"));
+//    transModel->setRelation(1, QSqlRelation("clients", "id", "code"));
+    transModel->setFilter(QString("itemslist REGEXP '%1/' AND type IN (2,7)").arg(code));
     transModel->select();
     productCode=code;
 }

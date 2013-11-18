@@ -72,7 +72,8 @@ ClientEditor::ClientEditor( QSqlDatabase parentDb, QWidget *parent )
     ui->editParentClient->setCustomLayout(0);
 
     // Limits
-    connect(ui->addLimitButton, SIGNAL(clicked()), SLOT( createLimit() ));
+    connect(ui->btnAddLimit, SIGNAL(clicked()), SLOT( createLimit() ));
+    connect(ui->btnCalcLimits, SIGNAL(clicked()), SLOT( calcLimits() ));
 
     //since date picker
     ui->sinceDatePicker->setDate(QDate::currentDate());
@@ -440,10 +441,14 @@ void ClientEditor::commitClientInfo()
     delete myDb;
 }
 
+// Limits
 void ClientEditor::createLimit()
-{
+{   //! Open the Limit Editor preconfigured for this family.
     limiteditor *limed = new limiteditor();
     limed->show();
+}
+void ClientEditor::calcLimits() {
+
 }
 
 #include "clienteditor.moc"
