@@ -2,7 +2,7 @@ project(lemon)
 
 find_package(KDE4 REQUIRED)
 include (KDE4Defaults)
-include_directories( ${KDE4_INCLUDES} ${QT_INCLUDES} ${QT_QTSQL_INCLUDE_DIR})
+include_directories( ${KDE4_INCLUDES} ${QT4_INCLUDES} ${QT4_QTSQL_INCLUDE_DIR})
 
 add_subdirectory( src )
 
