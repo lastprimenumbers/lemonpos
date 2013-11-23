@@ -477,6 +477,7 @@ void ProductEditor::checkIfCodeExists()
 
 void ProductEditor::resetEdits() {
     //clear all used edits
+    ui->editCode->clear();
     ui->editAlphacode->clear();
     ui->editDesc->clear();
     ui->editStockQty->clear();

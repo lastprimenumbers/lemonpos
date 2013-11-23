@@ -912,7 +912,7 @@ void squeezeView::setupDb()
   db.setUserName(Settings::editDBUsername());
   db.setPassword(Settings::editDBPassword());
 
-  db.setHostName("localhost");
+  db.setHostName("192.168.88.100");
   db.setDatabaseName("emporio");
   db.setUserName("emporio");
   db.setPassword("emporio");
