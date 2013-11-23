@@ -81,8 +81,13 @@ ClientEditor::ClientEditor( QSqlDatabase parentDb, QWidget *parent )
 
     //since date picker
     ui->sinceDatePicker->setDate(QDate::currentDate());
+    ui->expiryDatePicker->setDate(QDate::currentDate().addDays(180));
     ui->beginsuspPicker->setDate(QDate(1970,1,1));
     ui->endsuspPicker->setDate(QDate(1970,1,1));
+    connect(ui->sinceDatePicker, SIGNAL(changed(QDate)), SLOT(validateSubscription()));
+    connect(ui->expiryDatePicker, SIGNAL(changed(QDate)), SLOT(validateSubscription()));
+    connect(ui->beginsuspPicker, SIGNAL(changed(QDate)), SLOT(validateSubscription()));
+    connect(ui->endsuspPicker, SIGNAL(changed(QDate)), SLOT(validateSubscription()));
     
     QTimer::singleShot(750, this, SLOT(checkName()));
     ui->editClientCode->setFocus();
@@ -113,6 +118,19 @@ ClientEditor::~ClientEditor()
 
 void ClientEditor::refreshCaption() {
     setCaption( QString("%1, %2 [%3]").arg(getSurname(),getName(),getCode()) );
+}
+
+void ClientEditor::validateSubscription(){
+    QDate since=getSinceDate();
+    QDate expiry=getExpiryDate();
+    if (expiry<since) {
+        setExpiryDate(since.addDays(180));
+    }
+    QDate bs=getBeginsuspDate();
+    QDate es=getEndsuspDate();
+    if (es<bs) {
+        setEndsuspDate(bs.addDays(1));
+    }
 }
 
 void ClientEditor::changeDebit()

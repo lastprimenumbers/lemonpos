@@ -111,6 +111,7 @@ class ClientEditor : public KDialog
     void viewChildClient(int row,int col);
     void changeDebit();
     void refreshCaption();
+    void validateSubscription();
   private:
     ClientEditorUI *ui;
     long int clientId;
