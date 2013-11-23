@@ -416,16 +416,19 @@ void ProductEditor::checkIfCodeExists()
   Azahar *myDb = new Azahar;
   myDb->setDatabase(db);
   ProductInfo pInfo;
+  // Check productsHash
   if (productsHash.contains(codeStr)) {
       pInfo=productsHash[codeStr];
-  } else {
+  }
+  // Still 0?
+  if (pInfo.code=="0") {
       pInfo = myDb->getProductInfo(codeStr);
   }
+  // A group?
   if (pInfo.isAGroup) {
     // get it again with the appropiate tax and price.
     pInfo = myDb->getProductInfo(codeStr, true); //the 2nd parameter is to get the taxes for the group (not considering discounts)
   }
-
   if (pInfo.code != "0") {
     //code exists...
     status = statusMod;
@@ -456,8 +459,9 @@ void ProductEditor::checkIfCodeExists()
         photo.loadFromData(pInfo.photo);
         setPhoto(photo);
       }
-    }//if !modifyCode
+    }//if modifyCode
     else {
+      qDebug()<<"Code already exists"<<codeStr;
       errorPanel->showTip(i18n("Code %1 already exists.", codeStr),3000);
     }
   }
@@ -468,7 +472,6 @@ void ProductEditor::checkIfCodeExists()
     }
     qDebug()<< "no product found with code "<<codeStr;
   }
-  qDebug()<<"DESC:"<<getDescription();
   delete myDb;
 }
 

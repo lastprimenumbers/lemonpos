@@ -911,10 +911,11 @@ void squeezeView::setupDb()
   db.setDatabaseName(Settings::editDBName());
   db.setUserName(Settings::editDBUsername());
   db.setPassword(Settings::editDBPassword());
-//  db.setHostName("localhost");
-//  db.setDatabaseName("lemondb");
-//  db.setUserName("lemonclient");
-//  db.setPassword("xarwit0721");
+
+  db.setHostName("localhost");
+  db.setDatabaseName("emporio");
+  db.setUserName("emporio");
+  db.setPassword("emporio");
 
   qDebug()<<"SetupDB: opening";
   db.open();

@@ -57,6 +57,10 @@ ClientEditor::ClientEditor( QSqlDatabase parentDb, QWidget *parent )
     connect(ui->editClientCode, SIGNAL(returnPressed()),ui->editClientName, SLOT(setFocus()) );
     connect(ui->editClientCode, SIGNAL(editingFinished()),this, SLOT( checkNameDelayed() )); //both returnPressed and lost focus fires this signal. But only fired if validator is accepted.
 
+    connect( ui->editClientName, SIGNAL(textEdited(const QString &)),this, SLOT( refreshCaption()) );
+    connect( ui->editClientSurname, SIGNAL(textEdited(const QString &)),this, SLOT( refreshCaption()) );
+    connect( ui->editClientCode, SIGNAL(textEdited(const QString &)),this, SLOT( refreshCaption()) );
+
     QRegExp regexpC("[0-9]{1,13}");
     QRegExpValidator * validator = new QRegExpValidator(regexpC, this);
     ui->editMonthlyPoints->setValidator((new QDoubleValidator(0.00, 1000.000, 3,ui->editMonthlyPoints)));
@@ -102,10 +106,13 @@ ClientEditor::ClientEditor( QSqlDatabase parentDb, QWidget *parent )
 }
 
 
-
 ClientEditor::~ClientEditor()
 {
     delete ui;
+}
+
+void ClientEditor::refreshCaption() {
+    setCaption( QString("%1, %2 [%3]").arg(getSurname(),getName(),getCode()) );
 }
 
 void ClientEditor::changeDebit()
@@ -385,6 +392,7 @@ void ClientEditor::setClientInfo(ClientInfo info)
     setPhoto(photo);
     qDebug()<<"clientEditor setting tags"<<info.code<<info.tags;
     ui->clientTagEditor->setTags(info.tags);
+    refreshCaption();
 }
 //Overloaded: imposta le informazioni basandosi sul codice!
 void ClientEditor::setClientInfo(QString code)

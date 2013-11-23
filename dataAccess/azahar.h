@@ -50,6 +50,7 @@ class Azahar : public QObject
     void setError(QString err);
     QString m_mainClient;
     QStringList clientFields;
+    QString clientLightSelect;
     QStringList donorFields;
     QStringList limitFields;
   public:
@@ -304,7 +305,7 @@ private:
     QString     getInsertString(QStringList list);
     bool        _bindClient(ClientInfo &info, QSqlQuery &query);
     ClientInfo   _getClientInfo(qulonglong clientId);
-    ClientInfo   _getClientInfo(QString clientCode);
+    ClientInfo   _getClientInfo(QString clientCode, bool mini = false);
     bool   getClientInfoFromQuery(QSqlQuery &qC, ClientInfo &info);
 
     bool        _bindDonor(DonorInfo &info, QSqlQuery &query);

@@ -28,6 +28,7 @@ Azahar::Azahar(QWidget * parent): QObject(parent)
   errorStr = "";
   m_mainClient = "undefined";
   clientFields= QString("name, surname, address, phone, email, nation, monthly, photo, since, expiry, birthDate, code, beginsusp, endsusp, msgsusp, notes, parent, lastCreditReset").split(", ");
+  clientLightSelect= QString("id,name, surname, address, phone, email, nation, monthly, since, expiry, birthDate, code, beginsusp, endsusp, msgsusp, notes, parent, lastCreditReset");
   donorFields=QString("name, email, address, phone, photo, since, code, refname, refsurname, refemail, refphone, notes").split(", ");
   limitFields=QString("clientCode, clientTag, productCode, productCat, limit, priority, label").split(", ");
 }
@@ -1802,27 +1803,70 @@ bool Azahar::getClientInfoFromQuery(QSqlQuery &qC, ClientInfo &info){
         int fieldMonthly = qC.record().indexOf("monthly");
 
         //Should be only one
-        info.id         = qC.value(fieldId).toUInt();
-        info.code       = qC.value(fieldCode).toString();
-        info.name       = qC.value(fieldName).toString();
-        info.surname       = qC.value(fieldSurname).toString();
-        info.email       = qC.value(fieldEmail).toString();
-        info.nation       = qC.value(fieldNation).toString();
-        info.parentClient = qC.value(fieldParent).toString();
-        info.photo      = qC.value(fieldPhoto).toByteArray();
-        info.since      = qC.value(fieldSince).toDate();
-        info.expiry     = qC.value(fieldExpiry).toDate();
-        info.birthDate      = qC.value(fieldBirthDate).toDate();
-        info.phone      = qC.value(fieldPhone).toString();
-        info.address    = qC.value(fieldAdd).toString();
-        info.monthly   = qC.value(fieldMonthly).toDouble();
-        info.email       = qC.value(qC.record().indexOf("email")).toString();
-        info.nation       = qC.value(qC.record().indexOf("nation")).toString();
-        info.beginsusp       = qC.value(qC.record().indexOf("beginsusp")).toDate();
-        info.endsusp       = qC.value(qC.record().indexOf("endsusp")).toDate();
-        info.msgsusp       = qC.value(qC.record().indexOf("msgsusp")).toString();
-        info.notes       = qC.value(qC.record().indexOf("notes")).toString();
-        info.lastCreditReset      = qC.value(qC.record().indexOf("lastCreditReset")).toDate();
+        if (fieldId>=0) {
+            info.id         = qC.value(fieldId).toUInt();
+        }
+        if (fieldCode>=0) {
+            info.code       = qC.value(fieldCode).toString();
+        }
+        if (fieldName>=0) {
+            info.name       = qC.value(fieldName).toString();
+        }
+        if (fieldSurname>=0) {
+            info.surname       = qC.value(fieldSurname).toString();
+        }
+        if (fieldEmail>=0) {
+            info.email       = qC.value(fieldEmail).toString();
+        }
+        if (fieldNation>=0) {
+            info.nation       = qC.value(fieldNation).toString();
+        }
+        if (fieldParent>=0) {
+            info.parentClient = qC.value(fieldParent).toString();
+        }
+        if (fieldPhoto>=0) {
+            info.photo      = qC.value(fieldPhoto).toByteArray();
+        }
+        if (fieldSince>=0) {
+            info.since      = qC.value(fieldSince).toDate();
+        }
+        if (fieldExpiry>=0) {
+            info.expiry     = qC.value(fieldExpiry).toDate();
+        }
+        if (fieldBirthDate>=0) {
+            info.birthDate      = qC.value(fieldBirthDate).toDate();
+        }
+        if (fieldPhone>=0) {
+            info.phone      = qC.value(fieldPhone).toString();
+        }
+        if (fieldAdd>=0) {
+            info.address    = qC.value(fieldAdd).toString();
+        }
+        if (fieldMonthly>=0) {
+            info.monthly   = qC.value(fieldMonthly).toDouble();
+        }
+        int fieldBeginsusp=qC.record().indexOf("beginsusp");
+        if (fieldBeginsusp>=0) {
+            info.beginsusp       = qC.value(fieldBeginsusp).toDate();
+        }
+        int fieldEndsusp=qC.record().indexOf("endsusp");
+        if (fieldEndsusp>=0) {
+            info.endsusp       = qC.value(fieldEndsusp).toDate();
+        }
+        int fieldMsgsusp=qC.record().indexOf("msgsusp");
+        if (fieldMsgsusp>=0) {
+            info.msgsusp       = qC.value(fieldMsgsusp).toString();
+        }
+        int fieldNotes=qC.record().indexOf("notes");
+        if (fieldNotes>=0) {
+            info.notes       = qC.value(fieldNotes).toString();
+        }
+        int fieldLCR=qC.record().indexOf("lastCreditReset");
+        if (fieldLCR>=0) {
+            info.lastCreditReset      = qC.value(fieldLCR).toDate();
+        } else {
+            qDebug()<<"cifq not getting lcr"<<info.id;
+        }
         return true;
     }
     return false;
@@ -1836,7 +1880,7 @@ ClientInfo Azahar::checkParent(ClientInfo &info)
     ClientInfo parentInfo;
     parentInfo.id=0;
     if (info.parentClient.count()>0){
-        parentInfo=_getClientInfo(info.parentClient);
+        parentInfo=_getClientInfo(info.parentClient,true);
         if (parentInfo.id > 0){
             info.monthly=parentInfo.monthly;
             info.beginsusp=parentInfo.beginsusp;
@@ -1866,7 +1910,7 @@ Family Azahar::getFamily(ClientInfo &info)
         parentCode=info.code;
         result.append(info);
     } else {
-        parentInfo=_getClientInfo(info.parentClient);
+        parentInfo=_getClientInfo(info.parentClient,true);
         parentCode=info.parentClient;
         result.append(parentInfo);
         result.append(info);
@@ -1877,7 +1921,7 @@ Family Azahar::getFamily(ClientInfo &info)
     }
     QSqlQuery query(db);
     qDebug()<<"getFamily pre-query"<<parentCode;
-    query.exec(QString("select * from clients where parent='%1';").arg(parentCode));
+    query.exec(QString("select %1 from clients where parent='%2';").arg(clientLightSelect, parentCode));
     qDebug()<<"getFamily query"<<query.lastError()<<query.lastQuery();
     // Cycle over results, to build the limits hash
     ClientInfo ci;
@@ -1885,7 +1929,6 @@ Family Azahar::getFamily(ClientInfo &info)
     while (getClientInfoFromQuery(query,ci)) {
         qDebug()<<"GET Family"<<info.code<<ci.code<<result.count();
         if (ci.code==info.code or ci.code==parentCode) {continue;}
-        ci.photo="";
         ci.tags=getClientTags(ci.code);
         result.append(ci);
     }
@@ -2106,6 +2149,8 @@ void Azahar::migrateDonations()
             qDebug()<<"Skipping empty transaction"<<tr.id;
             continue;
         }
+        // Zero-out the amount: we will recalc it
+        tr.amount=0;
         itemlist=tr.itemlist.split(";");
         qDebug()<<"itemlist"<<itemlist<<itemlist.count();
         deleteAllTransactionItem(tr.id);
@@ -2140,7 +2185,11 @@ void Azahar::migrateDonations()
               tItemInfo.name            = info.desc;
             tItemInfo.isGroup = info.isAGroup;
             insertTransactionItem(tItemInfo);
+            // Update the amount
+            tr.amount+=tItemInfo.cost;
         }
+        // Push the updated transaction amount
+        updateTransaction(tr);
     }
 }
 
@@ -2408,7 +2457,7 @@ ClientInfo Azahar::getClientInfo(QString clientCode)
     return info;
 }
 
-ClientInfo Azahar::_getClientInfo(QString clientCode)
+ClientInfo Azahar::_getClientInfo(QString clientCode, bool mini)
 {
     ClientInfo info;
     info.name = "";
@@ -2417,7 +2466,13 @@ ClientInfo Azahar::_getClientInfo(QString clientCode)
     if (!db.isOpen()) db.open();
     if (db.isOpen()) {
         QSqlQuery qC(db);
-        if (qC.exec(QString("select * from clients WHERE code='%1';").arg(clientCode))) {
+        QString q;
+        if (mini=true) {
+            q=QString("select %1 from clients WHERE code='%2';").arg(clientLightSelect, clientCode);
+        } else {
+            q=QString("select * from clients WHERE code='%1';").arg(clientCode);
+        }
+        if (qC.exec(q)) {
             getClientInfoFromQuery(qC,info);
             info.tags=getClientTags(clientCode);
         }
@@ -2485,11 +2540,11 @@ QHash<int, ClientInfo> Azahar::getClientsHash()
   if (!db.isOpen()) db.open();
   if (db.isOpen()) {
     QSqlQuery qC(db);
-    if (qC.exec("select * from clients;")) {
-
+    // don't select photo for hashing purposes!
+    if (qC.exec(QString("select id,code,name,surname,since,expiry,beginsusp,endsusp,parent from clients"))) {
       while (getClientInfoFromQuery(qC,info)) {
-        checkParent(info);
-        info.photo = "";
+//        checkParent(info);
+          qDebug()<<"ClientsHash::"<<info.id<<info.code;
         result.insert(info.id, info);
         if (info.id == 1) {
             m_mainClient = info.name+" "+info.surname;
@@ -2499,7 +2554,9 @@ QHash<int, ClientInfo> Azahar::getClientsHash()
     else {
       qDebug()<<"ERROR: "<<qC.lastError();
     }
+
   }
+
   return result;
 }
 

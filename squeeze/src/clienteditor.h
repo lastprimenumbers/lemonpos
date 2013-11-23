@@ -110,7 +110,7 @@ class ClientEditor : public KDialog
     void viewParentClient();
     void viewChildClient(int row,int col);
     void changeDebit();
-
+    void refreshCaption();
   private:
     ClientEditorUI *ui;
     long int clientId;

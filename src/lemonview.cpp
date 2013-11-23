@@ -3588,6 +3588,7 @@ void lemonView::setupModel()
     connectToDb();
   }
   else {
+    qDebug()<<"Setting up model...";
     //workaround for a stupid crash: when re-connecting after Config, on setTable crashes.
     //Crashes without debug information.
     if (productsModel->tableName() != "products")
@@ -3759,15 +3760,10 @@ void lemonView::setupDB()
   //db = QSqlDatabase::addDatabase("QMYSQL");
 
 
-//    Settings::setEditDBServer("localhost");
-//    Settings::setEditDBName("lemondb");
-//    Settings::setEditDBUsername("lemonclient");
-//    Settings::setEditDBPassword("xarwit0721");
-
-//    Settings::setEditDBServer("192.168.88.100");
-//    Settings::setEditDBName("emporio");
-//    Settings::setEditDBUsername("emporio");
-//    Settings::setEditDBPassword("emporio");
+    Settings::setEditDBServer("localhost");
+    Settings::setEditDBName("emporio");
+    Settings::setEditDBUsername("emporio");
+    Settings::setEditDBPassword("emporio");
 
   db.setHostName(Settings::editDBServer());
   db.setDatabaseName(Settings::editDBName());
@@ -3798,7 +3794,7 @@ void lemonView::connectToDb()
     }
     setupModel();
     setupHistoryTicketsModel();
-    setupClients();
+//    setupClients();
     //pass db to login/pass dialogs
     dlgLogin->setDb(db);
     dlgPassword->setDb(db);
@@ -3820,7 +3816,9 @@ void lemonView::setupClients()
     ui_mainview.comboClients->clear();
     Azahar *myDb = new Azahar;
     myDb->setDatabase(db);
+    qDebug()<<"Setting up clientsHash...";
     clientsHash = myDb->getClientsHash();
+    qDebug()<<"Setting up main client...";
     mainClient  = myDb->getMainClient();
 
     //Set by default the 'general' client.
@@ -3884,7 +3882,7 @@ void lemonView::updateClientInfo()
   QPixmap pix;
 
 
-  clientInfo= myDb->getClientInfo(clientInfo.code);
+  clientInfo= myDb->getClientInfo(clientInfo.id);
   pix.loadFromData(clientInfo.photo);
   ui_mainview.lblClientPhoto->setPixmap(pix);
   QDate d=QDate::currentDate();
@@ -3902,7 +3900,7 @@ void lemonView::updateClientInfo()
   } else if (d>clientInfo.expiry && clientInfo.id>1) {
       QMessageBox::warning(this,
                            i18n("ATTENZIONE: CLIENTE TERMINATO"),
-                           i18n("Il cliente \"%1 %2\" era abilitato fino al %3 compreso. Il servizio è pertanto terminato.").arg(clientInfo.name, clientInfo.surname, clientInfo.beginsusp.toString("dd.MM.yyyy"),clientInfo.endsusp.toString("dd.MM.yyyy"),clientInfo.msgsusp),
+                           i18n("Il cliente \"%1 %2\" era abilitato fino al %3 compreso. Il servizio è pertanto terminato.").arg(clientInfo.name, clientInfo.surname, clientInfo.expiry.toString("dd.MM.yyyy")),
                            QMessageBox::Abort,
                            QMessageBox::Abort);
       ui_mainview.comboClients->setCurrentIndex(0);// Reset to general
@@ -3928,6 +3926,7 @@ void lemonView::setHistoryFilter() {
 
 void lemonView::setupHistoryTicketsModel()
 {
+    qDebug()<<"Setting up history tickets...";
   //qDebug()<<"Db name:"<<db.databaseName()<<", Tables:"<<db.tables();
   if (historyTicketsModel->tableName().isEmpty()) {
     if (!db.isOpen()) db.open();
