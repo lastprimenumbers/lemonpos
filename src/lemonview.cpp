@@ -3760,10 +3760,10 @@ void lemonView::setupDB()
   //db = QSqlDatabase::addDatabase("QMYSQL");
 
 
-    Settings::setEditDBServer("localhost");
-    Settings::setEditDBName("emporio");
-    Settings::setEditDBUsername("emporio");
-    Settings::setEditDBPassword("emporio");
+//    Settings::setEditDBServer("vcassa");
+//    Settings::setEditDBName("emporio");
+//    Settings::setEditDBUsername("emporio");
+//    Settings::setEditDBPassword("emporio");
 
   db.setHostName(Settings::editDBServer());
   db.setDatabaseName(Settings::editDBName());
