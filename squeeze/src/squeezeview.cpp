@@ -913,11 +913,9 @@ void squeezeView::setupDb()
   db.setUserName(Settings::editDBUsername());
   db.setPassword(Settings::editDBPassword());
 
-<<<<<<< HEAD
+
 /*  db.setHostName("192.168.88.100");
-=======
   db.setHostName("localhost");
->>>>>>> ff48aa09511db9f4afe31d75b570952a7bcea0ec
   db.setDatabaseName("emporio");
   db.setUserName("emporio");
   db.setPassword("emporio");*/
