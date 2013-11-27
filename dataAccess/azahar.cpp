@@ -1867,6 +1867,8 @@ bool Azahar::getClientInfoFromQuery(QSqlQuery &qC, ClientInfo &info){
         } else {
             qDebug()<<"cifq not getting lcr"<<info.id;
         }
+        // Special main client
+        if (info.id==1) info.expiry=QDate::currentDate().addYears(1);
         return true;
     }
     return false;
@@ -2452,7 +2454,7 @@ ClientInfo Azahar::_getClientInfo(qulonglong clientId)
 ClientInfo Azahar::getClientInfo(QString clientCode)
 {
     ClientInfo info;
-    info=_getClientInfo(clientCode);
+    info=_getClientInfo(clientCode,false);
     checkParent(info);
     return info;
 }
@@ -2467,7 +2469,7 @@ ClientInfo Azahar::_getClientInfo(QString clientCode, bool mini)
     if (db.isOpen()) {
         QSqlQuery qC(db);
         QString q;
-        if (mini=true) {
+        if (mini==true) {
             q=QString("select %1 from clients WHERE code='%2';").arg(clientLightSelect, clientCode);
         } else {
             q=QString("select * from clients WHERE code='%1';").arg(clientCode);

@@ -785,6 +785,7 @@ void squeezeView::setupGraphs()
 // UI and Database -- GRAPHS.
 void squeezeView::updateGraphs()
 {
+  return;
   if (!db.isOpen()) openDB();
   if (db.isOpen()) {
     if (!graphSoldItemsCreated ) setupGraphs();
@@ -912,7 +913,7 @@ void squeezeView::setupDb()
   db.setUserName(Settings::editDBUsername());
   db.setPassword(Settings::editDBPassword());
 
-  db.setHostName("192.168.88.100");
+  db.setHostName("localhost");
   db.setDatabaseName("emporio");
   db.setUserName("emporio");
   db.setPassword("emporio");
