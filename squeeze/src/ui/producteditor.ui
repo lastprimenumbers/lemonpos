@@ -531,7 +531,7 @@ color: blue;</string>
        <enum>Qt::LeftToRight</enum>
       </property>
       <property name="text">
-       <string>Contenuto:</string>
+       <string>Quantità:</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>

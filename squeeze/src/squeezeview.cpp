@@ -912,10 +912,10 @@ void squeezeView::setupDb()
   db.setUserName(Settings::editDBUsername());
   db.setPassword(Settings::editDBPassword());
 
-  db.setHostName("192.168.88.100");
+/*  db.setHostName("192.168.88.100");
   db.setDatabaseName("emporio");
   db.setUserName("emporio");
-  db.setPassword("emporio");
+  db.setPassword("emporio");*/
 
   qDebug()<<"SetupDB: opening";
   db.open();
@@ -1098,28 +1098,53 @@ void squeezeView::setupProductsModel()
     productDescIndex = productsModel->fieldIndex("name");
     productPriceIndex= productsModel->fieldIndex("price");
     productStockIndex= productsModel->fieldIndex("stockqty");
-    productCostIndex = productsModel->fieldIndex("cost");
+/*    productCostIndex = productsModel->fieldIndex("cost");
     productSoldUnitsIndex= productsModel->fieldIndex("soldunits");
     productLastSoldIndex= productsModel->fieldIndex("datelastsold");
     productUnitsIndex= productsModel->fieldIndex("units");
     productTaxIndex = productsModel->fieldIndex("taxpercentage");
     productETaxIndex= productsModel->fieldIndex("extrataxes");
     productPhotoIndex=productsModel->fieldIndex("photo");
-    productCategoryIndex=productsModel->fieldIndex("category");
-    productPointsIndex=productsModel->fieldIndex("points");
+*/    productCategoryIndex=productsModel->fieldIndex("category");
+/*    productPointsIndex=productsModel->fieldIndex("points");
     productLastProviderIndex = productsModel->fieldIndex("lastproviderid");
     productAlphaCodeIndex = productsModel->fieldIndex("alphacode");
     productIsAGroupIndex  = productsModel->fieldIndex("isAGroup");
     productIsARawIndex    = productsModel->fieldIndex("isARawProduct");
     productGEIndex        = productsModel->fieldIndex("groupElements");
-
+*/
 
     ui_mainview.productsView->setModel(productsModel);
-    ui_mainview.productsView->setViewMode(QListView::IconMode);
-    ui_mainview.productsView->setGridSize(QSize(170,170));
+//    ui_mainview.productsView->setViewMode(QListView::IconMode);
+//    ui_mainview.productsView->setGridSize(QSize(170,170));
     ui_mainview.productsView->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    ui_mainview.productsView->setResizeMode(QListView::Adjust);
-    ui_mainview.productsView->setModelColumn(productsModel->fieldIndex("photo"));
+//    ui_mainview.productsView->setResizeMode(QListView::Adjust);
+//    ui_mainview.productsView->setModelColumn(productsModel->fieldIndex("photo"));
+
+
+    ui_mainview.productsView->hideColumn(4);
+    ui_mainview.productsView->hideColumn(5);
+    ui_mainview.productsView->hideColumn(6);
+    ui_mainview.productsView->hideColumn(7);
+    ui_mainview.productsView->hideColumn(8);
+    ui_mainview.productsView->hideColumn(9);
+    ui_mainview.productsView->hideColumn(10);
+//    ui_mainview.productsView->hideColumn(11);
+    ui_mainview.productsView->hideColumn(12);
+    ui_mainview.productsView->hideColumn(13);
+    ui_mainview.productsView->hideColumn(14);
+    ui_mainview.productsView->hideColumn(15);
+    ui_mainview.productsView->hideColumn(16);
+    ui_mainview.productsView->hideColumn(17);
+    ui_mainview.productsView->hideColumn(18);
+    ui_mainview.productsView->hideColumn(19);
+    ui_mainview.productsView->hideColumn(20);
+    ui_mainview.productsView->hideColumn(21);
+    ui_mainview.productsView->hideColumn(22);
+//    ui_mainview.productsView->hideColumn(23);
+    ui_mainview.productsView->hideColumn(24);
+    ui_mainview.productsView->hideColumn(25);
+
 
     ui_mainview.productsViewAlt->setModel(productsModel);
     ui_mainview.productsViewAlt->setEditTriggers(QAbstractItemView::NoEditTriggers);
@@ -1150,9 +1175,10 @@ void squeezeView::setupProductsModel()
     productsModel->setHeaderData(productLastProviderIndex, Qt::Horizontal, i18n("Last Provider") );
     productsModel->setHeaderData(productAlphaCodeIndex, Qt::Horizontal, i18n("Alpha Code") );
     
-    ProductDelegate *delegate = new ProductDelegate(ui_mainview.productsView);
+/*    ProductDelegate *delegate = new ProductDelegate(ui_mainview.productsView);
     ui_mainview.productsView->setItemDelegate(delegate);
     ui_mainview.productsView->setSelectionMode(QAbstractItemView::SingleSelection);
+*/
 
     productsModel->select();
     ui_mainview.productsViewAlt->resizeColumnsToContents();
@@ -2170,10 +2196,10 @@ void squeezeView::productsViewOnSelected(const QModelIndex &index)
     QModelIndex indx = model->index(row, productsModel->fieldIndex("code"));
     QString id = model->data(indx, Qt::DisplayRole).toString();
 
-    indx = model->index(row, productsModel->fieldIndex("photo"));
-    QByteArray photoBA = model->data(indx, Qt::DisplayRole).toByteArray();
-    QPixmap photo;
-    photo.loadFromData(photoBA);
+//    indx = model->index(row, productsModel->fieldIndex("photo"));
+//    QByteArray photoBA = model->data(indx, Qt::DisplayRole).toByteArray();
+//    QPixmap photo;
+//    photo.loadFromData(photoBA);
 
     ProductInfo pInfo;
 
