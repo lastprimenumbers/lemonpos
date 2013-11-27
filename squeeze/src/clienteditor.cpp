@@ -84,11 +84,9 @@ ClientEditor::ClientEditor( QSqlDatabase parentDb, QWidget *parent )
     ui->expiryDatePicker->setDate(QDate::currentDate().addDays(180));
     ui->beginsuspPicker->setDate(QDate(1970,1,1));
     ui->endsuspPicker->setDate(QDate(1970,1,1));
-    connect(ui->sinceDatePicker, SIGNAL(changed(QDate)), SLOT(validateSubscription()));
-    connect(ui->expiryDatePicker, SIGNAL(changed(QDate)), SLOT(validateSubscription()));
-    connect(ui->beginsuspPicker, SIGNAL(changed(QDate)), SLOT(validateSubscription()));
-    connect(ui->endsuspPicker, SIGNAL(changed(QDate)), SLOT(validateSubscription()));
-    
+
+    connectSubscription();
+
     QTimer::singleShot(750, this, SLOT(checkName()));
     ui->editClientCode->setFocus();
     db=parentDb;
@@ -120,17 +118,82 @@ void ClientEditor::refreshCaption() {
     setCaption( QString("%1, %2 [%3]").arg(getSurname(),getName(),getCode()) );
 }
 
-void ClientEditor::validateSubscription(){
-    QDate since=getSinceDate();
-    QDate expiry=getExpiryDate();
-    if (expiry<since) {
-        setExpiryDate(since.addDays(180));
-    }
+int ClientEditor::remainingSuspension(){
+    //! Remaining suspension days
+    int dur=0;
     QDate bs=getBeginsuspDate();
     QDate es=getEndsuspDate();
-    if (es<bs) {
-        setEndsuspDate(bs.addDays(1));
+    QDate today=QDate::currentDate();
+    if (es>today) {
+        if (bs<today) bs=today;
+        dur=dur-bs.daysTo(es);
     }
+    return dur;
+}
+
+void ClientEditor::connectSubscription() {
+    connect(ui->sinceDatePicker, SIGNAL(changed(QDate)), SLOT(validateSubscriptionSince()));
+    connect(ui->expiryDatePicker, SIGNAL(changed(QDate)), SLOT(validateSubscriptionExpiry()));
+    connect(ui->beginsuspPicker, SIGNAL(changed(QDate)), SLOT(validateSubscriptionSusp()));
+    connect(ui->endsuspPicker, SIGNAL(changed(QDate)), SLOT(validateSubscriptionSusp()));
+    connect(ui->duration, SIGNAL(valueChanged(int)), SLOT(validateSubscriptionDuration(int)));
+}
+
+void ClientEditor::disconnectSubscription() {
+    disconnect(ui->sinceDatePicker, SIGNAL(changed(QDate)),this, SLOT(validateSubscriptionSince()));
+    disconnect(ui->expiryDatePicker, SIGNAL(changed(QDate)),this, SLOT(validateSubscriptionExpiry()));
+    disconnect(ui->beginsuspPicker, SIGNAL(changed(QDate)),this, SLOT(validateSubscriptionSusp()));
+    disconnect(ui->endsuspPicker, SIGNAL(changed(QDate)),this, SLOT(validateSubscriptionSusp()));
+    disconnect(ui->duration, SIGNAL(valueChanged(int)),this, SLOT(validateSubscriptionDuration(int)));
+}
+
+int ClientEditor::effectiveDuration() {
+    //! Return the duration corrected by the suspension days
+    QDate since=getSinceDate();
+    int dur=ui->duration->value();
+    QDate today=QDate::currentDate();
+    QDate bs=getBeginsuspDate();
+    QDate es=getEndsuspDate();
+    if (es>today) {
+        if (bs<today) bs=today;
+        dur=dur-bs.daysTo(es);
+    }
+    return dur;
+}
+
+void ClientEditor::validateSubscriptionSince(){
+    //! Update expiry date so that since and duration are enforced
+    disconnectSubscription();
+    QDate since=getSinceDate();
+    setExpiryDate(since.addDays(effectiveDuration()));
+    connectSubscription();
+}
+
+void ClientEditor::validateSubscriptionExpiry(){
+    //! Update duration so that expiry and since are enforced
+    disconnectSubscription();
+    QDate since=getSinceDate();
+    QDate expiry=getExpiryDate();
+    int dur=since.daysTo(expiry)-remainingSuspension();
+    ui->duration->setValue(dur);
+    connectSubscription();
+}
+
+void ClientEditor::validateSubscriptionDuration(int dur){
+    //! Update the expiry date so that since and duration are enforced
+    disconnectSubscription();
+    QDate since=getSinceDate();
+    QDate expiry=getExpiryDate();
+    int durEff=effectiveDuration();
+    qDebug()<<"validateSubscriptionDuration"<<dur<<durEff;
+    setExpiryDate(since.addDays(durEff));
+    connectSubscription();
+}
+
+void ClientEditor::validateSubscriptionSusp(){
+    disconnectSubscription();
+    connectSubscription();
+    return;
 }
 
 void ClientEditor::changeDebit()
@@ -367,7 +430,6 @@ void ClientEditor::loadLimits(ClientInfo info)
     setLastCreditReset(credit.lastCreditReset);
     info.lastCreditReset=credit.lastCreditReset;
     qDebug()<<"loadLimits: Last Credit Reset"<<credit.lastCreditReset;
-
     // Prepare statistical structure
     Family family=myDb->getFamily(info);
     delete myDb;
@@ -381,8 +443,11 @@ void ClientEditor::loadLimits(ClientInfo info)
 
 void ClientEditor::setClientInfo(ClientInfo info)
 {
-    setCode(info.code);
     setId(info.id);
+//    Azahar *myDb=new Azahar;
+//    info=myDb->getClientInfo(info.id);
+//    delete myDb;
+    setCode(info.code);
     setName(info.name);
     setSurname(info.surname);
     setEmail(info.email);
@@ -408,7 +473,7 @@ void ClientEditor::setClientInfo(ClientInfo info)
     QPixmap photo;
     photo.loadFromData(info.photo);
     setPhoto(photo);
-    qDebug()<<"clientEditor setting tags"<<info.code<<info.tags;
+    qDebug()<<"clientEditor setting tags"<<info.code<<info.tags<<info.photo.count();
     ui->clientTagEditor->setTags(info.tags);
     refreshCaption();
 }

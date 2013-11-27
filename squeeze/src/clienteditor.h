@@ -97,6 +97,10 @@ class ClientEditor : public KDialog
     void commitClientInfo();
     void loadLimits(ClientInfo info);
     QSqlTableModel *limitsModel;
+    int effectiveDuration();
+    int remainingSuspension();
+    void connectSubscription();
+    void disconnectSubscription();
 
   private slots:
     void createLimit();
@@ -111,7 +115,11 @@ class ClientEditor : public KDialog
     void viewChildClient(int row,int col);
     void changeDebit();
     void refreshCaption();
-    void validateSubscription();
+
+    void validateSubscriptionSince();
+    void validateSubscriptionDuration(int dur);
+    void validateSubscriptionExpiry();
+    void validateSubscriptionSusp();
   private:
     ClientEditorUI *ui;
     long int clientId;

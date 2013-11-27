@@ -3760,7 +3760,7 @@ void lemonView::setupDB()
   //db = QSqlDatabase::addDatabase("QMYSQL");
 
 
-//    Settings::setEditDBServer("vcassa");
+    Settings::setEditDBServer("192.168.88.100");
 //    Settings::setEditDBName("emporio");
 //    Settings::setEditDBUsername("emporio");
 //    Settings::setEditDBPassword("emporio");
@@ -3900,10 +3900,10 @@ void lemonView::updateClientInfo()
   } else if (d>clientInfo.expiry && clientInfo.id>1) {
       QMessageBox::warning(this,
                            i18n("ATTENZIONE: CLIENTE TERMINATO"),
-                           i18n("Il cliente \"%1 %2\" era abilitato fino al %3 compreso. Il servizio è pertanto terminato.").arg(clientInfo.name, clientInfo.surname, clientInfo.expiry.toString("dd.MM.yyyy")),
+                           i18n("Il cliente \"%1 %2\" era abilitato fino al %3 compreso. Il servizio è pertanto terminato. %4").arg(clientInfo.name, clientInfo.surname, clientInfo.expiry.toString("dd.MM.yyyy"),clientInfo.code),
                            QMessageBox::Abort,
                            QMessageBox::Abort);
-      ui_mainview.comboClients->setCurrentIndex(0);// Reset to general
+      ui_mainview.comboClients->setCurrentIndex(0); // Reset to general
       // Erase monthly credit and replace hash entry
       clientInfo.monthly=0;
       clientsHash[clientInfo.id]=clientInfo;
