@@ -57,13 +57,13 @@ void transactions::setStats(Statistics &stats) {
     if (stats.type.contains(1)) {
         f=QString("( clientid IN (%1) )").arg(instat[0]);
         // Model connecting clientid column to client code.
-        transModel->setRelation(1, QSqlRelation("clients", "id", "code"));
+//        transModel->setRelation(1, QSqlRelation("clients", "id", "code"));
 
     }
     else if (stats.type.contains(2) or stats.type.contains(7)) {
         f=QString("( donor IN (%1) )").arg(instat[1]);
         // Model connecting clientid with donor name
-        transModel->setRelation(24, QSqlRelation("donors", "code", "name"));
+//        transModel->setRelation(24, QSqlRelation("donors", "code", "name"));
         ui->transView->setColumnHidden(24,false);
         ui->transView->setColumnHidden(1,true);
     }

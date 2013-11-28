@@ -191,7 +191,14 @@ void ClientEditor::validateSubscriptionDuration(int dur){
 }
 
 void ClientEditor::validateSubscriptionSusp(){
+    //! Update end expiry date so that since, duration and subscription are enforced
     disconnectSubscription();
+    QDate since=getSinceDate();
+    int dur=ui->duration->value();
+    int durEff=effectiveDuration();
+    // Add missing days
+    qDebug()<<"validateSubscriptionSusp"<<dur<<durEff;
+    setExpiryDate(since.addDays(dur+(dur-durEff)));
     connectSubscription();
     return;
 }
