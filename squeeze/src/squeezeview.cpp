@@ -915,10 +915,10 @@ void squeezeView::setupDb()
 
 
 //  db.setHostName("192.168.88.100");
-  db.setHostName("localhost");
-  db.setDatabaseName("emporio");
-  db.setUserName("emporio");
-  db.setPassword("emporio");
+//  db.setHostName("localhost");
+//  db.setDatabaseName("emporio");
+//  db.setUserName("emporio");
+//  db.setPassword("emporio");
 
   qDebug()<<"SetupDB: opening";
   db.open();
