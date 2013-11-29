@@ -3759,8 +3759,12 @@ void lemonView::setupDB()
   //QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
   //db = QSqlDatabase::addDatabase("QMYSQL");
 
+//      Settings::setEditDBServer("localhost");
+//      Settings::setEditDBName("lemondb");
+//      Settings::setEditDBUsername("lemonclient");
+//      Settings::setEditDBPassword("xarwit0721");
 
-    Settings::setEditDBServer("192.168.88.100");
+//    Settings::setEditDBServer("192.168.88.100");
 //    Settings::setEditDBName("emporio");
 //    Settings::setEditDBUsername("emporio");
 //    Settings::setEditDBPassword("emporio");
