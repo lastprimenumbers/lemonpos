@@ -109,6 +109,7 @@ class ProductEditor : public QWidget
     ProductInfo getProductInfo();
     QSqlRelationalTableModel *m_model;
     void resetEdits();
+    void resetEdits(bool keepCode);
 
 public slots:
     bool checkFieldsState();

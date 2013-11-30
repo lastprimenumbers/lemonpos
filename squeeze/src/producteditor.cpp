@@ -468,7 +468,7 @@ void ProductEditor::checkIfCodeExists()
   else { //code does not exists... its a new product
     status = statusNormal;
     if (!modifyCode) {
-        resetEdits();
+        resetEdits(true);
     }
     qDebug()<< "no product found with code "<<codeStr;
   }
@@ -476,15 +476,26 @@ void ProductEditor::checkIfCodeExists()
 }
 
 void ProductEditor::resetEdits() {
+    resetEdits(false);
+}
+
+void ProductEditor::resetEdits(bool keepCode) {
     //clear all used edits
-    ui->editCode->clear();
-    ui->editAlphacode->clear();
+    if (!keepCode) {
+        ui->editCode->clear();
+        ui->editAlphacode->clear();
+        ui->editStockQty->clear();
+        ui->editQuantity->clear();
+    } else {
+        ui->editStockQty->setText("0");
+        ui->editQuantity->setText("0");
+    }
     ui->editDesc->clear();
-    ui->editStockQty->clear();
+
     setCategory(1);
     setMeasure(1);
     setQunit(1);
-    ui->editQuantity->clear();
+
     ui->editCost->clear();
     ui->editFinalPrice->clear();
     ui->editFinalPrice->clear();
