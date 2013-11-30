@@ -2515,7 +2515,13 @@ QHash<int, BasicInfo> Azahar::getBasicHash(QString table)
  QHash<int, BasicInfo> result;
  BasicInfo info;
  QString select;
- select="select * from " + table;
+ if (table=="clients") {
+     select="select id, code, name, surname from clients";
+ } else if (table=="products" or table=="donors") {
+    select="select id, code, name from "+table;
+ } else {
+    select="select * from " + table;
+ }
   if (!db.isOpen()) db.open();
   if (db.isOpen()) {
     QSqlQuery qC(db);
