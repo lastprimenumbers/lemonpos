@@ -78,15 +78,14 @@ void SearchCode::setDb(QSqlDatabase parentDb, QString targetTable){
     db=parentDb;
     table=targetTable;
     BasicInfo info;
+    QList<int> order;
     Azahar *myDb = new Azahar;
     myDb->setDatabase(db);
-    entries = myDb->getBasicHash(table);
+    entries = myDb->getBasicHash(table,order);
    // Fill the comboName list
-    QHashIterator<int, BasicInfo> i(entries);
     ui->comboName->addItem("", -1);
-    while (i.hasNext()) {
-        i.next();
-        info = i.value();
+    for (int i=0; i<order.count(); i++) {
+        info = entries[order[i]];
         ui->comboName->addItem(info.surname+" "+info.name, info.id);
         qDebug()<<"Inserted in combo"<<info.name;
     }

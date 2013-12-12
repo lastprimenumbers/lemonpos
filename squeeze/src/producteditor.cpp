@@ -87,9 +87,9 @@ ProductEditor::ProductEditor( QWidget *parent )
     connect( ui->btnPhoto          , SIGNAL( clicked() ), this, SLOT( changePhoto() ) );
     connect( ui->btnChangeCode,      SIGNAL( clicked() ), this, SLOT( changeCode() ) );
     connect( ui->editCode, SIGNAL(editingFinished()), SLOT(checkIfCodeExists()));
-    connect( ui->editCode, SIGNAL(returnPressed()), SLOT(checkIfCodeExists()));
-    connect( ui->editCode, SIGNAL(editingFinished()), this, SLOT(checkFieldsState()));
-    connect( ui->editCode, SIGNAL(returnPressed()), this, SLOT(checkFieldsState()));
+//    connect( ui->editCode, SIGNAL(returnPressed()), SLOT(checkIfCodeExists()));
+//    connect( ui->editCode, SIGNAL(editingFinished()), this, SLOT(checkFieldsState()));
+//    connect( ui->editCode, SIGNAL(returnPressed()), this, SLOT(checkFieldsState()));
     connect( ui->btnStockCorrect,      SIGNAL( clicked() ), this, SLOT( modifyStock() ));
 
     connect( ui->editDesc, SIGNAL(editingFinished()), this, SLOT(checkFieldsState()));

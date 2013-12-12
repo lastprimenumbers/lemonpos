@@ -2510,18 +2510,21 @@ QString Azahar::getMainClient()
 return result;
 }
 
-QHash<int, BasicInfo> Azahar::getBasicHash(QString table)
+QHash<int, BasicInfo> Azahar::getBasicHash(QString table, QList<int>& order)
 {
  QHash<int, BasicInfo> result;
  BasicInfo info;
  QString select;
+ QString orderby=" order by surname,name,code";
  if (table=="clients") {
      select="select id, code, name, surname from clients";
  } else if (table=="products" or table=="donors") {
     select="select id, code, name from "+table;
+    orderby=" order by name,code";
  } else {
     select="select * from " + table;
  }
+ select.append(orderby);
   if (!db.isOpen()) db.open();
   if (db.isOpen()) {
     QSqlQuery qC(db);
@@ -2529,6 +2532,7 @@ QHash<int, BasicInfo> Azahar::getBasicHash(QString table)
 
       while (getBasicInfoFromQuery(qC,info)) {
         result.insert(info.id, info);
+        order.append(info.id);
         qDebug()<<"Inserted "<<info.name<<result.count()<<qC.lastError();
 
       }
