@@ -119,7 +119,9 @@ class ClientEditor : public KDialog
     void validateSubscriptionSince();
     void validateSubscriptionDuration(int dur);
     void validateSubscriptionExpiry();
-    void validateSubscriptionSusp();
+    void validateBeginsusp();
+    void validateEndsusp();
+    void validateSuspDur(int dur);
   private:
     ClientEditorUI *ui;
     long int clientId;

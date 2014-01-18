@@ -915,7 +915,7 @@ void squeezeView::setupDb()
 
 
 ////  db.setHostName("192.168.88.100");
-//  db.setHostName("localhost");
+  db.setHostName("localhost");
 //  db.setDatabaseName("lemondb");
 ////  db.setDatabaseName("emporio");
 //  db.setUserName("emporio");
@@ -4029,19 +4029,33 @@ void squeezeView::reSelectModels()
 {
   qDebug()<<"Updating Models from database...";
   if ( modelsAreCreated() ) {
+    qDebug()<<"SEL prod";
     productsModel->select();
+    qDebug()<<"SEL meas";
     measuresModel->select();
+    qDebug()<<"SEL cli";
     clientsModel->select();
+    qDebug()<<"SEL usr";
     usersModel->select();
+    qDebug()<<"SEL tr";
     transactionsModel->select();
+    qDebug()<<"SEL cat";
     categoriesModel->select();
+    qDebug()<<"SEL off";
     offersModel->select();
+    qDebug()<<"SEL bal";
     balancesModel->select();
+    qDebug()<<"SEL cashflow";
     cashflowModel->select();
+    qDebug()<<"SEL som";
     specialOrdersModel->select();
+    qDebug()<<"SEL rdn";
     randomMsgModel->select();
+    qDebug()<<"SEL log";
     logsModel->select();
+    qDebug()<<"SEL cur";
     currenciesModel->select();
+    qDebug()<<"SEL done";
   }
 }
 

@@ -118,6 +118,29 @@ void ClientEditor::refreshCaption() {
     setCaption( QString("%1, %2 [%3]").arg(getSurname(),getName(),getCode()) );
 }
 
+
+void ClientEditor::connectSubscription() {
+    // Subscription signals
+    connect(ui->sinceDatePicker, SIGNAL(changed(QDate)), SLOT(validateSubscriptionSince()));
+    connect(ui->expiryDatePicker, SIGNAL(changed(QDate)), SLOT(validateSubscriptionExpiry()));
+    connect(ui->duration, SIGNAL(valueChanged(int)), SLOT(validateSubscriptionDuration(int)));
+    // Suspension signals
+    connect(ui->beginsuspPicker, SIGNAL(changed(QDate)), SLOT(validateBeginsusp()));
+    connect(ui->endsuspPicker, SIGNAL(changed(QDate)), SLOT(validateEndsusp()));
+    connect(ui->durationSusp, SIGNAL(valueChanged(int)), SLOT(validateSuspDur(int)));
+}
+
+void ClientEditor::disconnectSubscription() {
+    // Subscription signals
+    disconnect(ui->sinceDatePicker, SIGNAL(changed(QDate)),this, SLOT(validateSubscriptionSince()));
+    disconnect(ui->expiryDatePicker, SIGNAL(changed(QDate)),this, SLOT(validateSubscriptionExpiry()));
+    disconnect(ui->duration, SIGNAL(valueChanged(int)),this, SLOT(validateSubscriptionDuration(int)));
+    // Suspension signals
+    disconnect(ui->beginsuspPicker, SIGNAL(changed(QDate)),this, SLOT(validateBeginsusp()));
+    disconnect(ui->endsuspPicker, SIGNAL(changed(QDate)),this, SLOT(validateEndsusp()));
+    disconnect(ui->durationSusp, SIGNAL(valueChanged(int)),this, SLOT(validateSuspDur(int)));
+}
+
 int ClientEditor::remainingSuspension(){
     //! Remaining suspension days
     int dur=0;
@@ -131,22 +154,6 @@ int ClientEditor::remainingSuspension(){
     return dur;
 }
 
-void ClientEditor::connectSubscription() {
-    connect(ui->sinceDatePicker, SIGNAL(changed(QDate)), SLOT(validateSubscriptionSince()));
-    connect(ui->expiryDatePicker, SIGNAL(changed(QDate)), SLOT(validateSubscriptionExpiry()));
-    connect(ui->beginsuspPicker, SIGNAL(changed(QDate)), SLOT(validateSubscriptionSusp()));
-    connect(ui->endsuspPicker, SIGNAL(changed(QDate)), SLOT(validateSubscriptionSusp()));
-    connect(ui->duration, SIGNAL(valueChanged(int)), SLOT(validateSubscriptionDuration(int)));
-}
-
-void ClientEditor::disconnectSubscription() {
-    disconnect(ui->sinceDatePicker, SIGNAL(changed(QDate)),this, SLOT(validateSubscriptionSince()));
-    disconnect(ui->expiryDatePicker, SIGNAL(changed(QDate)),this, SLOT(validateSubscriptionExpiry()));
-    disconnect(ui->beginsuspPicker, SIGNAL(changed(QDate)),this, SLOT(validateSubscriptionSusp()));
-    disconnect(ui->endsuspPicker, SIGNAL(changed(QDate)),this, SLOT(validateSubscriptionSusp()));
-    disconnect(ui->duration, SIGNAL(valueChanged(int)),this, SLOT(validateSubscriptionDuration(int)));
-}
-
 int ClientEditor::effectiveDuration() {
     //! Return the duration corrected by the suspension days
     QDate since=getSinceDate();
@@ -154,7 +161,7 @@ int ClientEditor::effectiveDuration() {
     QDate today=QDate::currentDate();
     QDate bs=getBeginsuspDate();
     QDate es=getEndsuspDate();
-    if (es>today) {
+    if (es>today and es>bs) {
         if (bs<today) bs=today;
         dur=dur-bs.daysTo(es);
     }
@@ -165,7 +172,8 @@ void ClientEditor::validateSubscriptionSince(){
     //! Update expiry date so that since and duration are enforced
     disconnectSubscription();
     QDate since=getSinceDate();
-    setExpiryDate(since.addDays(effectiveDuration()));
+//    setExpiryDate(since.addDays(effectiveDuration()));
+    setExpiryDate(since.addDays(ui->duration->value()));
     connectSubscription();
 }
 
@@ -174,8 +182,10 @@ void ClientEditor::validateSubscriptionExpiry(){
     disconnectSubscription();
     QDate since=getSinceDate();
     QDate expiry=getExpiryDate();
-    int dur=since.daysTo(expiry)-remainingSuspension();
-    ui->duration->setValue(dur);
+//    int dur=since.daysTo(expiry)-remainingSuspension();
+//    qDebug()<<"validateSubscriptionExpiry duration"<<dur;
+//    ui->duration->setValue(dur);
+    ui->duration->setValue(since.daysTo(expiry));
     connectSubscription();
 }
 
@@ -183,25 +193,48 @@ void ClientEditor::validateSubscriptionDuration(int dur){
     //! Update the expiry date so that since and duration are enforced
     disconnectSubscription();
     QDate since=getSinceDate();
-    QDate expiry=getExpiryDate();
-    int durEff=effectiveDuration();
-    qDebug()<<"validateSubscriptionDuration"<<dur<<durEff;
-    setExpiryDate(since.addDays(durEff));
+    setExpiryDate(since.addDays(ui->duration->value()));
+//    QDate expiry=getExpiryDate();
+//    int durEff=effectiveDuration();
+//    qDebug()<<"validateSubscriptionDuration"<<dur<<durEff;
+//    setExpiryDate(since.addDays(durEff));
     connectSubscription();
 }
 
-void ClientEditor::validateSubscriptionSusp(){
-    //! Update end expiry date so that since, duration and subscription are enforced
+void ClientEditor::validateBeginsusp(){
+    //! Update susp end so that susp dur is enforced
     disconnectSubscription();
-    QDate since=getSinceDate();
-    int dur=ui->duration->value();
-    int durEff=effectiveDuration();
-    // Add missing days
-    qDebug()<<"validateSubscriptionSusp"<<dur<<durEff;
-    setExpiryDate(since.addDays(dur+(dur-durEff)));
+    QDate since=getBeginsuspDate();
+    setEndsuspDate(since.addDays(ui->durationSusp->value()));
     connectSubscription();
-    return;
 }
+
+void ClientEditor::validateEndsusp(){
+    //! Update susp dur so that begin/end are enforced
+    disconnectSubscription();
+    ui->durationSusp->setValue(getBeginsuspDate().daysTo(getEndsuspDate()));
+    connectSubscription();
+}
+
+void ClientEditor::validateSuspDur(int dur){
+    //! Update susp end so that begin/dur are enforced
+    disconnectSubscription();
+    setEndsuspDate(getBeginsuspDate().addDays(ui->durationSusp->value()));
+    connectSubscription();
+}
+
+//void ClientEditor::validateSubscriptionSusp(){
+//    //! Update expiry date so that since, duration and subscription are enforced
+//    disconnectSubscription();
+//    QDate since=getSinceDate();
+//    int dur=ui->duration->value();
+//    int durEff=effectiveDuration();
+//    // Add missing days
+//    qDebug()<<"validateSubscriptionSusp"<<dur<<durEff;
+//    setExpiryDate(since.addDays(dur+(dur-durEff)));
+//    connectSubscription();
+//    return;
+//}
 
 void ClientEditor::changeDebit()
 {
@@ -451,9 +484,6 @@ void ClientEditor::loadLimits(ClientInfo info)
 void ClientEditor::setClientInfo(ClientInfo info)
 {
     setId(info.id);
-//    Azahar *myDb=new Azahar;
-//    info=myDb->getClientInfo(info.id);
-//    delete myDb;
     setCode(info.code);
     setName(info.name);
     setSurname(info.surname);
@@ -470,10 +500,16 @@ void ClientEditor::setClientInfo(ClientInfo info)
     setAddress(info.address);
     setPhone(info.phone);
     setMonthly(info.monthly);
+
+    disconnectSubscription();
     setSinceDate(info.since);
     setExpiryDate(info.expiry);
     setBeginsuspDate(info.beginsusp);
     setEndsuspDate(info.endsusp);
+    connectSubscription();
+    validateSubscriptionExpiry();
+    validateEndsusp();
+
     setMsgsusp(info.msgsusp);
     setNotes(info.notes);
 
