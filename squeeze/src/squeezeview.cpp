@@ -915,7 +915,7 @@ void squeezeView::setupDb()
 
 
 ////  db.setHostName("192.168.88.100");
-  db.setHostName("localhost");
+//  db.setHostName("localhost");
 //  db.setDatabaseName("lemondb");
 ////  db.setDatabaseName("emporio");
 //  db.setUserName("emporio");
