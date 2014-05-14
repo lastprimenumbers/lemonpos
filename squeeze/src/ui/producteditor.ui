@@ -582,6 +582,9 @@ color: blue;</string>
     </item>
     <item row="5" column="2">
      <widget class="QCheckBox" name="chIsARaw">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
       <property name="text">
        <string>It's A Raw Product</string>
       </property>

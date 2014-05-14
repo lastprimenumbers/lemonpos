@@ -14,6 +14,7 @@ set(lemon_SRCS
    misc.cpp
    specialordereditor.cpp
    ../dataAccess/azahar.cpp
+   ../dataAccess/upgrade.cpp
    pricechecker.cpp
    ticketpopup.cpp
    ../printing/print-dev.cpp
@@ -47,6 +48,7 @@ kde4_add_ui_files( lemon_SRCS
   ui/resume.ui
   ui/reservations.ui
   ui/checker.ui
+  ../dataAccess/upgrade.ui
  )
 
 kde4_add_kcfg_files(lemon_SRCS settings.kcfgc )

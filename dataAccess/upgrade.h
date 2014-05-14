@@ -14,7 +14,11 @@ class Upgrade : public QWizard
 public:
     explicit Upgrade(QWidget *parent = 0);
     ~Upgrade();
-    
+    // accetta azahar e versione corrente
+    // si ricollega come root e fa il backup
+    // si ricollega come utente e lancia tutti gli aggiornamenti
+    // si ricollega come root e applica
+
 private:
     Ui::Upgrade *ui;
 };

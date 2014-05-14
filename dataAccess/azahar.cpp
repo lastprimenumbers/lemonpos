@@ -264,6 +264,7 @@ ProductInfo Azahar::getProductInfo(const QString &code, const bool &notConsiderD
         info.photo    = query.value(fieldPhoto).toByteArray();
         info.stockqty = query.value(fieldStock).toDouble();
         info.cost     = query.value(fieldCost).toDouble();
+        if (info.cost<0.001) { info.cost=0; };
         info.tax      = query.value(fieldTax1).toDouble(); ///TO be removed later, when taxmodel is coded.
         info.extratax = query.value(fieldTax2).toDouble(); ///TO be removed later, when taxmodel is coded.
         info.units    = query.value(fieldUnits).toInt();
@@ -1961,6 +1962,7 @@ bool Azahar::getStatisticsFromQuery(QSqlQuery &query, Statistics &stats) {
     qDebug()<<"Collecting stats from"<<query.size()<<query.boundValues();
     while (getTransactionItemInfoFromQuery(query,item)) {
         if (item.productCode=="0") {continue;}
+
         qDebug()<<"Stats for item:"<<item.name<<item.productCode;
         stats.items[item.productCode]=item;
         stats.total+=item.total;
@@ -2036,6 +2038,7 @@ Statistics Azahar::getStatistics(Statistics &stats)
     FROM transactions AS tr, transactionitems AS item, products AS product \
      WHERE ( tr.clientid IN (%1) or  donor IN (%2) ) AND tr.type in (%3)\
     AND tr.id=item.transaction_id  \
+    AND tr.status!=3 \
     AND product.code=item.product_id \
     AND item.product_id!='0' \
     AND product.code!='0' \
@@ -2520,7 +2523,7 @@ QHash<int, BasicInfo> Azahar::getBasicHash(QString table, QList<int>& order)
      select="select id, code, name, surname from clients";
  } else if (table=="products" or table=="donors") {
     select="select id, code, name from "+table;
-    orderby=" order by name,code";
+    orderby=" order by name, code";
  } else {
     select="select * from " + table;
  }
@@ -3268,21 +3271,6 @@ bool Azahar::cancelTransaction(qulonglong id, bool inProgress)
       if (transCompleted) {
         //TODO: when cancelling a transacion, take into account the groups sold to be returned. new feature
         QStringList soProducts;
-        ///if there is any special order (product)
-        if ( !tinfo.specialOrders.isEmpty() ) {
-          //get each special order
-          QStringList pSoList = tinfo.specialOrders.split(",");
-          for (int i = 0; i < pSoList.size(); ++i) {
-            QStringList l = pSoList.at(i).split("/");
-            if ( l.count()==2 ) { //==2 means its complete, having product and qty
-              qulonglong soid = l.at(0).toULongLong();
-              //set as cancelled
-              specialOrderSetStatus(soid, 4); //4 == cancelled
-              //get each product of the special order to increment its stock later
-              soProducts.append( getSpecialOrderProductsStr(soid) ); //are normal products (raw or not)
-            } //if count
-          } //for
-        }//if there are special orders
         QString soProductsStr = soProducts.join(",");
         ///increment stock for each product. including special orders and groups
         QStringList plist = (tinfo.itemlist.split(",") + soProductsStr.split(","));
@@ -3299,17 +3287,16 @@ bool Azahar::cancelTransaction(qulonglong id, bool inProgress)
                 incrementProductStock(l.at(0), l.at(1).toDouble()); //code at 0, qty at 1
           }
         }//for each product
-        ///save cashout for the money return
-        qDebug()<<"Saving cashout-cancel";
-        CashFlowInfo cinfo;
-        cinfo.userid = tinfo.userid;
-        cinfo.amount = tinfo.amount;
-        cinfo.date   = QDate::currentDate();
-        cinfo.time   = QTime::currentTime();
-        cinfo.terminalNum = tinfo.terminalnum;
-        cinfo.type   = ctCashOutMoneyReturnOnCancel;
-        cinfo.reason = i18n("Money return on cancelling ticket #%1 ", id);
-        insertCashFlow(cinfo);
+
+        // Restore client credit
+        ClientInfo cli;
+        cli=getClientInfo(tinfo.clientid);
+        CreditInfo credit;
+        credit=getCreditInfoForClient(tinfo.clientid);
+        if (cli.lastCreditReset.daysTo(tinfo.date)>0) {
+            credit.total+=tinfo.amount;
+            insertCredit(credit);
+        }
       }//transCompleted
     } //not in progress
   }

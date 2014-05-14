@@ -242,10 +242,10 @@ lemonView::lemonView(QWidget *parent) //: QWidget(parent)
   connect(ui_mainview.checkCard, SIGNAL(toggled(bool)), SLOT(checksChanged())  );
   connect(ui_mainview.checkCash, SIGNAL(toggled(bool)), SLOT(checksChanged())  );
   connect(ui_mainview.checkOwnCredit, SIGNAL(toggled(bool)), SLOT(checksChanged())  );
-  connect(ui_mainview.editAmount,SIGNAL(returnPressed()), SLOT(finishCurrentTransaction()) );
-  connect(ui_mainview.editAmount, SIGNAL(textChanged(const QString &)), SLOT(refreshTotalLabel()));
-  connect(ui_mainview.editCardNumber, SIGNAL(returnPressed()), SLOT(goSelectCardAuthNumber()) );
-  connect(ui_mainview.editCardAuthNumber, SIGNAL(returnPressed()), SLOT(finishCurrentTransaction()) );
+//  connect(ui_mainview.editAmount,SIGNAL(returnPressed()), SLOT(finishCurrentTransaction()) );
+//  connect(ui_mainview.editAmount, SIGNAL(textChanged(const QString &)), SLOT(refreshTotalLabel()));
+//  connect(ui_mainview.editCardNumber, SIGNAL(returnPressed()), SLOT(goSelectCardAuthNumber()) );
+//  connect(ui_mainview.editCardAuthNumber, SIGNAL(returnPressed()), SLOT(finishCurrentTransaction()) );
   connect(ui_mainview.splitter, SIGNAL(splitterMoved(int, int)), SLOT(setUpTable()));
   connect(ui_mainview.splitterGrid, SIGNAL(splitterMoved(int, int)), SLOT(setUpTable()));
   connect(ui_mainview.comboClients, SIGNAL(currentIndexChanged(int)), SLOT(comboClientsOnChange(int)));
@@ -1979,6 +1979,27 @@ void lemonView::createNewTransaction(TransactionType type)
 
 void lemonView::finishCurrentTransaction()
 {
+    QMessageBox::StandardButton override;
+
+    override=QMessageBox::warning(this,
+                         "Registrare e stampare lo scontrino?",
+                         "Clicca su Cancella per tornare al carrello e continuare la spesa, Applica per terminare la spesa.",
+                         QMessageBox::Apply|QMessageBox::Abort,
+                         QMessageBox::Abort);
+    if ( override  == QMessageBox::Abort ) { return; }
+
+    if (clientInfo.code=="*") {
+    override=QMessageBox::warning(this,
+                         "Transazione con utente indefinito!",
+                         "Clicca su Cancella per tornare al carrello e selezionare il cliente. Applica per terminare la spesa.",
+                         QMessageBox::Apply|QMessageBox::Abort,
+                         QMessageBox::Abort);
+    if ( override  == QMessageBox::Abort ) { return; }
+    }
+
+
+
+
   bool canfinish = true;
   completingOrder = false; //reset flag..
   TicketInfo ticket;
@@ -2303,30 +2324,6 @@ void lemonView::finishCurrentTransaction()
 
     //update transactions
     myDb->updateTransaction(tInfo);
-
-//    if (drawerCreated) {
-//        //FIXME: What to di first?... add or substract?... when there is No money or there is less money than the needed for the change.. what to do?
-//        if (ui_mainview.checkCash->isChecked()) {
-//          drawer->addCash(payWith);
-//          drawer->substractCash(changeGiven);
-//          drawer->incCashTransactions();
-//          //open drawer only if there is a printer available.
-//          if (Settings::openDrawer() && Settings::smallTicketDotMatrix() && Settings::printTicket())
-//            drawer->open();
-//        } else { /// OwnCredit also will be incremented in CARD transactions. No cash IN for this sales.
-//          drawer->incCardTransactions();
-//          drawer->addCard(payWith);
-//        }
-//        drawer->insertTransactionId(getCurrentTransaction());
-//    }
-//    else {
-//       //KMessageBox::error(this, i18n("The Drawer is not initialized, please start operation first."), i18n("Error") );
-//      KNotification *notify = new KNotification("information", this);
-//      notify->setText(i18n("The Drawer is not initialized, please start operation first."));
-//      QPixmap pixmap = DesktopIcon("dialog-information",32);
-//      notify->setPixmap(pixmap);
-//      notify->sendEvent();
-//    }
 
     //update client info in the hash....
     clientsHash.remove(clientInfo.id);
@@ -2956,19 +2953,20 @@ void lemonView::cancelTransaction(qulonglong transactionNumber)
       enoughCashAvailable = true;
     }
   }
-  
+  enoughCashAvailable = true;
+
   //Mark as cancelled if possible
   
   //Check if payment was with cash.
   //FIXME: Allow card payments to be cancelled!!! DIC 2009
-  if (tinfo.paymethod != 1 ) {
-    KNotification *notify = new KNotification("information", this);
-    notify->setText(i18n("The ticket cannot be cancelled because it was paid with a credit/debit card."));
-    QPixmap pixmap = DesktopIcon("dialog-error",32);
-    notify->setPixmap(pixmap);
-    notify->sendEvent();
-    return;
-  }
+//  if (tinfo.paymethod != 1 ) {
+//    KNotification *notify = new KNotification("information", this);
+//    notify->setText(i18n("The ticket cannot be cancelled because it was paid with a credit/debit card."));
+//    QPixmap pixmap = DesktopIcon("dialog-error",32);
+//    notify->setPixmap(pixmap);
+//    notify->sendEvent();
+//    return;
+//  }
   
   if  (enoughCashAvailable || transToCancelIsInProgress) {
     qDebug()<<" ok, trans is in progress or cash is enough";

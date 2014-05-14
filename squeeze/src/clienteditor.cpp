@@ -82,8 +82,8 @@ ClientEditor::ClientEditor( QSqlDatabase parentDb, QWidget *parent )
     //since date picker
     ui->sinceDatePicker->setDate(QDate::currentDate());
     ui->expiryDatePicker->setDate(QDate::currentDate().addDays(180));
-    ui->beginsuspPicker->setDate(QDate(1970,1,1));
-    ui->endsuspPicker->setDate(QDate(1970,1,1));
+    ui->beginsuspPicker->setDate(QDate::currentDate().addDays(-1));
+    ui->endsuspPicker->setDate(QDate::currentDate().addDays(-1));
 
     connectSubscription();
 
@@ -563,6 +563,14 @@ ClientInfo ClientEditor::getClientInfo()
 
 void ClientEditor::commitClientInfo()
 {
+    QMessageBox::StandardButton override;
+    override=QMessageBox::warning(this,
+                         "Applicare le modifiche al cliente?",
+                         "Clicca su Abort per annullare le modifiche, Apply per salvare le modifiche.",
+                         QMessageBox::Apply|QMessageBox::Abort,
+                         QMessageBox::Abort);
+    if ( override  == QMessageBox::Abort ) { return; }
+
     ClientInfo cInfo = getClientInfo();
     qDebug()<<"commitClientInfo: "<<cInfo.id<<cInfo.code<<cInfo.name<<cInfo.surname<<cInfo.birthDate<<cInfo.monthly;
     if (!db.isOpen()) db.open();
