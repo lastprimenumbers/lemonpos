@@ -282,12 +282,16 @@ void ClientEditor::openCamera()
   cam.start("cheese");
   cam.waitForFinished();
   QDir img=QDir::home();
-  img.cd("Immagini/Webcam");
+  QString subpath=QString("Immagini/Webcam");
+  if (!img.exists(subpath)) {
+      img.mkdir(subpath);
+  }
+  img.cd(subpath);
   img.setSorting(QDir::Time);
   QStringList imgs =img.entryList();
   QString fname=img.filePath(imgs.at(1));
   qDebug()<<"Camera "<<fname;
-  if (!fname.isEmpty()) {
+  if (!fname.endsWith("/..")) {
       qDebug()<<"Name OK";
     QPixmap p = QPixmap(fname);
     qDebug()<<"Pixmap";
