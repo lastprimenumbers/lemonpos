@@ -183,6 +183,7 @@ ProductInfo Azahar::getProductInfo(const QString &code, const bool &notConsiderD
     info.isNotDiscountable = false;
     info.qunit=0;
     info.quantity=0.0;
+    info.stockqty=0;
     QString rawCondition;
 
     if (!db.isOpen()) db.open();
@@ -2583,6 +2584,10 @@ bool Azahar::resetCredits (ClientInfo &info){
     int fromLastReset=info.lastCreditReset.daysTo(now);
     if (fromLastReset < 30 ) {
         qDebug()<<"not resetting "<<info.code<<info.id<<info.surname<<info.lastCreditReset;
+        return false;
+    }
+    if (now.daysTo(info.expiry)<=0) {
+        qDebug()<<"Expired or expiring today. Not resetting.";
         return false;
     }
     if (!db.isOpen()) db.open();

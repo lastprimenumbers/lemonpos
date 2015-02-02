@@ -419,15 +419,19 @@ void ProductEditor::checkIfCodeExists()
   // Check productsHash
   if (productsHash.contains(codeStr)) {
       pInfo=productsHash[codeStr];
+      qDebug()<<"Found productsHash"<<codeStr<<pInfo.stockqty;
   }
   // Still 0?
   if (pInfo.code=="0") {
       pInfo = myDb->getProductInfo(codeStr);
+      productsHash[pInfo.code]=pInfo;
+      qDebug()<<"Asked to db getProductInfo"<<codeStr<<pInfo.stockqty;
   }
   // A group?
   if (pInfo.isAGroup) {
     // get it again with the appropiate tax and price.
     pInfo = myDb->getProductInfo(codeStr, true); //the 2nd parameter is to get the taxes for the group (not considering discounts)
+    qDebug()<<"Asked to db getProductInfo and is Group!"<<codeStr<<pInfo.stockqty;
   }
   if (pInfo.code != "0") {
     //code exists...
