@@ -126,7 +126,7 @@ struct ClientInfo
   QStringList   tags;
   QDate        lastCreditReset;
   // Effective limits for the current transaction
-  QHash<int, Limit>         limits;
+  QHash<qulonglong, Limit>         limits;
 };
 
 

@@ -1066,7 +1066,6 @@ void squeezeView::setupUsersModel()
 {
   if (db.isOpen()) {
     usersModel->setTable("users");
-
     ui_mainview.usersView->setModel(usersModel);
     ui_mainview.usersView->setViewMode(QListView::IconMode);
     ui_mainview.usersView->setGridSize(QSize(170,170));
@@ -1095,9 +1094,12 @@ void squeezeView::setupProductsModel()
 {
   openDB();
   qDebug()<<"setupProducts..";
+
   if (db.isOpen()) {
     productsModel->setTable("products");
-
+    QSqlQuery query;
+    query=productsModel->query();
+    query.setForwardOnly(true);
     productCodeIndex = productsModel->fieldIndex("code");
     productDescIndex = productsModel->fieldIndex("name");
     productPriceIndex= productsModel->fieldIndex("price");
@@ -1117,14 +1119,12 @@ void squeezeView::setupProductsModel()
     productIsARawIndex    = productsModel->fieldIndex("isARawProduct");
     productGEIndex        = productsModel->fieldIndex("groupElements");
 */
-
     ui_mainview.productsView->setModel(productsModel);
 //    ui_mainview.productsView->setViewMode(QListView::IconMode);
 //    ui_mainview.productsView->setGridSize(QSize(170,170));
     ui_mainview.productsView->setEditTriggers(QAbstractItemView::NoEditTriggers);
 //    ui_mainview.productsView->setResizeMode(QListView::Adjust);
 //    ui_mainview.productsView->setModelColumn(productsModel->fieldIndex("photo"));
-
 
     ui_mainview.productsView->hideColumn(4);
     ui_mainview.productsView->hideColumn(5);
@@ -1149,7 +1149,6 @@ void squeezeView::setupProductsModel()
     ui_mainview.productsView->hideColumn(24);
     ui_mainview.productsView->hideColumn(25);
 
-
     ui_mainview.productsViewAlt->setModel(productsModel);
     ui_mainview.productsViewAlt->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui_mainview.productsViewAlt->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -1165,9 +1164,7 @@ void squeezeView::setupProductsModel()
     /// 0.7 version : hidden next columns
     ui_mainview.productsViewAlt->setColumnHidden(productLastProviderIndex, true);
     ui_mainview.productsViewAlt->setColumnHidden(productAlphaCodeIndex, true);
-
     productsModel->setRelation(productCategoryIndex, QSqlRelation("categories", "catid", "text"));
-
     productsModel->setHeaderData(productCodeIndex, Qt::Horizontal, i18n("Code"));
     productsModel->setHeaderData(productDescIndex, Qt::Horizontal, i18n("Name"));
     productsModel->setHeaderData(productCategoryIndex, Qt::Horizontal, i18n("Category") );
@@ -1178,28 +1175,30 @@ void squeezeView::setupProductsModel()
     productsModel->setHeaderData(productLastSoldIndex, Qt::Horizontal, i18n("Last Sold") );
     productsModel->setHeaderData(productLastProviderIndex, Qt::Horizontal, i18n("Last Provider") );
     productsModel->setHeaderData(productAlphaCodeIndex, Qt::Horizontal, i18n("Alpha Code") );
-    
 /*    ProductDelegate *delegate = new ProductDelegate(ui_mainview.productsView);
     ui_mainview.productsView->setItemDelegate(delegate);
     ui_mainview.productsView->setSelectionMode(QAbstractItemView::SingleSelection);
 */
-
+    qDebug()<<"setupProducts..2";
     productsModel->select();
+    qDebug()<<"setupProducts..2.1";
     ui_mainview.productsViewAlt->resizeColumnsToContents();
-
     //populate Categories...
     populateCategoriesHash();
+    qDebug()<<"setupProducts..3";
     ui_mainview.comboProductsFilterByCategory->clear();
       QHashIterator<QString, int> item(categoriesHash);
       while (item.hasNext()) {
         item.next();
         ui_mainview.comboProductsFilterByCategory->addItem(item.key());
       }
+      qDebug()<<"setupProducts..4";
       ui_mainview.comboProductsFilterByCategory->setCurrentIndex(0);
 
       ui_mainview.rbProductsFilterByAvailable->setChecked(true);
       ui_mainview.productsViewAlt->setCurrentIndex(productsModel->index(0, 0));
       setProductsFilter();
+      qDebug()<<"setupProducts..5";
  }
  qDebug()<<"setupProducts.. done.";
 }
@@ -1221,19 +1220,19 @@ void squeezeView::setProductsFilter()
 //   then NO pictures are shown; even if is refiltered again.
 QRegExp regexp = QRegExp(ui_mainview.editProductsFilterByDesc->text());
 QRegExp regexp2 = QRegExp(ui_mainview.editProductsFilterByCode->text());
-if (!ui_mainview.groupFilterProducts->isChecked()) productsModel->setFilter("");
+if (!ui_mainview.groupFilterProducts->isChecked()) productsModel->setFilter("products.code != '*'");
 else {
   if (ui_mainview.rbProductsFilterByDesc->isChecked()) {
   //1st if: Filter by DESC.
     if (!regexp.isValid())  ui_mainview.editProductsFilterByDesc->setText("");
-    if (ui_mainview.editProductsFilterByDesc->text()=="*" || ui_mainview.editProductsFilterByDesc->text()=="") productsModel->setFilter("");
+    if (ui_mainview.editProductsFilterByDesc->text()=="*" || ui_mainview.editProductsFilterByDesc->text()=="") productsModel->setFilter("products.code != '*'");
     else  productsModel->setFilter(QString("products.name REGEXP '%1'").arg(ui_mainview.editProductsFilterByDesc->text()));
     productsModel->setSort(productStockIndex, Qt::DescendingOrder);
   }
   else if (ui_mainview.rbProductsFilterByCode->isChecked()) {
       // Filter by CODE.
         if (!regexp2.isValid())  ui_mainview.editProductsFilterByCode->setText("");
-        if (ui_mainview.editProductsFilterByCode->text()=="*" || ui_mainview.editProductsFilterByCode->text()=="") productsModel->setFilter("");
+        if (ui_mainview.editProductsFilterByCode->text()=="*" || ui_mainview.editProductsFilterByCode->text()=="") productsModel->setFilter("products.code != '*'");
         else  productsModel->setFilter(QString("products.code REGEXP '%1'").arg(ui_mainview.editProductsFilterByCode->text()));
         productsModel->setSort(productStockIndex, Qt::DescendingOrder);
         qDebug()<< "filterCode" << productsModel->filter();
@@ -1261,7 +1260,7 @@ else {
   }
   else if (ui_mainview.rbProductsFilterByMostSold->isChecked()) {
   //5th if: filter by Most Sold items
-    productsModel->setFilter("");
+    productsModel->setFilter("products.code != '*'");
     productsModel->setSort(productSoldUnitsIndex, Qt::DescendingOrder);
   }
   else if (ui_mainview.rbProductsFilterByAlmostSoldOut->isChecked()) {
@@ -1281,7 +1280,7 @@ else {
   }
   else {
   //else: filter by less sold items
-    productsModel->setFilter("");
+    productsModel->setFilter("products.code != '*'");
     productsModel->setSort(productSoldUnitsIndex, Qt::AscendingOrder);
   }
 
@@ -1292,8 +1291,10 @@ else {
 void squeezeView::setupOffersModel()
 {
   offersModel->setTable("offers");
+  QSqlQuery query;
+  query=offersModel->query();
+  query.setForwardOnly(true);
   offersModel->setEditStrategy(QSqlTableModel::OnFieldChange);
-
   offerIdIndex       = offersModel->fieldIndex("id");
   offerProdIdIndex   = offersModel->fieldIndex("product_id");
   offerDiscountIndex = offersModel->fieldIndex("discount");
@@ -1333,6 +1334,9 @@ void squeezeView::setupMeasuresModel()
 {
   if (db.isOpen()) {
     measuresModel->setTable("measures");
+    QSqlQuery query;
+    query=measuresModel->query();
+    query.setForwardOnly(true);
     measuresModel->setEditStrategy(QSqlTableModel::OnFieldChange);
     measuresModel->setHeaderData(measuresModel->fieldIndex("text"), Qt::Horizontal, i18n("Description"));
 
@@ -1358,6 +1362,9 @@ void squeezeView::setupCategoriesModel()
 {
   if (db.isOpen()) {
     categoriesModel->setTable("categories");
+    QSqlQuery query;
+    query=categoriesModel->query();
+    query.setForwardOnly(true);
     categoriesModel->setEditStrategy(QSqlTableModel::OnFieldChange);
     categoriesModel->setHeaderData(categoriesModel->fieldIndex("text"), Qt::Horizontal, i18n("Description"));
 
@@ -1385,6 +1392,9 @@ void squeezeView::setupDonorsModel()
 {
   if (db.isOpen()) {
     donorsModel->setTable("donors");
+    QSqlQuery query;
+    query=donorsModel->query();
+    query.setForwardOnly(true);
     ui_mainview.donorsView->setViewMode(QListView::IconMode);
     ui_mainview.donorsView->setGridSize(QSize(170,170));
     ui_mainview.donorsView->setEditTriggers(QAbstractItemView::NoEditTriggers);
@@ -1417,7 +1427,9 @@ void squeezeView::setupClientsModel()
 {
   if (db.isOpen()) {
       clientsTableModel->setTable("clients");
-
+      QSqlQuery query;
+      query=clientsTableModel->query();
+      query.setForwardOnly(true);
       clientsTableModel->setHeaderData(1, Qt::Horizontal, "Codice Fiscale");
       clientsTableModel->setHeaderData(2, Qt::Horizontal, "Nome");
       clientsTableModel->setHeaderData(3, Qt::Horizontal, "Cognome");
@@ -1500,6 +1512,9 @@ void squeezeView::setupLimitsModel()
   qDebug()<<"Setting up Limits Model";
   if (db.isOpen()) {
     limitsModel->setTable("limits");
+    QSqlQuery query;
+    query=limitsModel->query();
+    query.setForwardOnly(true);
 //    limitsModel->setRelation(1, QSqlRelation("clients", "code", "surname"));
 //    limitsModel->setRelation(2, QSqlRelation("tags", "tag", "tag"));
     limitsModel->setRelation(3, QSqlRelation("products", "code", "name"));
@@ -1538,7 +1553,9 @@ void squeezeView::setupTransactionsModel()
   qDebug()<<"setupTransactions..";
   if (db.isOpen()) {
     transactionsModel->setTable("transactions");
-    
+    QSqlQuery query;
+    query=transactionsModel->query();
+    query.setForwardOnly(true);
     transIdIndex = transactionsModel->fieldIndex("id");
     transClientidIndex = transactionsModel->fieldIndex("clientid");
     transTypeIndex= transactionsModel->fieldIndex("type");
@@ -1720,6 +1737,9 @@ void squeezeView::setupCurrenciesModel()
 {
     if (db.isOpen()) {
         currenciesModel->setTable("currencies");
+        QSqlQuery query;
+        query=currenciesModel->query();
+        query.setForwardOnly(true);
         currenciesModel->setEditStrategy(QSqlTableModel::OnFieldChange);
         currenciesModel->setHeaderData(currenciesModel->fieldIndex("name"), Qt::Horizontal, i18n("Name"));
         
@@ -1750,7 +1770,9 @@ void squeezeView::setupBalancesModel()
   qDebug()<<"setupBalances.. after openDB";
   if (db.isOpen()) {
     balancesModel->setTable("balances");
-    
+    QSqlQuery query;
+    query=balancesModel->query();
+    query.setForwardOnly(true);
     balanceIdIndex = balancesModel->fieldIndex("id");
     balanceDateEndIndex = balancesModel->fieldIndex("datetime_end"); //just one date...
     balanceUserNameIndex= balancesModel->fieldIndex("usern");
@@ -1857,7 +1879,9 @@ void squeezeView::setupSpecialOrdersModel()
   qDebug()<<"setup special orders.. after openDB";
   if (db.isOpen()) {
     specialOrdersModel->setTable("special_orders");
-
+    QSqlQuery query;
+    query=specialOrdersModel->query();
+    query.setForwardOnly(true);
     ///NOTE: Here we can use the v_groupedSO table instead, to group them by saleid
     ///      I dont know how convenient is this.
     
@@ -1964,6 +1988,9 @@ void squeezeView::setupReservationsModel()
 {
     if (db.isOpen()) {
         reservationsModel->setTable("reservations");
+        QSqlQuery query;
+        query=reservationsModel->query();
+        query.setForwardOnly(true);
         reservationsModel->setEditStrategy(QSqlTableModel::OnFieldChange);
         reservationsModel->setHeaderData(reservationsModel->fieldIndex("id"), Qt::Horizontal, i18n("Reservation"));
         reservationsModel->setHeaderData(reservationsModel->fieldIndex("transaction_id"), Qt::Horizontal, i18n("Tr. #"));
@@ -2987,7 +3014,9 @@ void squeezeView::setupCashFlowModel()
   qDebug()<<"setupcashflow.. after openDB";
   if (db.isOpen()) {
     cashflowModel->setTable("cashflow");
-    
+    QSqlQuery query;
+    query=cashflowModel->query();
+    query.setForwardOnly(true);
     cashflowIdIndex = cashflowModel->fieldIndex("id");
     cashflowTypeIndex = cashflowModel->fieldIndex("type");
     cashflowDateIndex = cashflowModel->fieldIndex("date");
@@ -3905,7 +3934,9 @@ void squeezeView::setupLogsModel()
   qDebug()<<"setup logs msgs model.. after openDB";
   if (db.isOpen()) {
     logsModel->setTable("logs");
-
+    QSqlQuery query;
+    query=logsModel->query();
+    query.setForwardOnly(true);
     int logIdIndex      = logsModel->fieldIndex("id");
     int logUserIndex    = logsModel->fieldIndex("userid");
     int logActionIndex  = logsModel->fieldIndex("action");
@@ -3939,7 +3970,9 @@ void squeezeView::setupRandomMsgModel()
   qDebug()<<"setup random msgs model.. after openDB";
   if (db.isOpen()) {
     randomMsgModel->setTable("random_msgs");
-
+    QSqlQuery query;
+    query=randomMsgModel->query();
+    query.setForwardOnly(true);
     int randomMsgIdIndex      = randomMsgModel->fieldIndex("id");
     int randomMsgMessageIndex = randomMsgModel->fieldIndex("message");
     int randomMsgSeasonIndex  = randomMsgModel->fieldIndex("season");

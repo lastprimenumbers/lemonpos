@@ -278,7 +278,7 @@ ProductInfo Azahar::getProductInfo(const QString &code, const bool &notConsiderD
         info.purchaseQty = -1;
         info.lastProviderId = query.value(fieldLastProviderId).toULongLong();
         info.soldUnits = query.value(fieldSoldU).toDouble();
-        info.isARawProduct = query.value(fieldIsRaw).toBool();
+        info.isARawProduct = false; //query.value(fieldIsRaw).toBool();
         info.isAGroup = query.value(fieldIsGroup).toBool();
         info.groupPriceDrop = query.value(fieldGroupPD).toDouble();
         info.taxmodelid = query.value(fieldTaxModelId).toULongLong();
@@ -437,10 +437,11 @@ bool Azahar::insertProduct(ProductInfo info)
   //some buggy info can cause troubles.
   bool groupValueOK = false;
   bool rawValueOK = false;
+  info.isARawProduct =false;
   if (info.isAGroup == 0 || info.isAGroup == 1) groupValueOK=true;
   if (info.isARawProduct == 0 || info.isARawProduct == 1) rawValueOK=true;
   if (!groupValueOK) info.isAGroup = 0;
-  if (!rawValueOK) info.isARawProduct = 0;
+//  if (!rawValueOK) info.isARawProduct = 0;
 
   info.taxmodelid = 1; ///FIXME: Delete this code when taxmodels are added, for now, insert default one.
 
@@ -464,7 +465,7 @@ bool Azahar::insertProduct(ProductInfo info)
   query.bindValue(":alphacode", info.alphaCode);
   query.bindValue(":lastproviderid", info.lastProviderId);
   query.bindValue(":isAGroup", info.isAGroup);
-  query.bindValue(":isARaw", info.isARawProduct);
+  query.bindValue(":isARaw", false);
   query.bindValue(":groupE", info.groupElementsStr);
   query.bindValue(":groupPriceDrop", info.groupPriceDrop);
   query.bindValue(":taxmodel", info.taxmodelid); //for later use
@@ -501,6 +502,7 @@ bool Azahar::updateProduct(ProductInfo info, QString oldcode)
   //some buggy info can cause troubles.
   bool groupValueOK = false;
   bool rawValueOK = false;
+  info.isARawProduct = false;
   if (info.isAGroup == 0 || info.isAGroup == 1) groupValueOK=true;
   if (info.isARawProduct == 0 || info.isARawProduct == 1) rawValueOK=true;
   if (!groupValueOK) info.isAGroup = 0;
@@ -552,7 +554,7 @@ bool Azahar::updateProduct(ProductInfo info, QString oldcode)
   query.bindValue(":alphacode", info.alphaCode);
   query.bindValue(":lastproviderid", info.lastProviderId);
   query.bindValue(":isGroup", info.isAGroup);
-  query.bindValue(":isRaw", info.isARawProduct);
+  query.bindValue(":isRaw", false);
   query.bindValue(":ge", info.groupElementsStr);
   query.bindValue(":groupPriceDrop", info.groupPriceDrop);
   query.bindValue(":taxmodel", info.taxmodelid);
@@ -1925,7 +1927,7 @@ Family Azahar::getFamily(ClientInfo &info)
     }
     QSqlQuery query(db);
     qDebug()<<"getFamily pre-query"<<parentCode;
-    query.exec(QString("select %1 from clients where parent='%2';").arg(clientLightSelect, parentCode));
+    query.exec(QString("select %1 from clients where parent='%2' or code='%3'").arg(clientLightSelect, parentCode, info.code));
     qDebug()<<"getFamily query"<<query.lastError()<<query.lastQuery();
     // Cycle over results, to build the limits hash
     ClientInfo ci;
@@ -2039,7 +2041,7 @@ Statistics Azahar::getStatistics(Statistics &stats)
     FROM transactions AS tr, transactionitems AS item, products AS product \
      WHERE ( tr.clientid IN (%1) or  donor IN (%2) ) AND tr.type in (%3)\
     AND tr.id=item.transaction_id  \
-    AND tr.status!=3 \
+    AND tr.state!=3 \
     AND product.code=item.product_id \
     AND item.product_id!='0' \
     AND product.code!='0' \
@@ -2047,6 +2049,7 @@ Statistics Azahar::getStatistics(Statistics &stats)
             ORDER BY tr.date;").arg(instat[0],instat[1],instat[2]));
     query.bindValue(":start", stats.start.toString("yyyy-MM-dd"));
     query.bindValue(":end", stats.end.toString("yyyy-MM-dd"));
+    qDebug()<<stats.start.toString("yyyy-MM-dd")<<stats.end.toString("yyyy-MM-dd");
     if (!query.exec()) {
         qDebug()<<query.lastError()<<query.lastQuery()<<query.boundValues();
         return stats;
@@ -2332,7 +2335,7 @@ Limit Azahar::getFamilyLimit(Family &family, ProductInfo &pInfo) {
         }
     }
     ctags+="'*'";
-    qDebug()<<"Querying getClientLimits"<<cInfo.code<<ctags;
+    qDebug()<<"Querying getClientLimits"<<cInfo.code<<ctags<<pInfo.code<<QString::number(pInfo.category);
     QString q=QString("select * from limits where \
             (`clientCode`='%1' or (`clientCode`='*' and `clientTag` in (%2))) and \
             (`productCode`='%3' or (`productCode`='*' and `productCat`=%4)) \
@@ -2342,7 +2345,7 @@ Limit Azahar::getFamilyLimit(Family &family, ProductInfo &pInfo) {
         return lim;
     }
     getLimitFromQuery(query,lim);
-    qDebug()<<"getClientLimits:"<<lim.id;
+    qDebug()<<"getClientLimits:"<<lim.id<<lim.limit;
     return lim;
 }
 

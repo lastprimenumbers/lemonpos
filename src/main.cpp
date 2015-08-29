@@ -79,24 +79,24 @@ int main(int argc, char **argv)
             splash = new KSplashScreen(image, Qt::WindowStaysOnTopHint);
             splash->show();
 
-            //NOTE: Is this the best place to launch the backup process?
-            QString fn = QString("%1/lemon-backup/").arg(QDir::homePath());
-            QDir dir;
-            if (!dir.exists(fn))
-                dir.mkdir(fn);
-            fn = fn+QString("lemon-db--backup--%1.sql").arg(QDate::currentDate().toString("dd-MMM-yyyy")); //FIXME: Include TIME.
-            qDebug()<<"BACKUP DATABASE at " << fn;
+//            //NOTE: Is this the best place to launch the backup process?
+//            QString fn = QString("%1/lemon-backup/").arg(QDir::homePath());
+//            QDir dir;
+//            if (!dir.exists(fn))
+//                dir.mkdir(fn);
+//            fn = fn+QString("lemon-db--backup--%1.sql").arg(QDate::currentDate().toString("dd-MMM-yyyy")); //FIXME: Include TIME.
+//            qDebug()<<"BACKUP DATABASE at " << fn;
             
-            QStringList params;
-            QString pswd = "-p" + Settings::editDBPassword();
-            QString usr  = "-u" + Settings::editDBUsername();
-            QString hst  = "-h" + Settings::editDBServer();
-            QString dnm  = Settings::editDBName();
-            QString fnm  = "-r" + fn;
-            params << hst << usr << pswd  << fnm << dnm;
-            QProcess mysqldump;
-            mysqldump.start("mysqldump", params);
-            mysqldump.waitForFinished();
+//            QStringList params;
+//            QString pswd = "-p" + Settings::editDBPassword();
+//            QString usr  = "-u" + Settings::editDBUsername();
+//            QString hst  = "-h" + Settings::editDBServer();
+//            QString dnm  = Settings::editDBName();
+//            QString fnm  = "-r" + fn;
+//            params << hst << usr << pswd  << fnm << dnm;
+//            QProcess mysqldump;
+//            mysqldump.start("mysqldump", params);
+//            mysqldump.waitForFinished();
             
             lemon *widget = new lemon;
 

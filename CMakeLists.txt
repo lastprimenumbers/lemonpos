@@ -23,7 +23,7 @@ SET(PATCH_VERSION 0)
  
 IF(EXISTS "${CMAKE_ROOT}/Modules/CPack.cmake")
 INCLUDE(InstallRequiredSystemLibraries)
- 
+
 SET(CPACK_SET_DESTDIR "on")
 SET(CPACK_PACKAGING_INSTALL_PREFIX "/tmp")
 SET(CPACK_GENERATOR "DEB")
@@ -39,7 +39,7 @@ SET(CPACK_PACKAGE_VERSION_PATCH "${PATCH_VERSION}")
 SET(CPACK_PACKAGE_FILE_NAME "${CMAKE_PROJECT_NAME}_${MAJOR_VERSION}.${MINOR_VERSION}.${CPACK_PACKAGE_VERSION_PATCH}")
 SET(CPACK_SOURCE_PACKAGE_FILE_NAME "${CMAKE_PROJECT_NAME}_${MAJOR_VERSION}.${MINOR_VERSION}.${CPACK_PACKAGE_VERSION_PATCH}")
  
-SET(CPACK_DEBIAN_PACKAGE_DEPENDS "libc6, libgcc1, libqt4-dbus, libqt4-network, libqt4-sql-mysql, libqt4-xml, libqt4-svg, libqtcore4, libqtgui4, libstdc++6, mysql-client, cheese, beep")
+ SET(CPACK_DEBIAN_PACKAGE_DEPENDS "libc6, libgcc1, libqt4-dbus, libqt4-network, libqt4-sql-mysql, libqt4-xml, libqt4-svg, libqtcore4, libqtgui4, libstdc++6, libkdeui5, mysql-client, cheese")
  
 SET(CPACK_DEBIAN_PACKAGE_PRIORITY "extra")
 SET(CPACK_DEBIAN_PACKAGE_SECTION "business")
