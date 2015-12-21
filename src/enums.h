@@ -31,8 +31,6 @@ enum                  {pageMain=0, pageSearch=1, pageReprintTicket=2, pageRertur
 
 enum userRoles        {roleBasic=1, roleAdmin=2, roleSupervisor=3 };
 
-enum soStatus         {stPending=0, stInProgress=1, stReady=2, stDelivered=3, stCancelled=4};
-
 enum reservationState {rPending=1, rCompleted=2, rCancelled=3};
 
 #endif

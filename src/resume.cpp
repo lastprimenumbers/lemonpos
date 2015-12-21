@@ -107,21 +107,6 @@ void ResumeDialog::itemClicked(const QModelIndex &index)
     ui->contentTable->setItem(rowCount, 0, new QTableWidgetItem(QString::number(qty)));
     ui->contentTable->setItem(rowCount, 1, new QTableWidgetItem(pInfo.desc));
   }
-  //now iterate each special order
-  foreach(QString str, _soList) {
-    qulonglong code = str.section('/',0,0).toULongLong();
-    double     qty  = str.section('/',1,1).toDouble();
-    if (code <= 0 ) break;
-    count++;
-    SpecialOrderInfo soInfo = myDb->getSpecialOrderInfo(code);
-    soList << soInfo;
-    //NOTE:Check for product Availability ??
-    //insert to the content table
-    int rowCount = ui->contentTable->rowCount();
-    ui->contentTable->insertRow(rowCount);
-    ui->contentTable->setItem(rowCount, 0, new QTableWidgetItem(QString::number(qty)));
-    ui->contentTable->setItem(rowCount, 1, new QTableWidgetItem(soInfo.name));
-  }
   qDebug()<<"Clicked on tr# "<<trNumber<<" items count:"<<count;
 
   if ( trNumber > 0 && count > 0 ) enableButtonOk(true);

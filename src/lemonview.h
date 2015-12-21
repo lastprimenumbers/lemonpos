@@ -346,13 +346,10 @@ public:
 
     void freezeWidgets();
     void unfreezeWidgets();
-    void addSpecialOrder();
-    void specialOrderComplete();
     void lockScreen();
     void unlockScreen();
     void suspendSale();
     void resumeSale();
-    void changeSOStatus();
 
     void updateTransaction();
     void updateBalance(bool finish); //implies the drawer content

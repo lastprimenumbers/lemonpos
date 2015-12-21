@@ -28,9 +28,6 @@
 #include "ticketpopup.h"
 #include "misc.h"
 #include "hash.h"
-#include "specialordereditor.h"
-#include "soselector.h"
-#include "sostatus.h"
 #include "resume.h"
 #include "reservations.h"
 #include "../../mibitWidgets/mibittip.h"
@@ -991,24 +988,6 @@ void lemonView::refreshTotalLabel()
 
         sum_pre += iPrice * prod.qtyOnList;
     }
-    //now get the sum_pre for S.O.
-    foreach(SpecialOrderInfo soInfo, specialOrders) {
-        double iPrice   = soInfo.payment;
-        if (!Settings::addTax())
-            iPrice = soInfo.payment/(1+((soInfo.averageTax)/100));
-        //get discount
-        Azahar *myDb = new Azahar;
-        myDb->setDatabase(db);
-        
-        double soDiscount  = myDb->getSpecialOrderAverageDiscount(soInfo.orderid)/100;
-        nonDiscountables += myDb->getSpecialOrderNonDiscountables(soInfo.orderid);
-        
-        if (soDiscount > 0)
-            iPrice -= soDiscount*iPrice;
-            
-        sum_pre += iPrice * soInfo.qty;
-        delete myDb; //NOTE:create and delete this on every so item ??
-    }
 
     bool notApply = false;
     if ((nonDiscountables == productsHash.count() && !productsHash.isEmpty())  || (nonDiscountables == specialOrders.count() && !specialOrders.isEmpty() ))
@@ -1060,29 +1039,6 @@ void lemonView::refreshTotalLabel()
         qDebug()<<prod.desc<<" - Price without Tax and discounts:"<<iPrice<<" item Tax $:"<<iTax<<"  Accumulated Tax in the purchase:"<<taxes<< " Purchase Accumulated:"<<sum;
     }
     qDebug()<<" SUM:"<<sum<<" SUM_PRE:"<<sum_pre;
-    //now iterate the SO. In case there are SO then no products are allowed, sum will be 0 at this point.
-    foreach(SpecialOrderInfo soInfo, specialOrders) {
-        double iPrice   = soInfo.payment;
-        if (!Settings::addTax())
-            iPrice = soInfo.payment/(1+((soInfo.averageTax)/100));
-        double iPriceWD = iPrice; //price without discounts and taxes (if addtax...).
-        //get discount
-        Azahar *myDb = new Azahar;
-        myDb->setDatabase(db);
-
-        double soDiscount  = myDb->getSpecialOrderAverageDiscount(soInfo.orderid)/100;
-        nonDiscountables += myDb->getSpecialOrderNonDiscountables(soInfo.orderid);
-        
-        if (soDiscount > 0)
-            iPrice -= soDiscount*iPrice;
-        
-        sum += iPrice * soInfo.qty;
-        totalSumWODisc += iPriceWD * soInfo.qty; //total sum without discounts and taxes if addtax...
-        taxes += myDb->getSpecialOrderAverageTax(soInfo.orderid, rtMoney);
-        //buyPoints += (info.points*info.qtyOnList); NOTE & FIXME: SO does not get the POINTS. we would need to get frmo the elements (raw products).
-        delete myDb; //NOTE:create and delete this on every so item ??
-        qDebug()<<"<SO> Price without tax and discounts: $"<<iPrice<<" Tax:$"<<myDb->getSpecialOrderAverageTax(soInfo.orderid, rtMoney)<<" Accumulated tax:$"<<taxes<<" Accumulated Purchase:"<<sum;
-    }
 
     if (notApply && (gDiscount > 0 || gDiscountPercentage>0))
     {
@@ -1769,25 +1725,6 @@ void lemonView::itemDoubleClicked(QTableWidgetItem* item)
     QString oid = i2Modify->data(Qt::DisplayRole).toString();
     oid.remove(0,3);
     qulonglong id = oid.toULongLong();
-    if (specialOrders.contains(id)) {
-      SpecialOrderInfo info = specialOrders.take(id);
-      //check if is completing the order
-      if (info.status == stReady) return; //is completing the order, cant modify qty.
-
-      iqty = info.qty+1;
-      info.qty = iqty;
-      double newdiscount = info.disc * info.payment * iqty;
-
-      i2Modify = ui_mainview.tableWidget->item(row, colQty);
-      i2Modify->setData(Qt::EditRole, QVariant(iqty));
-      i2Modify = ui_mainview.tableWidget->item(row, colDue);
-      i2Modify->setData(Qt::EditRole, QVariant((iqty*info.payment)-newdiscount));
-      i2Modify = ui_mainview.tableWidget->item(row, colDisc);
-      i2Modify->setData(Qt::EditRole, QVariant(newdiscount));
-
-      //reinsert to the hash
-      specialOrders.insert(info.orderid,info);
-    }
     ui_mainview.editItemCode->setFocus();
     refreshTotalLabel();
     return; //to exit the method, we dont need to continue.
@@ -3841,13 +3778,6 @@ void lemonView::setupClients()
 
 void lemonView::comboClientsOnChange(int idx)
 {
-  if ( !specialOrders.isEmpty() ) {
-    // There are special orders, from now, we cannot change client
-    updateClientInfo();
-    refreshTotalLabel();
-    return;
-    //maybe the client combo box is changed, but not the data (points, discount...)
-  }
   QString newClientName    = ui_mainview.comboClients->currentText();
   int newClientIdx = ui_mainview.comboClients->itemData(idx).toInt();
   qDebug()<<"Client info changed by user.";
@@ -4090,22 +4020,9 @@ void lemonView::printTicketFromTransaction(qulonglong transactionNumber)
     QString newName;
     newName = trItem.soId;
     qulonglong sorderid = newName.remove(0,3).toULongLong();
-    QString    soNotes  = myDb->getSONotes(sorderid);
+    QString    soNotes  = "";
     soNotes = soNotes.replace("\n", "|  ");
-    if (sorderid > 0) {
-      ticket.hasSpecialOrders = true;
-      ticket.completingSpecialOrder = false; //we are re-printing...
-      QList<ProductInfo> pList = myDb->getSpecialOrderProductsList(sorderid);
-      newName = "";
-      foreach(ProductInfo info, pList ) {
-        QString unitStr;
-        if (info.units == 1 ) unitStr=" "; else unitStr = info.unitStr;
-        newName += "|  " + QString::number(info.qtyOnList) + " "+ unitStr +" "+ info.desc;
-      }
-      tLineInfo.geForPrint = trItem.name+newName+"|  |"+i18n("Notes:")+soNotes+" | ";
-    } else tLineInfo.geForPrint = "";
-
-    //qDebug()<<"isGROUP:"<<trItem.isGroup;
+    tLineInfo.geForPrint = "";
     if (trItem.isGroup) {
       tLineInfo.geForPrint = trItem.name;
       QString n = trItem.name.section('|',0,0);
@@ -4154,7 +4071,6 @@ void lemonView::printTicketFromTransaction(qulonglong transactionNumber)
 
   qDebug()<<"\n*** Ticket tax:"<<trInfo.totalTax<<" itemsDiscount:"<<itemsDiscount<<"client Discount:"<<trInfo.discmoney<<" ticket total:"<<ticket.total<<" SUBTOTAL:"<<subtotal<<" AddTax:"<<Settings::addTax()<<" \n";
   ticket.subTotal = realSubtotal;
-  if (ticket.hasSpecialOrders) ticket.deliveryDT = soDeliveryDT;
   ticket.soTotal = soGTotal;
   
   printTicket(ticket);
@@ -4278,245 +4194,6 @@ void lemonView::log(const qulonglong &uid, const QDate &date, const QTime &time,
   myDb->setDatabase(db);
   myDb->insertLog(uid, date, time, "[ LEMON ] "+text);
   delete myDb;
-}
-
-/** Inserts a S.O. into the buy list, at 50% of its price (a prepayment).
-**  Or it can be the total payment.
-**/
-void lemonView::addSpecialOrder()
-{
-  if ( transactionInProgress && (totalSum >0) && specialOrders.isEmpty() ) {
-    KNotification *notify = new KNotification("information", this);
-    notify->setText(i18n("Please finish the current transaction before creating a special order."));
-    QPixmap pixmap = DesktopIcon("dialog-information",32);
-    notify->setPixmap(pixmap);
-    notify->sendEvent();
-    return;
-  }
-
-  //first, if the sale contains another SO, then only the same client is allowed, and we must disable the client selection on the SO editor.
-  bool allowClientSelection = specialOrders.isEmpty();
-  
-  SpecialOrderInfo soInfo;
-  qulonglong newSOId = 0;
-  SpecialOrderEditor *soEditor = new SpecialOrderEditor(this);
-  soEditor->setModel(productsModel);
-  soEditor->setDb(db);
-  soEditor->setTransId(currentTransaction);
-  soEditor->setUsername(loggedUserName);
-  soEditor->setClientsComboEnabled(allowClientSelection);
-  soEditor->setDeliveryDateTimeEnabled(allowClientSelection);
-  if (!allowClientSelection) {
-    soEditor->setClientName(clientInfo.name);
-    soEditor->setDeliveryDateTime(QDateTime::currentDateTime());
-  }
-
-  if (soEditor->exec()) {
-    //get values from dialog
-    soInfo.saleid   = currentTransaction;
-    soInfo.name     = soEditor->getDescription();
-    soInfo.qty      = soEditor->getQty();
-    soInfo.price    = soEditor->getPrice();
-    soInfo.cost     = soEditor->getCost();
-    soInfo.notes    = soEditor->getNotes();
-    soInfo.status   = stPending;
-    soInfo.units    = 1; /// MCH 20DIC09
-    soInfo.unitStr  = "";
-    soInfo.groupElements = soEditor->getGroupElementsStr();
-    soInfo.payment  = soEditor->getPayment();
-    soInfo.deliveryDateTime = soEditor->getDeliveryDateTime();
-    if (soInfo.payment == soInfo.price)
-      soInfo.completePayment = true;
-    else
-      soInfo.completePayment = false;
-    
-    soInfo.dateTime = soEditor->getDateTime();
-
-    if (soInfo.payment == soInfo.price)
-      soInfo.completedOnTrNum = currentTransaction;
-    else
-      soInfo.completedOnTrNum = 0;
-    
-    soInfo.clientId = soEditor->getClientId();
-    soInfo.userId = soEditor->getUserId();
-
-    Azahar *myDb = new Azahar;
-    myDb->setDatabase(db);
-
-    //for the user discount, change user on transaction.
-    clientInfo = myDb->getClientInfo(soInfo.clientId);
-    int idx = ui_mainview.comboClients->findText(clientInfo.name,Qt::MatchCaseSensitive);
-    if (idx>-1) ui_mainview.comboClients->setCurrentIndex(idx);
-    updateClientInfo();
-    refreshTotalLabel();
-
-    newSOId = myDb->insertSpecialOrder(soInfo); //we need to insert it to get the orderid.
-    if ( newSOId == 0 ) qDebug()<<"Error insertando SO :"<<myDb->lastError();
-
-    soInfo.orderid = newSOId;
-
-    //discount from SO elements
-    soInfo.disc = myDb->getSpecialOrderAverageDiscount(soInfo.orderid)/100; //in percentage.
-    double soDiscount = soInfo.disc * soInfo.payment *soInfo.qty; 
-
-    //add info to the buy list
-
-    int insertedAtRow = -1;
-    QString codeX = QString("so.%1").arg(QString::number(soInfo.orderid));
-    QString newName = soInfo.name+"\n"+soEditor->getContentNames();
-    /// here we insert the product at  its payment - can be 50%  pre-payment
-    insertedAtRow = doInsertItem(codeX, newName, soInfo.qty, soInfo.payment, soDiscount, soInfo.unitStr); //April 5 2010: Now SO can have DISCOUNTS on its elements...
-    soInfo.insertedAtRow = insertedAtRow;
-    newName = newName.replace("\n", "|");
-    soInfo.geForPrint = newName;
-
-    //after inserting so in the db, calculate tax.
-    soInfo.averageTax = myDb->getSpecialOrderAverageTax(soInfo.orderid);
-    //add to the hash
-    specialOrders.insert(soInfo.orderid, soInfo);
-    refreshTotalLabel();
-    //Saving session.
-    qDebug()<<"** INSERTING A SPECIAL ORDER [updating balance/transaction]";
-    updateBalance(false);
-    updateTransaction();
-
-    //disable client combo box.
-    ui_mainview.comboClients->setDisabled(true);
-    
-    delete myDb;
-  }
-  //finally delete de ui
-  delete soEditor;
-}
-
-void lemonView::specialOrderComplete()
-{
-  //first ensure we have no pending transaction
-  if ( transactionInProgress && (totalSum >0) ) {
-    KNotification *notify = new KNotification("information", this);
-    notify->setText(i18n("Please finish the current transaction before completing a special order."));
-    QPixmap pixmap = DesktopIcon("dialog-information",32);
-    notify->setPixmap(pixmap);
-    notify->sendEvent();
-    return;
-  }
-
-  SOSelector *dlg = new SOSelector(this);
-  dlg->setDb(db);
-  
-  if (dlg->exec() ) {
-    qulonglong tNum=dlg->getSelectedTicket();
-    Azahar *myDb = new Azahar;
-    myDb->setDatabase(db);
-    QList<SpecialOrderInfo> soList = myDb->getAllSOforSale(tNum);
-    if (soList.isEmpty()) {
-      KNotification *notify = new KNotification("information", this);
-      notify->setText(i18n("The given ticket number does not contains any special order."));
-      QPixmap pixmap = DesktopIcon("dialog-information",32);
-      notify->setPixmap(pixmap);
-      notify->sendEvent();
-      return;
-    }
-    //continue.. its time to complete
-    QStringList paidOrders; paidOrders << i18n("These special orders cannot be completed because:");
-    int soCompletePayments = 0;
-    qulonglong clientIdForDiscount = 0;
-    foreach(SpecialOrderInfo soInfo, soList) {
-      if ( soInfo.status == stDelivered || soInfo.status == stCancelled) {
-        QString stStr;
-        if (soInfo.status == stCancelled)
-          stStr = i18n("<b>is Cancelled</b>");
-        else
-          stStr = i18n("is already <b>Delivered</b>");
-        paidOrders << i18n("%1 %2.", soInfo.name, stStr);
-      } else {
-        //first check if the so is already delivered or cancelled
-        if (soInfo.status == stDelivered || soInfo.status == stCancelled) {
-          continue; //HEY PURIST, WHEN I GOT SOME TIME I WILL CLEAN IT
-        }
-        if (soInfo.payment == soInfo.price) {
-          soCompletePayments++;
-          myDb->specialOrderSetStatus(soInfo.orderid, stDelivered);
-          qDebug()<<"This special order is completeley paid and marked as delivered without emiting a ticket.";
-          KNotification *notify = new KNotification("information", this);
-          notify->setText(i18n("The special order %1 in ticket %2 is completely paid. Marked as delivered.", soInfo.orderid, soInfo.saleid));
-          QPixmap pixmap = DesktopIcon("dialog-information",32);
-          notify->setPixmap(pixmap);
-          notify->sendEvent();
-          continue; //dont insert this...
-        }
-        qDebug()<<"Going to insert so in the list.";
-        clientIdForDiscount = soInfo.clientId;
-        //insert each so to the list.
-        int insertedAtRow = -1;
-        QString codeX = QString("so.%1").arg(QString::number(soInfo.orderid));
-
-        QList<ProductInfo> pList = myDb->getSpecialOrderProductsList(soInfo.orderid);
-        QString newName = soInfo.name;
-        foreach(ProductInfo inf, pList) {
-          QString unitStr;
-          if (inf.units == 1 ) unitStr=" "; else unitStr = inf.unitStr;
-          newName += "\n  " + QString::number(inf.qtyOnList) + " "+ unitStr +" "+ inf.desc;
-        }
-        newName = newName+"\n"+i18n("Notes:")+soInfo.notes;
-
-        ///discount from SO elements
-        double toPay = soInfo.price-soInfo.payment;
-        double soDiscount = soInfo.disc * toPay * soInfo.qty;
-
-        /// here we insert the product with the appropiate payment.
-        insertedAtRow = doInsertItem(codeX, newName, soInfo.qty, toPay, soDiscount, soInfo.unitStr);
-        //modify SpecialOrder info for database update.
-        soInfo.insertedAtRow = insertedAtRow;
-        soInfo.payment = soInfo.price-soInfo.payment; //the final payment is what we save on db.
-        soInfo.completePayment = true;
-        soInfo.status  = stReady; //status = ready to deliver.
-        soInfo.completedOnTrNum = currentTransaction;
-        newName = newName.replace("\n", "|");
-        soInfo.geForPrint = newName;
-
-        ///after inserting so in the db, calculate tax.
-        soInfo.averageTax = myDb->getSpecialOrderAverageTax(soInfo.orderid);
-        
-        //add to the hash
-        specialOrders.insert(soInfo.orderid, soInfo);
-        refreshTotalLabel();
-      } //else if cancelled or delivered
-    } //foreach soInfo
-
-    if (clientIdForDiscount == 0) {
-      // no client id.. this happens on completeley paid orders.
-      clientInfo = clientsHash.value(1);
-      clientIdForDiscount = clientInfo.id;
-    } else  clientInfo = myDb->getClientInfo(clientIdForDiscount);
-    int idx = ui_mainview.comboClients->findText(clientInfo.name,Qt::MatchCaseSensitive);
-    if (idx>-1) ui_mainview.comboClients->setCurrentIndex(idx);
-
-    // See if there was an occasional discount on the originating transaction to apply it to the PROFIT.
-    lastDiscount = 0;
-    lastDiscount = myDb->getTransactionDiscMoney(tNum);
-    qDebug()<<" Originating transaction discount:"<<lastDiscount<<" applying it to the profit.";
-    
-    updateClientInfo();
-    refreshTotalLabel();
-    
-    if (paidOrders.count()> 1) { // the first is the pre-message
-      KNotification *notify = new KNotification("information", this);
-      notify->setText(paidOrders.join("\n"));
-      QPixmap pixmap = DesktopIcon("dialog-information",32);
-      notify->setPixmap(pixmap);
-      notify->sendEvent();
-    }
-    //Saving session.
-    qDebug()<<"** COMPLETING A SPECIAL ORDER [updating balance/transaction]";
-    updateBalance(false);
-    updateTransaction();
-    
-    //disable clients combo box
-    ui_mainview.comboClients->setDisabled(true);
-
-    delete myDb;
-  }
 }
 
 
@@ -4668,11 +4345,6 @@ void lemonView::updateTransaction()
   info.itemlist   = tmpList.join(","); //Only save normal products. Its almost DEPRECATED.
   
   tmpList.clear();
-  foreach(SpecialOrderInfo soi, specialOrders) {
-    profit += (soi.price - soi.cost) * soi.qty;
-    if ( soi.units == uPiece ) cant   += soi.qty; else cant   += 1;
-    tmpList << QString::number(soi.orderid) + "/" + QString::number(soi.qty);
-  }
   info.specialOrders= tmpList.join(",");
 
   info.itemcount  = cant;
@@ -4736,70 +4408,10 @@ void lemonView::resumeSale()
       QString qtyXcode = QString::number(info.qtyOnList) + "*" + info.code;
       insertItem(qtyXcode);
     }
-    foreach(SpecialOrderInfo info, sList) {
-      int insertedAtRow = -1;
-      QString codeX = QString("so.%1").arg(QString::number(info.orderid));
-      //get formated content names for printing/list.
-          QStringList list;
-          QStringList strlTmp = info.groupElements.split(",");
-          foreach(QString str, strlTmp) {
-            QString    itemCode = str.section('/',0,0); //.toULongLong();
-            double     itemQty  = str.section('/',1,1).toDouble();
-            //get item info
-            ProductInfo itemInfo = myDb->getProductInfo(itemCode);
-            itemInfo.qtyOnList   = itemQty;
-            QString unitStr;
-            if (itemInfo.units == 1 ) unitStr=""; else unitStr = itemInfo.unitStr;
-            list.append("  "+QString::number(itemInfo.qtyOnList)+" "+unitStr+" "+ itemInfo.desc);
-          }
-          //append NOTES for the SO.
-          list.append("\n"+i18n("Notes: %1", info.notes+" \n"));
-      //end of formated content names for so
-      QString newName = info.name+"\n" + list.join("\n");
-      insertedAtRow = doInsertItem(codeX, newName, info.qty, info.payment, 0, info.unitStr);
-      info.insertedAtRow = insertedAtRow;
-      newName = newName.replace("\n", "|");
-      info.geForPrint = newName;
-      //change delivery datetime.
-      //get original date lapse between so-creation date and delivery date.
-      int lap = info.dateTime.date().daysTo( info.deliveryDateTime.date() );
-      info.deliveryDateTime = QDateTime::currentDateTime().addDays(lap);
-      qDebug()<<"lap:"<<lap;
-      //add to the hash
-      specialOrders.insert(info.orderid, info);
-      //myDb->updateSpecialOrder(info);
-      //In case this sale is re-suspended the delivery lapse is going to be increased...
-      //this update was moved to finishCurrentTransaction...
-    }
     updateBalance(false);
     updateTransaction();
   }
   delete myDb;
-}
-
-void lemonView::changeSOStatus()
-{
-  if ( transactionInProgress && (totalSum >0) ) {
-    KNotification *notify = new KNotification("information", this);
-    notify->setText(i18n("Please finish the current transaction before changing state for a special order."));
-    QPixmap pixmap = DesktopIcon("dialog-information",32);
-    notify->setPixmap(pixmap);
-    notify->sendEvent();
-    return;
-  }
-  
-  SOStatus *dlg = new SOStatus(this);
-  dlg->setDb(db);
-
-  if (dlg->exec()) {
-    int status         = dlg->getStatusId();
-    qulonglong orderid = dlg->getSelectedTicket();
-
-    Azahar *myDb = new Azahar;
-    myDb->setDatabase(db);
-    myDb->soTicketSetStatus(orderid, status);
-    delete myDb;
-  }//dlg exec
 }
 
 

@@ -247,27 +247,6 @@ class Azahar : public QObject
     void        setConfigUseCUPS(bool yes);
     void        setConfigLogoOnTop(bool yes);
 
-    //Special Orders
-    void                    specialOrderSetStatus(qulonglong id, int status);
-    void                    soTicketSetStatus(qulonglong ticketId, int status);
-    qulonglong              insertSpecialOrder(SpecialOrderInfo info);
-    bool                    updateSpecialOrder(SpecialOrderInfo info);
-    bool                    decrementSOStock(qulonglong id, double qty, QDate date);
-    bool                    deleteSpecialOrder(qulonglong id);
-    SpecialOrderInfo        getSpecialOrderInfo(qulonglong id);
-    QList<ProductInfo>      getSpecialOrderProductsList(qulonglong id);
-    QString                 getSpecialOrderProductsStr(qulonglong id);
-    QList<SpecialOrderInfo> getAllSOforSale(qulonglong saleId);
-    QList<SpecialOrderInfo> getAllReadySOforSale(qulonglong saleId);
-    int                     getReadySOCountforSale(qulonglong saleId);
-    QString                 getSONotes(qulonglong id);
-    QStringList             getStatusList();
-    QStringList             getStatusListExceptDelivered();
-    int                     getStatusId(QString texto);
-    double                  getSpecialOrderAverageTax(qulonglong id, AzaharRTypes returnType= rtPercentage);
-    double                  getSpecialOrderAverageDiscount(qulonglong id);
-    int                     getSpecialOrderNonDiscountables(qulonglong id);
-
     //Reservations
     qulonglong              insertReservation(ReservationInfo info);
     bool                    setReservationStatus(qulonglong id, reservationState state);

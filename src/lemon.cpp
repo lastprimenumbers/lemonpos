@@ -262,21 +262,6 @@ void lemon::setupActions()
   connect(endOfDayAction, SIGNAL(triggered(bool)), m_view, SLOT(endOfDay()));
   qDebug()<<"End of day shortcut:"<<endOfDayAction->shortcuts();
 
-  QAction *soAction = actionCollection()->addAction("specialOrder");
-  soAction->setText(i18n("Add Special Order"));
-  soAction->setIcon(KIcon("lemon-box"));
-  soAction->setShortcut(Qt::Key_PageUp);
-  connect(soAction, SIGNAL(triggered(bool)), m_view, SLOT(addSpecialOrder()));
-  qDebug()<<"SpecialOrder shortcut:"<<soAction->shortcuts();
-
-
-  QAction *socAction = actionCollection()->addAction("specialOrderComplete");
-  socAction->setText(i18n("Complete Special Order"));
-  socAction->setIcon(KIcon("lemon-box"));
-  socAction->setShortcut(Qt::Key_PageDown);
-  connect(socAction, SIGNAL(triggered(bool)), m_view, SLOT(specialOrderComplete()));
-  qDebug()<<"SpecialOrder Complete shortcut:"<<socAction->shortcuts();
-
   QAction *lockAction = actionCollection()->addAction("lockScreen");
   lockAction->setText(i18n("Lock Screen"));
   lockAction->setIcon(KIcon("lemon-box")); //TODO:CREATE ICON!
@@ -290,13 +275,6 @@ void lemon::setupActions()
   suspendSaleAction->setShortcut(Qt::CTRL+Qt::Key_Backspace);
   connect(suspendSaleAction, SIGNAL(triggered(bool)), m_view, SLOT( suspendSale() ));
   qDebug()<<"Suspend Sale shortcut:"<<suspendSaleAction->shortcuts();
-
-  QAction *soStatusAction = actionCollection()->addAction("soStatus");
-  soStatusAction->setText(i18n("Change Special Order Status"));
-  soStatusAction->setIcon(KIcon("lemon-box")); //TODO:CREATE ICON!
-  soStatusAction->setShortcut(Qt::CTRL+Qt::Key_PageUp);
-  connect(soStatusAction, SIGNAL(triggered(bool)), m_view, SLOT( changeSOStatus() ));
-  qDebug()<<"soStatus shortcut:"<<soStatusAction->shortcuts();
 
   QAction *oDiscAction = actionCollection()->addAction("occasionalDiscount");
   oDiscAction->setText(i18n("Change Special Order Status"));
@@ -574,10 +552,6 @@ void lemon::disableUi()
   action->setDisabled(true);
   action = actionCollection()->action("endOfDay");
   action->setDisabled(true);
-  action = actionCollection()->action("specialOrder");
-  action->setDisabled(true);
-  action = actionCollection()->action("specialOrderComplete");
-  action->setDisabled(true);
   action = actionCollection()->action("occasionalDiscount");
   action->setDisabled(true);
   
@@ -649,10 +623,6 @@ void lemon::enableUi()
   action = actionCollection()->action("showPriceChecker");
   action->setEnabled(true);
   action = actionCollection()->action("endOfDay");
-  action->setEnabled(true);
-  action = actionCollection()->action("specialOrder");
-  action->setEnabled(true);
-  action = actionCollection()->action("specialOrderComplete");
   action->setEnabled(true);
   action = actionCollection()->action("occasionalDiscount");
   action->setEnabled(true);
