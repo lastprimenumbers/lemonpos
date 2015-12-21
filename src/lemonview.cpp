@@ -990,7 +990,7 @@ void lemonView::refreshTotalLabel()
     }
 
     bool notApply = false;
-    if ((nonDiscountables == productsHash.count() && !productsHash.isEmpty())  || (nonDiscountables == specialOrders.count() && !specialOrders.isEmpty() ))
+    if ((nonDiscountables == productsHash.count() && !productsHash.isEmpty()))
         notApply = true;
     
     ///Now we need to get and apply GENERAL DISCOUNTS (applied to the whole sale) like client discount or ocassional discounts.
@@ -1062,14 +1062,9 @@ void lemonView::refreshTotalLabel()
     else totalSum = subTotalSum;
 
     long double paid, change;
-    bool isNum;
-    paid = ui_mainview.editAmount->text().toDouble(&isNum);
-    isNum=true;
-    Azahar *myDb = new Azahar;
-    CreditInfo credit;
-    myDb->setDatabase(db);
-    if (isNum) change = myDb->getClientCredit(clientInfo,totalSum); else change = 0.0;
-
+    //bool isNum;
+    paid = ui_mainview.editAmount->text().toDouble();
+    change = clientInfo.monthly- crInfo.total - totalSum;
     
     if (reservationPayment > 0) qDebug()<<" RESERVATION PAYMENT:"<<reservationPayment;
 
@@ -3792,7 +3787,7 @@ void lemonView::comboClientsOnChange(int idx)
     myDb->setDatabase(db);
     clientInfo=myDb->getClientInfo(newClientIdx);
     qDebug()<<"OK comboClientsOnChange getClientInfo";
-    updateClientInfo();
+    updateClientInfo(false);
     qDebug()<<"OK comboClientsOnChange updateClientInfo";
     refreshTotalLabel();
     qDebug()<<"OK comboClientsOnChange refreshTotalLabel";
@@ -3801,7 +3796,7 @@ void lemonView::comboClientsOnChange(int idx)
   }
 }
 
-void lemonView::updateClientInfo()
+void lemonView::updateClientInfo(bool updateCombo)
 {
   QString dStr;
   if (oDiscountMoney >0 ){
@@ -3809,18 +3804,19 @@ void lemonView::updateClientInfo()
   }
   QString pStr = "";
 
-  int comboIdx = ui_mainview.comboClients->findData(clientInfo.id);
-  ui_mainview.comboClients->setCurrentIndex(comboIdx);
-
-  ui_mainview.editClientCode->setText(clientInfo.code);
-
   Azahar *myDb = new Azahar;
   myDb->setDatabase(db); //NOTE:maybe its better to add creditInfo to clientInfo, and from azahar::getClientInfo() get the creditInfoForClient. Need more code review at azahar.
 
   QPixmap pix;
 
-
+  if (updateCombo) {
+  int comboIdx = ui_mainview.comboClients->findData(clientInfo.id);
+  ui_mainview.comboClients->setCurrentIndex(comboIdx);
   clientInfo= myDb->getClientInfo(clientInfo.id);
+  }
+  ui_mainview.editClientCode->setText(clientInfo.code);
+
+
   pix.loadFromData(clientInfo.photo);
   ui_mainview.lblClientPhoto->setPixmap(pix);
   QDate d=QDate::currentDate();
@@ -3846,9 +3842,9 @@ void lemonView::updateClientInfo()
       clientInfo.monthly=0;
       clientsHash[clientInfo.id]=clientInfo;
   } else {
-  CreditInfo credit = myDb->getCreditInfoForClient(clientInfo.id, false);//do not create new credit if not found.
-  if (credit.id > 0 and credit.total != 0 )
-      ui_mainview.lblCreditInfo->setText(i18n("Credito Residuo: %1", KGlobal::locale()->formatMoney(clientInfo.monthly-credit.total,currency())));
+  crInfo = myDb->getCreditInfoForClient(clientInfo.id, false);//do not create new credit if not found.
+  if (crInfo.id > 0 and crInfo.total != 0 )
+      ui_mainview.lblCreditInfo->setText(i18n("Credito Residuo: %1", KGlobal::locale()->formatMoney(clientInfo.monthly-crInfo.total,currency())));
   else
       ui_mainview.lblCreditInfo->setText("");
   }

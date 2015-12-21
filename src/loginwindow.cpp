@@ -209,7 +209,6 @@ void LoginWindow::paintEvent(QPaintEvent* event){
   /*indxe = indxe-1;*/ indxs = indxs+1;
   bgName = styleSheet.mid(indxs,indxe-indxs);
   bgName="loginPortobello.png";
-  qDebug()<<" index start:"<<indxs<<" index end:"<<indxe<<" string:"<<bgName<< " OMG: How many times this is updated! (painted)...";
   
 
   switch (currentMode)

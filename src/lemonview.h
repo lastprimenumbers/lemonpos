@@ -322,7 +322,7 @@ public:
     void listViewOnMouseMove(const QModelIndex & index);
     void listViewOnClick( const QModelIndex & index );
     void comboClientsOnChange(int idx);
-    void updateClientInfo();
+    void updateClientInfo(bool updateCombo = true);
     void updateModelView();
     void showProductsGrid(bool show);
     void showPriceChecker();
