@@ -1094,6 +1094,35 @@ bool PrintCUPS::printBigTicket(const PrintTicketInfo &ptInfo, QPrinter &printer)
  //    yPos = yPos + fm.lineSpacing();
  //}
  
+  //Balance
+      textWidth = fm.size(Qt::TextExpandTabs | Qt::TextDontClip, ptInfo.thBalanceStr);
+      painter.drawText(printer.width()-(printer.width()/3)-textWidth.width(), Margin+yPos, ptInfo.thBalanceStr);
+      textWidth = fm.size(Qt::TextExpandTabs | Qt::TextDontClip, ptInfo.thBalance);
+      painter.drawText((printer.width() - textWidth.width() - Margin), Margin+yPos,ptInfo.thBalance);
+      yPos = yPos + fm.lineSpacing();
+  //Monthly
+      textWidth = fm.size(Qt::TextExpandTabs | Qt::TextDontClip, ptInfo.thMonthlyStr);
+      painter.drawText(printer.width()-(printer.width()/3)-textWidth.width(), Margin+yPos, ptInfo.thMonthlyStr);
+      textWidth = fm.size(Qt::TextExpandTabs | Qt::TextDontClip,ptInfo.thMonthly);
+      painter.drawText((printer.width() - textWidth.width() - Margin), Margin+yPos,ptInfo.thMonthly);
+      yPos = yPos + 2*fm.lineSpacing();
+
+   //Expiry
+      textWidth = fm.size(Qt::TextExpandTabs | Qt::TextDontClip, ptInfo.thExpiryStr);
+      painter.drawText(printer.width()-(printer.width()/3)-textWidth.width(), Margin+yPos, ptInfo.thExpiryStr);
+      yPos = yPos +  fm.lineSpacing();
+      textWidth = fm.size(Qt::TextExpandTabs | Qt::TextDontClip,ptInfo.thExpiry);
+      painter.drawText((printer.width() - textWidth.width() - Margin), Margin+yPos, ptInfo.thExpiry);
+      yPos = yPos +  fm.lineSpacing();
+
+      //Reset
+      textWidth = fm.size(Qt::TextExpandTabs | Qt::TextDontClip, ptInfo.thNextResetStr);
+      painter.drawText(printer.width()-(printer.width()/3)-textWidth.width(), Margin+yPos, ptInfo.thNextResetStr);
+      yPos = yPos +  fm.lineSpacing();
+      textWidth = fm.size(Qt::TextExpandTabs | Qt::TextDontClip,ptInfo.thNextReset);
+      painter.drawText((printer.width() - textWidth.width() - Margin), Margin+yPos, ptInfo.thNextReset);
+      yPos = yPos +  fm.lineSpacing();
+
  //if space, the ticket message.
  if ( (Margin + yPos +fm.lineSpacing()*4) <= printer.height() - Margin ) {
    tmpFont = QFont("Bitstream Vera Sans", 12);

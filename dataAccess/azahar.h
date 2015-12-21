@@ -149,8 +149,8 @@ class Azahar : public QObject
     //CLIENTS
     bool         insertClient(ClientInfo info);
     bool         updateClient(ClientInfo info);
-    ClientInfo   getClientInfo(qulonglong clientId);
-    ClientInfo   getClientInfo(QString clientCode);
+    ClientInfo   getClientInfo(qulonglong clientId, bool mini = false);
+    ClientInfo   getClientInfo(QString clientCode, bool mini = false);
     ClientInfo checkParent(ClientInfo &info);
     QHash<int, ClientInfo> getClientsHash();
     QStringList  getClientsList();
@@ -304,8 +304,8 @@ private:
     QString     getUpdateString(QStringList list);
     QString     getInsertString(QStringList list);
     bool        _bindClient(ClientInfo &info, QSqlQuery &query);
-    ClientInfo   _getClientInfo(qulonglong clientId);
-    ClientInfo   _getClientInfo(QString clientCode, bool mini = false);
+    ClientInfo   _getClientInfoFromCode(QString clientCode, bool mini = false);
+    ClientInfo   _getClientInfoFromId(qulonglong clientId, bool mini = false);
     bool   getClientInfoFromQuery(QSqlQuery &qC, ClientInfo &info);
 
     bool        _bindDonor(DonorInfo &info, QSqlQuery &query);

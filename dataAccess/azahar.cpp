@@ -1886,7 +1886,7 @@ ClientInfo Azahar::checkParent(ClientInfo &info)
     ClientInfo parentInfo;
     parentInfo.id=0;
     if (info.parentClient.count()>0){
-        parentInfo=_getClientInfo(info.parentClient,true);
+        parentInfo=_getClientInfoFromCode(info.parentClient,true);
         if (parentInfo.id > 0){
             info.monthly=parentInfo.monthly;
             info.beginsusp=parentInfo.beginsusp;
@@ -1916,7 +1916,7 @@ Family Azahar::getFamily(ClientInfo &info)
         parentCode=info.code;
         result.append(info);
     } else {
-        parentInfo=_getClientInfo(info.parentClient,true);
+        parentInfo=_getClientInfoFromCode(info.parentClient,true);
         parentCode=info.parentClient;
         result.append(parentInfo);
         result.append(info);
@@ -2433,40 +2433,25 @@ QStringList Azahar::getAvailableTags()
 }
 
 
-ClientInfo Azahar::getClientInfo(qulonglong clientId)
+ClientInfo Azahar::getClientInfo(qulonglong clientId, bool mini)
 {
   ClientInfo info;
-  info=_getClientInfo(clientId);
+  info=_getClientInfoFromId(clientId,mini);
   checkParent(info);
   return info;
 }
 
-ClientInfo Azahar::_getClientInfo(qulonglong clientId)
+ClientInfo Azahar::getClientInfo(QString clientCode, bool mini)
 {
     ClientInfo info;
-    if (!db.isOpen()) db.open();
-    if (db.isOpen()) {
-        QSqlQuery qC(db);
-        if (qC.exec(QString("select * from clients where id=%1;").arg(clientId))) {
-            getClientInfoFromQuery(qC,info);
-            info.tags=getClientTags(info.code);
-        }
-        else {
-            qDebug()<<"ERROR: "<<qC.lastError();
-        }
-    }
-    return info;
-}
-
-ClientInfo Azahar::getClientInfo(QString clientCode)
-{
-    ClientInfo info;
-    info=_getClientInfo(clientCode,false);
+    info=_getClientInfoFromCode(clientCode,mini);
     checkParent(info);
     return info;
 }
 
-ClientInfo Azahar::_getClientInfo(QString clientCode, bool mini)
+
+
+ClientInfo Azahar::_getClientInfoFromCode(QString clientCode, bool mini)
 {
     ClientInfo info;
     info.name = "";
@@ -2484,6 +2469,33 @@ ClientInfo Azahar::_getClientInfo(QString clientCode, bool mini)
         if (qC.exec(q)) {
             getClientInfoFromQuery(qC,info);
             info.tags=getClientTags(clientCode);
+        }
+        else {
+            qDebug()<<"ERROR: "<<qC.lastError();
+        }
+    }
+
+    return info;
+}
+
+ClientInfo Azahar::_getClientInfoFromId(qulonglong clientId, bool mini)
+{
+    ClientInfo info;
+    info.name = "";
+    info.id = clientId;//to recognize errors.
+    info.parentClient="";
+    if (!db.isOpen()) db.open();
+    if (db.isOpen()) {
+        QSqlQuery qC(db);
+        QString q;
+        if (mini==true) {
+            q=QString("select %1 from clients WHERE id='%2';").arg(clientLightSelect, clientId);
+        } else {
+            q=QString("select * from clients WHERE id='%1';").arg(clientId);
+        }
+        if (qC.exec(q)) {
+            getClientInfoFromQuery(qC,info);
+            info.tags=getClientTags(info.code);
         }
         else {
             qDebug()<<"ERROR: "<<qC.lastError();
@@ -5067,7 +5079,7 @@ CreditInfo Azahar::queryCreditInfoForClient(const qulonglong &cid, const bool &c
 CreditInfo Azahar::getCreditInfoForClient(const qulonglong &clientId, const bool &create)
 {
     qulonglong cid=0;
-    ClientInfo info= getClientInfo(clientId);
+    ClientInfo info= _getClientInfoFromId(clientId, true);
     QDate lastCreditReset;
     // Get parent info
     ClientInfo pInfo=checkParent(info);

@@ -907,7 +907,7 @@ void squeezeView::setupDb()
 {
   qDebug()<<"SetupDB";
   if (db.isOpen()) db.close();
-  qDebug()<<"SetupDB: closed";
+  qDebug()<<"SetupDB: closed.";
   db.setHostName(Settings::editDBServer());
   db.setDatabaseName(Settings::editDBName());
   db.setUserName(Settings::editDBUsername());
@@ -921,7 +921,7 @@ void squeezeView::setupDb()
 //  db.setUserName("emporio");
 //  db.setPassword("emporio");
 
-  qDebug()<<"SetupDB: opening";
+  qDebug()<<"SetupDB: opening"<<Settings::editDBServer()<<Settings::editDBName()<<Settings::editDBUsername();
   db.open();
   qDebug()<<"SetupDB: opened";
   dlgPassword->setDb(db);

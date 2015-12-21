@@ -1112,7 +1112,6 @@ void lemonView::refreshTotalLabel()
     Azahar *myDb = new Azahar;
     CreditInfo credit;
     myDb->setDatabase(db);
-//    credit = myDb->getCreditInfoForClient(clientInfo.id);
 //    paid=clientInfo.monthly-credit.total;
 //   // qDebug()<<"PAID (credit.total):"<<paid;
 //           //<<"TOTSUM:"<<totalSum;
@@ -2284,7 +2283,7 @@ void lemonView::finishCurrentTransaction()
       myDb->insertTransactionItem(tItemInfo);
 
       //re-select the transactionItems model
-      historyTicketsModel->select();
+      //historyTicketsModel->select();
 
       iname = iname.replace("\n", "|");
 
@@ -2825,7 +2824,7 @@ void lemonView::freezeWidgets()
 void lemonView::unfreezeWidgets()
 {
   emit signalEnableUI();
-  startAgain();
+  //startAgain();
 }
 
 void lemonView::startAgain()
@@ -3594,7 +3593,7 @@ void lemonView::setupModel()
 
     productsModel->setEditStrategy(QSqlTableModel::OnRowChange);
     ui_mainview.listView->setModel(productsModel);
-    ui_mainview.listView->setResizeMode(QListView::Adjust);
+    ui_mainview.listView->setResizeMode(QListView::Fixed);
 
     ui_mainview.listView->setModelColumn(productsModel->fieldIndex("photo"));
     ui_mainview.listView->setViewMode(QListView::IconMode);
@@ -3604,10 +3603,11 @@ void lemonView::setupModel()
 
     ProductDelegate *delegate = new ProductDelegate(ui_mainview.listView);
     ui_mainview.listView->setItemDelegate(delegate);
-
-    productsModel->select();
+    qDebug()<<"productsModel.select()...";
+    //productsModel->select();
 
     //Categories popuplist
+    qDebug()<<"populateCategoriesHash";
     populateCategoriesHash();
      for (int i; i<categoriesList.count(); ++i) {
          ui_mainview.comboFilterByCategory->addItem(categoriesList.at(i));
@@ -3854,7 +3854,7 @@ void lemonView::comboClientsOnChange(int idx)
   qDebug()<<"comboClientsOnChange"<<newClientIdx<<newClientName;
   if (clientsHash.contains(newClientIdx)) {
     clientInfo = clientsHash.value(newClientIdx);
-    qDebug()<<'OK comboClientsOnChange'<<clientInfo.id<<clientInfo.name<<clientInfo.monthly;
+    qDebug()<<"OK comboClientsOnChange"<<clientInfo.id<<clientInfo.name<<clientInfo.monthly;
     Azahar *myDb = new Azahar;
     myDb->setDatabase(db);
     clientInfo=myDb->getClientInfo(newClientIdx);
@@ -3921,9 +3921,12 @@ void lemonView::updateClientInfo()
 }
 
 void lemonView::setHistoryFilter() {
-  historyTicketsModel->setFilter(QString("date <= STR_TO_DATE('%1', '%d/%m/%Y')").
-    arg(ui_mainview.editTicketDatePicker->date().toString("dd/MM/yyyy")));
+  QDate olddate;
+  olddate = ui_mainview.editTicketDatePicker->date().addDays(-7);
+  historyTicketsModel->setFilter(QString("date <= STR_TO_DATE('%1', '%d/%m/%Y') and date >= STR_TO_DATE('%2', '%d/%m/%Y')").
+    arg(ui_mainview.editTicketDatePicker->date().toString("dd/MM/yyyy")).arg(olddate.toString("dd/MM/yyyy")));
   historyTicketsModel->setSort(historyTicketsModel->fieldIndex("id"),Qt::DescendingOrder); //change this when implemented headers click
+  historyTicketsModel->select();
 }
 
 void lemonView::setupHistoryTicketsModel()
@@ -3935,7 +3938,7 @@ void lemonView::setupHistoryTicketsModel()
     historyTicketsModel->setTable("v_transactions");
     historyTicketsModel->setRelation(historyTicketsModel->fieldIndex("clientid"), QSqlRelation("clients", "id", "name"));
     historyTicketsModel->setRelation(historyTicketsModel->fieldIndex("userid"), QSqlRelation("users", "id", "username"));
-    
+
     historyTicketsModel->setHeaderData(historyTicketsModel->fieldIndex("id"), Qt::Horizontal, i18n("Tr"));
     historyTicketsModel->setHeaderData(historyTicketsModel->fieldIndex("clientid"), Qt::Horizontal, i18n("Client"));
     historyTicketsModel->setHeaderData(historyTicketsModel->fieldIndex("datetime"), Qt::Horizontal, i18n("Date"));
@@ -3943,26 +3946,27 @@ void lemonView::setupHistoryTicketsModel()
     historyTicketsModel->setHeaderData(historyTicketsModel->fieldIndex("itemcount"), Qt::Horizontal, i18n("Items"));
     historyTicketsModel->setHeaderData(historyTicketsModel->fieldIndex("amount"), Qt::Horizontal, i18n("Total"));
     historyTicketsModel->setHeaderData(historyTicketsModel->fieldIndex("disc"), Qt::Horizontal, i18n("Discount"));
+    historyTicketsModel->setSort(historyTicketsModel->fieldIndex("id"),Qt::DescendingOrder);
 
     ui_mainview.ticketView->setModel(historyTicketsModel);
+    ui_mainview.ticketView->horizontalHeader()->setResizeMode(QHeaderView::Interactive);
+    ui_mainview.ticketView->verticalHeader()->setResizeMode(QHeaderView::Interactive);
     ui_mainview.ticketView->setColumnHidden(historyTicketsModel->fieldIndex("date"), true);
     ui_mainview.ticketView->setSelectionMode(QAbstractItemView::SingleSelection);
     ui_mainview.ticketView->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui_mainview.ticketView->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui_mainview.ticketView->resizeColumnsToContents();
     ui_mainview.ticketView->setCurrentIndex(historyTicketsModel->index(0, 0));
-    
-    historyTicketsModel->setSort(historyTicketsModel->fieldIndex("id"),Qt::DescendingOrder);
-    historyTicketsModel->select();
   }
   setHistoryFilter();
 }
+
 
 void lemonView::setupTicketView()
 {
   if (historyTicketsModel->tableName().isEmpty()) setupHistoryTicketsModel();
   historyTicketsModel->setSort(historyTicketsModel->fieldIndex("id"),Qt::DescendingOrder);
-  historyTicketsModel->select();
+  //historyTicketsModel->select();
   QSize tableSize = ui_mainview.ticketView->size();
   int portion = tableSize.width()/7;
   ui_mainview.ticketView->horizontalHeader()->setResizeMode(QHeaderView::Interactive);
@@ -3991,7 +3995,7 @@ void lemonView::itemHIDoubleClicked(const QModelIndex &index){
 void lemonView::printSelTicket()
 {
   QModelIndex index = ui_mainview.ticketView->currentIndex();
-  if (historyTicketsModel->tableName().isEmpty()) setupHistoryTicketsModel();
+  //if (historyTicketsModel->tableName().isEmpty()) setupHistoryTicketsModel();
   if (index == historyTicketsModel->index(-1,-1) ) {
     KMessageBox::information(this, i18n("Please select a ticket to print."), i18n("Cannot print ticket"));
   }
@@ -4160,7 +4164,7 @@ void lemonView::printTicketFromTransaction(qulonglong transactionNumber)
 void lemonView::showReprintTicket()
 {
   ui_mainview.mainPanel->setCurrentIndex(pageReprintTicket);
-  QTimer::singleShot(500, this, SLOT(setupTicketView()));
+  //QTimer::singleShot(500, this, SLOT(setupTicketView()));
 }
 
 void lemonView::cashOut()
@@ -5214,7 +5218,7 @@ void lemonView::filterClientForCredit()
         //search by client code (alphanum, 0000001 and not 1)
         Azahar *myDb = new Azahar;
         myDb->setDatabase(db);
-        crClientInfo = myDb->getClientInfo(clientCode);
+        crClientInfo = myDb->getClientInfo(clientCode,true);
         crInfo = myDb->getCreditInfoForClient(crClientInfo.id); //this returns a new credit if no one found for that client.
         qDebug()<<__FUNCTION__<<"Getting credit info for clientId:"<<crInfo.clientId<<" -- $"<<crInfo.total;
         delete myDb;
