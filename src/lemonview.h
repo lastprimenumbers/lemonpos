@@ -107,16 +107,12 @@ public:
     double discMoney;
     double totalSumWODisc;
     double subTotalSum;
-    double reservationPayment;
     QDateTime transDateTime;
     double lastDiscount;
     bool completingOrder;
 
     bool availabilityDoesNotMatters;
     bool doNotAddMoreItems;
-    bool finishingReservation;
-    bool startingReservation;
-    qulonglong reservationId;
 
     QHash<qulonglong, SpecialOrderInfo> specialOrders;
     
@@ -348,8 +344,6 @@ public:
     void unfreezeWidgets();
     void lockScreen();
     void unlockScreen();
-    void suspendSale();
-    void resumeSale();
 
     void updateTransaction();
     void updateBalance(bool finish); //implies the drawer content
@@ -367,11 +361,6 @@ public:
     void comboCurrencyOnChange();
     void doCurrencyConversion();
     void acceptCurrencyConversion();
-
-    void reserveItems();
-    void suspendReservation();
-    void resumeReservation();
-    void postponeReservation();
 
     void showCredits();
     void filterClientForCredit();

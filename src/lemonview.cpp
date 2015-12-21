@@ -28,8 +28,6 @@
 #include "ticketpopup.h"
 #include "misc.h"
 #include "hash.h"
-#include "resume.h"
-#include "reservations.h"
 #include "../../mibitWidgets/mibittip.h"
 #include "../../mibitWidgets/mibitpassworddlg.h"
 #include "../../mibitWidgets/mibitfloatpanel.h"
@@ -144,10 +142,6 @@ lemonView::lemonView(QWidget *parent) //: QWidget(parent)
   currentBalanceId = 0;
   availabilityDoesNotMatters = false;
   doNotAddMoreItems = false;
-  finishingReservation = false;
-  startingReservation = false;
-  reservationPayment = 0;
-  reservationId = 0;
   QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
   db = QSqlDatabase::addDatabase("QMYSQL"); //moved here because calling multiple times cause a crash on certain installations (Not kubuntu 8.10).
   ui_mainview.setupUi(this);
@@ -1056,7 +1050,7 @@ void lemonView::refreshTotalLabel()
         
     ///we get subtotal.
     totalTax       = taxes;
-    subTotalSum    = sum - reservationPayment; //- gDiscount: ya se incluyo en la iteracion...
+    subTotalSum    = sum;
     if (Settings::addTax())
         totalSum   = subTotalSum + totalTax;
     else totalSum = subTotalSum;
@@ -1065,8 +1059,7 @@ void lemonView::refreshTotalLabel()
     //bool isNum;
     paid = ui_mainview.editAmount->text().toDouble();
     change = clientInfo.monthly- crInfo.total - totalSum;
-    
-    if (reservationPayment > 0) qDebug()<<" RESERVATION PAYMENT:"<<reservationPayment;
+
 
     qDebug()<<"SUBTOTAL: "<<subTotalSum<<" TOTAL: "<<totalSum<<"Fromatted SUBTOTAL:"<<KGlobal::locale()->formatMoney(subTotalSum,currency())<<" Formatted TOTAL:"<<KGlobal::locale()->formatMoney(totalSum,currency());
 
@@ -2045,11 +2038,7 @@ void lemonView::finishCurrentTransaction()
   tInfo.balanceId = currentBalanceId;
   tInfo.type = 0;//already on db.
 
-  qDebug()<<"FinishingReservation:"<<finishingReservation<<" reservation Payment:"<<reservationPayment;
-  if (finishingReservation)
-      tInfo.amount = totalSum + reservationPayment; //at the transaction the REAL total must be considered (for accountability)
-  else
-      tInfo.amount = totalSum;
+  tInfo.amount = totalSum;
 
   //new feature from biel : Change sale date time
   bool printDTticket=true;
@@ -2604,13 +2593,9 @@ void lemonView::printTicket(TicketInfo ticket)
       ptInfo.thTax = hTax;
       ptInfo.thSubtotal = hSubtotal;
       ptInfo.thTendered = hTendered;
-      //for reservations
-      ptInfo.hdrReservation = i18n(" RESERVATION ");
 
-      if (!ptInfo.ticketInfo.reservationStarted)
-        ptInfo.resTotalAmountStr  = i18n("Purchase Total Amount");
-      else
-        ptInfo.resTotalAmountStr  = i18n("Reservation Total Amount");
+
+      ptInfo.resTotalAmountStr  = i18n("Purchase Total Amount");
 
       QPrinter printer;
       printer.setFullPage( true );
@@ -2698,38 +2683,6 @@ void lemonView::printTicket(TicketInfo ticket)
       }
       delete myDb;
     }//bigTicket
-    //now if so.. print it
-    if (Settings::printSO() && ticket.hasSpecialOrders && !ticket.completingSpecialOrder){
-      qDebug()<<"Printing small receipt for SPECIAL ORDERS using CUPS";
-      PrintTicketInfo ptInfo;
-      
-      ptInfo.ticketInfo = ticket;
-      ptInfo.storeName  = hSpecialOrder; //user for header
-      ptInfo.salesPerson= loggedUserName;
-      ptInfo.terminal   = terminal;
-      ptInfo.thDate     = KGlobal::locale()->formatDateTime(ptInfo.ticketInfo.datetime, KLocale::LongDate);
-      ptInfo.thTicket   = hTicket;
-      ptInfo.thProduct  = hProduct;
-      ptInfo.thQty      = i18n("Qty");
-      ptInfo.thPrice    = hPrice;
-      ptInfo.thTotal    = hTotal;
-      ptInfo.thTotals   = KGlobal::locale()->formatMoney(ptInfo.ticketInfo.total, currency(), 2);
-      QString signM = KGlobal::locale()->formatMoney(tDisc, currency(), 2);
-      signM.truncate(2); //this gets the $ only...
-      ptInfo.paymentStrPrePayment = hPrePayment + signM;
-      ptInfo.paymentStrComplete = hCompletePayment + signM;
-      ptInfo.nextPaymentStr = hNextPaymentStr;
-      ptInfo.lastPaymentStr = hLastPaymentStr;
-      ptInfo.deliveryDateStr = hDeliveryDT;    
-      
-      QPrinter printer;
-      printer.setFullPage( true );
-      QPrintDialog printDialog( &printer );
-      printDialog.setWindowTitle(i18n("Print Special Order Instructions "));
-      if ( printDialog.exec() ) {
-        PrintCUPS::printSmallSOTicket(ptInfo, printer);
-      }
-    }//soticket
   } //printTicket
 
   freezeWidgets();
@@ -2767,12 +2720,8 @@ void lemonView::startAgain()
   discMoney=0;
   refreshTotalLabel();
   createNewTransaction(tSell);
-  reservationPayment = 0; //reservationPayment is for reservations only!
   availabilityDoesNotMatters = false; // Only for reservations for now!
   doNotAddMoreItems = false;
-  finishingReservation = false;
-  startingReservation = false;
-  reservationId = 0;
   //qDebug()<<" doNotAddMoreItems = false. FinishingReservation = false.";
   refreshTotalLabel();
   //NOTE: when createNewTRansaction is executed, and we are exiting application, the requested transaction create in not completed.. due to the way it is implemented in qtsql. This is a good thing for me because i dont want to create a new transaction when we are exiting lemon. Thats why the message "QSqlDatabasePrivate::removeDatabase: connection 'qt_sql_default_connection' is still in use, all queries will cease to work." appears on log (std output) when exiting lemon. This method is called from corteDeCaja which is called from cancelByExit() method which is called by lemon class on exit-query.
@@ -2851,28 +2800,10 @@ void lemonView::cancelTransaction(qulonglong transactionNumber)
 
   if (getCurrentTransaction() == transactionNumber) {
     ///this transaction is not saved yet (more than the initial data when transaction is created)
-    //UPDATE: Now each time a product is inserted or screen locked, transaction and balance is saved.
-    if (finishingReservation) {
-        postponeReservation();
-        startAgain();
-//         productsHash.clear();
-//         specialOrders.clear();
-//         setupClients(); //clear the clientInfo (sets the default client info)
-//         clearUsedWidgets();
-//         buyPoints =0;
-//         discMoney=0;
-//         finishingReservation = false;
-//         startingReservation  = false;
-//         transactionInProgress= false;
-//         doNotAddMoreItems    = false;
-//         createNewTransaction(tSell);
-//         refreshTotalLabel();
-        return;
-    } else {
         transToCancelIsInProgress = true;
         clearUsedWidgets();
         refreshTotalLabel();
-    }
+
   } else {
     ///this transaction is saved (amount,products,points...)
     clearUsedWidgets();
@@ -3131,7 +3062,6 @@ void lemonView::corteDeCaja()
     QString strAmount      = i18n("Amount");
     QString strPaidWith    = i18n("Paid");
     QString strPayMethodH  = i18n("Method");
-    pbInfo.reservationNote = i18n("When Completing Reservations, the Amount may be grater than Paid (amount) because of the reservation payment.");
 
     QPixmap logoPixmap;
     logoPixmap.load(Settings::storeLogo());
@@ -3978,23 +3908,9 @@ void lemonView::printTicketFromTransaction(qulonglong transactionNumber)
   double soGTotal = 0;
   QDateTime soDeliveryDT;
 
-  //NOTE: Fixing printing reservations that does not exists.
-  ReservationInfo rInfo = myDb->getReservationInfoFromTr(transactionNumber);
-  //qDebug()<<"ReservationId:"<<rInfo.id<<" TrNum:"<<transactionNumber<<" rInfo.transaction_id"<<rInfo.transaction_id;
-  if (rInfo.transaction_id != trInfo.id) { //its not true!
-      ticket.reservationId = 0;
-      ticket.isAReservation = false;
-  } else {
-      ticket.reservationId  = rInfo.id;
-      ticket.isAReservation = true;
-      if ( rInfo.status == rCompleted ) //NOTE: This is not saved in the rInfo, but only completed reservations can be re-printed.
-          ticket.reservationStarted = false;
-      else
-        ticket.reservationStarted = true; 
-      ticket.reservationPayment = rInfo.payment;
-      ticket.purchaseTotal = rInfo.total;
-  } //end fixing...
-  
+  ticket.reservationId = 0;
+  ticket.isAReservation = false;
+
   for (int i = 0; i < pListItems.size(); ++i) {
     TransactionItemInfo trItem = pListItems.at(i);
     // add line to ticketLines
@@ -4359,63 +4275,6 @@ void lemonView::updateTransaction()
   delete myDb;
 }
 
-void lemonView::suspendSale()
-{
-  qulonglong count = specialOrders.count() + productsHash.count();
-  if ( operationStarted && count>0 ) {
-    qulonglong tmpId = currentTransaction;
-    qDebug()<<"THE SALE HAS BEEN SUSPENDED. Id="<<tmpId;
-    // save transaction and balance
-    updateTransaction();
-    updateBalance(false);
-    // clear widgets
-    startAgain();
-    //inform the user
-    KNotification *notify = new KNotification("information", this);
-    notify->setText(i18n("The sale %1 has been sucessfully suspended.", tmpId));
-    QPixmap pixmap = DesktopIcon("dialog-information",32);
-    notify->setPixmap(pixmap);
-    notify->sendEvent();
-  }
-}
-
-//This will resume the sale, using a new balanceid.
-void lemonView::resumeSale()
-{
-  Azahar *myDb = new Azahar;
-  myDb->setDatabase(db);
-  ResumeDialog *dlg = new ResumeDialog(this);
-  dlg->setUserId(loggedUserId); //note: this must be called before setDb()
-  dlg->setDb(db);
-
-  if (dlg->exec()) {
-    //get data
-    QList<ProductInfo>      pList = dlg->getProductsList();
-    QList<SpecialOrderInfo> sList = dlg->getSOList();
-    qulonglong trNumber           = dlg->getSelectedTransaction();
-    qulonglong clientId           = dlg->getSelectedClient();
-    //Check if there is a transaction, and suspend it.
-    suspendSale();
-    currentTransaction = trNumber;
-    emit signalUpdateTransactionInfo();
-    clientInfo = myDb->getClientInfo(clientId);
-    qDebug()<<"Client id for the resumed sale:";
-    int idx = ui_mainview.comboClients->findText(clientInfo.name,Qt::MatchCaseSensitive);
-    if (idx>-1) ui_mainview.comboClients->setCurrentIndex(idx);
-    updateClientInfo();
-    refreshTotalLabel();
-    //NOTE: change sale date ?
-    //get each product - the availability and group verification will do the insertItem method
-    foreach(ProductInfo info, pList) {
-      QString qtyXcode = QString::number(info.qtyOnList) + "*" + info.code;
-      insertItem(qtyXcode);
-    }
-    updateBalance(false);
-    updateTransaction();
-  }
-  delete myDb;
-}
-
 
 //NOTE: Aug 6 2011: Now occasionalDiscount can be in dollar and cents.
 void  lemonView::occasionalDiscount()
@@ -4526,281 +4385,6 @@ void lemonView::applyOccasionalDiscount()
     discountPanel->hidePanel();
 }
 
-//NOTE: Reservations are not treated as sales until they are completed. The amount payment at the reservation is
-//      treated as a cash-in, without any transaction implied. The transaction used is kept at NotCompleted state.
-void lemonView::reserveItems()
-{
-    TicketInfo      ticket;
-    QList<TicketLineInfo> ticketLines;
-    double           payWith = 0.0;
-    double           changeGiven = 0.0;
-    QString          authnumber = "";
-    QString          cardNum = "";
-    QString          paidStr = "'[Not Available]'";
-    QStringList      groupList;
-
-    startingReservation = true;
-    finishingReservation= false;
-
-    reservationPayment = ui_mainview.editAmount->text().toDouble();
-    payWith = reservationPayment;
-    //change given is allways 0.
-    
-    //check if there are items in the list. Only on normal products, not SO.
-    if (!productsHash.isEmpty()) {
-        ReservationInfo rInfo;
-        rInfo.id=0;
-        rInfo.client_id = clientInfo.id;
-        rInfo.transaction_id = currentTransaction;
-        rInfo.date = QDate::currentDate();
-        rInfo.status = rPending;
-        //get Payment Amount.
-        rInfo.payment = reservationPayment;
-        // total without payment
-        rInfo.total = subTotalSum; // This amount is WITHOUT TAXES.
-        rInfo.totalTaxes = totalTax;
-        qDebug()<< __FUNCTION__ <<" Reservation Amount:"<< rInfo.payment<<" Total :"<<rInfo.total<<" Taxes:"<< rInfo.totalTaxes;
-
-        if (rInfo.payment <= 0) {
-            //TODO: Replace this notify with a mibitLineEdit->VIBRAR, y mibitTip
-            KNotification *notify = new KNotification("information", this);
-            notify->setText(i18n("Please Enter the reservation Amount in the Payment Amount and try again."));
-            QPixmap pixmap = DesktopIcon("dialog-information",32);
-            notify->setPixmap(pixmap);
-            notify->sendEvent();
-            ui_mainview.editAmount->setFocus();
-            return;
-        }
-
-        Azahar *myDb = new Azahar;
-        myDb->setDatabase(db);
-
-        double pDiscounts=0;
-        double cantidad=0;
-
-        //create the reservation record
-        qulonglong rId = myDb->insertReservation(rInfo);
-
-        foreach (ProductInfo pi, productsHash) {
-            //Decrement product-qty from inventory.
-            if (pi.isAGroup)
-                myDb->decrementGroupStock(pi.code, pi.qtyOnList, QDate::currentDate() );
-            else
-                myDb->decrementProductStock(pi.code, pi.qtyOnList, QDate::currentDate() );
-            //get item data
-            pDiscounts+= pi.disc * pi.qtyOnList;
-            if (pi.units == uPiece) cantidad += pi.qtyOnList; else cantidad += 1; // :)
-            QString iname = "";
-            if (!pi.groupElementsStr.isEmpty()) {
-                QStringList lelem = pi.groupElementsStr.split(",");
-                foreach(QString ea, lelem) {
-                    if (Settings::printPackContents()) {
-                        qulonglong c = ea.section('/',0,0).toULongLong();
-                        double     q = ea.section('/',1,1).toDouble();
-                        ProductInfo p = myDb->getProductInfo(QString::number(c));
-                        QString unitStr;
-                        if (p.units == 1 ) unitStr=" "; else unitStr = p.unitStr;
-                        iname += "\n  " + QString::number(q) + " "+ unitStr +" "+ p.desc;
-                    }
-                }
-            }
-            iname = iname.replace("\n", "|");
-            // add line to ticketLines
-            TicketLineInfo tLineInfo;
-            tLineInfo.qty     = pi.qtyOnList;
-            tLineInfo.unitStr = pi.unitStr;
-            tLineInfo.isGroup = false;
-            if (pi.isAGroup) { 
-                tLineInfo.geForPrint    =iname;
-                tLineInfo.completePayment = true;
-                tLineInfo.payment = 0;
-                tLineInfo.isGroup = true;
-            }
-            tLineInfo.desc    = pi.desc;
-            tLineInfo.price   = pi.price;
-            tLineInfo.disc    = pi.disc*pi.qtyOnList;
-            tLineInfo.total   = (pi.price - pi.disc) * pi.qtyOnList;
-            tLineInfo.tax     = pi.totaltax*pi.qtyOnList;
-            ticketLines.append(tLineInfo);
-            
-        } //for each product
-
-        //Register the cash-in
-        CashFlowInfo info;
-        info.amount = rInfo.payment;
-        info.reason = i18n("Reservation #%1 [tr. %2]", rId, currentTransaction);
-        info.date = QDate::currentDate();
-        info.time = QTime::currentTime();
-        info.terminalNum = Settings::editTerminalNumber();
-        info.userid = loggedUserId;
-        info.type   = ctCashIn;
-        qulonglong cfId = myDb->insertCashFlow(info);
-        //affect drawer
-        if (Settings::openDrawer() && Settings::smallTicketDotMatrix() && Settings::printTicket() ) drawer->open();
-        if (ui_mainview.checkCash->isChecked()) {
-            drawer->addCash(info.amount);
-            drawer->insertCashflow(cfId);
-            drawer->substractCash(changeGiven);
-            //drawer->incCashTransactions(); //it is not a transaction.
-        } else {
-            drawer->addCard(payWith);
-            drawer->insertCashflow(cfId);
-        }
-
-        //write a log 
-        QString authBy = dlgPassword->username();
-        if (authBy.isEmpty()) authBy = myDb->getUserName(1); //default admin.
-            log(loggedUserId, QDate::currentDate(), QTime::currentTime(), i18n("Cash-IN [%1] for RESERVATION [%5] by %2 at terminal %3 on %4",QString::number(info.amount, 'f',2),authBy,Settings::editTerminalNumber(),QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm")).arg(rId));
-        //end cash-in
-
-        ui_mainview.editAmount->setStyleSheet("");
-        ui_mainview.editCardNumber->setStyleSheet("");
-
-        //TODO:PRINT A TICKET  - Print it twice? one for client other for store (stick it at the product)
-        // investigate how to manipulate printer settings (cups) 
-        ticket.isAReservation     = true;
-        ticket.reservationStarted = true;
-        ticket.reservationPayment = rInfo.payment;
-        ticket.reservationId  = rId;
-        ticket.purchaseTotal  = rInfo.total;
-        ticket.datetime = QDateTime::currentDateTime(); //NOTE:Reservations are not DATE CHANGEABLE.
-
-        QString realSubtotal;
-        if (Settings::addTax())
-            realSubtotal = KGlobal::locale()->formatMoney(subTotalSum-discMoney+pDiscounts, currency(), 2);
-        else
-            realSubtotal = KGlobal::locale()->formatMoney(subTotalSum-totalTax+discMoney+pDiscounts, currency(), 2); //FIXME: es +discMoney o -discMoney??
-            qDebug()<<"\n********** Total Taxes:"<<totalTax<<" total Discount:"<<discMoney<<" Prod Discounts:"<<pDiscounts;
-        
-        ticket.number = currentTransaction;
-        ticket.subTotal = realSubtotal; //This is the subtotal-taxes-discount
-        ticket.total  = reservationPayment; qDebug()<<" *************** totalSum:"<<totalSum;
-        ticket.change = changeGiven;
-        ticket.paidwith = payWith;
-        ticket.itemcount = cantidad;
-        ticket.cardnum = cardNum;
-        ticket.cardAuthNum = authnumber;
-        ticket.paidWithCard = ui_mainview.checkCard->isChecked();
-        ticket.clientDisc = 0;
-        ticket.clientDiscMoney = discMoney;
-        ticket.buyPoints = buyPoints;
-        ticket.clientPoints = 0;
-        ticket.lines = ticketLines;
-        ticket.clientid = clientInfo.id;
-        ticket.hasSpecialOrders = false;
-        ticket.completingSpecialOrder = false;
-        ticket.totalTax = totalTax;
-        ticket.terminal = QString::number(Settings::editTerminalNumber());
-
-        //TODO: Add TERMS AND CONDITIONS OF RESERVATIONS to the ticket ??
-
-        // Suspend Reservation (save balance, transaction, clear widgets...)
-        suspendReservation();
-        // Change transaction STATUS to tReserved.
-        myDb->setTransactionStatus(rInfo.transaction_id, tReserved);
-
-        //send print ticket data
-        printTicket(ticket);
-        printTicket(ticket);
-
-
-    } else {
-        //Cannot reserve empty product list!
-        KNotification *notify = new KNotification("information", this);
-        notify->setText(i18n("Cannot make a reservation, no products on the list. Special Orders are not considered."));
-        QPixmap pixmap = DesktopIcon("dialog-information",32);
-        notify->setPixmap(pixmap);
-        notify->sendEvent();
-    }
-}
-
-//NOTE: Here the store owner/admin needs to know that when lemon makes a product reservation the product qty in stock is decremented.
-//      So, if the reserved product is not completed, the item is physically in the store but not in stock. It must be re-stocked, which
-//      is done with a stockCorrection with a reason of "Reservation not completed or cancelled."
-void lemonView::suspendReservation()
-{
-    qulonglong count = productsHash.count();
-    if ( operationStarted && count>0 ) {
-        qulonglong tmpId = currentTransaction;
-        qDebug()<<"THE TRANSACTION HAS BEEN RESERVED. Id="<<tmpId;
-        // save transaction and balance
-        updateTransaction();
-        updateBalance(false);
-        // clear widgets
-        startAgain();
-        //inform the user
-        KNotification *notify = new KNotification("information", this);
-        notify->setText(i18n("The sale %1 has been sucessfully reserved.", tmpId));
-        QPixmap pixmap = DesktopIcon("dialog-information",32);
-        notify->setPixmap(pixmap);
-        notify->sendEvent();
-    }
-}
-
-void lemonView::resumeReservation()
-{
-    qDebug()<<"finishingReservation:"<<finishingReservation<<" startingReservation:"<<startingReservation;
-    if (finishingReservation || startingReservation) return;
-
-    Azahar *myDb = new Azahar;
-    myDb->setDatabase(db);
-    ReservationsDialog *dlg = new ReservationsDialog(this, drawer, loggedUserId);
-    dlg->setDb(db);
-
-    if (dlg->exec()) {
-        // Until now, the transaction has the total of totalREAL - reservation.payment.
-        // When doing the finishTransaction we need to update the total to the REAL TOTAL only
-        // We can use a flag to indicate to do such thing on the finishCurrentTransaction() method.
-        startingReservation = false;
-        finishingReservation= true;
-        
-        //get data
-        QList<ProductInfo>      pList = dlg->getProductsList();
-        qulonglong trNumber           = dlg->getSelectedTransaction();
-        qulonglong clientId           = dlg->getSelectedClient();
-        reservationPayment            = dlg->getReservationPayment();
-        reservationId                 = dlg->getSelectedReservation();
-        //Check if there is a transaction, and suspend it before resume the reservation.
-        suspendSale();
-        currentTransaction = trNumber;
-        
-        emit signalUpdateTransactionInfo();
-        clientInfo = myDb->getClientInfo(clientId);
-        int idx = ui_mainview.comboClients->findText(clientInfo.name,Qt::MatchCaseSensitive);
-        if (idx>-1) ui_mainview.comboClients->setCurrentIndex(idx);
-        updateClientInfo();
-        refreshTotalLabel();
-        //HERE the availability does not matter, the item is Physically Reserved.
-        //FIXME: Consider the total amount when reserved, because product price could be changed.
-        foreach(ProductInfo info, pList) {
-            QString qtyXcode = QString::number(info.qtyOnList) + "*" + info.code;
-            availabilityDoesNotMatters = true;
-            insertItem(qtyXcode);
-            availabilityDoesNotMatters = false;
-        }
-        doNotAddMoreItems = true;
-        qDebug()<<"DoNotAddMoreItems = "<<doNotAddMoreItems;
-        updateBalance(false);
-        updateTransaction();
-
-        // Next is a comment for the time the transaction is fihising
-        // TODO PRINT TICKET:
-        //    When printing ticket, the total is for the total value of the products (without the reservation payment).
-        //    We need (for accountants) the total to be real on the transaction info.
-        //    But, write a note on the ticket saying that a reservation payment of $X.XX was done.
-    }
-    delete myDb;
-}
-
-void lemonView::postponeReservation()
-{
-    //this is to save the transaction with the tReserved state, instead of cancelTransaction.
-    Azahar *myDb = new Azahar;
-    myDb->setDatabase(db);
-
-    myDb->setTransactionReservationStatus(getCurrentTransaction());
-    delete myDb;
-}
 
 //-----------CREDITS-----------------
 

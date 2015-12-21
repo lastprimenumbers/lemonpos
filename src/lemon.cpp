@@ -269,40 +269,12 @@ void lemon::setupActions()
   connect(lockAction, SIGNAL(triggered(bool)), m_view, SLOT(lockScreen()));
   qDebug()<<"LockScreen shortcut:"<<lockAction->shortcuts();
 
-  QAction *suspendSaleAction = actionCollection()->addAction("suspendSale");
-  suspendSaleAction->setText(i18n("Suspend Sale"));
-  suspendSaleAction->setIcon(KIcon("lemon-suspend"));
-  suspendSaleAction->setShortcut(Qt::CTRL+Qt::Key_Backspace);
-  connect(suspendSaleAction, SIGNAL(triggered(bool)), m_view, SLOT( suspendSale() ));
-  qDebug()<<"Suspend Sale shortcut:"<<suspendSaleAction->shortcuts();
-
   QAction *oDiscAction = actionCollection()->addAction("occasionalDiscount");
   oDiscAction->setText(i18n("Change Special Order Status"));
   oDiscAction->setIcon(KIcon("lemon-money")); //TODO:CREATE ICON!
   oDiscAction->setShortcut(Qt::CTRL+Qt::Key_D);
   connect(oDiscAction, SIGNAL(triggered(bool)), m_view, SLOT( occasionalDiscount() ));
   qDebug()<<"occasionalDiscount shortcut:"<<oDiscAction->shortcuts();
-
-  QAction *resumeAction = actionCollection()->addAction("resumeSale");
-  resumeAction->setText(i18n("Resume Sale"));
-  resumeAction->setIcon(KIcon("lemon-resume"));
-  resumeAction->setShortcut(Qt::CTRL+Qt::Key_R);
-  connect(resumeAction, SIGNAL(triggered(bool)), m_view, SLOT( resumeSale() ));
-  qDebug()<<"resumeSale shortcut:"<<resumeAction->shortcuts();
-
-  QAction *makeReservationA = actionCollection()->addAction("makeReservation");
-  makeReservationA->setText(i18n("Reserve Items"));
-  makeReservationA->setIcon(KIcon("lemon-box")); //TODO:CREATE ICON!
-  makeReservationA->setShortcut(Qt::ALT + Qt::Key_R); // Qt::ALT is the left ALT key ( not the Alt Gr )
-  connect(makeReservationA, SIGNAL(triggered(bool)), m_view, SLOT( reserveItems() ));
-  qDebug()<<"makeReservation shortcut:"<<makeReservationA->shortcuts();
-
-  QAction *resumeRAction = actionCollection()->addAction("resumeReservation");
-  resumeRAction->setText(i18n("Reservations"));
-  resumeRAction->setIcon(KIcon("lemon-box")); //TODO:CREATE ICON!
-  resumeRAction->setShortcut(Qt::CTRL+Qt::SHIFT+Qt::Key_R);
-  connect(resumeRAction, SIGNAL(triggered(bool)), m_view, SLOT( resumeReservation() ));
-  qDebug()<<"Reservations shortcut:"<<resumeRAction->shortcuts();
 
   QAction *showCreditsAction = actionCollection()->addAction("showCredits");
   showCreditsAction->setText(i18n("Show Credits"));
@@ -554,17 +526,6 @@ void lemon::disableUi()
   action->setDisabled(true);
   action = actionCollection()->action("occasionalDiscount");
   action->setDisabled(true);
-  
-  action = actionCollection()->action("suspendSale");
-  action->setDisabled(true);
-  action = actionCollection()->action("resumeSale");
-  action->setDisabled(true);
-
-  action = actionCollection()->action("makeReservation");
-  action->setDisabled(true);
-
-  action = actionCollection()->action("resumeReservation");
-  action->setDisabled(true);
 
   action = actionCollection()->action("showCredits");
   action->setDisabled(true);
@@ -627,24 +588,9 @@ void lemon::enableUi()
   action = actionCollection()->action("occasionalDiscount");
   action->setEnabled(true);
 
-  action = actionCollection()->action("suspendSale");
-  action->setEnabled(true);
-  action = actionCollection()->action("resumeSale");
-  action->setEnabled(true);
-
-  action = actionCollection()->action("resumeReservation");
-  action->setEnabled(true);
-
-  action = actionCollection()->action("makeReservation");
-  action->setEnabled(true);
-
   action = actionCollection()->action("showCredits");
   action->setEnabled(true);
   
-  if (m_view->canStartSelling()) {
-//     action = actionCollection()->action("suspendSale");
-//     action->setEnabled(true);
-  }
 }
 
 void lemon::disableConfig()

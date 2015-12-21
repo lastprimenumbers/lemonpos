@@ -264,23 +264,6 @@ bool PrintCUPS::printSmallBalance(const PrintBalanceInfo &pbInfo, QPrinter &prin
   painter.setPen(QPen(Qt::darkGray, 1, Qt::SolidLine, Qt::FlatCap, Qt::RoundJoin));
   painter.drawLine(Margin, yPos, printer.width()-Margin,yPos);
 
-
-  //Draw the Note about Reservations ( amount > paid )
-  if (drawNote) {
-      yPos = yPos + fm.lineSpacing()*2;
-      painter.setPen(QPen(normalPen));
-      fm = painter.fontMetrics();
-      text = "* " + pbInfo.reservationNote;
-      // Adjust text width
-      double maxLen = (printer.width())-Margin*1.5;
-      QStringList tmpStr = Misc::stringToParagraph( text , fm, maxLen );
-      foreach(QString str, tmpStr) {
-          painter.drawText(Margin, yPos, str);
-          yPos = yPos + fm.lineSpacing();
-      }
-      
-  }
-
   //NOTE: Print a note for the payment type.
   yPos = yPos + fm.lineSpacing()*2;
   painter.drawText(Margin, yPos, "** "+ pbInfo.notCashNote);
@@ -488,24 +471,6 @@ bool PrintCUPS::printSmallTicket(const PrintTicketInfo &ptInfo, QPrinter &printe
   painter.drawText(Margin, yPos, text);
   yPos = yPos + 2*fm.lineSpacing();
 
-  //Print a RESERVATION header if is a starting Reservation.
-  if (ptInfo.ticketInfo.isAReservation && ptInfo.ticketInfo.reservationStarted && !ptInfo.ticketInfo.hasSpecialOrders) {
-      tmpFont = QFont("Bitstream Vera Sans", textSize);
-      tmpFont.setItalic(true);
-      tmpFont.setBold(true);
-      painter.setFont(tmpFont);
-      fm = painter.fontMetrics();
-      text = ptInfo.hdrReservation;
-      textWidth = fm.size(Qt::TextExpandTabs | Qt::TextDontClip, text);
-      painter.drawText((printer.width()/2)-(textWidth.width()/2), yPos, text);
-      yPos = yPos + fm.lineSpacing();
-      text =  QString::number(ptInfo.ticketInfo.reservationId);
-      textWidth = fm.size(Qt::TextExpandTabs | Qt::TextDontClip, text);
-      painter.drawText((printer.width()/2)-(textWidth.width()/2), yPos , text); //+textWidth.height()
-      yPos = yPos + fm.lineSpacing()*2;
-  }
-
-
   painter.setPen(Qt::black);
   tmpFont = QFont("Bitstream Vera Sans", textSize);
   tmpFont.setItalic(false);
@@ -680,151 +645,46 @@ bool PrintCUPS::printSmallTicket(const PrintTicketInfo &ptInfo, QPrinter &printe
     text = ptInfo.thArticles;
     painter.drawText(Margin, Margin + yPos , text);
     yPos = yPos + fm.lineSpacing();
-
-    //RESERVATION STUFF
-    bool isAReservation = ptInfo.ticketInfo.isAReservation;
-    double resPayment   = ptInfo.ticketInfo.reservationPayment;
-    if (isAReservation  && !ptInfo.ticketInfo.hasSpecialOrders) {
-        QLocale locale;
-        QString sp; QString spQty;
-        tmpFont = QFont("Bitstream Vera Sans", textSize);
-        tmpFont.setWeight(QFont::Bold);
-        painter.setFont(tmpFont);
-        fm = painter.fontMetrics();
-        yPos = yPos + Margin; //just a small space..
-        // PURCHASE AMOUNT
-        sp     = ptInfo.resTotalAmountStr;
-        spQty  = locale.toString(ptInfo.ticketInfo.purchaseTotal, 'f',2);
-        textWidth = fm.size(Qt::TextExpandTabs | Qt::TextDontClip, sp);
-        painter.drawText(printer.width()-(printer.width()/3)-textWidth.width(), Margin+yPos, sp);
-        textWidth = fm.size(Qt::TextExpandTabs | Qt::TextDontClip, spQty);
-        painter.drawText((printer.width() - textWidth.width() - Margin), Margin+yPos, spQty);
-        yPos = yPos + fm.lineSpacing();
-        // PRE PAYMENT.
-        sp     = ptInfo.paymentStrPrePayment;
-        spQty  = locale.toString(resPayment,'f',2); // THE AMOUNT PRE PAID
-        textWidth = fm.size(Qt::TextExpandTabs | Qt::TextDontClip, sp);
-        painter.drawText(printer.width()-(printer.width()/3)-textWidth.width(), Margin+yPos, sp);
-        textWidth = fm.size(Qt::TextExpandTabs | Qt::TextDontClip, spQty);
-        painter.drawText((printer.width() - textWidth.width() - Margin), Margin+yPos, spQty);
-        yPos = yPos + fm.lineSpacing()*3;
-    }
-    
-    // NOW SPECIAL ORDERS STUFF
-    //BEGIN The PRE-PAYMENT/NEXT-PAYMENT DATA.
-    bool isSO = ptInfo.ticketInfo.hasSpecialOrders;
-    bool isCompletingSO = ptInfo.ticketInfo.completingSpecialOrder;
-    QLocale locale;
-    if (isSO) {
-      QString sp; QString sp2; QString spQty; QString sp2Qty;
-      if (isCompletingSO) {
-        sp     = ptInfo.paymentStrComplete;
-        spQty  = locale.toString(ptInfo.ticketInfo.total,'f',2); // THE DEBT of the SO.
-        sp2    = ptInfo.lastPaymentStr;
-        sp2Qty = locale.toString(ptInfo.ticketInfo.soTotal - ptInfo.ticketInfo.total , 'f',2); // the prepayment
-      }
-      else {
-        // SO is in pre payment
-        sp = ptInfo.paymentStrPrePayment;
-        spQty  = locale.toString(ptInfo.ticketInfo.total, 'f',2); // prepayment
-        sp2    = ptInfo.nextPaymentStr;
-        sp2Qty = locale.toString(ptInfo.ticketInfo.soTotal-ptInfo.ticketInfo.total, 'f',2); // Next payment
-      }
-      if (!isSO) sp  = ""; ///hack!
-      //change font for the PAYMENT MSG
-      tmpFont = QFont("Bitstream Vera Sans", textSize );
-      tmpFont.setWeight(QFont::Bold);
-      painter.setFont(tmpFont);
-      fm = painter.fontMetrics();
-      textWidth = fm.size(Qt::TextExpandTabs | Qt::TextDontClip, sp);
-      painter.drawText(printer.width()-(printer.width()/3)-textWidth.width(), Margin+yPos, sp);
-      textWidth = fm.size(Qt::TextExpandTabs | Qt::TextDontClip, spQty);
-      painter.drawText((printer.width() - textWidth.width() - Margin), Margin+yPos, spQty);
-      yPos = yPos + fm.lineSpacing();
-      //print the negative qty for the payment.
-      // The negative qty is one of the next:
-      //     * When completing the SO: the amount of the pre-payment.
-      //     * When starting the SO:   the remaining amount to pay.
-      sp2 = (ptInfo.ticketInfo.soTotal-ptInfo.ticketInfo.total >0) ? sp2 : "";
-      if (!isSO) sp2  = ""; ///hack!
-      textWidth = fm.size(Qt::TextExpandTabs | Qt::TextDontClip, sp2);
-      painter.drawText(printer.width()-(printer.width()/3)-textWidth.width(), Margin+yPos, sp2);
-      textWidth = fm.size(Qt::TextExpandTabs | Qt::TextDontClip, sp2Qty);
-      painter.drawText((printer.width() - textWidth.width() - Margin), Margin+yPos, sp2Qty);
-      yPos = yPos + fm.lineSpacing();
-      ///Check for delivery date and if its a SO
-      if (isSO) {
-        sp = ptInfo.deliveryDateStr; // + deliveryDT.toString("ddd d MMMM, h:m ap"); //TODO:hey i18n stuff!!!
-        tmpFont = QFont("Bitstream Vera Sans", textSize );
-        tmpFont.setWeight(QFont::Bold);
-        painter.setFont(tmpFont);
-        fm = painter.fontMetrics();
-        textWidth = fm.size(Qt::TextExpandTabs | Qt::TextDontClip, sp);
-        painter.drawText(printer.width()-(printer.width()/3)-textWidth.width(), Margin+yPos, sp);
-        sp = ptInfo.ticketInfo.deliveryDT.toString("ddd d MMM");
-        textWidth = fm.size(Qt::TextExpandTabs | Qt::TextDontClip, sp);
-        painter.drawText((printer.width() - textWidth.width() - Margin), Margin+yPos, sp);
-        sp = ptInfo.ticketInfo.deliveryDT.toString("h:m ap");
-        yPos = yPos + fm.lineSpacing();
-        textWidth = fm.size(Qt::TextExpandTabs | Qt::TextDontClip, sp);
-        painter.drawText((printer.width() - textWidth.width() - Margin), Margin+yPos, sp);
-        yPos = yPos + fm.lineSpacing();
-      }
-      yPos = yPos + fm.lineSpacing()*2;
-      //END The PRE-PAYMENT/NEXT-PAYMENT DATA.
-    }
     
     tmpFont = QFont("Bitstream Vera Sans", textSize );
     tmpFont.setWeight(QFont::Normal);
     painter.setFont(tmpFont);
     fm = painter.fontMetrics();
 
-    //NOTE:
-    //When starting a reservation, the amount paid is only an advance payment, not the whole.
-    //When complelting the reservation (payment) the taxes are added to the remaining amount to pay.
-    //So, when starting the reservation, we do not print details about taxes (subtotal taxes and total)
-    //because those amounts will not check.
-    //When completing reservation, the details WILL be printed.
-    //ALSO SEE NOTE on the balance printing when are reservations in the transactions.
-    bool printDetails = true;
-    if (ptInfo.ticketInfo.isAReservation && ptInfo.ticketInfo.reservationStarted)
-        printDetails = false;
-    
-    if ( printDetails ) {
-        //subtotals
-        textWidth = fm.size(Qt::TextExpandTabs | Qt::TextDontClip, ptInfo.thSubtotal);
-        painter.drawText(printer.width()-(printer.width()/3)-textWidth.width(), Margin+yPos, ptInfo.thSubtotal);
-        textWidth = fm.size(Qt::TextExpandTabs | Qt::TextDontClip, ptInfo.subtotal);
-        painter.drawText((printer.width() - textWidth.width() - Margin), Margin+yPos, ptInfo.subtotal);
+    //subtotals
+    textWidth = fm.size(Qt::TextExpandTabs | Qt::TextDontClip, ptInfo.thSubtotal);
+    painter.drawText(printer.width()-(printer.width()/3)-textWidth.width(), Margin+yPos, ptInfo.thSubtotal);
+    textWidth = fm.size(Qt::TextExpandTabs | Qt::TextDontClip, ptInfo.subtotal);
+    painter.drawText((printer.width() - textWidth.width() - Margin), Margin+yPos, ptInfo.subtotal);
+    yPos = yPos + fm.lineSpacing();
+    if (ptInfo.totDisc >0) {
+        textWidth = fm.size(Qt::TextExpandTabs | Qt::TextDontClip, ptInfo.thDiscount);
+        painter.drawText(printer.width()-(printer.width()/3)-textWidth.width(), Margin+yPos, ptInfo.thDiscount);
+        textWidth = fm.size(Qt::TextExpandTabs | Qt::TextDontClip, ptInfo.tDisc);
+        painter.drawText((printer.width() - textWidth.width() - Margin), Margin+yPos, ptInfo.tDisc);
         yPos = yPos + fm.lineSpacing();
-        if (ptInfo.totDisc >0) {
-            textWidth = fm.size(Qt::TextExpandTabs | Qt::TextDontClip, ptInfo.thDiscount);
-            painter.drawText(printer.width()-(printer.width()/3)-textWidth.width(), Margin+yPos, ptInfo.thDiscount);
-            textWidth = fm.size(Qt::TextExpandTabs | Qt::TextDontClip, ptInfo.tDisc);
-            painter.drawText((printer.width() - textWidth.width() - Margin), Margin+yPos, ptInfo.tDisc);
-            yPos = yPos + fm.lineSpacing();
-        }
-        //taxes
-   //   textWidth = fm.size(Qt::TextExpandTabs | Qt::TextDontClip, ptInfo.thTax);
-   //     painter.drawText(printer.width()-(printer.width()/3)-textWidth.width(), Margin+yPos, ptInfo.thTax);
-//        textWidth = fm.size(Qt::TextExpandTabs | Qt::TextDontClip, ptInfo.taxes);
-//        painter.drawText((printer.width() - textWidth.width() - Margin), Margin+yPos, ptInfo.taxes);
-//        yPos = yPos + fm.lineSpacing();
-       //draw a total line
-        painter.setPen(QPen(Qt::darkGray, 1, Qt::SolidLine, Qt::FlatCap, Qt::RoundJoin));
-        painter.drawLine((printer.width() - (printer.width()/3)) , Margin + yPos - 8, printer.width()-Margin, Margin + yPos - 8);
-        yPos = yPos + fm.lineSpacing();
-        painter.setPen(QPen(Qt::black, 1, Qt::SolidLine, Qt::FlatCap, Qt::RoundJoin));
-        //grand total
-        tmpFont = QFont("Bitstream Vera Sans", textSize );
-        tmpFont.setWeight(QFont::Bold);
-        painter.setFont(tmpFont);
-        fm = painter.fontMetrics();
-        textWidth = fm.size(Qt::TextExpandTabs | Qt::TextDontClip, ptInfo.thTotal);
-        painter.drawText(printer.width()-(printer.width()/3)-textWidth.width(), Margin+yPos, ptInfo.thTotal);
-        textWidth = fm.size(Qt::TextExpandTabs | Qt::TextDontClip, ptInfo.thTotals);
-        painter.drawText((printer.width() - textWidth.width() - Margin), Margin+yPos, ptInfo.thTotals);
     }
+    //taxes
+    //   textWidth = fm.size(Qt::TextExpandTabs | Qt::TextDontClip, ptInfo.thTax);
+    //     painter.drawText(printer.width()-(printer.width()/3)-textWidth.width(), Margin+yPos, ptInfo.thTax);
+    //        textWidth = fm.size(Qt::TextExpandTabs | Qt::TextDontClip, ptInfo.taxes);
+    //        painter.drawText((printer.width() - textWidth.width() - Margin), Margin+yPos, ptInfo.taxes);
+    //        yPos = yPos + fm.lineSpacing();
+    //draw a total line
+    painter.setPen(QPen(Qt::darkGray, 1, Qt::SolidLine, Qt::FlatCap, Qt::RoundJoin));
+    painter.drawLine((printer.width() - (printer.width()/3)) , Margin + yPos - 8, printer.width()-Margin, Margin + yPos - 8);
+    yPos = yPos + fm.lineSpacing();
+    painter.setPen(QPen(Qt::black, 1, Qt::SolidLine, Qt::FlatCap, Qt::RoundJoin));
+    //grand total
+    tmpFont = QFont("Bitstream Vera Sans", textSize );
+    tmpFont.setWeight(QFont::Bold);
+    painter.setFont(tmpFont);
+    fm = painter.fontMetrics();
+    textWidth = fm.size(Qt::TextExpandTabs | Qt::TextDontClip, ptInfo.thTotal);
+    painter.drawText(printer.width()-(printer.width()/3)-textWidth.width(), Margin+yPos, ptInfo.thTotal);
+    textWidth = fm.size(Qt::TextExpandTabs | Qt::TextDontClip, ptInfo.thTotals);
+    painter.drawText((printer.width() - textWidth.width() - Margin), Margin+yPos, ptInfo.thTotals);
+
     
     yPos = yPos + fm.lineSpacing()*2;
     // Tendered with and change
@@ -1781,175 +1641,3 @@ bool PrintCUPS::printBigLowStockReport(const PrintLowStockInfo &plInfo, QPrinter
   result = painter.end();
   return result;
 }
-
-bool PrintCUPS::printSmallSOTicket(const PrintTicketInfo &ptInfo, QPrinter &printer)
-{
-  bool result = false;
-  // calculate font size
-  const int headerSize = printer.width()/16; //divisor found by trying, maybe has to do with font metrics?
-  const int textSize = headerSize/2; //i think the half of header size is ok
-  qDebug()<<"Paper Width: "<<printer.widthMM()<<"mm"<<"; Page Width: "<<printer.width()<<"; calculated headerSize: "<<headerSize;
-  
-  QFont header = QFont("Impact", headerSize);
-  const int Margin = printer.width()/40;
-  int yPos = 0;
-  QPainter painter;
-  painter.begin( &printer );
-  QFontMetrics fm = painter.fontMetrics();
-  
-  //NOTE from Qt for the drawText: The y-position is used as the baseline of the font
-  // Header
-  QFont tmpFont = QFont("Bitstream Vera Sans", textSize);
-  QPen normalPen = painter.pen();
-  QString text;
-  QSize textWidth;
-  // Store Name
-  painter.setFont(header);
-  yPos = Margin + painter.fontMetrics().height();
-
-  painter.setFont(header);
-  fm = painter.fontMetrics();
-  text = ptInfo.storeName;
-  textWidth = fm.size(Qt::TextExpandTabs | Qt::TextDontClip, text);
-  painter.drawText((printer.width()/2)-(textWidth.width()/2),yPos, text);
-
-  tmpFont.setItalic(false);
-  painter.setFont(tmpFont);
-  fm = painter.fontMetrics();
-  yPos = yPos + fm.lineSpacing()*2;
-  //Date, Ticket number
-  painter.setPen(normalPen);
-  text = ptInfo.thDate ;
-  textWidth = fm.size(Qt::TextExpandTabs | Qt::TextDontClip, text);
-  painter.drawText(Margin, yPos, text);
-  //change font for ticket number... bigger. Check for really big numbers to fit the page.
-  tmpFont = QFont("Bitstream Vera Sans", textSize+3);
-  tmpFont.setItalic(false);
-  tmpFont.setBold(true);
-  painter.setFont(tmpFont);
-  fm = painter.fontMetrics();
-  text = ptInfo.thTicket;
-  textWidth = fm.size(Qt::TextExpandTabs | Qt::TextDontClip, text);
-  painter.drawText(printer.width() - textWidth.width() - Margin, yPos, text);
-  //change font again
-  tmpFont = QFont("Bitstream Vera Sans", textSize);
-  tmpFont.setItalic(false);
-  tmpFont.setBold(false);
-  painter.setFont(tmpFont);
-  fm = painter.fontMetrics();
-  yPos = yPos + fm.lineSpacing();
-  //Vendor, terminal number
-  text = ptInfo.salesPerson + ", " + ptInfo.terminal;
-  textWidth = fm.size(Qt::TextExpandTabs | Qt::TextDontClip, text);
-  painter.drawText(Margin, yPos, text);
-  yPos = yPos + 3*fm.lineSpacing();
-  // Products Subheader
-
-  int offsetQty = printer.width()/5;
-  tmpFont.setWeight(QFont::Bold);
-  painter.setFont(tmpFont);
-  fm = painter.fontMetrics();
-  text = ptInfo.thProduct;
-  while (fm.size(Qt::TextExpandTabs | Qt::TextDontClip, text).width() >= offsetQty*4 ) { text.chop(2); }
-  painter.drawText(Margin,yPos, text);
-  text = ptInfo.thQty;
-  painter.drawText(offsetQty*4, yPos, text);
-  yPos = yPos + fm.lineSpacing();
-  
-  painter.drawLine(Margin, yPos, printer.width()-Margin, yPos);
-  painter.setPen(normalPen);
-  tmpFont = QFont("Bitstream Vera Sans", textSize );
-  painter.setFont(tmpFont);
-  yPos = yPos + fm.lineSpacing();
-  // End of Header Information.
-
-  // Content : Each product
-  QLocale localeForPrinting;
-  for (int i = 0; i < ptInfo.ticketInfo.lines.size(); ++i)
-  {
-    TicketLineInfo tLine = ptInfo.ticketInfo.lines.at(i);
-    QString  idesc =  tLine.desc;
-    QString iqty   =  localeForPrinting.toString(tLine.qty, 'f', 2);
-    bool isGroup = ptInfo.ticketInfo.lines.at(i).isGroup;
-    QString sp;
-    QDateTime deliveryDT = ptInfo.ticketInfo.lines.at(i).deliveryDateTime;
-    // We must be aware of the locale. europe uses ',' instead of '.' as the decimals separator.
-    // note: QLocale has a method that does this locale aware! if the locale is set correctly
-    if (iqty.endsWith(".00") || iqty.endsWith(",00")) { iqty.chop(3); iqty += "   ";}//we chop the trailing zeroes...
-    iqty = iqty;
-    tmpFont.setBold(true);
-    painter.setFont(tmpFont);
-    fm = painter.fontMetrics();
-    text = idesc;
-    while (fm.size(Qt::TextExpandTabs | Qt::TextDontClip, text).width() >= offsetQty*2 ) { text.chop(2); }
-    painter.drawText(Margin, yPos, text); //first product description...
-    text = iqty;
-    tmpFont.setBold(false);
-    painter.setFont(tmpFont);
-    fm = painter.fontMetrics();
-    painter.drawText(offsetQty*4, yPos, text);
-    yPos = yPos + fm.lineSpacing();
-      //check if there is a Special Order, to print contents
-      if ( !tLine.geForPrint.isEmpty() ) {
-        //QStringList strList = tLine.geForPrint.split("|");
-        //strList.removeFirst();
-        QStringList tmpList = tLine.geForPrint.split("|");
-        QStringList strList;
-        tmpList.removeFirst();
-        //check text lenght
-        double maxL = ((printer.width())-Margin*2);
-        foreach(QString strTmp, tmpList) {
-          fm = painter.fontMetrics();
-          QString strCopy = strTmp;
-          double realTrozos = fm.size(Qt::TextExpandTabs | Qt::TextDontClip, strTmp).width() / maxL;
-          int trozos   = realTrozos;
-          double diff = (realTrozos - trozos);
-          if (diff > 0.25 && trozos > 0) trozos += 1;
-          int tamTrozo = 0;
-          if (trozos > 0) {
-            tamTrozo = (strTmp.length()/trozos);
-          } else {
-            tamTrozo = strTmp.length();
-          }
-          
-          QStringList otherList;
-          for (int x = 1; x <= trozos; x++) {
-            //we repeat for each trozo
-            if (x*(tamTrozo-1) < strCopy.length())
-              strCopy.insert(x*(tamTrozo-1), "|  "); //create a section
-              otherList = strCopy.split("|");
-          }
-          if (!otherList.isEmpty()) strList << otherList;
-          if (trozos < 1) strList << strTmp;
-          //qDebug()<<"Trozos:"<<trozos<<" tamTrozo:"<<tamTrozo<<" realTrozos:"<<QString::number(realTrozos,'f', 2)<<" maxL:"<<maxL<<" strTmp.width in pixels:"<<fm.size(Qt::TextExpandTabs | Qt::TextDontClip, strTmp).width()<<" diff:"<<diff;
-        }
-
-
-        foreach(QString str/*Tmp*/, strList) {
-          painter.drawText(Margin, yPos, str/*Tmp*/);
-          yPos = yPos + fm.lineSpacing();
-        }
-        ///Check for delivery date and if its a SO
-        if (!isGroup && tLine.payment>0 ) {
-          sp = ptInfo.deliveryDateStr + deliveryDT.toString("  ddd d MMMM, h:m ap"); //TODO FIXME:hey i18n stuff!!!
-          tmpFont.setBold(true);
-          painter.setFont(tmpFont);
-          fm = painter.fontMetrics();
-          painter.drawText(Margin, yPos, sp);
-          yPos = yPos + fm.lineSpacing();
-          tmpFont.setBold(false);
-          painter.setFont(tmpFont);
-          fm = painter.fontMetrics();
-          yPos = yPos + fm.lineSpacing();
-        }
-        yPos = yPos + fm.lineSpacing();
-      }
-  } //for each item
-  
-  painter.drawLine(Margin, yPos, printer.width()-Margin, yPos);
-  
-  result = painter.end();// this makes the print job start
-  
-  return result;
-}
-

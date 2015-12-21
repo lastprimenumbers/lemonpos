@@ -212,8 +212,6 @@ void squeeze::enableUI()
     action->setEnabled(true);
     action = actionCollection()->action("currenciesBrowse");
     action->setEnabled(true);
-    action = actionCollection()->action("reservationsBrowse");
-    action->setEnabled(true);
   }
   qDebug()<<"Enabling others..";
   action = actionCollection()->action("usersBrowse");
@@ -276,8 +274,6 @@ void squeeze::disableUI()
   action = actionCollection()->action("printEndOfDay");
   action->setDisabled(true);
   action = actionCollection()->action("currenciesBrowse");
-  action->setDisabled(true);
-  action = actionCollection()->action("reservationsBrowse");
   action->setDisabled(true);
   
 }
@@ -443,12 +439,6 @@ void squeeze::setupActions()
     action->setIcon(KIcon("lemon-money"));
     action->setShortcut(Qt::ALT+Qt::Key_C);
     connect(action, SIGNAL(triggered(bool)),m_view, SLOT(showCurrencies()));
-
-    action = actionCollection()->addAction( "reservationsBrowse" );
-    action->setText(i18n("View Reservations"));
-    action->setIcon(KIcon("lemon-box"));
-    action->setShortcut(Qt::ALT+Qt::Key_R);
-    connect(action, SIGNAL(triggered(bool)),m_view, SLOT(showReservations()));
 
 }
 

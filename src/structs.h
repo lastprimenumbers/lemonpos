@@ -531,17 +531,6 @@ struct CurrencyInfo
     double  factor;
 };
 
-struct ReservationInfo
-{
-    qulonglong id;
-    qulonglong transaction_id;
-    qulonglong client_id;
-    QDate      date;
-    double     payment;
-    double     total;
-    double     totalTaxes;
-    int        status;
-};
 
 struct CreditInfo
 {

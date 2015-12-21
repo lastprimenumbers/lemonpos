@@ -43,9 +43,6 @@ class PrintCUPS {
     static bool printSmallLowStockReport(const PrintLowStockInfo &plInfo, QPrinter &printer);
     static bool printBigLowStockReport(const PrintLowStockInfo &plInfo, QPrinter &printer);
 
-    static bool printSmallSOTicket(const PrintTicketInfo &ptInfo, QPrinter &printer); //NOTE Apr 14 2011: Fixed page/font size.
-
-    //static bool printSmallReservationTicket(const PrintTicketInfo &ptInfo, QPrinter &printer); //NOTE:WHAT ABOUT THIS!
 };
 
 #endif

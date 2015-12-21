@@ -247,15 +247,6 @@ class Azahar : public QObject
     void        setConfigUseCUPS(bool yes);
     void        setConfigLogoOnTop(bool yes);
 
-    //Reservations
-    qulonglong              insertReservation(ReservationInfo info);
-    bool                    setReservationStatus(qulonglong id, reservationState state);
-    double                  getReservationTotalAmount(qulonglong id);
-    double                  getReservationPayment(qulonglong id);
-    bool                    setTransactionReservationStatus(const qulonglong &trId);
-    ReservationInfo         getReservationInfo(const qulonglong &id);
-    ReservationInfo         getReservationInfoFromTr(const qulonglong &trId);
-
     //Random Msgs
     QString   getRandomMessage(QList<qulonglong> &excluded, const int &season);
               //NOTE:We will modify excluded list.. SO do not make const the List.
