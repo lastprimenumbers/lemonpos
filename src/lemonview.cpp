@@ -1068,10 +1068,7 @@ void lemonView::refreshTotalLabel()
     Azahar *myDb = new Azahar;
     CreditInfo credit;
     myDb->setDatabase(db);
-//    paid=clientInfo.monthly-credit.total;
-//   // qDebug()<<"PAID (credit.total):"<<paid;
-//           //<<"TOTSUM:"<<totalSum;
-     if (isNum) change = myDb->getClientCredit(clientInfo,totalSum); else change = 0.0;
+    if (isNum) change = myDb->getClientCredit(clientInfo,totalSum); else change = 0.0;
 
     
     if (reservationPayment > 0) qDebug()<<" RESERVATION PAYMENT:"<<reservationPayment;
@@ -3779,17 +3776,26 @@ void lemonView::setupClients()
 void lemonView::comboClientsOnChange(int idx)
 {
   QString newClientName    = ui_mainview.comboClients->currentText();
+  ClientInfo newClientInfo;
   int newClientIdx = ui_mainview.comboClients->itemData(idx).toInt();
   qDebug()<<"Client info changed by user.";
   qDebug()<<"comboClientsOnChange"<<newClientIdx<<newClientName;
   if (clientsHash.contains(newClientIdx)) {
-    clientInfo = clientsHash.value(newClientIdx);
+    newClientInfo = clientsHash.value(newClientIdx);
+    if (newClientInfo.code == clientInfo.code) {
+        qDebug()<<"Avoid double client selection";
+        return;
+    }
+    clientInfo = newClientInfo;
     qDebug()<<"OK comboClientsOnChange"<<clientInfo.id<<clientInfo.name<<clientInfo.monthly;
     Azahar *myDb = new Azahar;
     myDb->setDatabase(db);
     clientInfo=myDb->getClientInfo(newClientIdx);
+    qDebug()<<"OK comboClientsOnChange getClientInfo";
     updateClientInfo();
+    qDebug()<<"OK comboClientsOnChange updateClientInfo";
     refreshTotalLabel();
+    qDebug()<<"OK comboClientsOnChange refreshTotalLabel";
     ui_mainview.editItemCode->setFocus();
     qDebug()<<"FINE comboClients";
   }
