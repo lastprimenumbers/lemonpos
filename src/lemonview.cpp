@@ -3799,15 +3799,16 @@ void lemonView::setupHistoryTicketsModel()
   //qDebug()<<"Db name:"<<db.databaseName()<<", Tables:"<<db.tables();
   if (historyTicketsModel->tableName().isEmpty()) {
 //    if (!db.isOpen()) db.open();
-    historyTicketsModel->setTable("v_transactions");
-    historyTicketsModel->setRelation(historyTicketsModel->fieldIndex("clientid"), QSqlRelation("clients", "id", "name"));
-    historyTicketsModel->setRelation(historyTicketsModel->fieldIndex("userid"), QSqlRelation("users", "id", "username"));
+    historyTicketsModel->setTable("v2_transactions");
+    // Severe QT bug: setRelation will cause the loading of the ENTIRE clients and users tables!!! Extremely slow. Fixed by modifying the view.
+//    historyTicketsModel->setRelation(historyTicketsModel->fieldIndex("clientid"), QSqlRelation("clients", "id", "name"));
+//    historyTicketsModel->setRelation(historyTicketsModel->fieldIndex("userid"), QSqlRelation("users", "id", "username"));
     historyTicketsModel->setJoinMode(QSqlRelationalTableModel::LeftJoin);
 
     historyTicketsModel->setHeaderData(historyTicketsModel->fieldIndex("id"), Qt::Horizontal, i18n("Tr"));
-    historyTicketsModel->setHeaderData(historyTicketsModel->fieldIndex("clientid"), Qt::Horizontal, i18n("Client"));
+    historyTicketsModel->setHeaderData(historyTicketsModel->fieldIndex("clientname"), Qt::Horizontal, i18n("Client"));
     historyTicketsModel->setHeaderData(historyTicketsModel->fieldIndex("datetime"), Qt::Horizontal, i18n("Date"));
-    historyTicketsModel->setHeaderData(historyTicketsModel->fieldIndex("userid"), Qt::Horizontal, i18n("User"));
+    historyTicketsModel->setHeaderData(historyTicketsModel->fieldIndex("username"), Qt::Horizontal, i18n("User"));
     historyTicketsModel->setHeaderData(historyTicketsModel->fieldIndex("itemcount"), Qt::Horizontal, i18n("Items"));
     historyTicketsModel->setHeaderData(historyTicketsModel->fieldIndex("amount"), Qt::Horizontal, i18n("Total"));
     historyTicketsModel->setHeaderData(historyTicketsModel->fieldIndex("disc"), Qt::Horizontal, i18n("Discount"));
@@ -3820,6 +3821,8 @@ void lemonView::setupHistoryTicketsModel()
 //    ui_mainview.ticketView->horizontalHeader()->setResizeMode(QHeaderView::Interactive);
     ui_mainview.ticketView->verticalHeader()->setResizeMode(QHeaderView::Interactive);
     ui_mainview.ticketView->setColumnHidden(historyTicketsModel->fieldIndex("date"), true);
+    ui_mainview.ticketView->setColumnHidden(historyTicketsModel->fieldIndex("clientid"), true);
+    ui_mainview.ticketView->setColumnHidden(historyTicketsModel->fieldIndex("userid"), true);
     ui_mainview.ticketView->setSelectionMode(QAbstractItemView::SingleSelection);
     ui_mainview.ticketView->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui_mainview.ticketView->setEditTriggers(QAbstractItemView::NoEditTriggers);
@@ -3841,7 +3844,7 @@ void lemonView::setupTicketView()
   int portion = tableSize.width()/7;
   ui_mainview.ticketView->horizontalHeader()->setResizeMode(QHeaderView::Interactive);
   ui_mainview.ticketView->horizontalHeader()->resizeSection(historyTicketsModel->fieldIndex("id"), portion);
-  ui_mainview.ticketView->horizontalHeader()->resizeSection(historyTicketsModel->fieldIndex("name"), portion);
+  ui_mainview.ticketView->horizontalHeader()->resizeSection(historyTicketsModel->fieldIndex("clientname"), portion);
   ui_mainview.ticketView->horizontalHeader()->resizeSection(historyTicketsModel->fieldIndex("datetime"), portion);
   ui_mainview.ticketView->horizontalHeader()->resizeSection(historyTicketsModel->fieldIndex("username"), portion);
   ui_mainview.ticketView->horizontalHeader()->resizeSection(historyTicketsModel->fieldIndex("itemcount"), portion);
