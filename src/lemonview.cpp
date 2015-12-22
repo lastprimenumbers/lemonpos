@@ -282,7 +282,6 @@ lemonView::lemonView(QWidget *parent) //: QWidget(parent)
   
   operationStarted = false;
   productsHash.clear();
-  specialOrders.clear();
   clientsHash.clear();
   //ui_mainview.lblClientPhoto->hide();
   //ui_mainview.labelInsertCodeMsg->hide();
@@ -1895,7 +1894,6 @@ void lemonView::createNewTransaction(TransactionType type)
     delete myDb;
    }
   productsHash.clear();
-  specialOrders.clear();
 }
 
 void lemonView::finishCurrentTransaction()
@@ -2273,7 +2271,7 @@ void lemonView::finishCurrentTransaction()
     ticket.clientPoints = 0;
     ticket.lines = ticketLines;
     ticket.clientid = clientInfo.id;
-    ticket.hasSpecialOrders = !specialOrders.isEmpty();
+    ticket.hasSpecialOrders = false;
     if (completePayments>0)
       ticket.completingSpecialOrder = true;
     else
@@ -2713,7 +2711,6 @@ void lemonView::startAgain()
 {
   qDebug()<<"startAgain(): New Transaction";
   productsHash.clear();
-  specialOrders.clear();
   setupClients(); //clear the clientInfo (sets the default client info)
   clearUsedWidgets();
   buyPoints =0;
@@ -2748,7 +2745,6 @@ void lemonView::preCancelCurrentTransaction()
 {
   if (ui_mainview.tableWidget->rowCount()==0 ) { //empty transaction
     productsHash.clear();
-    specialOrders.clear();
     //setupClients(); //clear the clientInfo (sets the default client info)
     clearUsedWidgets();
     buyPoints =0;
@@ -2862,7 +2858,6 @@ void lemonView::cancelTransaction(qulonglong transactionNumber)
         //Reuse the transaction instead of creating a new one.
         qDebug()<<"Transaction to cancel is in progress. Clearing all to reuse transaction number...";
         productsHash.clear();
-        specialOrders.clear();
         setupClients(); //clear the clientInfo (sets the default client info)
         clearUsedWidgets();
         buyPoints =0;
@@ -4010,7 +4005,7 @@ void lemonView::showReprintTicket()
 {
   qDebug()<<"showReprintTicket setting up view...";
   ui_mainview.mainPanel->setCurrentIndex(pageReprintTicket);
-  QTimer::singleShot(500, this, SLOT(setupTicketView()));
+  QTimer::singleShot(50, this, SLOT(setupTicketView()));
   qDebug()<<"showReprintTicket  done";
 }
 

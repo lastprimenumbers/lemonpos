@@ -66,7 +66,6 @@ public:
     QSqlRelationalTableModel *productsModel;
     QSqlRelationalTableModel *offersModel;
     QSqlRelationalTableModel *cashflowModel;
-    QSqlRelationalTableModel *specialOrdersModel;
     QSqlTableModel *usersModel;
     QSqlTableModel *measuresModel;
     QSqlTableModel *categoriesModel;
@@ -95,7 +94,7 @@ public:
     int counter;
     bool modelsCreated,graphSoldItemsCreated;
     KPlotObject *objProfit, *objSales, *objMostSold, *objMostSoldB;
-    MibitFloatPanel *fpFilterTrans, *fpFilterProducts, *fpFilterBalances, *fpFilterOffers, *fpFilterSpecialOrders;
+    MibitFloatPanel *fpFilterTrans, *fpFilterProducts, *fpFilterBalances, *fpFilterOffers;
 
     QListWidgetItem *itmEndOfMonth;
     QListWidgetItem *itmGralEndOfDay;
@@ -170,10 +169,7 @@ signals:
    void showBalancesPage();
    void setupBalancesModel();
    void showCashFlowPage();
-   void showSpecialOrders();
    void setupCashFlowModel();
-   void setupSpecialOrdersModel();
-   void setSpecialOrdersFilter();
    void setupRandomMsgModel();
    void showCurrencies();
 

@@ -113,8 +113,6 @@ public:
 
     bool availabilityDoesNotMatters;
     bool doNotAddMoreItems;
-
-    QHash<qulonglong, SpecialOrderInfo> specialOrders;
     
     QSqlRelationalTableModel *historyTicketsModel;
 

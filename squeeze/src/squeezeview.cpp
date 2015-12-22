@@ -121,14 +121,14 @@ squeezeView::squeezeView(QWidget *parent)
   setupSignalConnections();
   QTimer::singleShot(1100, this, SLOT(setupDb()));
 
-  rmTimer = new QTimer(this);
-  connect(rmTimer, SIGNAL(timeout()), SLOT(reSelectModels()) );
+  //rmTimer = new QTimer(this);
+  //connect(rmTimer, SIGNAL(timeout()), SLOT(reSelectModels()) );
 
   QTimer::singleShot(2000, timerCheckDb, SLOT(start()));
   QTimer::singleShot(20000, timerUpdateGraphs, SLOT(start()));
   QTimer::singleShot(2010, this, SLOT(showWelcomeGraphs()));
   QTimer::singleShot(2000, this, SLOT(login()));
-  rmTimer->start(1000*60*2);
+  //rmTimer->start(1000*60*2);
   QTimer::singleShot(500,this, SLOT(createFloatingPanels()) );
   QTimer::singleShot(1000,this, SLOT(checkDefaultView()) );
 
@@ -194,12 +194,10 @@ void squeezeView::createFloatingPanels()
   fpFilterProducts = new MibitFloatPanel(ui_mainview.productsView, path, Top,700,200);
   fpFilterOffers   = new MibitFloatPanel(ui_mainview.tableBrowseOffers, path, Top,500,200);
   fpFilterBalances = new MibitFloatPanel(ui_mainview.balancesTable, path, Top,700,240);
-  fpFilterSpecialOrders = new MibitFloatPanel(ui_mainview.tableSO, path, Top,700,240);
   fpFilterTrans->addWidget(ui_mainview.groupFilterTransactions);
   fpFilterProducts->addWidget(ui_mainview.groupFilterProducts);
   fpFilterBalances->addWidget(ui_mainview.groupFilterBalances);
   fpFilterOffers->addWidget(ui_mainview.groupFilterOffers);
-  fpFilterSpecialOrders->addWidget(ui_mainview.groupSOFilter);
 }
 
 void squeezeView::cleanErrorLabel()
@@ -391,27 +389,14 @@ void squeezeView::setupSignalConnections()
   connect(ui_mainview.btnBalances, SIGNAL(clicked()),  SLOT(showBalancesPage()));
   connect(ui_mainview.btnTransactions, SIGNAL(clicked()),  SLOT(showTransactionsPage()));
   connect(ui_mainview.btnCashFlow, SIGNAL(clicked()),  SLOT(showCashFlowPage()));
-  connect(ui_mainview.btnSO, SIGNAL(clicked()),  SLOT(showSpecialOrders()));
 
   connect(ui_mainview.reportsList, SIGNAL(itemActivated(QListWidgetItem *)), SLOT(reportActivated(QListWidgetItem *)));
-
-  //connect actions for special orders filters
-  connect(ui_mainview.groupSOFilter, SIGNAL(toggled(bool)), this, SLOT( setSpecialOrdersFilter()) );
-  connect(ui_mainview.rbSOByDate, SIGNAL(toggled(bool)), this, SLOT( setSpecialOrdersFilter()) );
-  connect(ui_mainview.rbSOByThisWeek, SIGNAL(toggled(bool)), this, SLOT( setSpecialOrdersFilter()) );
-  connect(ui_mainview.rbSOByThisMonth, SIGNAL(toggled(bool)), this, SLOT( setSpecialOrdersFilter()) );
-  connect(ui_mainview.rbSOByStatusPending, SIGNAL(toggled(bool)), this, SLOT( setSpecialOrdersFilter()) );
-  connect(ui_mainview.rbSOByStatusReady, SIGNAL(toggled(bool)), this, SLOT( setSpecialOrdersFilter()) );
-  connect(ui_mainview.rbSOByStatusDelivered, SIGNAL( toggled(bool) ), SLOT(setSpecialOrdersFilter()));
-  connect(ui_mainview.rbSOByStatusCancelled, SIGNAL(toggled(bool)), this, SLOT( setSpecialOrdersFilter()) );
-  connect(ui_mainview.datePicker,SIGNAL(changed(const QDate &)), this, SLOT( setSpecialOrdersFilter()) );
-
 
   connect(ui_mainview.btnAddCurrency, SIGNAL(clicked()), SLOT(createCurrency()));
   connect(ui_mainview.btnDeleteCurrency, SIGNAL(clicked()), SLOT(deleteSelectedCurrency()));
 
   // Connect client filter slots
-  connect(ui_mainview.editClientsFilter, SIGNAL(textEdited(const QString &)), SLOT(updateClientFilter()));
+  connect(ui_mainview.editClientsFilter, SIGNAL(returnPressed()), SLOT(updateClientFilter()));
   connect(ui_mainview.rbClientsFilterSurname, SIGNAL(clicked()), SLOT(updateClientFilter()));
   connect(ui_mainview.rbClientsFilterName, SIGNAL(clicked()), SLOT(updateClientFilter()));
   connect(ui_mainview.rbClientsFilterId, SIGNAL(clicked()), SLOT(updateClientFilter()));
@@ -582,17 +567,6 @@ void squeezeView::showBalancesPage()
   ui_mainview.headerImg->setPixmap((DesktopIcon("lemon-balance",48)));
   ui_mainview.btnPrintBalance->show();
   QTimer::singleShot(200,fpFilterBalances, SLOT(fixPos()));
-}
-
-void squeezeView::showSpecialOrders()
-{
-  ui_mainview.stackedWidget->setCurrentIndex(pReports);
-  ui_mainview.stackedWidget2->setCurrentIndex(3);
-  if (specialOrdersModel->tableName().isEmpty()) setupSpecialOrdersModel();
-  ui_mainview.headerLabel->setText(i18n("Special Orders"));
-  ui_mainview.headerImg->setPixmap((DesktopIcon("lemon-box",48))); //FIXME: Create an icon
-  QTimer::singleShot(200,fpFilterSpecialOrders, SLOT(fixPos()));
-  ui_mainview.datePicker->setDate(QDate::currentDate());
 }
 
 
@@ -932,26 +906,39 @@ void squeezeView::setupDb()
     transactionsModel = new QSqlRelationalTableModel();
     balancesModel   = new QSqlTableModel();
     cashflowModel   = new QSqlRelationalTableModel();
-    specialOrdersModel   = new QSqlRelationalTableModel();
     randomMsgModel  = new QSqlTableModel();
     logsModel       = new QSqlRelationalTableModel();
     currenciesModel = new QSqlTableModel();
     modelsCreated   = true;
+    qDebug()<<"setupDb 0";
     setupProductsModel();
+    qDebug()<<"setupDb 1";
     setupMeasuresModel();
+    qDebug()<<"setupDb 2";
     setupClientsModel();
+    qDebug()<<"setupDb 3";
     setupDonorsModel();
+    qDebug()<<"setupDb 4";
     setupLimitsModel();
+    qDebug()<<"setupDb 5";
     setupUsersModel();
+    qDebug()<<"setupDb 6";
     setupTransactionsModel();
+    qDebug()<<"setupDb 7";
     setupCategoriesModel();
+    qDebug()<<"setupDb 8";
     setupOffersModel();
+    qDebug()<<"setupDb 9";
     setupBalancesModel();
+    qDebug()<<"setupDb 10";
     setupCashFlowModel();
-    setupSpecialOrdersModel();
+    qDebug()<<"setupDb 11";
     setupRandomMsgModel();
+    qDebug()<<"setupDb 13";
     setupLogsModel();
+    qDebug()<<"setupDb 14";
     setupCurrenciesModel();
+    qDebug()<<"setupDb 15";
 
   } else {
       qDebug()<<"it was not open...";
@@ -1001,7 +988,6 @@ void squeezeView::connectToDb()
       transactionsModel = new QSqlRelationalTableModel();
       balancesModel   = new QSqlTableModel();
       cashflowModel   = new QSqlRelationalTableModel();
-      specialOrdersModel   = new QSqlRelationalTableModel();
       randomMsgModel  = new QSqlTableModel();
       logsModel       = new QSqlRelationalTableModel();
       currenciesModel = new QSqlTableModel();
@@ -1020,7 +1006,6 @@ void squeezeView::connectToDb()
     setupOffersModel();
     setupBalancesModel();
     setupCashFlowModel();
-    setupSpecialOrdersModel();
     setupRandomMsgModel();
     setupLogsModel();
     setupCurrenciesModel();
@@ -1413,42 +1398,44 @@ void squeezeView::setupDonorsModel()
 void squeezeView::setupClientsModel()
 {
   if (db.isOpen()) {
-      clientsTableModel->setTable("clients");
+      clientsTableModel->setTable("v_clients");
       QSqlQuery query;
       query=clientsTableModel->query();
       query.setForwardOnly(true);
       clientsTableModel->setHeaderData(1, Qt::Horizontal, "Codice Fiscale");
       clientsTableModel->setHeaderData(2, Qt::Horizontal, "Nome");
       clientsTableModel->setHeaderData(3, Qt::Horizontal, "Cognome");
+      clientsTableModel->setFilter(QString("parent=''"));
 
-      ui_mainview.clientsTableView->setModel(clientsTableModel);
       ui_mainview.clientsTableView->setItemDelegate(new QSqlRelationalDelegate(ui_mainview.clientsTableView));
       ui_mainview.clientsTableView->setSelectionBehavior(QAbstractItemView::SelectRows);
       ui_mainview.clientsTableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
-
-      clientsTableModel->setFilter(QString("parent=''"));
-
-//      ui_mainview.clientsTableView->hideColumn(0); //id
+      qDebug()<<"Setting sorting enabled clientsTableModel";
+            ui_mainview.clientsTableView->setSortingEnabled(true);
+qDebug()<<"Setting model clientsTableModel";
+      ui_mainview.clientsTableView->setModel(clientsTableModel);
+qDebug()<<"Done setting model clientsTableModel";
+////      ui_mainview.clientsTableView->hideColumn(0); //id
       ui_mainview.clientsTableView->hideColumn(4);
-      ui_mainview.clientsTableView->hideColumn(5);
-      ui_mainview.clientsTableView->hideColumn(6);
-      ui_mainview.clientsTableView->hideColumn(7);
-      ui_mainview.clientsTableView->hideColumn(8);
-      ui_mainview.clientsTableView->hideColumn(9);
-      ui_mainview.clientsTableView->hideColumn(10);
-      ui_mainview.clientsTableView->hideColumn(11);
-      ui_mainview.clientsTableView->hideColumn(12);
-      ui_mainview.clientsTableView->hideColumn(13);
-      ui_mainview.clientsTableView->hideColumn(14);
-      ui_mainview.clientsTableView->hideColumn(15);
-      ui_mainview.clientsTableView->hideColumn(16);
-      ui_mainview.clientsTableView->hideColumn(17);
-      ui_mainview.clientsTableView->hideColumn(18);
+//      ui_mainview.clientsTableView->hideColumn(5);
+//      ui_mainview.clientsTableView->hideColumn(6);
+//      ui_mainview.clientsTableView->hideColumn(7);
+//      ui_mainview.clientsTableView->hideColumn(8);
+//      ui_mainview.clientsTableView->hideColumn(9);
+//      ui_mainview.clientsTableView->hideColumn(10);
+//      ui_mainview.clientsTableView->hideColumn(11);
+//      ui_mainview.clientsTableView->hideColumn(12);
+//      ui_mainview.clientsTableView->hideColumn(13);
+//      ui_mainview.clientsTableView->hideColumn(14);
+//      ui_mainview.clientsTableView->hideColumn(15);
+//      ui_mainview.clientsTableView->hideColumn(16);
+//      ui_mainview.clientsTableView->hideColumn(17);
+//      ui_mainview.clientsTableView->hideColumn(18);
 
-      ui_mainview.clientsTableView->setSortingEnabled(true);
+      qDebug()<<"Selecting clientsTableModel";
       clientsTableModel->select();
 
-
+      qDebug()<<"Done selecting clientsTableModel";
 
       //clientsModel
       clientsModel->setTable("clients");
@@ -1466,10 +1453,10 @@ void squeezeView::setupClientsModel()
       cols.append(2);
       delegate->setCol(cols);
       ui_mainview.clientsView->setItemDelegate(delegate);
-
-      clientsModel->select();
+      qDebug()<<"Selecting clientsModel";
+      //clientsModel->select();
       ui_mainview.clientsView->setCurrentIndex(clientsModel->index(0, 0));
-
+      qDebug()<<"Done selecting clientsModel";
 
   }
   else {
@@ -1608,7 +1595,6 @@ void squeezeView::setupTransactionsModel()
     ui_mainview.transactionsTable->setColumnHidden(transactionsModel->fieldIndex("discmoney"), true);
     ui_mainview.transactionsTable->setColumnHidden(transactionsModel->fieldIndex("cardnumber"), true);
     ui_mainview.transactionsTable->setColumnHidden(transactionsModel->fieldIndex("cardauthnumber"), true);
-    ui_mainview.transactionsTable->setColumnHidden(transactionsModel->fieldIndex("specialOrders"), true);
     ui_mainview.transactionsTable->setColumnHidden(transactionsModel->fieldIndex("itemlist"), true);
     //ui_mainview.transactionsTable->setColumnHidden(transactionsModel->fieldIndex("disc"), true);
     
@@ -1856,119 +1842,6 @@ void squeezeView::setBalancesFilter()
     balancesModel->select();
   }
 }
-
-
-// Special Orders
-
-void squeezeView::setupSpecialOrdersModel()
-{
-  openDB();
-  qDebug()<<"setup special orders.. after openDB";
-  if (db.isOpen()) {
-    specialOrdersModel->setTable("special_orders");
-    QSqlQuery query;
-    query=specialOrdersModel->query();
-    query.setForwardOnly(true);
-    ///NOTE: Here we can use the v_groupedSO table instead, to group them by saleid
-    ///      I dont know how convenient is this.
-    
-   int soIdIndex = specialOrdersModel->fieldIndex("orderid");
-   int soDateIndex = specialOrdersModel->fieldIndex("dateTime");
-   int soNameIndex= specialOrdersModel->fieldIndex("name");
-   int soGroupElemIndex= specialOrdersModel->fieldIndex("groupElements");
-   int soQtyIndex = specialOrdersModel->fieldIndex("qty");
-   int soPriceIndex= specialOrdersModel->fieldIndex("price");
-   int soCostIndex= specialOrdersModel->fieldIndex("cost");
-   int soUnitsIndex= specialOrdersModel->fieldIndex("units");
-   int soStatusIndex = specialOrdersModel->fieldIndex("status");
-   int soSaleIdIndex= specialOrdersModel->fieldIndex("saleid");
-   int soNotesIndex=specialOrdersModel->fieldIndex("notes");
-   int soPaymentIndex=specialOrdersModel->fieldIndex("payment");
-   int soCompletePaymentIndex=specialOrdersModel->fieldIndex("completePayment");
-    
-    
-    ui_mainview.tableSO->setModel(specialOrdersModel);
-    ui_mainview.tableSO->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    ui_mainview.tableSO->setColumnHidden(soGroupElemIndex, true);
-    ui_mainview.tableSO->setColumnHidden(soUnitsIndex, true);
-
-    specialOrdersModel->setHeaderData(soIdIndex, Qt::Horizontal, i18n("Order #"));
-    specialOrdersModel->setHeaderData(soNameIndex, Qt::Horizontal, i18n("Name"));
-    specialOrdersModel->setHeaderData(soDateIndex, Qt::Horizontal, i18n("Date") );
-    specialOrdersModel->setHeaderData(soQtyIndex, Qt::Horizontal, i18n("Qty") );
-    specialOrdersModel->setHeaderData(soPriceIndex, Qt::Horizontal, i18n("Price") );
-    specialOrdersModel->setHeaderData(soCostIndex, Qt::Horizontal, i18n("Cost") );
-    specialOrdersModel->setHeaderData(soUnitsIndex, Qt::Horizontal, i18n("Sold by") );
-    specialOrdersModel->setHeaderData(soStatusIndex, Qt::Horizontal, i18n("Status") );
-    specialOrdersModel->setHeaderData(soSaleIdIndex, Qt::Horizontal, i18n("Tr. Id") );
-    specialOrdersModel->setHeaderData(soNotesIndex, Qt::Horizontal, i18n("Notes") );
-    specialOrdersModel->setHeaderData(soPaymentIndex, Qt::Horizontal, i18n("Payment") );
-    specialOrdersModel->setHeaderData(soCompletePaymentIndex, Qt::Horizontal, i18n("Payment Complete") );
-
-    //relations
-    specialOrdersModel->setRelation(soUnitsIndex, QSqlRelation("measures", "id", "text"));
-    specialOrdersModel->setRelation(soStatusIndex, QSqlRelation("so_status", "id", "text"));
-    specialOrdersModel->setRelation(soCompletePaymentIndex, QSqlRelation("bool_values", "id", "text"));
-    
-    ui_mainview.tableSO->setSelectionMode(QAbstractItemView::SingleSelection);
-    specialOrdersModel->select();
-  }
-  qDebug()<<"setup special orders.. done.";
-}
-
-void squeezeView::setSpecialOrdersFilter()
-{
-  if (!ui_mainview.groupSOFilter->isChecked()) specialOrdersModel->setFilter("");
-  else {
-    if (ui_mainview.rbSOByDate->isChecked()) {
-      //1st if: Filter by date
-      QDate d = ui_mainview.datePicker->date();
-      QDateTime dt = QDateTime(d);
-      QString dtStr = dt.toString("yyyy-MM-dd hh:mm:ss");
-      QString dtStr2= d.toString("yyyy-MM-dd")+" 23:59:59";
-      specialOrdersModel->setFilter(QString("special_orders.dateTime>='%1' and special_orders.dateTime<='%2'").arg(dtStr).arg(dtStr2));
-      specialOrdersModel->setSort(12, Qt::DescendingOrder); //by date
-    }
-    else if (ui_mainview.rbSOByThisWeek->isChecked()) {
-      //2nd if: Filter by one week
-      specialOrdersModel->setFilter(QString("special_orders.dateTime > ADDDATE(sysdate( ), INTERVAL -8 DAY )"));
-      specialOrdersModel->setSort(0, Qt::DescendingOrder); //orderid
-    }
-    else if (ui_mainview.rbSOByThisMonth->isChecked()) {
-      //3rd if: filter by ONE Month
-      specialOrdersModel->setFilter(QString("special_orders.dateTime > ADDDATE(sysdate( ), INTERVAL -31 DAY )"));
-      specialOrdersModel->setSort(0, Qt::DescendingOrder); //orderid
-    }
-    else if (ui_mainview.rbSOByStatusPending->isChecked()) {
-      //4th if: filter by STATUS PENDING
-      specialOrdersModel->setFilter(QString("special_orders.status=0"));
-      specialOrdersModel->setSort(0, Qt::DescendingOrder);
-    }
-    else if (ui_mainview.rbSOByStatusInProgress->isChecked()) {
-      //4th if: filter by STATUS IN PROGRESS
-      specialOrdersModel->setFilter(QString("special_orders.status=1"));
-      specialOrdersModel->setSort(0, Qt::DescendingOrder);
-    }
-    else if (ui_mainview.rbSOByStatusReady->isChecked()) {
-      //4th if: filter by STATUS READY
-      specialOrdersModel->setFilter(QString("special_orders.status=2"));
-      specialOrdersModel->setSort(0, Qt::DescendingOrder);
-    }
-    else if (ui_mainview.rbSOByStatusDelivered->isChecked()) {
-      //4th if: filter by STATUS DELIVERED
-      specialOrdersModel->setFilter(QString("special_orders.status=3"));
-      specialOrdersModel->setSort(0, Qt::DescendingOrder);
-    }
-    else {
-      //4th if: filter by STATUS CANCELLED
-      specialOrdersModel->setFilter(QString("special_orders.status=4"));
-      specialOrdersModel->setSort(0, Qt::DescendingOrder);
-    }
-    
-    specialOrdersModel->select();
-  }
-}
-
 
 /* widgets */
 
@@ -3850,6 +3723,8 @@ void squeezeView::setupLogsModel()
     QSqlQuery query;
     query=logsModel->query();
     query.setForwardOnly(true);
+    logsModel->setFilter(QString("date >= STR_TO_DATE('%1', '%d/%m/%Y')").
+                         arg(QDate::currentDate().addDays(-7).toString("dd/MM/yyyy")));
     int logIdIndex      = logsModel->fieldIndex("id");
     int logUserIndex    = logsModel->fieldIndex("userid");
     int logActionIndex  = logsModel->fieldIndex("action");
@@ -3993,8 +3868,6 @@ void squeezeView::reSelectModels()
     balancesModel->select();
     qDebug()<<"SEL cashflow";
     cashflowModel->select();
-    qDebug()<<"SEL som";
-    specialOrdersModel->select();
     qDebug()<<"SEL rdn";
     randomMsgModel->select();
     qDebug()<<"SEL log";

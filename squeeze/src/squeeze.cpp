@@ -198,8 +198,6 @@ void squeeze::enableUI()
     action->setEnabled(true);
     action = actionCollection()->action("randomMsgsBrowse");
     action->setEnabled(true);
-    action = actionCollection()->action("showSpecialOrders");
-    action->setEnabled(true);
     action = actionCollection()->action("printSoldOut");
     action->setEnabled(true);
     action = actionCollection()->action("printLowStock");
@@ -260,8 +258,6 @@ void squeeze::disableUI()
   action = actionCollection()->action("viewLog");
   action->setDisabled(true);
   action = actionCollection()->action("randomMsgsBrowse");
-  action->setDisabled(true);
-  action = actionCollection()->action("showSpecialOrders");
   action->setDisabled(true);
   action = actionCollection()->action("printSoldOut");
   action->setDisabled(true);
@@ -415,12 +411,6 @@ void squeeze::setupActions()
     action->setIcon(KIcon("lemon-reports"));
     action->setShortcut(Qt::Key_F10);
     connect(action, SIGNAL(triggered(bool)),m_view, SLOT(printSoldOutProducts()));
-
-    action = actionCollection()->addAction( "showSpecialOrders" );
-    action->setText(i18n("Show Special Orders"));
-    action->setIcon(KIcon("lemon-box")); //FIXME: Create an ICON
-    action->setShortcut(Qt::Key_Insert);
-    connect(action, SIGNAL(triggered(bool)),m_view, SLOT(showSpecialOrders()));
 
     action = actionCollection()->addAction( "randomMsgsBrowse" );
     action->setText(i18n("Ticket Messages"));
