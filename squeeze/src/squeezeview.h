@@ -76,7 +76,9 @@ public:
     QSqlRelationalTableModel *limitsModel;
     QSqlTableModel *randomMsgModel;
     QSqlRelationalTableModel *logsModel;
+    bool selectedLogsModel;
     QSqlRelationalTableModel *transactionsModel;
+    bool selectedTransactionsModel;
     QSqlTableModel *currenciesModel;
     int productCodeIndex, productDescIndex, productPriceIndex, productStockIndex, productCostIndex,
     productSoldUnitsIndex, productLastSoldIndex, productUnitsIndex, productTaxIndex, productETaxIndex,
@@ -85,8 +87,8 @@ public:
     int userIdIndex, usernameIndex, nameIndex, passwordIndex, saltIndex, addressIndex, phoneIndex, cellIndex, roleIndex,
     photoIndex;
     QString clientCodeIndex, clientSurnameIndex, clientNameIndex;
-    int transIdIndex, transClientidIndex, transTypeIndex,transAmountIndex,transDateIndex,transTimeIndex,transPaidWithIndex,
-    transChangeGivenIndex,transPayMethodIndex,transStateIndex,transUseridIndex,transCardNumIndex,transItemCountIndex,transPointsIndex,
+    int transIdIndex, transClientidIndex, transClientNameIndex, transTypeIndex,transAmountIndex,transDateIndex,transTimeIndex,transPaidWithIndex,
+    transChangeGivenIndex,transPayMethodIndex,transStateIndex,transUseridIndex,transUserNameIndex,transCardNumIndex,transItemCountIndex,transPointsIndex,
     transDiscMoneyIndex,transDiscIndex,transCardAuthNumberIndex,transUtilityIndex,transTerminalNumIndex,transItemsListIndex,  transSOIndex, transProvIdIndex;
     QTimer *timerCheckDb, *timerUpdateGraphs;
     int balanceIdIndex, balanceDateEndIndex, balanceUserNameIndex, balanceInitAmountIndex, balanceInIndex, balanceOutIndex, balanceCashIndex, balanceCardIndex,balanceTransIndex, balanceTerminalNumIndex, balanceDateStartIndex, balanceUseridIndex;

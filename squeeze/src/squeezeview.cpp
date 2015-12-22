@@ -89,6 +89,8 @@ squeezeView::squeezeView(QWidget *parent)
 {
   qDebug()<<"===STARTING SQUEEZE AT "<<QDateTime::currentDateTime().toString()<<" ===";
   adminIsLogged = false;
+  selectedLogsModel = false;
+  selectedTransactionsModel = false;
   ui_mainview.setupUi(this);
   qDebug()<<"setupUi OK";
   setAutoFillBackground(true);
@@ -359,20 +361,7 @@ void squeezeView::setupSignalConnections()
 
   connect(ui_mainview.btnPrintBalance, SIGNAL(clicked()) ,SLOT(printSelectedBalance()) );
 
-  connect(ui_mainview.comboProductsFilterByCategory,SIGNAL(currentIndexChanged(int)), this, SLOT( setProductsFilter()) );
-  connect(ui_mainview.editProductsFilterByDesc,SIGNAL(textEdited(const QString &)), this, SLOT( setProductsFilter()) );
-  connect(ui_mainview.editProductsFilterByCode,SIGNAL(textEdited(const QString &)), this, SLOT( setProductsFilter()) );
-  connect(ui_mainview.rbProductsFilterByCode, SIGNAL(toggled(bool)), this, SLOT( setProductsFilter()) );
-  connect(ui_mainview.rbProductsFilterByDesc, SIGNAL(toggled(bool)), this, SLOT( setProductsFilter()) );
-  connect(ui_mainview.rbProductsFilterByCategory, SIGNAL(toggled(bool)), this, SLOT( setProductsFilter()) );
-  connect(ui_mainview.rbProductsFilterByAvailable, SIGNAL(toggled(bool)), this, SLOT( setProductsFilter()) );
-  connect(ui_mainview.rbProductsFilterByNotAvailable, SIGNAL(toggled(bool)), this, SLOT( setProductsFilter()) );
-  connect(ui_mainview.rbProductsFilterByMostSold, SIGNAL(toggled(bool)), this, SLOT( setProductsFilter()) );
-  connect(ui_mainview.rbProductsFilterByLessSold, SIGNAL(toggled(bool)), this, SLOT( setProductsFilter()) );
-  connect(ui_mainview.rbProductsFilterByAlmostSoldOut, SIGNAL(toggled(bool)), this, SLOT( setProductsFilter()) );
-  connect(ui_mainview.rbProductsFilterByRaw, SIGNAL(toggled(bool)), this, SLOT( setProductsFilter()) );
-  connect(ui_mainview.rbProductsFilterByGroup, SIGNAL(toggled(bool)), this, SLOT( setProductsFilter()) );
-  connect(ui_mainview.groupFilterProducts, SIGNAL(toggled(bool)), this, SLOT( setProductsFilter()) );
+
   
   // BFB: New, export qtableview
   connect(ui_mainview.btnExport, SIGNAL(clicked()),  SLOT( exportTable()));
@@ -412,13 +401,13 @@ void squeezeView::updateClientFilter() {
              clientsTableModel->setFilter("");
          }
          else if(ui_mainview.rbClientsFilterSurname->isChecked()){
-             clientsTableModel->setFilter(QString("clients.surname REGEXP '%1'").arg(ui_mainview.editClientsFilter->text()));}
+             clientsTableModel->setFilter(QString("surname REGEXP '%1'").arg(ui_mainview.editClientsFilter->text()));}
          else if(ui_mainview.rbClientsFilterName->isChecked()){
-             clientsTableModel->setFilter(QString("clients.name REGEXP '%1'").arg(ui_mainview.editClientsFilter->text()));}
+             clientsTableModel->setFilter(QString("name REGEXP '%1'").arg(ui_mainview.editClientsFilter->text()));}
          else if(ui_mainview.rbClientsFilterCode->isChecked()){
-             clientsTableModel->setFilter(QString("clients.code REGEXP '%1'").arg(ui_mainview.editClientsFilter->text()));}
+             clientsTableModel->setFilter(QString("code REGEXP '%1'").arg(ui_mainview.editClientsFilter->text()));}
          else if(ui_mainview.rbClientsFilterId->isChecked()){
-             clientsTableModel->setFilter(QString("clients.id REGEXP '%1'").arg(ui_mainview.editClientsFilter->text()));}
+             clientsTableModel->setFilter(QString("id REGEXP '%1'").arg(ui_mainview.editClientsFilter->text()));}
 
          if(ui_mainview.checkBoxParent->isChecked()){
              QString f=clientsTableModel->filter();
@@ -528,7 +517,10 @@ void squeezeView::showLimitsPage()
 {
   qDebug()<<"showLimitsPage";
   ui_mainview.stackedWidget->setCurrentIndex(pBrowseLimits);
-  if (limitsModel->tableName().isEmpty()) setupLimitsModel();
+  if (limitsModel->tableName().isEmpty()) {
+      setupLimitsModel();
+      limitsModel->select();
+  }
   qDebug()<<"Set up";
   ui_mainview.headerLabel->setText(i18n("Limits"));
   ui_mainview.headerImg->setPixmap((DesktopIcon("lemon-user",48)));
@@ -550,7 +542,12 @@ void squeezeView::showTransactionsPage()
 {
   ui_mainview.stackedWidget->setCurrentIndex(pReports);
   ui_mainview.stackedWidget2->setCurrentIndex(1);
-  if (transactionsModel->tableName().isEmpty()) setupTransactionsModel();
+  if (transactionsModel->tableName().isEmpty()) {
+      setupTransactionsModel();
+  }
+  if (!selectedTransactionsModel) {
+      transactionsModel->select();
+  }
   ui_mainview.headerLabel->setText(i18n("Transactions"));
   ui_mainview.headerImg->setPixmap((DesktopIcon("lemon-reports",48)));
   ui_mainview.transactionsDateEditor->setDate(QDate::currentDate());
@@ -1067,112 +1064,67 @@ void squeezeView::setupProductsModel()
   openDB();
   qDebug()<<"setupProducts..";
 
-  if (db.isOpen()) {
-    productsModel->setTable("products");
-    QSqlQuery query;
-    query=productsModel->query();
-    query.setForwardOnly(true);
-    productCodeIndex = productsModel->fieldIndex("code");
-    productDescIndex = productsModel->fieldIndex("name");
-    productPriceIndex= productsModel->fieldIndex("price");
-    productStockIndex= productsModel->fieldIndex("stockqty");
-/*    productCostIndex = productsModel->fieldIndex("cost");
-    productSoldUnitsIndex= productsModel->fieldIndex("soldunits");
-    productLastSoldIndex= productsModel->fieldIndex("datelastsold");
-    productUnitsIndex= productsModel->fieldIndex("units");
-    productTaxIndex = productsModel->fieldIndex("taxpercentage");
-    productETaxIndex= productsModel->fieldIndex("extrataxes");
-    productPhotoIndex=productsModel->fieldIndex("photo");
-*/    productCategoryIndex=productsModel->fieldIndex("category");
-/*    productPointsIndex=productsModel->fieldIndex("points");
-    productLastProviderIndex = productsModel->fieldIndex("lastproviderid");
-    productAlphaCodeIndex = productsModel->fieldIndex("alphacode");
-    productIsAGroupIndex  = productsModel->fieldIndex("isAGroup");
-    productIsARawIndex    = productsModel->fieldIndex("isARawProduct");
-    productGEIndex        = productsModel->fieldIndex("groupElements");
-*/
-    ui_mainview.productsView->setModel(productsModel);
-//    ui_mainview.productsView->setViewMode(QListView::IconMode);
-//    ui_mainview.productsView->setGridSize(QSize(170,170));
-    ui_mainview.productsView->setEditTriggers(QAbstractItemView::NoEditTriggers);
-//    ui_mainview.productsView->setResizeMode(QListView::Adjust);
-//    ui_mainview.productsView->setModelColumn(productsModel->fieldIndex("photo"));
+      if (db.isOpen()) {
+        productsModel->setTable("v_products");
+        QSqlQuery query;
+        query=productsModel->query();
+        query.setForwardOnly(true);
+        productCodeIndex = productsModel->fieldIndex("code");
+        productDescIndex = productsModel->fieldIndex("name");
+        productPriceIndex= productsModel->fieldIndex("price");
+        productStockIndex= productsModel->fieldIndex("stockqty");
+        productCategoryIndex=productsModel->fieldIndex("category");
+        ui_mainview.productsView->setModel(productsModel);
+        ui_mainview.productsView->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
-    ui_mainview.productsView->hideColumn(4);
-    ui_mainview.productsView->hideColumn(5);
-    ui_mainview.productsView->hideColumn(6);
-    ui_mainview.productsView->hideColumn(7);
-    ui_mainview.productsView->hideColumn(8);
-    ui_mainview.productsView->hideColumn(9);
-    ui_mainview.productsView->hideColumn(10);
-//    ui_mainview.productsView->hideColumn(11);
-    ui_mainview.productsView->hideColumn(12);
-    ui_mainview.productsView->hideColumn(13);
-    ui_mainview.productsView->hideColumn(14);
-    ui_mainview.productsView->hideColumn(15);
-    ui_mainview.productsView->hideColumn(16);
-    ui_mainview.productsView->hideColumn(17);
-    ui_mainview.productsView->hideColumn(18);
-    ui_mainview.productsView->hideColumn(19);
-    ui_mainview.productsView->hideColumn(20);
-    ui_mainview.productsView->hideColumn(21);
-    ui_mainview.productsView->hideColumn(22);
-//    ui_mainview.productsView->hideColumn(23);
-    ui_mainview.productsView->hideColumn(24);
-    ui_mainview.productsView->hideColumn(25);
+        ui_mainview.productsViewAlt->setModel(productsModel);
+        ui_mainview.productsViewAlt->setEditTriggers(QAbstractItemView::NoEditTriggers);
+        ui_mainview.productsViewAlt->setSelectionMode(QAbstractItemView::SingleSelection);
 
-    ui_mainview.productsViewAlt->setModel(productsModel);
-    ui_mainview.productsViewAlt->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    ui_mainview.productsViewAlt->setSelectionMode(QAbstractItemView::SingleSelection);
+//        productsModel->setRelation(productCategoryIndex, QSqlRelation("categories", "catid", "text"));
+        productsModel->setHeaderData(productCodeIndex, Qt::Horizontal, i18n("Code"));
+        productsModel->setHeaderData(productDescIndex, Qt::Horizontal, i18n("Name"));
+        productsModel->setHeaderData(productCategoryIndex, Qt::Horizontal, i18n("Category") );
+        productsModel->setHeaderData(productPriceIndex, Qt::Horizontal, i18n("Price") );
+        productsModel->setHeaderData(productCostIndex, Qt::Horizontal, i18n("Cost") );
+        productsModel->setHeaderData(productStockIndex, Qt::Horizontal, i18n("Stock Qty") );
 
-    ui_mainview.productsViewAlt->setColumnHidden(productPhotoIndex, true);
-    ui_mainview.productsViewAlt->setColumnHidden(productUnitsIndex, true);
-    ui_mainview.productsViewAlt->setColumnHidden(productTaxIndex, true);
-    ui_mainview.productsViewAlt->setColumnHidden(productETaxIndex, true);
-    ui_mainview.productsViewAlt->setColumnHidden(productPointsIndex, true);
-    ui_mainview.productsViewAlt->setColumnHidden(productGEIndex, true);
-    ui_mainview.productsViewAlt->setColumnHidden(productIsAGroupIndex, true);
-    ui_mainview.productsViewAlt->setColumnHidden(productIsARawIndex, true);
-    /// 0.7 version : hidden next columns
-    ui_mainview.productsViewAlt->setColumnHidden(productLastProviderIndex, true);
-    ui_mainview.productsViewAlt->setColumnHidden(productAlphaCodeIndex, true);
-    productsModel->setRelation(productCategoryIndex, QSqlRelation("categories", "catid", "text"));
-    productsModel->setHeaderData(productCodeIndex, Qt::Horizontal, i18n("Code"));
-    productsModel->setHeaderData(productDescIndex, Qt::Horizontal, i18n("Name"));
-    productsModel->setHeaderData(productCategoryIndex, Qt::Horizontal, i18n("Category") );
-    productsModel->setHeaderData(productPriceIndex, Qt::Horizontal, i18n("Price") );
-    productsModel->setHeaderData(productCostIndex, Qt::Horizontal, i18n("Cost") );
-    productsModel->setHeaderData(productStockIndex, Qt::Horizontal, i18n("Stock Qty") );
-    productsModel->setHeaderData(productSoldUnitsIndex, Qt::Horizontal, i18n("Sold Units") );
-    productsModel->setHeaderData(productLastSoldIndex, Qt::Horizontal, i18n("Last Sold") );
-    productsModel->setHeaderData(productLastProviderIndex, Qt::Horizontal, i18n("Last Provider") );
-    productsModel->setHeaderData(productAlphaCodeIndex, Qt::Horizontal, i18n("Alpha Code") );
-/*    ProductDelegate *delegate = new ProductDelegate(ui_mainview.productsView);
-    ui_mainview.productsView->setItemDelegate(delegate);
-    ui_mainview.productsView->setSelectionMode(QAbstractItemView::SingleSelection);
-*/
-    qDebug()<<"setupProducts..2";
-    productsModel->select();
-    qDebug()<<"setupProducts..2.1";
-    ui_mainview.productsViewAlt->resizeColumnsToContents();
-    //populate Categories...
-    populateCategoriesHash();
-    qDebug()<<"setupProducts..3";
-    ui_mainview.comboProductsFilterByCategory->clear();
-      QHashIterator<QString, int> item(categoriesHash);
-      while (item.hasNext()) {
-        item.next();
-        ui_mainview.comboProductsFilterByCategory->addItem(item.key());
-      }
-      qDebug()<<"setupProducts..4";
-      ui_mainview.comboProductsFilterByCategory->setCurrentIndex(0);
-
-      ui_mainview.rbProductsFilterByAvailable->setChecked(true);
-      ui_mainview.productsViewAlt->setCurrentIndex(productsModel->index(0, 0));
-      setProductsFilter();
-      qDebug()<<"setupProducts..5";
- }
- qDebug()<<"setupProducts.. done.";
+        qDebug()<<"setupProducts..2";
+        //productsModel->select();
+        qDebug()<<"setupProducts..2.1";
+    //    ui_mainview.productsViewAlt->resizeColumnsToContents();
+        //populate Categories...
+        populateCategoriesHash();
+        qDebug()<<"setupProducts..3";
+        ui_mainview.comboProductsFilterByCategory->clear();
+          QHashIterator<QString, int> item(categoriesHash);
+          while (item.hasNext()) {
+            item.next();
+            ui_mainview.comboProductsFilterByCategory->addItem(item.key());
+          }
+          qDebug()<<"setupProducts..4";
+          ui_mainview.comboProductsFilterByCategory->setCurrentIndex(0);
+          ui_mainview.rbProductsFilterByAvailable->setChecked(true);
+          ui_mainview.productsViewAlt->setCurrentIndex(productsModel->index(0, 0));
+          // connect signals
+          connect(ui_mainview.comboProductsFilterByCategory,SIGNAL(currentIndexChanged(int)), this, SLOT( setProductsFilter()) );
+          connect(ui_mainview.editProductsFilterByDesc,SIGNAL(textEdited(const QString &)), this, SLOT( setProductsFilter()) );
+          connect(ui_mainview.editProductsFilterByCode,SIGNAL(textEdited(const QString &)), this, SLOT( setProductsFilter()) );
+          connect(ui_mainview.rbProductsFilterByCode, SIGNAL(toggled(bool)), this, SLOT( setProductsFilter()) );
+          connect(ui_mainview.rbProductsFilterByDesc, SIGNAL(toggled(bool)), this, SLOT( setProductsFilter()) );
+          connect(ui_mainview.rbProductsFilterByCategory, SIGNAL(toggled(bool)), this, SLOT( setProductsFilter()) );
+          connect(ui_mainview.rbProductsFilterByAvailable, SIGNAL(toggled(bool)), this, SLOT( setProductsFilter()) );
+          connect(ui_mainview.rbProductsFilterByNotAvailable, SIGNAL(toggled(bool)), this, SLOT( setProductsFilter()) );
+          connect(ui_mainview.rbProductsFilterByMostSold, SIGNAL(toggled(bool)), this, SLOT( setProductsFilter()) );
+          connect(ui_mainview.rbProductsFilterByLessSold, SIGNAL(toggled(bool)), this, SLOT( setProductsFilter()) );
+          connect(ui_mainview.rbProductsFilterByAlmostSoldOut, SIGNAL(toggled(bool)), this, SLOT( setProductsFilter()) );
+          connect(ui_mainview.rbProductsFilterByRaw, SIGNAL(toggled(bool)), this, SLOT( setProductsFilter()) );
+          connect(ui_mainview.rbProductsFilterByGroup, SIGNAL(toggled(bool)), this, SLOT( setProductsFilter()) );
+          connect(ui_mainview.groupFilterProducts, SIGNAL(toggled(bool)), this, SLOT( setProductsFilter()) );
+          setProductsFilter();
+          qDebug()<<"setupProducts..5";
+     }
+     qDebug()<<"setupProducts.. done.";
 }
 
 void squeezeView::populateCategoriesHash()
@@ -1187,77 +1139,78 @@ void squeezeView::populateCategoriesHash()
 
 void squeezeView::setProductsFilter()
 {
-//NOTE: This is a QT BUG.
-//   If filter by description is selected and the text is empty, and later is re-filtered
-//   then NO pictures are shown; even if is refiltered again.
-QRegExp regexp = QRegExp(ui_mainview.editProductsFilterByDesc->text());
-QRegExp regexp2 = QRegExp(ui_mainview.editProductsFilterByCode->text());
-if (!ui_mainview.groupFilterProducts->isChecked()) productsModel->setFilter("products.code != '*'");
-else {
-  if (ui_mainview.rbProductsFilterByDesc->isChecked()) {
-  //1st if: Filter by DESC.
-    if (!regexp.isValid())  ui_mainview.editProductsFilterByDesc->setText("");
-    if (ui_mainview.editProductsFilterByDesc->text()=="*" || ui_mainview.editProductsFilterByDesc->text()=="") productsModel->setFilter("products.code != '*'");
-    else  productsModel->setFilter(QString("products.name REGEXP '%1'").arg(ui_mainview.editProductsFilterByDesc->text()));
-    productsModel->setSort(productStockIndex, Qt::DescendingOrder);
-  }
-  else if (ui_mainview.rbProductsFilterByCode->isChecked()) {
-      // Filter by CODE.
-        if (!regexp2.isValid())  ui_mainview.editProductsFilterByCode->setText("");
-        if (ui_mainview.editProductsFilterByCode->text()=="*" || ui_mainview.editProductsFilterByCode->text()=="") productsModel->setFilter("products.code != '*'");
-        else  productsModel->setFilter(QString("products.code REGEXP '%1'").arg(ui_mainview.editProductsFilterByCode->text()));
-        productsModel->setSort(productStockIndex, Qt::DescendingOrder);
-        qDebug()<< "filterCode" << productsModel->filter();
-      }
-  else if (ui_mainview.rbProductsFilterByCategory->isChecked()) {
-  //2nd if: Filter by CATEGORY
-    //Find catId for the text on the combobox.
-    int catId=-1;
-    QString catText = ui_mainview.comboProductsFilterByCategory->currentText();
-    if (categoriesHash.contains(catText)) {
-      catId = categoriesHash.value(catText);
+    //NOTE: This is a QT BUG.
+    //   If filter by description is selected and the text is empty, and later is re-filtered
+    //   then NO pictures are shown; even if is refiltered again.
+    QRegExp regexp = QRegExp(ui_mainview.editProductsFilterByDesc->text());
+    QRegExp regexp2 = QRegExp(ui_mainview.editProductsFilterByCode->text());
+    if (!ui_mainview.groupFilterProducts->isChecked()) productsModel->setFilter("code != '*'");
+    else {
+        if (ui_mainview.rbProductsFilterByDesc->isChecked()) {
+            //1st if: Filter by DESC.
+            if (!regexp.isValid())  ui_mainview.editProductsFilterByDesc->setText("");
+            if (ui_mainview.editProductsFilterByDesc->text()=="*" || ui_mainview.editProductsFilterByDesc->text()=="") productsModel->setFilter("code != '*'");
+            else  productsModel->setFilter(QString("name REGEXP '%1'").arg(ui_mainview.editProductsFilterByDesc->text()));
+            productsModel->setSort(productStockIndex, Qt::DescendingOrder);
+        }
+        else if (ui_mainview.rbProductsFilterByCode->isChecked()) {
+            // Filter by CODE.
+            if (!regexp2.isValid())  ui_mainview.editProductsFilterByCode->setText("");
+            if (ui_mainview.editProductsFilterByCode->text()=="*" || ui_mainview.editProductsFilterByCode->text()=="") productsModel->setFilter("code != '*'");
+            else  productsModel->setFilter(QString("code REGEXP '%1'").arg(ui_mainview.editProductsFilterByCode->text()));
+            productsModel->setSort(productStockIndex, Qt::DescendingOrder);
+            qDebug()<< "filterCode" << productsModel->filter();
+        }
+        else if (ui_mainview.rbProductsFilterByCategory->isChecked()) {
+            //2nd if: Filter by CATEGORY
+            //Find catId for the text on the combobox.
+            int catId=-1;
+            QString catText = ui_mainview.comboProductsFilterByCategory->currentText();
+            if (categoriesHash.contains(catText)) {
+                catId = categoriesHash.value(catText);
+            }
+            productsModel->setFilter(QString("category=%1").arg(catId));
+            productsModel->setSort(productStockIndex, Qt::DescendingOrder);
+        }
+        else if (ui_mainview.rbProductsFilterByAvailable->isChecked()) {
+            //3rd if: filter by Available items
+            productsModel->setFilter(QString("stockqty>0"));
+            productsModel->setSort(productStockIndex, Qt::DescendingOrder);
+        }
+        else if (ui_mainview.rbProductsFilterByNotAvailable->isChecked()) {
+            //4th if: filter by NOT Available items
+            productsModel->setFilter(QString("stockqty=0"));
+            productsModel->setSort(productSoldUnitsIndex, Qt::DescendingOrder);
+        }
+        else if (ui_mainview.rbProductsFilterByMostSold->isChecked()) {
+            //5th if: filter by Most Sold items
+            productsModel->setFilter("code != '*'");
+            productsModel->setSort(productSoldUnitsIndex, Qt::DescendingOrder);
+        }
+        else if (ui_mainview.rbProductsFilterByAlmostSoldOut->isChecked()) {
+            //6th if: filter by ALMOST sold-out items
+            productsModel->setFilter(QString("stockqty<%1 AND stockqty>0").arg(Settings::mostSoldMaxValue()));
+            productsModel->setSort(productSoldUnitsIndex, Qt::AscendingOrder);
+        }
+        else if (ui_mainview.rbProductsFilterByRaw->isChecked()) {
+            //7th if: filter by raw products
+            productsModel->setFilter(QString("isARawProduct=true"));
+            productsModel->setSort(productCodeIndex, Qt::AscendingOrder);
+        }
+        else if (ui_mainview.rbProductsFilterByGroup->isChecked()) {
+            //8th if: filter by GROUPS
+            productsModel->setFilter(QString("isAGroup=true"));
+            productsModel->setSort(productCodeIndex, Qt::AscendingOrder);
+        }
+        else {
+            //else: filter by less sold items
+            productsModel->setFilter("code != '*'");
+            productsModel->setSort(productSoldUnitsIndex, Qt::AscendingOrder);
+        }
     }
-    productsModel->setFilter(QString("products.category=%1").arg(catId));
-    productsModel->setSort(productStockIndex, Qt::DescendingOrder);
-  }
-  else if (ui_mainview.rbProductsFilterByAvailable->isChecked()) {
-  //3rd if: filter by Available items
-    productsModel->setFilter(QString("products.stockqty>0"));
-    productsModel->setSort(productStockIndex, Qt::DescendingOrder);
-  }
-  else if (ui_mainview.rbProductsFilterByNotAvailable->isChecked()) {
-  //4th if: filter by NOT Available items
-    productsModel->setFilter(QString("products.stockqty=0"));
-    productsModel->setSort(productSoldUnitsIndex, Qt::DescendingOrder);
-  }
-  else if (ui_mainview.rbProductsFilterByMostSold->isChecked()) {
-  //5th if: filter by Most Sold items
-    productsModel->setFilter("products.code != '*'");
-    productsModel->setSort(productSoldUnitsIndex, Qt::DescendingOrder);
-  }
-  else if (ui_mainview.rbProductsFilterByAlmostSoldOut->isChecked()) {
-    //6th if: filter by ALMOST sold-out items
-    productsModel->setFilter(QString("products.stockqty<%1 AND products.stockqty>0").arg(Settings::mostSoldMaxValue()));
-    productsModel->setSort(productSoldUnitsIndex, Qt::AscendingOrder);
-  }
-  else if (ui_mainview.rbProductsFilterByRaw->isChecked()) {
-    //7th if: filter by raw products
-    productsModel->setFilter(QString("products.isARawProduct=true"));
-    productsModel->setSort(productCodeIndex, Qt::AscendingOrder);
-  }
-  else if (ui_mainview.rbProductsFilterByGroup->isChecked()) {
-    //8th if: filter by GROUPS
-    productsModel->setFilter(QString("products.isAGroup=true"));
-    productsModel->setSort(productCodeIndex, Qt::AscendingOrder);
-  }
-  else {
-  //else: filter by less sold items
-    productsModel->setFilter("products.code != '*'");
-    productsModel->setSort(productSoldUnitsIndex, Qt::AscendingOrder);
-  }
-
-  productsModel->select();
- }
+    qDebug()<<"Selecting productsModel...";
+    productsModel->select();
+    qDebug()<<"Done selecting productsModel...";
 }
 
 void squeezeView::setupOffersModel()
@@ -1412,25 +1365,8 @@ void squeezeView::setupClientsModel()
       ui_mainview.clientsTableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
       qDebug()<<"Setting sorting enabled clientsTableModel";
             ui_mainview.clientsTableView->setSortingEnabled(true);
-qDebug()<<"Setting model clientsTableModel";
       ui_mainview.clientsTableView->setModel(clientsTableModel);
-qDebug()<<"Done setting model clientsTableModel";
-////      ui_mainview.clientsTableView->hideColumn(0); //id
       ui_mainview.clientsTableView->hideColumn(4);
-//      ui_mainview.clientsTableView->hideColumn(5);
-//      ui_mainview.clientsTableView->hideColumn(6);
-//      ui_mainview.clientsTableView->hideColumn(7);
-//      ui_mainview.clientsTableView->hideColumn(8);
-//      ui_mainview.clientsTableView->hideColumn(9);
-//      ui_mainview.clientsTableView->hideColumn(10);
-//      ui_mainview.clientsTableView->hideColumn(11);
-//      ui_mainview.clientsTableView->hideColumn(12);
-//      ui_mainview.clientsTableView->hideColumn(13);
-//      ui_mainview.clientsTableView->hideColumn(14);
-//      ui_mainview.clientsTableView->hideColumn(15);
-//      ui_mainview.clientsTableView->hideColumn(16);
-//      ui_mainview.clientsTableView->hideColumn(17);
-//      ui_mainview.clientsTableView->hideColumn(18);
 
       qDebug()<<"Selecting clientsTableModel";
       clientsTableModel->select();
@@ -1485,14 +1421,12 @@ void squeezeView::setupLimitsModel()
 {
   qDebug()<<"Setting up Limits Model";
   if (db.isOpen()) {
-    limitsModel->setTable("limits");
+    limitsModel->setTable("v_limits");
     QSqlQuery query;
     query=limitsModel->query();
     query.setForwardOnly(true);
-//    limitsModel->setRelation(1, QSqlRelation("clients", "code", "surname"));
-//    limitsModel->setRelation(2, QSqlRelation("tags", "tag", "tag"));
-    limitsModel->setRelation(3, QSqlRelation("products", "code", "name"));
-    limitsModel->setRelation(4, QSqlRelation("categories", "catid", "text"));
+    //limitsModel->setRelation(3, QSqlRelation("v_products", "code", "name"));
+    //limitsModel->setRelation(4, QSqlRelation("categories", "catid", "text"));
     limitsModel->setHeaderData(1, Qt::Horizontal, "Cliente");
     limitsModel->setHeaderData(2, Qt::Horizontal, "Etichetta");
     limitsModel->setHeaderData(3, Qt::Horizontal, "Prodotto");
@@ -1501,15 +1435,9 @@ void squeezeView::setupLimitsModel()
     limitsModel->setHeaderData(6, Qt::Horizontal, "Priorità");
     limitsModel->setHeaderData(7, Qt::Horizontal, "Nome");
     ui_mainview.limitsView->setModel(limitsModel);
-    ui_mainview.limitsView->setItemDelegate(new QSqlRelationalDelegate(ui_mainview.limitsView));
-//    QString f;
-//    f=QString("clientCode='*'");
-//    limitsModel->setFilter(f);
-//    ui_mainview.limitsView->hideColumn(0); //id
-//    ui_mainview.limitsView->hideColumn(1); //clientcode
-//    ui_mainview.limitsView->hideColumn(6); //priorità
+//    ui_mainview.limitsView->setItemDelegate(new QSqlRelationalDelegate(ui_mainview.limitsView));
     ui_mainview.limitsView->setSortingEnabled(true);
-    limitsModel->select();
+//    limitsModel->select();
 
   }
   else {
@@ -1532,6 +1460,7 @@ void squeezeView::setupTransactionsModel()
     query.setForwardOnly(true);
     transIdIndex = transactionsModel->fieldIndex("id");
     transClientidIndex = transactionsModel->fieldIndex("clientid");
+    transClientNameIndex = transactionsModel->fieldIndex("clientname");
     transTypeIndex= transactionsModel->fieldIndex("type");
     transAmountIndex= transactionsModel->fieldIndex("amount");
     transDateIndex = transactionsModel->fieldIndex("date");
@@ -1541,6 +1470,7 @@ void squeezeView::setupTransactionsModel()
     transPayMethodIndex = transactionsModel->fieldIndex("paymethod");
     transStateIndex= transactionsModel->fieldIndex("state");
     transUseridIndex=transactionsModel->fieldIndex("userid");
+    transUserNameIndex = transactionsModel->fieldIndex("username");
     transCardNumIndex=transactionsModel->fieldIndex("cardnumber");
     transItemCountIndex=transactionsModel->fieldIndex("itemcount");
     transItemsListIndex=transactionsModel->fieldIndex("itemslist");
@@ -1553,25 +1483,16 @@ void squeezeView::setupTransactionsModel()
     transProvIdIndex = transactionsModel->fieldIndex("providerid");
     transSOIndex = transactionsModel->fieldIndex("specialOrders");
 
-    
-    ui_mainview.transactionsTable->setModel(transactionsModel);
-    ui_mainview.transactionsTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    ui_mainview.transactionsTable->setColumnHidden(transItemsListIndex, true);
-    ui_mainview.transactionsTable->setColumnHidden(transPaidWithIndex, true);
-    ui_mainview.transactionsTable->setColumnHidden(transChangeGivenIndex, true);
-    ui_mainview.transactionsTable->setColumnHidden(transPayMethodIndex, true);
-    ui_mainview.transactionsTable->setColumnHidden(transCardNumIndex, true);
-    ui_mainview.transactionsTable->setColumnHidden(transCardAuthNumberIndex, true);
-    ui_mainview.transactionsTable->setColumnHidden(transSOIndex, true);
 
     transactionsModel->setRelation(transTypeIndex, QSqlRelation("transactiontypes", "ttypeid", "text"));
     transactionsModel->setRelation(transStateIndex, QSqlRelation("transactionstates", "stateid", "text"));
     transactionsModel->setRelation(transPayMethodIndex, QSqlRelation("paytypes", "typeid", "text"));
-    transactionsModel->setRelation(transClientidIndex, QSqlRelation("clients", "id", "name"));
-    transactionsModel->setRelation(transUseridIndex, QSqlRelation("users", "id", "username"));
+//    transactionsModel->setRelation(transClientidIndex, QSqlRelation("clients", "id", "name"));
+//    transactionsModel->setRelation(transUseridIndex, QSqlRelation("users", "id", "username"));
     
     transactionsModel->setHeaderData(transIdIndex, Qt::Horizontal, i18n("Id"));
     transactionsModel->setHeaderData(transClientidIndex, Qt::Horizontal, i18n("Client"));
+
     transactionsModel->setHeaderData(transTypeIndex, Qt::Horizontal, i18n("Type") );
     transactionsModel->setHeaderData(transAmountIndex, Qt::Horizontal, i18n("Amount") );
     transactionsModel->setHeaderData(transDateIndex, Qt::Horizontal, i18n("Date") );
@@ -1580,6 +1501,7 @@ void squeezeView::setupTransactionsModel()
     transactionsModel->setHeaderData(transChangeGivenIndex, Qt::Horizontal, i18n("Change Given") );
     transactionsModel->setHeaderData(transPayMethodIndex, Qt::Horizontal, i18n("Pay Method") );
     transactionsModel->setHeaderData(transStateIndex, Qt::Horizontal, i18n("State") );
+
     transactionsModel->setHeaderData(transUseridIndex, Qt::Horizontal, i18n("Vendor") );
     transactionsModel->setHeaderData(transCardNumIndex, Qt::Horizontal, i18n("Card Num") );
     transactionsModel->setHeaderData(transItemCountIndex, Qt::Horizontal, i18n("Items Count") );
@@ -1591,16 +1513,31 @@ void squeezeView::setupTransactionsModel()
     transactionsModel->setHeaderData(transTerminalNumIndex, Qt::Horizontal, i18n("Terminal #") );
     transactionsModel->setHeaderData(transProvIdIndex, Qt::Horizontal, i18n("Provider") );
 
+    ui_mainview.transactionsTable->setSelectionMode(QAbstractItemView::SingleSelection);
+    transactionsModel->setFilter(QString("date >= STR_TO_DATE('%1', '%d/%m/%Y')").
+                                            arg(QDate::currentDate().addDays(30).toString("dd/MM/yyyy")));
+//    transactionsModel->select();
+
+
+    ui_mainview.transactionsTable->setModel(transactionsModel);
+    ui_mainview.transactionsTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    ui_mainview.transactionsTable->setColumnHidden(transItemsListIndex, true);
+    ui_mainview.transactionsTable->setColumnHidden(transPaidWithIndex, true);
+    ui_mainview.transactionsTable->setColumnHidden(transChangeGivenIndex, true);
+    ui_mainview.transactionsTable->setColumnHidden(transPayMethodIndex, true);
+    ui_mainview.transactionsTable->setColumnHidden(transCardNumIndex, true);
+    ui_mainview.transactionsTable->setColumnHidden(transCardAuthNumberIndex, true);
+    ui_mainview.transactionsTable->setColumnHidden(transSOIndex, true);
+    ui_mainview.transactionsTable->setColumnHidden(transactionsModel->fieldIndex("clientid"), true);
+    ui_mainview.transactionsTable->setColumnHidden(transactionsModel->fieldIndex("userid"), true);
+
     ui_mainview.transactionsTable->setColumnHidden(transactionsModel->fieldIndex("disc"), true);
     ui_mainview.transactionsTable->setColumnHidden(transactionsModel->fieldIndex("discmoney"), true);
     ui_mainview.transactionsTable->setColumnHidden(transactionsModel->fieldIndex("cardnumber"), true);
     ui_mainview.transactionsTable->setColumnHidden(transactionsModel->fieldIndex("cardauthnumber"), true);
     ui_mainview.transactionsTable->setColumnHidden(transactionsModel->fieldIndex("itemlist"), true);
-    //ui_mainview.transactionsTable->setColumnHidden(transactionsModel->fieldIndex("disc"), true);
     
-    ui_mainview.transactionsTable->setSelectionMode(QAbstractItemView::SingleSelection);
-    
-    transactionsModel->select();
+
     
   }
   qDebug()<<"setupTransactions.. done, "<<transactionsModel->lastError();
@@ -1625,7 +1562,7 @@ void squeezeView::setTransactionsFilter()
       if (ui_mainview.editTransUsersFilter->text()=="*") transactionsModel->setFilter("");
       else {
         unsigned int uid = myDb->getUserId(ui_mainview.editTransUsersFilter->text());
-        transactionsModel->setFilter(QString("transactions.userid=%1").arg(uid));
+        transactionsModel->setFilter(QString("userid=%1").arg(uid));
       }
       transactionsModel->setSort(transIdIndex, Qt::DescendingOrder);
     }
@@ -1636,66 +1573,66 @@ void squeezeView::setTransactionsFilter()
       if (ui_mainview.editTransClientsFilter->text()=="") transactionsModel->setFilter("");
       else {
         unsigned int cid = myDb->getClientId(ui_mainview.editTransClientsFilter->text());
-        transactionsModel->setFilter(QString("transactions.clientid=%1").arg(cid));
+        transactionsModel->setFilter(QString("clientid=%1").arg(cid));
       }
       transactionsModel->setSort(transIdIndex, Qt::DescendingOrder);
     }
     else if (ui_mainview.rbTransFilterByStateFinished->isChecked()) {
       //3rd if: filter by FINISHED TRANSACTIONS
-      transactionsModel->setFilter(QString("transactions.state=2")); //tCompleted=2
+      transactionsModel->setFilter(QString("state=2")); //tCompleted=2
       transactionsModel->setSort(transIdIndex, Qt::DescendingOrder);
     }
     else if (ui_mainview.rbTransFilterByStateCancelled->isChecked()) {
       //4th if: filter by CANCELLED TRANSACTIONS
-      transactionsModel->setFilter(QString("transactions.state=3")); //tCancelled=3
+      transactionsModel->setFilter(QString("state=3")); //tCancelled=3
       transactionsModel->setSort(transIdIndex, Qt::DescendingOrder);
     }
     else if (ui_mainview.rbTransFilterByPaidCash->isChecked()) {
       //5th if: filter by PAID IN CASH
-      transactionsModel->setFilter("transactions.paymethod=1 and transactions.state=2"); // paid in cash and finished
+      transactionsModel->setFilter("paymethod=1 and state=2"); // paid in cash and finished
       transactionsModel->setSort(transIdIndex, Qt::DescendingOrder);
     }
     else if (ui_mainview.rbTransFilterByPaidCredit->isChecked()) {
       //6th if: filter by PAID WITH CARD
-      transactionsModel->setFilter("transactions.paymethod=2 and transactions.state=2"); //paid with card and finished only
+      transactionsModel->setFilter("paymethod=2 and state=2"); //paid with card and finished only
       transactionsModel->setSort(transIdIndex, Qt::AscendingOrder);
     }
     else if (ui_mainview.rbTransFilterByDate->isChecked()) {
       //7th if: filter by DATE
       QDate date = ui_mainview.transactionsDateEditor->date();
-      transactionsModel->setFilter(QString("transactions.date = '%1'").arg(date.toString("yyyy-MM-dd")));
+      transactionsModel->setFilter(QString("date = '%1'").arg(date.toString("yyyy-MM-dd")));
       qDebug()<<"Filtro:"<<transactionsModel->filter();
       transactionsModel->setSort(transIdIndex, Qt::DescendingOrder);
     }
     else if (ui_mainview.rbTransFilterByAmountLess->isChecked()) {
       //6th if: filter by AMOUNT <
       double amo = ui_mainview.editTransAmountLess->value();
-      transactionsModel->setFilter(QString("transactions.amount<%1").arg(amo));
+      transactionsModel->setFilter(QString("amount<%1").arg(amo));
       transactionsModel->setSort(transIdIndex, Qt::AscendingOrder);
     }
     else if (ui_mainview.rbTransFilterByAmountGreater->isChecked()) {
       //6th if: filter by AMOUNT >
       double amo = ui_mainview.editTransAmountGreater->value();
-      transactionsModel->setFilter(QString("transactions.amount>%1").arg(amo));
+      transactionsModel->setFilter(QString("amount>%1").arg(amo));
       transactionsModel->setSort(transIdIndex, Qt::AscendingOrder);
     }
     //NOTE: in the next 3 ifs, transactions.type=X is hardcoded... I assume the user did not change the default values.
     else if (ui_mainview.rbTransactionsFilterOnlySales->isChecked()) {
-      transactionsModel->setFilter("transactions.type=1");
+      transactionsModel->setFilter("type=1");
       transactionsModel->setSort(transIdIndex, Qt::DescendingOrder);
     }
     else if (ui_mainview.rbTransactionsFilterOnlyPurchases->isChecked()) {
-      transactionsModel->setFilter("transactions.type=2");
+      transactionsModel->setFilter("type=2");
       transactionsModel->setSort(transIdIndex, Qt::DescendingOrder);
     }
     else if (ui_mainview.rbTransactionsFilterOnlyChangesReturns->isChecked()) {
-      transactionsModel->setFilter("transactions.type=3 OR transactions.type=4");
+      transactionsModel->setFilter("type=3 OR type=4");
       transactionsModel->setSort(transIdIndex, Qt::DescendingOrder);
     }
     else {
       //else: filter by terminal number
       unsigned int tnum = ui_mainview.editTransTermNum->value();
-      transactionsModel->setFilter(QString("transactions.terminalnum=%1").arg(tnum));
+      transactionsModel->setFilter(QString("terminalnum=%1").arg(tnum));
       transactionsModel->setSort(transIdIndex, Qt::AscendingOrder);
     }
     
@@ -1797,12 +1734,12 @@ void squeezeView::setBalancesFilter()
   else {
     if (ui_mainview.rbBalancesFilterByState->isChecked()) {
       //1st if: Filter by NOT EMPTY Transactions on balances
-      balancesModel->setFilter(QString("balances.transactions!='EMPTY'"));
+      balancesModel->setFilter(QString("transactions!='EMPTY'"));
       balancesModel->setSort(balanceIdIndex, Qt::DescendingOrder);
     }
     else if (ui_mainview.rbBalancesFilterBySuspicious->isChecked()) {
       //2nd if: Filter by Suspicious balances
-      balancesModel->setFilter(QString("balances.initamount+balances.in-balances.out!=balances.cash"));
+      balancesModel->setFilter(QString("initamount+balances.in-balances.out!=balances.cash"));
       balancesModel->setSort(balanceIdIndex, Qt::DescendingOrder);
     }
     else if (ui_mainview.rbBalancesFilterByDate->isChecked()) {
@@ -1811,31 +1748,31 @@ void squeezeView::setBalancesFilter()
       QDateTime dt = QDateTime(date); //time 00:00:00
       QString dtStr = dt.toString("yyyy-MM-dd hh:mm:ss");
       QString dtStr2= date.toString("yyyy-MM-dd")+" 23:59:59";
-      balancesModel->setFilter(QString("balances.datetime_end>='%1' and balances.datetime_end<='%2'").arg(dtStr).arg(dtStr2));
+      balancesModel->setFilter(QString("datetime_end>='%1' and datetime_end<='%2'").arg(dtStr).arg(dtStr2));
       qDebug()<<"Filtro:"<<balancesModel->filter();
       balancesModel->setSort(balanceIdIndex, Qt::DescendingOrder);
     }
     else if (ui_mainview.rbBalancesFilterByCashInLess->isChecked()) {
       //4th if: filter by CASH IN <
       double amo = ui_mainview.editBalancesFilterByCasInLess->value();
-      balancesModel->setFilter(QString("balances.in<%1").arg(amo));
+      balancesModel->setFilter(QString("in<%1").arg(amo));
       balancesModel->setSort(balanceIdIndex, Qt::DescendingOrder);
     }
     else if (ui_mainview.rbBalancesFilterByCashInGrater->isChecked()) {
       //5th if: filter by CASH IN >
       double csh = ui_mainview.editBalancesFilterByCashInGrater->value();
-      balancesModel->setFilter(QString("balances.in>%1").arg(csh));
+      balancesModel->setFilter(QString("in>%1").arg(csh));
       balancesModel->setSort(balanceIdIndex, Qt::DescendingOrder);
     }
     else if (ui_mainview.rbBalancesFilterByUser->isChecked()) {
       //6th if: filter by vendor
-      balancesModel->setFilter(QString("balances.usern='%1'").arg(ui_mainview.editBalancesFilterByVendor->text()));
+      balancesModel->setFilter(QString("usern='%1'").arg(ui_mainview.editBalancesFilterByVendor->text()));
       balancesModel->setSort(balanceIdIndex, Qt::DescendingOrder);
     }
     else {
       //7th else: filter by terminal number
       unsigned int tnum = ui_mainview.editBalancesFilterByTermNum->value();
-      balancesModel->setFilter(QString("balances.terminalnum=%1").arg(tnum));
+      balancesModel->setFilter(QString("terminalnum=%1").arg(tnum));
       balancesModel->setSort(balanceIdIndex, Qt::DescendingOrder);
     }
     
@@ -1888,27 +1825,27 @@ void squeezeView::setOffersFilter()
       myFilter = myDb->getOffersFilterWithText(desc);
       delete myDb;
 
-      if (myFilter == "") myFilter = "offers.product_id=0"; //there should not be a product with code=0
+      if (myFilter == "") myFilter = "product_id=0"; //there should not be a product with code=0
       offersModel->setFilter(myFilter);
     }
     else if (ui_mainview.chOffersTodayDiscounts->isChecked()) {
         //Today Offers
         QDate date = QDate::currentDate();
         QString today = date.toString("yyyy-MM-dd");
-        offersModel->setFilter(QString(" offers.datestart <= '%1' and offers.dateend >='%1' ").arg(today));
+        offersModel->setFilter(QString(" datestart <= '%1' and dateend >='%1' ").arg(today));
         //offers.datestart between '%1' and '%2' or offers.dateend between %3 and %4
         qDebug()<<"Filtro:"<<offersModel->filter();
     }
     else if (ui_mainview.chOffersSelectDate->isChecked()) {
         //Selected Date Offers
         QDate date = ui_mainview.offersDateEditor->date();
-//         offersModel->setFilter(QString("offers.dateend='%1'").arg());
-        offersModel->setFilter(QString(" offers.datestart <= '%1' and offers.dateend >='%1' ").arg(date.toString("yyyy-MM-dd")));
+//         offersModel->setFilter(QString("dateend='%1'").arg());
+        offersModel->setFilter(QString(" datestart <= '%1' and dateend >='%1' ").arg(date.toString("yyyy-MM-dd")));
         qDebug()<<"Filtro:"<<offersModel->filter();
     }
     else { //old offers, non valid anymore...
         QDate date = QDate::currentDate();
-        offersModel->setFilter(QString("offers.dateend<'%1'").arg(date.toString("yyyy-MM-dd")));
+        offersModel->setFilter(QString("dateend<'%1'").arg(date.toString("yyyy-MM-dd")));
         qDebug()<<"Filtro: "<<offersModel->filter();
     }
     //Faltaria las ofertas aun no validas (futuras)
@@ -3709,7 +3646,13 @@ void squeezeView::log(const qulonglong &uid, const QDate &date, const QTime &tim
 void squeezeView::showLogs()
 {
   ui_mainview.stackedWidget->setCurrentIndex(pBrowseLogs);
-  if (logsModel->tableName().isEmpty()) setupLogsModel();
+  if (logsModel->tableName().isEmpty()) {
+      setupLogsModel();
+  }
+  if (!selectedLogsModel) {
+    logsModel->select();
+    selectedLogsModel = true;
+  }
   ui_mainview.headerLabel->setText(i18n("Events Log"));
   ui_mainview.headerImg->setPixmap((DesktopIcon("view-pim-tasks-pending",48)));
 }
@@ -3744,7 +3687,7 @@ void squeezeView::setupLogsModel()
     ui_mainview.logTable->setSelectionMode(QAbstractItemView::SingleSelection);
     ui_mainview.logTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
-    logsModel->select();
+//    logsModel->select();
   }
   ui_mainview.logTable->resizeColumnsToContents();
 
