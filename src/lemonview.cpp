@@ -3800,6 +3800,10 @@ void lemonView::setupHistoryTicketsModel()
   if (historyTicketsModel->tableName().isEmpty()) {
 //    if (!db.isOpen()) db.open();
     historyTicketsModel->setTable("v_transactions");
+    historyTicketsModel->setRelation(historyTicketsModel->fieldIndex("clientid"), QSqlRelation("clients", "id", "name"));
+    historyTicketsModel->setRelation(historyTicketsModel->fieldIndex("userid"), QSqlRelation("users", "id", "username"));
+    historyTicketsModel->setJoinMode(QSqlRelationalTableModel::LeftJoin);
+
     historyTicketsModel->setHeaderData(historyTicketsModel->fieldIndex("id"), Qt::Horizontal, i18n("Tr"));
     historyTicketsModel->setHeaderData(historyTicketsModel->fieldIndex("clientid"), Qt::Horizontal, i18n("Client"));
     historyTicketsModel->setHeaderData(historyTicketsModel->fieldIndex("datetime"), Qt::Horizontal, i18n("Date"));
@@ -3807,12 +3811,10 @@ void lemonView::setupHistoryTicketsModel()
     historyTicketsModel->setHeaderData(historyTicketsModel->fieldIndex("itemcount"), Qt::Horizontal, i18n("Items"));
     historyTicketsModel->setHeaderData(historyTicketsModel->fieldIndex("amount"), Qt::Horizontal, i18n("Total"));
     historyTicketsModel->setHeaderData(historyTicketsModel->fieldIndex("disc"), Qt::Horizontal, i18n("Discount"));
-    historyTicketsModel->setJoinMode(QSqlRelationalTableModel::LeftJoin);
+
     setHistoryFilter();
 
     historyTicketsModel->setSort(historyTicketsModel->fieldIndex("id"),Qt::DescendingOrder);
-    historyTicketsModel->setRelation(historyTicketsModel->fieldIndex("clientid"), QSqlRelation("clients", "id", "name"));
-    historyTicketsModel->setRelation(historyTicketsModel->fieldIndex("userid"), QSqlRelation("users", "id", "username"));
 
     ui_mainview.ticketView->setModel(historyTicketsModel);
 //    ui_mainview.ticketView->horizontalHeader()->setResizeMode(QHeaderView::Interactive);
