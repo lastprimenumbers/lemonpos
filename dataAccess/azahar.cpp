@@ -2572,7 +2572,7 @@ QHash<int, ClientInfo> Azahar::getClientsHash()
   if (db.isOpen()) {
     QSqlQuery qC(db);
     // don't select photo for hashing purposes!
-    if (qC.exec(QString("select id,code,name,surname,since,expiry,beginsusp,endsusp,parent from clients"))) {
+    if (qC.exec(QString("select id,code,name,surname,since,expiry,beginsusp,endsusp,parent from clients where expiry>=STR_TO_DATE('%1', '%d/%m/%Y');").arg(QDate::currentDate().toString("dd/MM/yyyy")))) {
       while (getClientInfoFromQuery(qC,info)) {
 //        checkParent(info);
           qDebug()<<"ClientsHash::"<<info.id<<info.code;

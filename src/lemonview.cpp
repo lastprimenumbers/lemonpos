@@ -479,7 +479,7 @@ void lemonView::settingsChanged()
   db.setPassword(Settings::editDBPassword());
   connectToDb();
   setupModel();
-  setupHistoryTicketsModel();
+//  setupHistoryTicketsModel();
   
   currentBalanceId = 0;
   insertBalance(); //this updates the currentBalanceId
@@ -523,7 +523,7 @@ void lemonView::settingsChangedOnInitConfig()
   ///This is also affected by the weird crash.
   connectToDb();
   setupModel();
-  setupHistoryTicketsModel();
+//  setupHistoryTicketsModel();
 
   currentBalanceId = 0;
   insertBalance(); //this updates the currentBalanceId
@@ -2749,11 +2749,11 @@ void lemonView::preCancelCurrentTransaction()
   if (ui_mainview.tableWidget->rowCount()==0 ) { //empty transaction
     productsHash.clear();
     specialOrders.clear();
-    setupClients(); //clear the clientInfo (sets the default client info)
+    //setupClients(); //clear the clientInfo (sets the default client info)
     clearUsedWidgets();
     buyPoints =0;
     discMoney=0;
-    refreshTotalLabel();
+    //refreshTotalLabel();
     qDebug()<<"** Cancelling an empty transaction [updating transaction]";
     updateTransaction();
     ///Next two lines were deleted to do not increment transactions number. reuse it.
@@ -3654,7 +3654,7 @@ void lemonView::connectToDb()
       modelsCreated = true;
     }
     setupModel();
-    setupHistoryTicketsModel();
+//    setupHistoryTicketsModel();
 //    setupClients();
     //pass db to login/pass dialogs
     dlgLogin->setDb(db);
@@ -3783,12 +3783,14 @@ void lemonView::updateClientInfo(bool updateCombo)
 }
 
 void lemonView::setHistoryFilter() {
+  qDebug()<<"setHistoryFilter start";
   QDate olddate;
   olddate = ui_mainview.editTicketDatePicker->date().addDays(-7);
   historyTicketsModel->setFilter(QString("date <= STR_TO_DATE('%1', '%d/%m/%Y') and date >= STR_TO_DATE('%2', '%d/%m/%Y')").
     arg(ui_mainview.editTicketDatePicker->date().toString("dd/MM/yyyy")).arg(olddate.toString("dd/MM/yyyy")));
-  historyTicketsModel->setSort(historyTicketsModel->fieldIndex("id"),Qt::DescendingOrder); //change this when implemented headers click
+//  historyTicketsModel->setSort(historyTicketsModel->fieldIndex("id"),Qt::DescendingOrder); //change this when implemented headers click
   historyTicketsModel->select();
+  qDebug()<<"setHistoryFilter end";
 }
 
 void lemonView::setupHistoryTicketsModel()
@@ -3796,11 +3798,8 @@ void lemonView::setupHistoryTicketsModel()
     qDebug()<<"Setting up history tickets...";
   //qDebug()<<"Db name:"<<db.databaseName()<<", Tables:"<<db.tables();
   if (historyTicketsModel->tableName().isEmpty()) {
-    if (!db.isOpen()) db.open();
+//    if (!db.isOpen()) db.open();
     historyTicketsModel->setTable("v_transactions");
-    historyTicketsModel->setRelation(historyTicketsModel->fieldIndex("clientid"), QSqlRelation("clients", "id", "name"));
-    historyTicketsModel->setRelation(historyTicketsModel->fieldIndex("userid"), QSqlRelation("users", "id", "username"));
-
     historyTicketsModel->setHeaderData(historyTicketsModel->fieldIndex("id"), Qt::Horizontal, i18n("Tr"));
     historyTicketsModel->setHeaderData(historyTicketsModel->fieldIndex("clientid"), Qt::Horizontal, i18n("Client"));
     historyTicketsModel->setHeaderData(historyTicketsModel->fieldIndex("datetime"), Qt::Horizontal, i18n("Date"));
@@ -3808,19 +3807,26 @@ void lemonView::setupHistoryTicketsModel()
     historyTicketsModel->setHeaderData(historyTicketsModel->fieldIndex("itemcount"), Qt::Horizontal, i18n("Items"));
     historyTicketsModel->setHeaderData(historyTicketsModel->fieldIndex("amount"), Qt::Horizontal, i18n("Total"));
     historyTicketsModel->setHeaderData(historyTicketsModel->fieldIndex("disc"), Qt::Horizontal, i18n("Discount"));
+    historyTicketsModel->setJoinMode(QSqlRelationalTableModel::LeftJoin);
+    setHistoryFilter();
+
     historyTicketsModel->setSort(historyTicketsModel->fieldIndex("id"),Qt::DescendingOrder);
+    historyTicketsModel->setRelation(historyTicketsModel->fieldIndex("clientid"), QSqlRelation("clients", "id", "name"));
+    historyTicketsModel->setRelation(historyTicketsModel->fieldIndex("userid"), QSqlRelation("users", "id", "username"));
 
     ui_mainview.ticketView->setModel(historyTicketsModel);
-    ui_mainview.ticketView->horizontalHeader()->setResizeMode(QHeaderView::Interactive);
+//    ui_mainview.ticketView->horizontalHeader()->setResizeMode(QHeaderView::Interactive);
     ui_mainview.ticketView->verticalHeader()->setResizeMode(QHeaderView::Interactive);
     ui_mainview.ticketView->setColumnHidden(historyTicketsModel->fieldIndex("date"), true);
     ui_mainview.ticketView->setSelectionMode(QAbstractItemView::SingleSelection);
     ui_mainview.ticketView->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui_mainview.ticketView->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    ui_mainview.ticketView->resizeColumnsToContents();
+//    ui_mainview.ticketView->resizeColumnsToContents();
     ui_mainview.ticketView->setCurrentIndex(historyTicketsModel->index(0, 0));
-  }
+  } else {
   setHistoryFilter();
+  }
+  qDebug()<<"setting up history tickets end";
 }
 
 
@@ -3997,8 +4003,10 @@ void lemonView::printTicketFromTransaction(qulonglong transactionNumber)
 
 void lemonView::showReprintTicket()
 {
+  qDebug()<<"showReprintTicket setting up view...";
   ui_mainview.mainPanel->setCurrentIndex(pageReprintTicket);
-  //QTimer::singleShot(500, this, SLOT(setupTicketView()));
+  QTimer::singleShot(500, this, SLOT(setupTicketView()));
+  qDebug()<<"showReprintTicket  done";
 }
 
 void lemonView::cashOut()
