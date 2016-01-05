@@ -239,11 +239,9 @@ lemonView::lemonView(QWidget *parent) //: QWidget(parent)
 //  connect(ui_mainview.editCardAuthNumber, SIGNAL(returnPressed()), SLOT(finishCurrentTransaction()) );
   connect(ui_mainview.splitter, SIGNAL(splitterMoved(int, int)), SLOT(setUpTable()));
   connect(ui_mainview.splitterGrid, SIGNAL(splitterMoved(int, int)), SLOT(setUpTable()));
-  connect(ui_mainview.comboClients, SIGNAL(currentIndexChanged(int)), SLOT(comboClientsOnChange(int)));
-  (ui_mainview.comboClients) ->setEditable(true);
   connect(ui_mainview.btnChangeSaleDate, SIGNAL(clicked()), SLOT(showChangeDate()));
 
-  ui_mainview.editTicketDatePicker->setDate(QDate::currentDate());
+  ui_mainview.editTicketDatePicker->setDate(QDate::currentDate().addDays(1));
   connect(ui_mainview.editTicketDatePicker, SIGNAL(dateChanged(const QDate &)), SLOT(setHistoryFilter()) );
   connect(ui_mainview.btnTicketDone, SIGNAL(clicked()), SLOT(btnTicketsDone()) );
   connect(ui_mainview.btnTicketPrint, SIGNAL(clicked()), SLOT(printSelTicket()) );
@@ -601,8 +599,6 @@ void lemonView::clearUsedWidgets()
   ui_mainview.labelDetailPhoto->clear();
   ui_mainview.labelDetailPoints->clear();
 
-  //enable clients combo box...
-  ui_mainview.comboClients->setEnabled(true);
 }
 
 void lemonView::askForIdToCancel()
@@ -1161,14 +1157,14 @@ RoundingInfo lemonView::roundUsStandard(const double &number)
     return result;
 }
 
-void lemonView::loadClient()
+void lemonView::loadClient(bool force)
 {
     ClientInfo info;
     Azahar *myDb = new Azahar;
     myDb->setDatabase(db);
     info = myDb->getClientInfo(ui_mainview.editClientCode->text());
     qDebug()<<"loadClient"<<info.beginsusp.toString("dd.MM.yyyy")<<info.endsusp.toString("dd.MM.yyyy")<<info.msgsusp;
-    if ( info.id == 0)  {
+    if ( info.id == 0 and not force)  {
         qDebug()<<"KNOT";
         QMessageBox::warning(this,
                              i18n("Warning: Client Code Not Found"),
@@ -1181,6 +1177,7 @@ void lemonView::loadClient()
             updateFamily(info);
             updateClientInfo();
     }
+    refreshTotalLabel();
 }
 
 void lemonView::updateFamily(ClientInfo info) {
@@ -1691,7 +1688,6 @@ void lemonView::deleteSelectedItem(double remqty)
     }//continueIt
   }//there is something to delete..
 
-  if (ui_mainview.tableWidget->rowCount() == 0) ui_mainview.comboClients->setEnabled(true);
   refreshTotalLabel();
 }
 
@@ -2745,7 +2741,6 @@ void lemonView::preCancelCurrentTransaction()
 {
   if (ui_mainview.tableWidget->rowCount()==0 ) { //empty transaction
     productsHash.clear();
-    //setupClients(); //clear the clientInfo (sets the default client info)
     clearUsedWidgets();
     buyPoints =0;
     discMoney=0;
@@ -3669,57 +3664,20 @@ void lemonView::setupClients()
     qDebug()<<"Setting up clients...";
     ClientInfo info;
     clientsHash.clear();
-    ui_mainview.comboClients->clear();
     Azahar *myDb = new Azahar;
     myDb->setDatabase(db);
-    qDebug()<<"Setting up clientsHash...";
-    clientsHash = myDb->getClientsHash();
     qDebug()<<"Setting up main client...";
-    mainClient  = myDb->getMainClient();
-
-    //Set by default the 'general' client.
-    QHashIterator<int, ClientInfo> i(clientsHash);
-    while (i.hasNext()) {
-        i.next();
-        info = i.value();
-        ui_mainview.comboClients->addItem(QString("%1, %2").arg(info.surname,info.name), info.id);
-    }
-    int idx = ui_mainview.comboClients->findText(mainClient,Qt::MatchCaseSensitive);
-    if (idx>-1) ui_mainview.comboClients->setCurrentIndex(idx);
-    clientInfo = clientsHash.value(1);
+    ui_mainview.editClientCode->setText("*");
+    clientInfo=info;
+    loadClient(true);
+    qDebug()<<"loadClient"<<info.name<<info.monthly;
+    updateFamily(info);
     updateClientInfo();
     refreshTotalLabel();
 
     delete myDb;
 }
 
-void lemonView::comboClientsOnChange(int idx)
-{
-  QString newClientName    = ui_mainview.comboClients->currentText();
-  ClientInfo newClientInfo;
-  int newClientIdx = ui_mainview.comboClients->itemData(idx).toInt();
-  qDebug()<<"Client info changed by user.";
-  qDebug()<<"comboClientsOnChange"<<newClientIdx<<newClientName;
-  if (clientsHash.contains(newClientIdx)) {
-    newClientInfo = clientsHash.value(newClientIdx);
-    if (newClientInfo.code == clientInfo.code) {
-        qDebug()<<"Avoid double client selection";
-        return;
-    }
-    clientInfo = newClientInfo;
-    qDebug()<<"OK comboClientsOnChange"<<clientInfo.id<<clientInfo.name<<clientInfo.monthly;
-    Azahar *myDb = new Azahar;
-    myDb->setDatabase(db);
-    clientInfo=myDb->getClientInfo(newClientIdx);
-    qDebug()<<"OK comboClientsOnChange getClientInfo";
-    updateClientInfo(false);
-    qDebug()<<"OK comboClientsOnChange updateClientInfo";
-    refreshTotalLabel();
-    qDebug()<<"OK comboClientsOnChange refreshTotalLabel";
-    ui_mainview.editItemCode->setFocus();
-    qDebug()<<"FINE comboClients";
-  }
-}
 
 void lemonView::updateClientInfo(bool updateCombo)
 {
@@ -3734,13 +3692,8 @@ void lemonView::updateClientInfo(bool updateCombo)
 
   QPixmap pix;
 
-  if (updateCombo) {
-  int comboIdx = ui_mainview.comboClients->findData(clientInfo.id);
-  ui_mainview.comboClients->setCurrentIndex(comboIdx);
-  clientInfo= myDb->getClientInfo(clientInfo.id);
-  }
-  ui_mainview.editClientCode->setText(clientInfo.code);
-
+  //ui_mainview.editClientCode->setText(clientInfo.code);
+  ui_mainview.labelClient->setText(clientInfo.surname + ", " + clientInfo.name );
 
   pix.loadFromData(clientInfo.photo);
   ui_mainview.lblClientPhoto->setPixmap(pix);
@@ -3762,10 +3715,13 @@ void lemonView::updateClientInfo(bool updateCombo)
                            i18n("Il cliente \"%1 %2\" era abilitato fino al %3 compreso. Il servizio è pertanto terminato. %4").arg(clientInfo.name, clientInfo.surname, clientInfo.expiry.toString("dd.MM.yyyy"),clientInfo.code),
                            QMessageBox::Abort,
                            QMessageBox::Abort);
-      ui_mainview.comboClients->setCurrentIndex(0); // Reset to general
+      setupClients(); // Reset to general
       // Erase monthly credit and replace hash entry
       clientInfo.monthly=0;
       clientsHash[clientInfo.id]=clientInfo;
+
+
+
   } else {
   crInfo = myDb->getCreditInfoForClient(clientInfo.id, false);//do not create new credit if not found.
   if (crInfo.id > 0 and crInfo.total != 0 )

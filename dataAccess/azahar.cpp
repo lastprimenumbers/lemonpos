@@ -2036,8 +2036,35 @@ Statistics Azahar::getStatistics(Statistics &stats)
         return stats;
     }
     QSqlQuery query;
+
+    /*
+        int fieldId   = query.record().indexOf("transaction_id");
+        int fieldPosition = query.record().indexOf("position");
+        int fieldProductCode   = query.record().indexOf("product_id");
+        int fieldQty     = query.record().indexOf("qty");
+        int fieldPoints  = query.record().indexOf("points");
+        int fieldCost    = query.record().indexOf("cost");
+        int fieldPrice   = query.record().indexOf("price");
+        int fieldDisc    = query.record().indexOf("disc");
+        int fieldTotal   = query.record().indexOf("total");
+        int fieldName    = query.record().indexOf("name");
+        int fieldUStr    = query.record().indexOf("unitstr");
+        int fieldPayment = query.record().indexOf("payment");
+        int fieldCPayment = query.record().indexOf("completePayment");
+        int fieldSoid = query.record().indexOf("soId");
+        int fieldIsG = query.record().indexOf("isGroup");
+        int fieldDDT = query.record().indexOf("deliveryDateTime");
+        int fieldTax = query.record().indexOf("tax");
+        // Fields for joint queries
+        int fieldDate = query.record().indexOf("date");
+        int fieldQuantity = query.record().indexOf("quantity");
+     */
+
     // Combined query
-    query.prepare(QString("SELECT *\
+    query.prepare(QString("SELECT item.transaction_id, item.position, item.product_id, item.qty, item.points,\
+                          item.cost, item.price, item.disc, item.total, item.name, item.unitstr, \
+                          item.payment, item.completePayment, item.soId, item.isGroup, item.deliveryDateTime, item.tax,\
+                          tr.date, product.quantity \
     FROM transactions AS tr, transactionitems AS item, products AS product \
      WHERE ( tr.clientid IN (%1) or  donor IN (%2) ) AND tr.type in (%3)\
     AND tr.id=item.transaction_id  \
@@ -2051,7 +2078,7 @@ Statistics Azahar::getStatistics(Statistics &stats)
     query.bindValue(":end", stats.end.toString("yyyy-MM-dd"));
     qDebug()<<stats.start.toString("yyyy-MM-dd")<<stats.end.toString("yyyy-MM-dd");
     if (!query.exec()) {
-        qDebug()<<query.lastError()<<query.lastQuery()<<query.boundValues();
+        qDebug()<<"getStatistics error executing query: "<<query.lastError()<<query.lastQuery()<<query.boundValues();
         return stats;
     }
     getStatisticsFromQuery(query,stats);
@@ -2513,7 +2540,7 @@ QString Azahar::getMainClient()
     if (!db.isOpen()) db.open();
     if (db.isOpen()) {
       QSqlQuery qC(db);
-      if (qC.exec("select * from clients where id=1;")) {
+      if (qC.exec("select * from clients where id=0;")) {
         while (qC.next()) {
           int fieldName   = qC.record().indexOf("name");
           info.name       = qC.value(fieldName).toString();

@@ -300,7 +300,7 @@ public:
 
 
     void doEmitSignalQueryDb();
-    void loadClient();
+    void loadClient(bool force = false);
 
     void settingsChanged();
     void settingsChangedOnInitConfig();
@@ -315,7 +315,6 @@ public:
 
     void listViewOnMouseMove(const QModelIndex & index);
     void listViewOnClick( const QModelIndex & index );
-    void comboClientsOnChange(int idx);
     void updateClientInfo(bool updateCombo = true);
     void updateModelView();
     void showProductsGrid(bool show);

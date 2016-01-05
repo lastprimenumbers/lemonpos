@@ -80,8 +80,8 @@
             <rect>
              <x>0</x>
              <y>10</y>
-             <width>281</width>
-             <height>271</height>
+             <width>255</width>
+             <height>212</height>
             </rect>
            </property>
            <property name="sizePolicy">
@@ -128,21 +128,12 @@
              </layout>
             </item>
             <item>
-             <widget class="QComboBox" name="comboClients">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
+             <widget class="QLabel" name="labelClient">
+              <property name="text">
+               <string>Client name</string>
               </property>
-              <property name="minimumSize">
-               <size>
-                <width>140</width>
-                <height>0</height>
-               </size>
-              </property>
-              <property name="editable">
-               <bool>true</bool>
+              <property name="buddy">
+               <cstring>editItemCode</cstring>
               </property>
              </widget>
             </item>
