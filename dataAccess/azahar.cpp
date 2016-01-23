@@ -2061,19 +2061,15 @@ Statistics Azahar::getStatistics(Statistics &stats)
      */
 
     // Combined query
-    query.prepare(QString("SELECT item.transaction_id, item.position, item.product_id, item.qty, item.points,\
-                          item.cost, item.price, item.disc, item.total, item.name, item.unitstr, \
-                          item.payment, item.completePayment, item.soId, item.isGroup, item.deliveryDateTime, item.tax,\
-                          tr.date, product.quantity \
-    FROM transactions AS tr, transactionitems AS item, products AS product \
-     WHERE ( tr.clientid IN (%1) or  donor IN (%2) ) AND tr.type in (%3)\
-    AND tr.id=item.transaction_id  \
-    AND tr.state!=3 \
-    AND product.code=item.product_id \
-    AND item.product_id!='0' \
-    AND product.code!='0' \
-    AND ( tr.date BETWEEN :start AND :end )\
-            ORDER BY tr.date;").arg(instat[0],instat[1],instat[2]));
+    query.prepare(QString("SELECT transaction_id, position, product_id, qty, points,\
+                          cost, price, disc, total, name, unitstr, \
+                          payment, completePayment, soId, isGroup, deliveryDateTime, tax,\
+                          date, quantity \
+    FROM v_statistics \
+    WHERE ( clientid IN (%1) or  donor IN (%2) ) \
+        AND type in (%3)\
+        AND ( date BETWEEN :start AND :end )\
+        ORDER BY date;").arg(instat[0],instat[1],instat[2]));
     query.bindValue(":start", stats.start.toString("yyyy-MM-dd"));
     query.bindValue(":end", stats.end.toString("yyyy-MM-dd"));
     qDebug()<<stats.start.toString("yyyy-MM-dd")<<stats.end.toString("yyyy-MM-dd");

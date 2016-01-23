@@ -1050,10 +1050,10 @@ void lemonView::refreshTotalLabel()
         totalSum   = subTotalSum + totalTax;
     else totalSum = subTotalSum;
 
-    long double paid, change;
+    long double paid;
     //bool isNum;
     paid = ui_mainview.editAmount->text().toDouble();
-    change = clientInfo.monthly- crInfo.total - totalSum;
+    change = clientInfo.monthly - crInfo.total - totalSum;
 
 
     qDebug()<<"SUBTOTAL: "<<subTotalSum<<" TOTAL: "<<totalSum<<"Fromatted SUBTOTAL:"<<KGlobal::locale()->formatMoney(subTotalSum,currency())<<" Formatted TOTAL:"<<KGlobal::locale()->formatMoney(totalSum,currency());
@@ -1353,6 +1353,19 @@ void lemonView::insertItem(QString code)
   }
 
   if ( qty <= 0) {return;}
+
+  if ( (change - (qty*info.price)) < 0 ) {
+      QApplication::beep();
+      system("beep -f 600 -r 5 -l 80");
+      msg=i18n("Disponibilità esaurita. Rimanenti %1 punti, costo %2 punti.", change, qty*info.price);
+      tipCode->showTip(msg, 6000);
+      QMessageBox::warning(this,
+                           i18n("PUNTI ESAURITI"),
+                           msg,
+                           QMessageBox::Abort,
+                           QMessageBox::Abort);
+      return;
+  }
 
   // Check for limits
   updateFamily(clientInfo);

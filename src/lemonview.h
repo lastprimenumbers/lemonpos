@@ -107,6 +107,7 @@ public:
     double discMoney;
     double totalSumWODisc;
     double subTotalSum;
+    double change;
     QDateTime transDateTime;
     double lastDiscount;
     bool completingOrder;
