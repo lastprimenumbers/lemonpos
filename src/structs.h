@@ -340,6 +340,9 @@ struct PrintTicketInfo {
   QString    thMonthlyStr;
   QString    thNextReset;
   QString    thNextResetStr;
+  QString    clientName;
+  QString    clientSurname;
+  QString    clientCode;
 };
 
 //TODO: add grouped products and special orders

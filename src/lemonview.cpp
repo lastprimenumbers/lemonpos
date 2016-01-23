@@ -2519,30 +2519,19 @@ void lemonView::printTicket(TicketInfo ticket)
 
   //tDisc = tDisc + ticket.clientDiscMoney; NOTE: moved above, aug 7 2011. text ticket did not get clientDiscMoney.
 
-  ///Real printing... [sendind data to print-methods]
+
+
   if (Settings::printTicket()) {
-    if (Settings::smallTicketDotMatrix()) {
-      QString printerFile=Settings::printerDevice();
-      if (printerFile.length() == 0) printerFile="/dev/lp0";
-      QString printerCodec=Settings::printerCodec();
-      PrintDEV::printSmallTicket(printerFile, printerCodec, itemsForPrint.join("\n"));
-    } //smalTicket
-    else if (Settings::smallTicketCUPS() ) { // some code inspired on Daniel O'Neill code.
-      qDebug()<<"Printing small receipt using CUPS";
       PrintTicketInfo ptInfo;
       //NOTE: Apr 14 2011: If we print to a dot-matrix printer using CUPS, then we need to REMOVE PIXMAPS because they will print pages of strange characters.
       //FIXME: We need an extra option in config for this (using cups for dot-matrix printers)
       QPixmap logoPixmap;
       logoPixmap.load(Settings::storeLogo());
 
-      //foreach(TicketLineInfo li, ticket.lines) {
-      //  qDebug()<<"TicketLine.geForPrint:"<<li.geForPrint;
-      //}
-
-
       Azahar *myDb = new Azahar;
       myDb->setDatabase(db);
-      QString clientName = myDb->getClientInfo(ticket.clientid).name;
+      ClientInfo cliInfo = myDb->getClientInfo(ticket.clientid, true);
+      QString clientName = cliInfo.name;
       CreditInfo crInfo  = myDb->getCreditInfoForClient(ticket.clientid, false); //gets the credit info for the client, wihtout creating a new creditInfo if not exists.
       if (crInfo.id > 0) {
           //the client has credit info.
@@ -2550,6 +2539,9 @@ void lemonView::printTicket(TicketInfo ticket)
       } else {
           ptInfo.thPoints   = i18n(" %3 [ %4 ]| You got %1 points | Your accumulated is :%2 | ", ticket.buyPoints, ticket.clientPoints, clientName, ticket.clientid);
       }
+
+
+      ///Real printing... [sendind data to print-methods]
 
       ptInfo.ticketInfo = ticket;
       ptInfo.storeLogo  = logoPixmap;
@@ -2600,9 +2592,17 @@ void lemonView::printTicket(TicketInfo ticket)
       ptInfo.thTax = hTax;
       ptInfo.thSubtotal = hSubtotal;
       ptInfo.thTendered = hTendered;
-
-
       ptInfo.resTotalAmountStr  = i18n("Purchase Total Amount");
+
+
+    if (Settings::smallTicketDotMatrix()) {
+      QString printerFile=Settings::printerDevice();
+      if (printerFile.length() == 0) printerFile="/dev/lp0";
+      QString printerCodec=Settings::printerCodec();
+      PrintDEV::printSmallTicket(printerFile, printerCodec, itemsForPrint.join("\n"));
+    } //smalTicket
+    else if (Settings::smallTicketCUPS() ) { // some code inspired on Daniel O'Neill code.
+      qDebug()<<"Printing small receipt using CUPS";
 
       QPrinter printer;
       printer.setFullPage( true );
@@ -2640,19 +2640,10 @@ void lemonView::printTicket(TicketInfo ticket)
 
           PrintCUPS::printSmallTicket(ptInfo, printer);
       }
-      delete myDb;
     }
     else {
       qDebug()<<"Printing big receipt using CUPS";
 
-      PrintTicketInfo ptInfo;
-      QPixmap logoPixmap;
-      logoPixmap.load(Settings::storeLogo());
-
-      Azahar *myDb = new Azahar;
-      myDb->setDatabase(db);
-      QString clientName = myDb->getClientInfo(ticket.clientid).name;
-      
       ptInfo.ticketInfo = ticket;
       ptInfo.storeLogo  = logoPixmap;
       ptInfo.storeName  = Settings::editStoreName();
@@ -2670,7 +2661,7 @@ void lemonView::printTicket(TicketInfo ticket)
       ptInfo.thDiscount = hDisc;
       ptInfo.thTotal    = hTotal;
       ptInfo.thTotals   = KGlobal::locale()->formatMoney(ptInfo.ticketInfo.total, currency(), 2);
-      ptInfo.thPoints   = i18n(" %3 [ %4 ]| You got %1 points | Your accumulated is :%2 | ", ticket.buyPoints, ticket.clientPoints, clientName, ticket.clientid);
+      ptInfo.thPoints   = i18n(" %3 %4 [ %5 ]| You got %1 points | Your accumulated is :%2 | ", ticket.buyPoints, ticket.clientPoints, cliInfo.name, cliInfo.surname, ticket.clientid);
       ptInfo.thArticles = i18np("%1 article.", "%1 articles.", ptInfo.ticketInfo.itemcount);
       ptInfo.thPaid     = ""; //i18n("Paid with %1, your change is %2", KGlobal::locale()->formatMoney(ptInfo.ticketInfo.paidwith, currency(), 2),KGlobal::locale()->formatMoney(ptInfo.ticketInfo.change, currency(), 2) );
       ptInfo.tDisc      = KGlobal::locale()->formatMoney(-tDisc, currency(), 2);
@@ -2680,6 +2671,9 @@ void lemonView::printTicket(TicketInfo ticket)
       ptInfo.clientDiscMoney = ticket.clientDiscMoney;
       ptInfo.clientDiscountStr = hClientDisc;
       ptInfo.randomMsg = myDb->getRandomMessage(rmExcluded, rmSeason);
+      ptInfo.clientName = cliInfo.name;
+      ptInfo.clientSurname = cliInfo.surname;
+      ptInfo.clientCode = cliInfo.code;
 
       QPrinter printer;
       printer.setFullPage( true );
@@ -2688,8 +2682,9 @@ void lemonView::printTicket(TicketInfo ticket)
       if ( printDialog.exec() ) {
         PrintCUPS::printBigTicket(ptInfo, printer);
       }
-      delete myDb;
+
     }//bigTicket
+    delete myDb;
   } //printTicket
 
   freezeWidgets();

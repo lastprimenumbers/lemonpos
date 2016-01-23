@@ -2512,10 +2512,11 @@ ClientInfo Azahar::_getClientInfoFromId(qulonglong clientId, bool mini)
         QSqlQuery qC(db);
         QString q;
         if (mini==true) {
-            q=QString("select %1 from clients WHERE id='%2';").arg(clientLightSelect, clientId);
+            q=QString("select %1 from clients WHERE `id`='%2';").arg(clientLightSelect).arg(clientId);
         } else {
-            q=QString("select * from clients WHERE id='%1';").arg(clientId);
+            q=QString("select * from clients WHERE `id`='%1';").arg(clientId);
         }
+        qDebug()<<"_getClientInfoFromId"<<clientId<<q;
         if (qC.exec(q)) {
             getClientInfoFromQuery(qC,info);
             info.tags=getClientTags(info.code);
@@ -2631,7 +2632,7 @@ bool Azahar::resetCredits (ClientInfo &info){
     if (!db.isOpen()) db.open();
     if (db.isOpen()) {
         CreditInfo old=queryCreditInfoForClient(info.id);
-
+        qDebug()<<"RESETTING CREDITS"<<info.code<<info.lastCreditReset<<fromLastReset;
         if (old.clientId>0) {
             // Add 30 days * integer number of months from since date
             info.lastCreditReset=info.lastCreditReset.addDays(30*(int(fromLastReset / 30)));
@@ -4469,6 +4470,7 @@ CreditInfo Azahar::getCreditInfoForClient(const qulonglong &clientId, const bool
 {
     qulonglong cid=0;
     ClientInfo info= _getClientInfoFromId(clientId, true);
+    qDebug()<<"getCreditInfoForClient"<<clientId<<info.id<<info.code;
     QDate lastCreditReset;
     // Get parent info
     ClientInfo pInfo=checkParent(info);
