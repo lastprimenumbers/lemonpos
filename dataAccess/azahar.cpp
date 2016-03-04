@@ -4432,7 +4432,7 @@ CreditInfo Azahar::queryCreditInfoForClient(const qulonglong &cid, const bool &c
     if (!db.isOpen()) db.open();
     if (db.isOpen()) {
         QSqlQuery myQuery(db);
-        myQuery.prepare("SELECT TOP 1 * FROM credits WHERE customerid=:id; ORDER BY Id DESC");
+        myQuery.prepare("SELECT TOP 1 * FROM credits WHERE customerid=:id ORDER BY Id DESC;");
         myQuery.bindValue(":id", cid);
         if (myQuery.exec() ) {
             while (myQuery.next()) {

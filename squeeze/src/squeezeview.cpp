@@ -391,32 +391,45 @@ void squeezeView::setupSignalConnections()
   connect(ui_mainview.rbClientsFilterId, SIGNAL(clicked()), SLOT(updateClientFilter()));
   connect(ui_mainview.rbClientsFilterCode, SIGNAL(clicked()), SLOT(updateClientFilter()));
   connect(ui_mainview.checkBoxParent, SIGNAL(clicked()), SLOT(updateClientFilter()));
+  connect(ui_mainview.checkBoxActiveUsers, SIGNAL(clicked()), SLOT(updateClientFilter()));
+  connect(ui_mainview.checkBoxSuspended, SIGNAL(clicked()), SLOT(updateClientFilter()));
 }
 
 void squeezeView::updateClientFilter() {
     //filters
+        QString f="";
+        QString now= QDate::currentDate().toString("yyyy-MM-dd");
+
          QRegExp regexp3 = QRegExp(ui_mainview.editClientsFilter->text());
          if (!regexp3.isValid()) ui_mainview.editClientsFilter->setText("");
          if (ui_mainview.editClientsFilter->text()=="*" || ui_mainview.editClientsFilter->text()==""){
-             clientsTableModel->setFilter("");
+             f="";
          }
          else if(ui_mainview.rbClientsFilterSurname->isChecked()){
-             clientsTableModel->setFilter(QString("surname REGEXP '%1'").arg(ui_mainview.editClientsFilter->text()));}
+             f = QString("surname REGEXP '%1'").arg(ui_mainview.editClientsFilter->text());}
          else if(ui_mainview.rbClientsFilterName->isChecked()){
-             clientsTableModel->setFilter(QString("name REGEXP '%1'").arg(ui_mainview.editClientsFilter->text()));}
+             f = QString("name REGEXP '%1'").arg(ui_mainview.editClientsFilter->text());}
          else if(ui_mainview.rbClientsFilterCode->isChecked()){
-             clientsTableModel->setFilter(QString("code REGEXP '%1'").arg(ui_mainview.editClientsFilter->text()));}
+             f = QString("code REGEXP '%1'").arg(ui_mainview.editClientsFilter->text());}
          else if(ui_mainview.rbClientsFilterId->isChecked()){
-             clientsTableModel->setFilter(QString("id REGEXP '%1'").arg(ui_mainview.editClientsFilter->text()));}
+             f = QString("id REGEXP '%1'").arg(ui_mainview.editClientsFilter->text());}
 
-         if(ui_mainview.checkBoxParent->isChecked()){
-             QString f=clientsTableModel->filter();
-             if(f=="") {f.append("parent=''");}
-             else {f.append(" AND parent=''");}
-             clientsTableModel->setFilter(f);
+         if(ui_mainview.checkBoxActiveUsers->isChecked()){
+             if(f=="") {f.append(QString("expiry>'%1'").arg(now));}
+             else {f.append(QString(" AND expiry>'%1'").arg(now));}
+         }
+         if (ui_mainview.checkBoxSuspended->isChecked()){
+             if(f=="") {f.append(QString("endsusp>'%1'").arg(now));}
+             else {f.append(QString(" AND endsusp>'%1'").arg(now));}
          }
 
-         clientsTableModel->select();
+         if(ui_mainview.checkBoxParent->isChecked()){
+             if(f=="") {f.append("parent=''");}
+             else {f.append(" AND parent=''");}
+         }
+        qDebug()<<"setFilter  "<<f;
+        clientsTableModel->setFilter(f);
+        clientsTableModel->select();
 }
 
 void squeezeView::doEmitSignalSalir()
@@ -1358,16 +1371,18 @@ void squeezeView::setupClientsModel()
       clientsTableModel->setHeaderData(1, Qt::Horizontal, "Codice Fiscale");
       clientsTableModel->setHeaderData(2, Qt::Horizontal, "Nome");
       clientsTableModel->setHeaderData(3, Qt::Horizontal, "Cognome");
+      clientsTableModel->setHeaderData(4, Qt::Horizontal, "Scadenza");
+      clientsTableModel->setHeaderData(5, Qt::Horizontal, "Fine Sospensione");
+      clientsTableModel->setHeaderData(6, Qt::Horizontal, "Capofamiglia");
       clientsTableModel->setFilter(QString("parent=''"));
 
       ui_mainview.clientsTableView->setItemDelegate(new QSqlRelationalDelegate(ui_mainview.clientsTableView));
       ui_mainview.clientsTableView->setSelectionBehavior(QAbstractItemView::SelectRows);
       ui_mainview.clientsTableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
-      qDebug()<<"Setting sorting enabled clientsTableModel";
-            ui_mainview.clientsTableView->setSortingEnabled(true);
+      ui_mainview.clientsTableView->setSortingEnabled(true);
       ui_mainview.clientsTableView->setModel(clientsTableModel);
-      ui_mainview.clientsTableView->hideColumn(4);
-
+      ui_mainview.clientsTableView->hideColumn(5);
+      ui_mainview.clientsTableView->hideColumn(6);
       qDebug()<<"Selecting clientsTableModel";
       clientsTableModel->select();
 
