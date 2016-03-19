@@ -334,7 +334,7 @@ lemonView::lemonView(QWidget *parent) //: QWidget(parent)
  //    case 11:
  //    }
 
-  ui_mainview.editItemCode->setFocus();
+  ui_mainview.editClientCode->setFocus();
 
 }
 
@@ -1178,6 +1178,7 @@ void lemonView::loadClient(bool force)
             updateClientInfo();
     }
     refreshTotalLabel();
+    ui_mainview.editItemCode->setFocus();
 }
 
 void lemonView::updateFamily(ClientInfo info) {
