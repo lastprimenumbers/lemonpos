@@ -3961,6 +3961,7 @@ void lemonView::showReprintTicket()
 {
   qDebug()<<"showReprintTicket setting up view...";
   ui_mainview.mainPanel->setCurrentIndex(pageReprintTicket);
+  historyTicketsModel->select();
   QTimer::singleShot(50, this, SLOT(setupTicketView()));
   qDebug()<<"showReprintTicket  done";
 }
