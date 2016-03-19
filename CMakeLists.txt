@@ -19,7 +19,7 @@ add_subdirectory( database_resources )
 # https://nowardev.wordpress.com/2009/12/27/how-to-create-a-debian-package-for-script-and-for-project-that-use-cmake/
 SET(MAJOR_VERSION 1)
 SET(MINOR_VERSION 0)
-SET(PATCH_VERSION 0)
+SET(PATCH_VERSION 1)
  
 IF(EXISTS "${CMAKE_ROOT}/Modules/CPack.cmake")
 INCLUDE(InstallRequiredSystemLibraries)
