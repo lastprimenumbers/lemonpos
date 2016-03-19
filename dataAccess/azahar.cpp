@@ -1898,6 +1898,7 @@ ClientInfo Azahar::checkParent(ClientInfo &info)
             return parentInfo;
         }
     }
+    qDebug()<<"checkParent"<<info.code<<info.parentClient.count()<<parentInfo.id;
     return parentInfo;
 }
 
@@ -2037,29 +2038,6 @@ Statistics Azahar::getStatistics(Statistics &stats)
     }
     QSqlQuery query;
 
-    /*
-        int fieldId   = query.record().indexOf("transaction_id");
-        int fieldPosition = query.record().indexOf("position");
-        int fieldProductCode   = query.record().indexOf("product_id");
-        int fieldQty     = query.record().indexOf("qty");
-        int fieldPoints  = query.record().indexOf("points");
-        int fieldCost    = query.record().indexOf("cost");
-        int fieldPrice   = query.record().indexOf("price");
-        int fieldDisc    = query.record().indexOf("disc");
-        int fieldTotal   = query.record().indexOf("total");
-        int fieldName    = query.record().indexOf("name");
-        int fieldUStr    = query.record().indexOf("unitstr");
-        int fieldPayment = query.record().indexOf("payment");
-        int fieldCPayment = query.record().indexOf("completePayment");
-        int fieldSoid = query.record().indexOf("soId");
-        int fieldIsG = query.record().indexOf("isGroup");
-        int fieldDDT = query.record().indexOf("deliveryDateTime");
-        int fieldTax = query.record().indexOf("tax");
-        // Fields for joint queries
-        int fieldDate = query.record().indexOf("date");
-        int fieldQuantity = query.record().indexOf("quantity");
-     */
-
     // Combined query
     query.prepare(QString("SELECT transaction_id, position, product_id, qty, points,\
                           cost, price, disc, total, name, unitstr, \
@@ -2100,32 +2078,6 @@ bool Azahar::getFamilyStatistics(Family &family, QDate start, QDate end)
     family.stats.end=end;
     family.stats=getStatistics(family.stats);
     return true;
-    // Combined query
-//    QSqlQuery query;
-//    QString instat=getFamilyInStatement(family);
-//    if (instat=="\"") {
-//        return false;
-//    }
-//    family.stats.start=start;
-//    family.stats.end=end;
-//    query.prepare(QString("SELECT *\
-//    FROM transactions AS tr, transactionitems AS item, products AS product \
-//     WHERE tr.clientid IN (%1) \
-//    AND tr.id=item.transaction_id \
-//    AND product.code=item.product_id \
-//    AND item.product_id!='0' \
-//    AND product.code!='0' \
-//    AND ( tr.date BETWEEN :start AND :end )\
-//    ORDER BY tr.date;").arg(instat));
-//    query.bindValue(":start", start.toString("yyyy-MM-dd"));
-//    query.bindValue(":end", end.toString("yyyy-MM-dd"));
-//    if (!query.exec()) {
-//        qDebug()<<query.lastError()<<query.lastQuery()<<query.boundValues();
-//        return false;
-//    }
-
-//    return getStatisticsFromQuery(query,family.stats);
-
 }
 
 
@@ -2137,27 +2089,6 @@ bool Azahar::getDonorStatistics(DonorInfo &info, QDate start, QDate end)
     info.stats.end=end;
     info.stats=getStatistics(info.stats);
     return true;
-//    // Combined query
-//    QSqlQuery query;
-//    query.prepare(QString("SELECT *\
-//    FROM transactions AS tr, transactionitems AS item, products AS product \
-//     WHERE tr.donor=%1 AND tr.type in (2,7)\
-//    AND tr.id=item.transaction_id \
-//    AND product.code=item.product_id \
-//    AND item.product_id!='0' \
-//    AND product.code!='0' \
-//    AND ( tr.date BETWEEN :start AND :end )\
-//    ORDER BY tr.date;").arg(info.code));
-//    query.bindValue(":start", start.toString("yyyy-MM-dd"));
-//    query.bindValue(":end", end.toString("yyyy-MM-dd"));
-//    if (!query.exec()) {
-//        qDebug()<<query.lastError()<<query.lastQuery()<<query.boundValues();
-//        return false;
-//    }
-//    // Zero-out any previous stat
-//    info.stats.start=start;
-//    info.stats.end=end;
-//    return getStatisticsFromQuery(query,info.stats);
 }
 
 void Azahar::migrateDonations()
@@ -2617,6 +2548,7 @@ QHash<int, ClientInfo> Azahar::getClientsHash()
 
 
 bool Azahar::resetCredits (ClientInfo &info){
+    // Check if to reset credits
     // Skip non-parent clients:
     if (info.parentClient.count()>0) { return false; }
     QDate now=QDate::currentDate();
@@ -2626,16 +2558,17 @@ bool Azahar::resetCredits (ClientInfo &info){
         return false;
     }
     if (now.daysTo(info.expiry)<=0) {
-        qDebug()<<"Expired or expiring today. Not resetting.";
+        qDebug()<<"Expired or expiring today. Not resetting."<<now.daysTo(info.expiry)<<info.expiry;
         return false;
     }
     if (!db.isOpen()) db.open();
     if (db.isOpen()) {
+        // Add 30 days * integer number of months from since date
+        info.lastCreditReset=info.lastCreditReset.addDays(30*(int(fromLastReset / 30)));
+        // Update credit info
         CreditInfo old=queryCreditInfoForClient(info.id);
-        qDebug()<<"RESETTING CREDITS"<<info.code<<info.lastCreditReset<<fromLastReset;
+        qDebug()<<"RESETTING CREDITS"<<info.code<<info.lastCreditReset<<fromLastReset<<old.total;
         if (old.clientId>0) {
-            // Add 30 days * integer number of months from since date
-            info.lastCreditReset=info.lastCreditReset.addDays(30*(int(fromLastReset / 30)));
             qDebug()<<"resetting credit"<<info.id<<fromLastReset<<info.code<<info.surname<<old.total<<info.lastCreditReset;
             QSqlQuery query(db);
             query.prepare("update credits set total=0 where `customerid`=:id;");
@@ -2650,7 +2583,7 @@ bool Azahar::resetCredits (ClientInfo &info){
         q.bindValue(":id",info.id);
         q.exec();
         q.next();
-        qDebug()<<"Update last credit reset run"<<q.lastError()<<q.lastQuery();
+        qDebug()<<"Update last credit reset run"<<q.lastError()<<q.lastQuery()<<info.lastCreditReset<<info.id;
         CreditHistoryInfo chi;
         chi.amount=0;
         chi.date=now;
@@ -4432,7 +4365,7 @@ CreditInfo Azahar::queryCreditInfoForClient(const qulonglong &cid, const bool &c
     if (!db.isOpen()) db.open();
     if (db.isOpen()) {
         QSqlQuery myQuery(db);
-        myQuery.prepare("SELECT TOP 1 * FROM credits WHERE customerid=:id ORDER BY Id DESC;");
+        myQuery.prepare("SELECT * FROM credits WHERE customerid=:id ORDER BY Id DESC limit 1;");
         myQuery.bindValue(":id", cid);
         if (myQuery.exec() ) {
             while (myQuery.next()) {
@@ -4461,6 +4394,7 @@ CreditInfo Azahar::queryCreditInfoForClient(const qulonglong &cid, const bool &c
         }
         else {
             setError(myQuery.lastError().text());
+            qDebug()<<__FUNCTION__<<myQuery.lastError().text();
         }
     }
     return result;
@@ -4505,6 +4439,7 @@ qulonglong  Azahar::insertCredit(const CreditInfo &info)
         qDebug()<< __FUNCTION__ << query.lastError().text();
     }
     else result = query.lastInsertId().toULongLong();
+    qDebug()<<"insertCredit"<<info.clientId<<info.total<<info.id<<result;
     return result;
 }
 
@@ -4523,6 +4458,7 @@ bool Azahar::updateCredit(const CreditInfo &info)
         qDebug()<< __FUNCTION__ << query.lastError().text();
     }
     else result = query.lastInsertId().toULongLong();
+    qDebug()<<"updateCredit"<<info.clientId<<info.total<<info.id<<result;
     return result;
 }
 

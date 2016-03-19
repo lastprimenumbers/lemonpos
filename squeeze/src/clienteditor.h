@@ -45,6 +45,7 @@ class ClientEditor : public KDialog
     bool hasChild;
     bool inserting;
     ClientInfo parentClientInfo;
+    ClientInfo clientInfo;
     Family family;
     void setInserting(bool status) { inserting=status; };
     void setCode(QString code) { ui->editClientCode->setText(code); };

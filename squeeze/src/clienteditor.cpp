@@ -348,7 +348,6 @@ bool ClientEditor::validateParent(QString code)
     myDb->setDatabase(db);
     ClientInfo info=myDb->getClientInfo(code);
     delete myDb;
-    parentClientInfo=info;
     qDebug()<<"validateParent: code , "<<code<<" id:"<<info.id;
     if (info.id == 0) {
         qDebug()<<"Not found!";
@@ -361,6 +360,7 @@ bool ClientEditor::validateParent(QString code)
         }
     }
     else {
+        parentClientInfo=info;
         r=true;
         col.setNamedColor("green");
         photo.loadFromData(info.photo);
