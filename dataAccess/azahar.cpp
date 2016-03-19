@@ -2050,7 +2050,7 @@ Statistics Azahar::getStatistics(Statistics &stats)
         ORDER BY date;").arg(instat[0],instat[1],instat[2]));
     query.bindValue(":start", stats.start.toString("yyyy-MM-dd"));
     query.bindValue(":end", stats.end.toString("yyyy-MM-dd"));
-    qDebug()<<stats.start.toString("yyyy-MM-dd")<<stats.end.toString("yyyy-MM-dd");
+    qDebug()<<"getStatistics"<<stats.start.toString("yyyy-MM-dd")<<stats.end.toString("yyyy-MM-dd");
     if (!query.exec()) {
         qDebug()<<"getStatistics error executing query: "<<query.lastError()<<query.lastQuery()<<query.boundValues();
         return stats;

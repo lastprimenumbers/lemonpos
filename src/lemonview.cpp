@@ -2311,7 +2311,7 @@ void lemonView::finishCurrentTransaction()
     
     transactionInProgress = false;
     updateModelView();
-    ui_mainview.editItemCode->setFocus();
+    ui_mainview.editClientCode->setFocus();
 
     clearUsedWidgets();
     refreshTotalLabel();
@@ -2930,7 +2930,7 @@ void lemonView::startOperation(const QString &adminUser)
     updateBalance(false);
   }
   
-  ui_mainview.editItemCode->setFocus();
+  ui_mainview.editClientCode->setFocus();
 }
 
 //this method is for lemon.cpp's action connect for button, since button's trigger(bool) will cause to ask = trigger's var.
@@ -4114,7 +4114,7 @@ void lemonView::unlockScreen()
       //unlock ui
       emit signalEnableUI();
       emit signalEnableLogin();
-      ui_mainview.editItemCode->setFocus();
+      ui_mainview.editClientCode->setFocus();
     } else {
       lockDialog->cleanPassword();
       lockDialog->shake();
