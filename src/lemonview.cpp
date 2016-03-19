@@ -2253,7 +2253,6 @@ void lemonView::finishCurrentTransaction()
     clientsHash.remove(clientInfo.id);
     clientsHash.insert(clientInfo.id, clientInfo);
     updateClientInfo();
-    refreshTotalLabel();
 
     QString realSubtotal;
     if (Settings::addTax())
@@ -2313,15 +2312,8 @@ void lemonView::finishCurrentTransaction()
     updateModelView();
     ui_mainview.editItemCode->setFocus();
 
-    //Check level of cash in drawer
-    if (drawer->getAvailableInCash() < Settings::cashMinLevel() && Settings::displayWarningOnLowCash()) {
-      //KPassivePopup::message( i18n("Warning:"),i18n("Cash level in drawer is low."),DesktopIcon("dialog-warning", 48), this);
-      KNotification *notify = new KNotification("information", this);
-      notify->setText(i18n("Cash level in drawer is low."));
-      QPixmap pixmap = DesktopIcon("dialog-warning",32); //NOTE: This does not works
-      notify->setPixmap(pixmap);
-      notify->sendEvent();
-    }
+    clearUsedWidgets();
+    refreshTotalLabel();
     
     delete myDb;
    }
